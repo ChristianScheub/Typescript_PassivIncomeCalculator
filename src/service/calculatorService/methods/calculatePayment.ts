@@ -76,3 +76,47 @@ export const calculateDividendSchedule = (schedule: DividendSchedule, quantity: 
 
   return { monthlyAmount, annualAmount };
 };
+
+// Neue Funktion: Berechnet die Dividende für einen spezifischen Monat
+export const calculateDividendForMonth = (schedule: DividendSchedule, quantity: number, monthNumber: number): number => {
+  if (!schedule || !schedule.amount || schedule.frequency === 'none' || !quantity) {
+    return 0;
+  }
+
+  const totalDividendPerPayment = schedule.amount * quantity;
+
+  switch (schedule.frequency) {
+    case 'monthly':
+      return totalDividendPerPayment;
+      
+    case 'quarterly':
+      // Prüfe ob dieser Monat ein Zahlungsmonat ist
+      if (schedule.paymentMonths && schedule.paymentMonths.includes(monthNumber)) {
+        return totalDividendPerPayment;
+      }
+      // Standard quartalsweise: März, Juni, September, Dezember
+      const defaultQuarterlyMonths = [3, 6, 9, 12];
+      return defaultQuarterlyMonths.includes(monthNumber) ? totalDividendPerPayment : 0;
+      
+    case 'annually':
+      // Prüfe ob dieser Monat der Zahlungsmonat ist
+      if (schedule.paymentMonths && schedule.paymentMonths.includes(monthNumber)) {
+        return totalDividendPerPayment;
+      }
+      // Standard jährlich: Dezember
+      return monthNumber === 12 ? totalDividendPerPayment : 0;
+      
+    case 'custom':
+      if (schedule.months && schedule.months.includes(monthNumber)) {
+        // Bei custom können unterschiedliche Beträge pro Monat definiert sein
+        if (schedule.customAmounts && schedule.customAmounts[monthNumber]) {
+          return schedule.customAmounts[monthNumber] * quantity;
+        }
+        return totalDividendPerPayment;
+      }
+      return 0;
+      
+    default:
+      return 0;
+  }
+};

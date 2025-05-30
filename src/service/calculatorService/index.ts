@@ -1,12 +1,12 @@
 import { ICalculatorService } from './interfaces/ICalculatorService';
-import { calculateAssetMonthlyIncome } from './methods/calculateAssetIncome';
+import { calculateAssetMonthlyIncome, calculateAssetIncomeForMonth, calculateTotalAssetIncomeForMonth } from './methods/calculateAssetIncome';
 import { 
   calculateMonthlyIncome, 
   calculateTotalMonthlyIncome, 
   calculatePassiveIncome, 
   calculateAnnualIncome 
 } from './methods/calculateIncome';
-import { calculatePaymentSchedule, calculateDividendSchedule } from './methods/calculatePayment';
+import { calculatePaymentSchedule, calculateDividendSchedule, calculateDividendForMonth } from './methods/calculatePayment';
 import { 
   calculateTotalDebt,
   calculateTotalMonthlyLiabilityPayments 
@@ -26,12 +26,15 @@ const calculatorService: ICalculatorService = {
   // Payment Schedule calculations
   calculatePaymentSchedule,
   calculateDividendSchedule,
+  calculateDividendForMonth,
 
   // Asset calculations
   calculateAssetMonthlyIncome,
+  calculateAssetIncomeForMonth,
   calculateTotalAssetValue: (assets) => assets.reduce((sum, asset) => sum + asset.value, 0),
   calculateTotalMonthlyAssetIncome: (assets) => 
     assets.reduce((sum, asset) => sum + calculateAssetMonthlyIncome(asset), 0),
+  calculateTotalAssetIncomeForMonth,
   calculateAnnualAssetIncome: (monthlyIncome) => monthlyIncome * 12,
 
   // Income calculations

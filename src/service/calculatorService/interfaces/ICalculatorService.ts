@@ -15,11 +15,14 @@ export interface ICalculatorService {
   // Payment Schedule calculations
   calculatePaymentSchedule: (schedule: PaymentSchedule) => { monthlyAmount: number; annualAmount: number };
   calculateDividendSchedule: (schedule: DividendSchedule, quantity: number) => { monthlyAmount: number; annualAmount: number };
+  calculateDividendForMonth: (schedule: DividendSchedule, quantity: number, monthNumber: number) => number;
   
   // Asset calculations
   calculateAssetMonthlyIncome: (asset: Asset) => number;
+  calculateAssetIncomeForMonth: (asset: Asset, monthNumber: number) => number;
   calculateTotalAssetValue: (assets: Asset[]) => number;
   calculateTotalMonthlyAssetIncome: (assets: Asset[]) => number;
+  calculateTotalAssetIncomeForMonth: (assets: Asset[], monthNumber: number) => number;
   calculateAnnualAssetIncome: (monthlyIncome: number) => number;
 
   // Income calculations

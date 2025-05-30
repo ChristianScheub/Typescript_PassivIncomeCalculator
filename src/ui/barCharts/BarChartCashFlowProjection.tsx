@@ -13,37 +13,65 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   const { t } = useTranslation();
 
   if (active && payload && payload.length > 0) {
-    // Gruppiere die Daten nach stackId
-    const incomeEntries = payload.filter((p: any) => p.stackId === "income");
-    const expenseEntries = payload.filter((p: any) => p.stackId === "expenses");
-
+    // Prüfe ob Asset-Einkommen deutlich höher als normal ist (Dividendenzahlungen)
+    const assetIncomeEntry = payload.find((entry: any) => entry.dataKey === 'assetIncome');
+    const isDividendMonth = assetIncomeEntry && assetIncomeEntry.value > 0;
+    
     return (
       <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-        <p className="text-gray-600 dark:text-gray-400 mb-2">
+        <p className="text-gray-600 dark:text-gray-400 font-medium mb-2">
           {new Date(label).toLocaleString('default', { month: 'long', year: 'numeric' })}
+          {isDividendMonth && assetIncomeEntry.value > 0 && (
+            <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-1 rounded">
+              📈 {t('forecast.dividendPayment')}
+            </span>
+          )}
         </p>
-        {/* Zeige Einnahmen */}
-        {incomeEntries.map((entry: any) => (
-          <div key={entry.dataKey} className="flex justify-between items-center mb-1">
-            <span className="text-sm mr-4" style={{ color: entry.fill }}>
-              {entry.dataKey === "activeIncome" ? t('dashboard.income') : t('dashboard.assetIncome')}:
-            </span>
-            <span className="text-sm font-medium">
-              {formatService.formatCurrency(entry.value)}
-            </span>
-          </div>
-        ))}
-        {/* Zeige Ausgaben */}
-        {expenseEntries.map((entry: any) => (
-          <div key={entry.dataKey} className="flex justify-between items-center mb-1">
-            <span className="text-sm mr-4" style={{ color: entry.fill }}>
-              {entry.dataKey === "expenseTotal" ? t('forecast.expenses') : t('dashboard.liabilities')}:
-            </span>
-            <span className="text-sm font-medium">
-              {formatService.formatCurrency(entry.value)}
-            </span>
-          </div>
-        ))}
+        
+        {/* Zeige alle Einträge */}
+        {payload.map((entry: any) => {
+          if (entry.value === 0) return null;
+          
+          let entryLabel = '';
+          let isIncome = false;
+          
+          switch (entry.dataKey) {
+            case 'activeIncome':
+              entryLabel = t('dashboard.income');
+              isIncome = true;
+              break;
+            case 'assetIncome':
+              entryLabel = t('dashboard.assetIncome');
+              isIncome = true;
+              break;
+            case 'expenseTotal':
+              entryLabel = t('forecast.expenses');
+              isIncome = false;
+              break;
+            case 'liabilityPayments':
+              entryLabel = t('dashboard.liabilities');
+              isIncome = false;
+              break;
+            default:
+              return null;
+          }
+          
+          return (
+            <div key={entry.dataKey} className="flex justify-between items-center mb-1">
+              <span className="text-sm mr-4" style={{ color: entry.color }}>
+                {entryLabel}:
+                {entry.dataKey === 'assetIncome' && entry.value > 0 && (
+                  <span className="ml-1 text-xs opacity-70">
+                    🏦
+                  </span>
+                )}
+              </span>
+              <span className="text-sm font-medium" style={{ color: entry.color }}>
+                {isIncome ? '+' : ''}{formatService.formatCurrency(isIncome ? entry.value : -Math.abs(entry.value))}
+              </span>
+            </div>
+          );
+        })}
       </div>
     );
   }

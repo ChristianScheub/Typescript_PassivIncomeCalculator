@@ -4,6 +4,7 @@ import { calculateTotalMonthlyIncome } from './calculateIncome';
 import { calculateTotalMonthlyExpenses } from './calculateExpenses';
 import { calculateTotalMonthlyLiabilityPayments } from './calculateLiabilities';
 import { calculatePassiveIncome } from './calculateIncome';
+import { calculateTotalAssetIncomeForMonth } from './calculateAssetIncome';
 
 export const calculateProjections = (
   income: Income[],
@@ -23,8 +24,8 @@ export const calculateProjections = (
   // Calculate monthly liability payments
   const monthlyLiabilityPayments = calculateTotalMonthlyLiabilityPayments(liabilities);
   
-  // Calculate passive income
-  const passiveIncome = calculatePassiveIncome(income, assets);
+  // Calculate passive income from income sources only
+  const passiveIncome = calculatePassiveIncome(income);
   
   Logger.info(`Starting projection calculations - monthlyIncome: ${monthlyIncome}, monthlyExpenses: ${monthlyExpenses}, monthlyLiabilityPayments: ${monthlyLiabilityPayments}, passiveIncome: ${passiveIncome}`);
 
@@ -32,22 +33,33 @@ export const calculateProjections = (
   let accumulatedSavings = 0;
   
   for (let i = 0; i < months; i++) {
-    const totalIncome = monthlyIncome + passiveIncome;
+    // Berechne das aktuelle Datum für den Monat
+    const currentDate = new Date(new Date().getFullYear(), new Date().getMonth() + i, 1);
+    const monthNumber = currentDate.getMonth() + 1; // 1-12
+    
+    // Berechne Asset-Einkommen für diesen spezifischen Monat (berücksichtigt Dividendentermine)
+    const monthlyAssetIncome = calculateTotalAssetIncomeForMonth(assets, monthNumber);
+    
+    const totalIncome = monthlyIncome + passiveIncome + monthlyAssetIncome;
     const netCashFlow = totalIncome - monthlyExpenses - monthlyLiabilityPayments;
     accumulatedSavings += netCashFlow;
     
+    const totalMonthlyObligations = monthlyExpenses + monthlyLiabilityPayments;
+    const totalPassiveIncome = passiveIncome + monthlyAssetIncome;
+    
     const projection = {
-      month: new Date(new Date().getFullYear(), new Date().getMonth() + i, 1).toISOString(),
+      month: currentDate.toISOString(),
       activeIncome: monthlyIncome,
       passiveIncome: passiveIncome,
-      assetIncome: passiveIncome, // Asset income is the same as passive income in this context
+      assetIncome: monthlyAssetIncome,
       expenseTotal: monthlyExpenses,
       liabilityPayments: monthlyLiabilityPayments,
       incomeTotal: totalIncome,
       netCashFlow: netCashFlow,
-      passiveIncomeCoverage: monthlyExpenses > 0 ? passiveIncome / monthlyExpenses : 0
+      passiveIncomeCoverage: totalMonthlyObligations > 0 ? totalPassiveIncome / totalMonthlyObligations : 0
     };
 
+    Logger.info(`Month ${monthNumber} (${currentDate.toLocaleDateString()}): Asset income: ${monthlyAssetIncome}, Total income: ${totalIncome}, Net cash flow: ${netCashFlow}`);
     projections.push(projection);
   }
 

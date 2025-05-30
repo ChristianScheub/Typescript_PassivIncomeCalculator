@@ -89,7 +89,7 @@ export default {
       projections: 'Projektionen',
       allocations: 'Zuordnungen',
       cashFlowProjection: 'Monatliche Cashflow-Prognose',
-      passiveIncomeCoverage: 'Deckung durch passives Einkommen',
+      passiveIncomeCoverage: 'Deckung aller Ausgaben durch passives Einkommen',
       assetAllocation: 'Vermögensaufteilung',
       expenseBreakdown: 'Monatliche Ausgabenaufschlüsselung',
       incomeAllocation: 'Einkommensverteilung',
@@ -101,7 +101,8 @@ export default {
       income: 'Einkommen',
       expenses: 'Ausgaben',
       netCashFlow: 'Netto-Cashflow',
-      expenseCoverage: 'Ausgabendeckung',
+      dividendPayment: 'Dividendenzahlung',
+      expenseCoverage: 'Deckung aller Ausgaben',
       loading: 'Prognosedaten werden geladen...',
     },
     common: {

@@ -151,6 +151,11 @@ export interface MonthlyProjection {
   expenseTotal: number;
   netCashFlow: number;
   passiveIncomeCoverage: number;
+  // Detaillierte Aufschlüsselung für Charts
+  activeIncome: number;
+  passiveIncome: number;
+  assetIncome: number;
+  liabilityPayments: number;
 }
 
 export interface AssetAllocation {

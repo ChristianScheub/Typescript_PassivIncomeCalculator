@@ -9,6 +9,81 @@ interface BarChartNetCashFlowProps {
   projections: MonthlyProjection[];
 }
 
+const CustomNetTooltip = ({ active, payload, label }: any) => {
+  const { t } = useTranslation();
+
+  if (active && payload && payload.length > 0) {
+    const data = payload[0].payload; // Gesamte Datenzeile
+    const netValue = payload[0].value;
+    
+    return (
+      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
+        <p className="text-gray-600 dark:text-gray-400 font-medium mb-2">
+          {new Date(label).toLocaleString('default', { month: 'long', year: 'numeric' })}
+        </p>
+        
+        {/* Zeige Einnahmen Details */}
+        <div className="mb-2">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-sm text-green-600 mr-4">
+              {t('dashboard.income')}:
+            </span>
+            <span className="text-sm font-medium text-green-600">
+              +{formatService.formatCurrency(data.activeIncome || 0)}
+            </span>
+          </div>
+          {data.assetIncome > 0 && (
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm text-blue-600 mr-4">
+                {t('dashboard.assetIncome')}:
+              </span>
+              <span className="text-sm font-medium text-blue-600">
+                +{formatService.formatCurrency(data.assetIncome)}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Zeige Ausgaben Details */}
+        <div className="mb-2">
+          {data.expenseTotal > 0 && (
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm text-red-600 mr-4">
+                {t('forecast.expenses')}:
+              </span>
+              <span className="text-sm font-medium text-red-600">
+                {formatService.formatCurrency(-data.expenseTotal)}
+              </span>
+            </div>
+          )}
+          {data.liabilityPayments > 0 && (
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-sm text-orange-600 mr-4">
+                {t('dashboard.liabilities')}:
+              </span>
+              <span className="text-sm font-medium text-orange-600">
+                {formatService.formatCurrency(-data.liabilityPayments)}
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* Zeige Netto-Ergebnis */}
+        <hr className="border-gray-200 dark:border-gray-600 my-2" />
+        <div className="flex justify-between items-center">
+          <span className="text-sm font-bold mr-4">
+            {t('forecast.net')}:
+          </span>
+          <span className={`text-sm font-bold ${netValue >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            {formatService.formatCurrency(netValue)}
+          </span>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
 const BarChartNetCashFlow: React.FC<BarChartNetCashFlowProps> = ({
   projections
 }) => {
@@ -37,9 +112,7 @@ const BarChartNetCashFlow: React.FC<BarChartNetCashFlowProps> = ({
                 tickFormatter={(value) => formatService.formatCurrency(value)} 
                 width={80}
               />
-              <Tooltip 
-                formatter={(value: number) => [formatService.formatCurrency(value), t('forecast.net')]}
-              />
+              <Tooltip content={<CustomNetTooltip />} />
               <Bar dataKey="netCashFlow" name={t('forecast.net')} radius={[4, 4, 0, 0]}>
                 {projections.map((entry, index) => (
                   <Cell 
