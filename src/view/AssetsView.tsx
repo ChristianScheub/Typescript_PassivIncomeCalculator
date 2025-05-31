@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import formatService from '../service/formatService';
 import { Modal } from '../ui/Modal';
 import { DataSummaryCard } from '../ui/DataSummaryCard';
-import { AssetForm } from '../container/AssetForm';
+import { MaterialAssetForm } from '../container/MaterialAssetForm';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
@@ -156,13 +156,12 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
       {/* Asset Form Modal */}
       <Modal
         isOpen={isAddingAsset || editingAsset !== null}
-        title={editingAsset ? t('assets.editAsset') : t('assets.addAsset')}
         onClose={() => {
           onSetIsAddingAsset(false);
           onSetEditingAsset(null);
         }}
       >
-        <AssetForm
+        <MaterialAssetForm
           initialData={editingAsset || undefined}
           onSubmit={editingAsset ? onUpdateAsset : onAddAsset}
           onCancel={() => {

@@ -24,6 +24,21 @@ export interface ICalculatorService {
   calculateTotalMonthlyAssetIncome: (assets: Asset[]) => number;
   calculateTotalAssetIncomeForMonth: (assets: Asset[], monthNumber: number) => number;
   calculateAnnualAssetIncome: (monthlyIncome: number) => number;
+  
+  // Cached asset calculations
+  calculateAssetMonthlyIncomeWithCache?: (asset: Asset) => { 
+    monthlyAmount: number; 
+    annualAmount: number; 
+    monthlyBreakdown: Record<number, number>;
+    cacheHit: boolean;
+    cacheDataToUpdate?: {
+      monthlyAmount: number;
+      annualAmount: number;
+      monthlyBreakdown: Record<number, number>;
+    };
+  };
+  calculateTotalMonthlyAssetIncomeWithCache?: (assets: Asset[]) => number;
+  calculateTotalAssetIncomeForMonthWithCache?: (assets: Asset[], monthNumber: number) => number;
 
   // Income calculations
   calculateMonthlyIncome: (income: Income) => number;

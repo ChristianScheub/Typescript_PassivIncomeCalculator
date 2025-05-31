@@ -1,3 +1,4 @@
+import React from 'react';
 import { UseFormRegister, FieldValues, Path } from 'react-hook-form';
 
 interface FormFieldProps<T extends FieldValues> {

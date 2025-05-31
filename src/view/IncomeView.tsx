@@ -8,7 +8,7 @@ import { DataSummaryCard } from '../ui/DataSummaryCard';
 import { Modal } from '../ui/Modal';
 import { EmptyState } from '../ui/EmptyState';
 import { Income, IncomeFormData } from '../types';
-import { IncomeForm } from '../container/IncomeForm';
+import { MaterialIncomeForm } from '../container/MaterialIncomeForm';
 import formatService from '../service/formatService';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
 
@@ -139,13 +139,12 @@ const IncomeView: React.FC<IncomeViewProps> = ({
 
       <Modal
         isOpen={isAddingIncome || !!editingIncome}
-        title={editingIncome ? t('income.editIncome') : t('income.addIncome')}
         onClose={() => {
           onSetIsAddingIncome(false);
           onSetEditingIncome(null);
         }}
       >
-        <IncomeForm
+        <MaterialIncomeForm
           initialData={editingIncome || undefined}
           onSubmit={(data: IncomeFormData) => {
             const income: Income = {

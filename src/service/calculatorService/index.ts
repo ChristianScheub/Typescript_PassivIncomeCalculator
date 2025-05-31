@@ -21,6 +21,7 @@ import { calculateMonthlyCashFlow } from './methods/calculateCashFlow';
 import { calculateAssetAllocation, calculateIncomeAllocation } from './methods/calculateAllocations';
 import { calculateExpenseBreakdown } from './methods/calculateExpenseBreakdown';
 import { calculateProjections } from './methods/calculateProjections';
+import { getDividendCacheService } from '../dividendCacheService';
 
 const calculatorService: ICalculatorService = {
   // Payment Schedule calculations
@@ -36,6 +37,46 @@ const calculatorService: ICalculatorService = {
     assets.reduce((sum, asset) => sum + calculateAssetMonthlyIncome(asset), 0),
   calculateTotalAssetIncomeForMonth,
   calculateAnnualAssetIncome: (monthlyIncome) => monthlyIncome * 12,
+
+  // Cached asset calculations
+  calculateAssetMonthlyIncomeWithCache: (asset) => {
+    const cacheService = getDividendCacheService();
+    if (cacheService) {
+      const result = cacheService.calculateAssetIncomeWithCache(asset);
+      if (result) return result;
+    }
+    // Fallback to non-cached calculation
+    const monthlyAmount = calculateAssetMonthlyIncome(asset);
+    return {
+      monthlyAmount,
+      annualAmount: monthlyAmount * 12,
+      monthlyBreakdown: {},
+      cacheHit: false,
+      cacheDataToUpdate: {
+        monthlyAmount,
+        annualAmount: monthlyAmount * 12,
+        monthlyBreakdown: {},
+      },
+    };
+  },
+  
+  calculateTotalMonthlyAssetIncomeWithCache: (assets) => {
+    const cacheService = getDividendCacheService();
+    if (cacheService) {
+      return cacheService.calculateTotalMonthlyAssetIncomeWithCache(assets);
+    }
+    // Fallback to non-cached calculation
+    return assets.reduce((sum, asset) => sum + calculateAssetMonthlyIncome(asset), 0);
+  },
+  
+  calculateTotalAssetIncomeForMonthWithCache: (assets, monthNumber) => {
+    const cacheService = getDividendCacheService();
+    if (cacheService) {
+      return cacheService.calculateTotalAssetIncomeForMonthWithCache(assets, monthNumber);
+    }
+    // Fallback to non-cached calculation
+    return calculateTotalAssetIncomeForMonth(assets, monthNumber);
+  },
 
   // Income calculations
   calculateMonthlyIncome,

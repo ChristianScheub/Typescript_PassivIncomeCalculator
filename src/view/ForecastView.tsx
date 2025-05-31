@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { MonthlyProjection, AssetAllocation, ExpenseBreakdown, IncomeAllocation, Liability } from '../types';
+import { MonthlyProjection, AssetAllocation, ExpenseBreakdown, IncomeAllocation } from '../types';
 import TabSelector from '../ui/TabSelector';
 import AssetAllocationChart from '../ui/pieCharts/PieChartAssetAllocation';
 import PieChartIncomeAllocation from '../ui/pieCharts/PieChartIncomeAllocation';

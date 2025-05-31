@@ -1,6 +1,7 @@
 import { Capacitor } from "@capacitor/core";
 import {
   featureFlag_Debug_AllLogs,
+  featureFlag_Debug_Log_Cache,
   featureFlag_Debug_Log_Error,
   featureFlag_Debug_Log_Info,
   featureFlag_Debug_Log_Service,
@@ -94,6 +95,12 @@ class Logger {
   static error(message: string): void {
     if (featureFlag_Debug_Log_Error || featureFlag_Debug_AllLogs) {
       this.log(this.formatMessage(`ERROR: ${message}`, "‼️🆘"));
+    }
+  }
+
+  static cache(message: string): void {
+    if (featureFlag_Debug_Log_Cache || featureFlag_Debug_AllLogs) {
+      this.log(this.formatMessage(`CACHE: ${message}`, '🗄️'));
     }
   }
 

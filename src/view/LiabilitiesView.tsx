@@ -3,7 +3,7 @@ import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Plus, Trash2, Edit, Landmark } from 'lucide-react';
 import { Liability } from '../types';
-import { LiabilityForm } from '../container/LiabilityForm';
+import { MaterialLiabilityForm } from '../container/MaterialLiabilityForm';
 import { useTranslation } from 'react-i18next';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { EmptyState } from '../ui/EmptyState';
@@ -143,13 +143,12 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
       {/* Liability Form Modal */}
       <Modal
         isOpen={isAddingLiability || editingLiability !== null}
-        title={editingLiability ? t('liabilities.editLiability') : t('liabilities.addLiability')}
         onClose={() => {
           onSetIsAddingLiability(false);
           onSetEditingLiability(null);
         }}
       >
-        <LiabilityForm
+        <MaterialLiabilityForm
           initialData={editingLiability || undefined}
           onSubmit={editingLiability ? onUpdateLiability : onAddLiability}
           onCancel={() => {

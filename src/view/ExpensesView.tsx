@@ -3,10 +3,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Plus, Trash2, Edit, ReceiptText } from 'lucide-react';
 import { Expense } from '../types';
-import { ExpenseForm } from '../container/ExpenseForm';
+import { MaterialExpenseForm } from '../container/MaterialExpenseForm';
 import { useTranslation } from 'react-i18next';
 import formatService from '../service/formatService';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
+import { Modal } from '../ui/Modal';
 
 interface ExpensesViewProps {
   expenses: Expense[];
@@ -147,27 +148,22 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
       )}
 
       {/* Expense Form Modal */}
-      {(isAddingExpense || editingExpense) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <CardHeader>
-              <CardTitle>
-                {editingExpense ? t('expenses.editExpense') : t('expenses.addExpense')}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ExpenseForm
-                initialData={editingExpense || undefined}
-                onSubmit={editingExpense ? onUpdateExpense : onAddExpense}
-                onCancel={() => {
-                  onSetIsAddingExpense(false);
-                  onSetEditingExpense(null);
-                }}
-              />
-            </CardContent>
-          </Card>
-        </div>
-      )}
+      <Modal
+        isOpen={isAddingExpense || editingExpense !== null}
+        onClose={() => {
+          onSetIsAddingExpense(false);
+          onSetEditingExpense(null);
+        }}
+      >
+        <MaterialExpenseForm
+          initialData={editingExpense || undefined}
+          onSubmit={editingExpense ? onUpdateExpense : onAddExpense}
+          onCancel={() => {
+            onSetIsAddingExpense(false);
+            onSetEditingExpense(null);
+          }}
+        />
+      </Modal>
     </div>
   );
 };

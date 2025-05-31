@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { Asset } from '../../types';
+import { Asset, CachedDividends } from '../../types';
 import * as storageService from '../../service/storage';
 import { v4 as uuidv4 } from '../../utils/uuid';
 import Logger from '../../service/Logger/logger';
+import { shouldInvalidateCache } from '../../utils/dividendCacheUtils';
 
 interface AssetsState {
   items: Asset[];
@@ -45,11 +46,23 @@ export const addAsset = createAsyncThunk('assets/addAsset', async (asset: Omit<A
   }
 });
 
-export const updateAsset = createAsyncThunk('assets/updateAsset', async (asset: Asset) => {
+export const updateAsset = createAsyncThunk('assets/updateAsset', async (asset: Asset, { getState }) => {
+  const state = getState() as { assets: AssetsState };
+  const oldAsset = state.assets.items.find(a => a.id === asset.id);
+  
   const updatedAsset: Asset = {
     ...asset,
     updatedAt: new Date().toISOString()
   };
+  
+  // Clear cache if dividend-relevant data changed
+  if (oldAsset && shouldInvalidateCache(oldAsset, updatedAsset)) {
+    updatedAsset.cachedDividends = undefined;
+  } else if (oldAsset?.cachedDividends) {
+    // Keep existing cache if data didn't change
+    updatedAsset.cachedDividends = oldAsset.cachedDividends;
+  }
+  
   await storageService.update('assets', updatedAsset);
   return updatedAsset;
 });
@@ -63,7 +76,28 @@ export const deleteAsset = createAsyncThunk('assets/deleteAsset', async (id: str
 const assetsSlice = createSlice({
   name: 'assets',
   initialState,
-  reducers: {},
+  reducers: {
+    // Cache management actions
+    updateAssetDividendCache: (state, action: PayloadAction<{ assetId: string; cachedDividends: CachedDividends }>) => {
+      const index = state.items.findIndex(asset => asset.id === action.payload.assetId);
+      if (index !== -1) {
+        state.items[index].cachedDividends = action.payload.cachedDividends;
+      }
+    },
+    
+    invalidateAssetDividendCache: (state, action: PayloadAction<string>) => {
+      const index = state.items.findIndex(asset => asset.id === action.payload);
+      if (index !== -1) {
+        state.items[index].cachedDividends = undefined;
+      }
+    },
+    
+    invalidateAllDividendCaches: (state) => {
+      state.items.forEach(asset => {
+        asset.cachedDividends = undefined;
+      });
+    }
+  },
   extraReducers: (builder) => {
     builder
       // Fetch assets
@@ -109,5 +143,7 @@ const assetsSlice = createSlice({
       });
   }
 });
+
+export const { updateAssetDividendCache, invalidateAssetDividendCache, invalidateAllDividendCaches } = assetsSlice.actions;
 
 export default assetsSlice.reducer;

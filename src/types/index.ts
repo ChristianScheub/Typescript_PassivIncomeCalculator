@@ -27,6 +27,15 @@ export interface DividendSchedule {
   };
 }
 
+// Cached dividend calculations
+export interface CachedDividends {
+  monthlyAmount: number;
+  annualAmount: number;
+  monthlyBreakdown: Record<number, number>; // Month (1-12) -> Amount
+  lastCalculated: string; // ISO date string
+  calculationHash: string; // Hash of dividend info + quantity for invalidation
+}
+
 export interface Asset extends BaseEntity {
   type: AssetType;
   value: number;
@@ -59,6 +68,9 @@ export interface Asset extends BaseEntity {
   // Crypto specific
   symbol?: string;
   acquisitionCost?: number;
+  
+  // Cached dividend calculations
+  cachedDividends?: CachedDividends;
 }
 
 // Payment Types
