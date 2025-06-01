@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "../hooks/useTheme";
-import * as storageService from "../service/storage";
+import sqliteService from "../service/sqlLiteService";
 import { analytics } from "../service/analytics";
 import Logger from "../service/Logger/logger";
 import SettingsView from "../view/SettingsView";
@@ -48,7 +48,7 @@ const SettingsContainer: React.FC = () => {
       Logger.info("Data export started");
 
       setExportStatus("loading");
-      const data = await storageService.exportData();
+      const data = await sqliteService.exportData();
       handleFileDownload(data);
       setExportStatus("success");
       setTimeout(() => setExportStatus("idle"), 2000);
@@ -105,7 +105,7 @@ const SettingsContainer: React.FC = () => {
             );
           }
 
-          await storageService.importData(fileContent);
+          await sqliteService.importData(fileContent);
           setImportStatus("success");
           setTimeout(() => setImportStatus("idle"), 2000);
 

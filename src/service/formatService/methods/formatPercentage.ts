@@ -4,7 +4,7 @@ export const formatPercentage = (value: number, options?: {
   minimumFractionDigits?: number;
   maximumFractionDigits?: number;
 }): string => {
-  Logger.info(`Formatting percentage: ${value}`);
+  Logger.infoService(`Formatting percentage: ${value}`);
   return new Intl.NumberFormat('en-US', {
     style: 'percent',
     minimumFractionDigits: options?.minimumFractionDigits ?? 0,

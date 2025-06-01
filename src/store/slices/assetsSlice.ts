@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Asset, CachedDividends } from '../../types';
-import * as storageService from '../../service/storage';
+import sqliteService from '../../service/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
 import Logger from '../../service/Logger/logger';
 import { shouldInvalidateCache } from '../../utils/dividendCacheUtils';
@@ -19,7 +19,7 @@ const initialState: AssetsState = {
 
 // Async Thunks
 export const fetchAssets = createAsyncThunk('assets/fetchAssets', async () => {
-  return await storageService.getAll('assets');
+  return await sqliteService.getAll('assets');
 });
 
 export const addAsset = createAsyncThunk('assets/addAsset', async (asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>) => {
@@ -36,7 +36,7 @@ export const addAsset = createAsyncThunk('assets/addAsset', async (asset: Omit<A
     
     Logger.info(`Redux addAsset thunk - Asset with ID created: ${JSON.stringify(newAsset)}`);
     
-    await storageService.add('assets', newAsset);
+    await sqliteService.add('assets', newAsset);
     Logger.info(`Redux addAsset thunk - Asset saved to storage successfully`);
     
     return newAsset;
@@ -63,12 +63,12 @@ export const updateAsset = createAsyncThunk('assets/updateAsset', async (asset: 
     updatedAsset.cachedDividends = oldAsset.cachedDividends;
   }
   
-  await storageService.update('assets', updatedAsset);
+  await sqliteService.update('assets', updatedAsset);
   return updatedAsset;
 });
 
 export const deleteAsset = createAsyncThunk('assets/deleteAsset', async (id: string) => {
-  await storageService.remove('assets', id);
+  await sqliteService.remove('assets', id);
   return id;
 });
 

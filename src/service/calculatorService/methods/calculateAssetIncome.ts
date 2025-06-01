@@ -13,7 +13,7 @@ import {
 export const calculateAssetMonthlyIncome = (asset: Asset): number => {
   let income = 0;
 
-  Logger.info(
+  Logger.infoService(
     `Calculating income for individual asset: ${asset.name} - Type: ${asset.type}`
   );
 
@@ -22,7 +22,7 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
       asset.dividendInfo,
       asset.quantity
     );
-    Logger.info(
+    Logger.infoService(
       `Individual dividend calculation result for ${
         asset.name
       }: ${JSON.stringify(dividendResult)}`
@@ -32,16 +32,16 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
 
   if (asset.type === "real_estate" && asset.rentalIncome) {
     const monthlyRental = asset.rentalIncome.amount; // Rental income is already monthly
-    Logger.info(
+    Logger.infoService(
       `Individual rental calculation result for ${asset.name}: ${monthlyRental}`
     );
-    Logger.info(`Asset details for ${asset.name}: ${JSON.stringify(asset)}`);
+    Logger.infoService(`Asset details for ${asset.name}: ${JSON.stringify(asset)}`);
     income += monthlyRental;
   } else if (asset.type === "real_estate") {
-    Logger.info(`Real estate asset ${asset.name} has no rental income defined`);
+    Logger.infoService(`Real estate asset ${asset.name} has no rental income defined`);
   }
 
-  Logger.info(`Final individual income for asset ${asset.name}: ${income}`);
+  Logger.infoService(`Final individual income for asset ${asset.name}: ${income}`);
   return income;
 };
 
@@ -52,7 +52,7 @@ export const calculateAssetIncomeForMonth = (
 ): number => {
   let income = 0;
 
-  Logger.info(
+  Logger.infoService(
     `Calculating income for asset ${asset.name} in month ${monthNumber}`
   );
 
@@ -62,7 +62,7 @@ export const calculateAssetIncomeForMonth = (
       asset.quantity,
       monthNumber
     );
-    Logger.info(
+    Logger.infoService(
       `Dividend for ${asset.name} in month ${monthNumber}: ${dividendForMonth}`
     );
     income += dividendForMonth;
@@ -70,7 +70,7 @@ export const calculateAssetIncomeForMonth = (
 
   if (asset.type === "real_estate" && asset.rentalIncome) {
     const monthlyRental = asset.rentalIncome.amount; // Rental income occurs every month
-    Logger.info(
+    Logger.infoService(
       `Rental income for ${asset.name} in month ${monthNumber}: ${monthlyRental}`
     );
     income += monthlyRental;
@@ -78,7 +78,7 @@ export const calculateAssetIncomeForMonth = (
 
   // Andere Asset-Typen können hier hinzugefügt werden (z.B. Bond-Zinsen)
 
-  Logger.info(
+  Logger.infoService(
     `Total income for asset ${asset.name} in month ${monthNumber}: ${income}`
   );
   return income;
@@ -87,17 +87,17 @@ export const calculateAssetIncomeForMonth = (
 export const calculateTotalMonthlyAssetIncome = (assets: Asset[]): number => {
   let totalIncome = 0;
 
-  Logger.info(`Calculating total asset income for ${assets.length} assets`);
+  Logger.infoService(`Calculating total asset income for ${assets.length} assets`);
 
   for (const asset of assets) {
     const assetIncome = calculateAssetMonthlyIncome(asset);
     totalIncome += assetIncome;
-    Logger.info(
+    Logger.infoService(
       `Added ${assetIncome} from asset ${asset.name}, total now: ${totalIncome}`
     );
   }
 
-  Logger.info(`Final total asset income: ${totalIncome}`);
+  Logger.infoService(`Final total asset income: ${totalIncome}`);
   return totalIncome;
 };
 
@@ -108,19 +108,19 @@ export const calculateTotalAssetIncomeForMonth = (
 ): number => {
   let totalIncome = 0;
 
-  Logger.info(
+  Logger.infoService(
     `Calculating total asset income for ${assets.length} assets in month ${monthNumber}`
   );
 
   for (const asset of assets) {
     const assetIncome = calculateAssetIncomeForMonth(asset, monthNumber);
     totalIncome += assetIncome;
-    Logger.info(
+    Logger.infoService(
       `Added ${assetIncome} from asset ${asset.name} in month ${monthNumber}, total now: ${totalIncome}`
     );
   }
 
-  Logger.info(
+  Logger.infoService(
     `Final total asset income for month ${monthNumber}: ${totalIncome}`
   );
   return totalIncome;

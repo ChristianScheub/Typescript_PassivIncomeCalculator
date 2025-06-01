@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Liability } from '../../types';
-import * as storageService from '../../service/storage';
+import sqliteService from '../../service/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
 
 interface LiabilitiesState {
@@ -17,7 +17,7 @@ const initialState: LiabilitiesState = {
 
 // Async Thunks
 export const fetchLiabilities = createAsyncThunk('liabilities/fetchLiabilities', async () => {
-  return await storageService.getAll<Liability>('liabilities');
+  return await sqliteService.getAll('liabilities');
 });
 
 export const addLiability = createAsyncThunk(
@@ -30,7 +30,7 @@ export const addLiability = createAsyncThunk(
       createdAt: now,
       updatedAt: now
     };
-    await storageService.add('liabilities', newLiability);
+    await sqliteService.add('liabilities', newLiability);
     return newLiability;
   }
 );
@@ -40,12 +40,12 @@ export const updateLiability = createAsyncThunk('liabilities/updateLiability', a
     ...liability,
     updatedAt: new Date().toISOString()
   };
-  await storageService.update('liabilities', updatedLiability);
+  await sqliteService.update('liabilities', updatedLiability);
   return updatedLiability;
 });
 
 export const deleteLiability = createAsyncThunk('liabilities/deleteLiability', async (id: string) => {
-  await storageService.remove('liabilities', id);
+  await sqliteService.remove('liabilities', id);
   return id;
 });
 

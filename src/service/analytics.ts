@@ -23,7 +23,7 @@ class AnalyticsService {
     this.events.push(event);
     
     if (featureFlag_Debug_Log_Analytics) {
-      Logger.info(`Analytics event tracked: ${type} - ${JSON.stringify(data)}`);
+      Logger.infoService(`Analytics event tracked: ${type} - ${JSON.stringify(data)}`);
     }
   }
 
@@ -41,7 +41,7 @@ class AnalyticsService {
   clearEvents() {
     this.events = [];
     if (featureFlag_Debug_Log_Analytics) {
-      Logger.info('Analytics events cleared');
+      Logger.infoService('Analytics events cleared');
     }
   }
 }

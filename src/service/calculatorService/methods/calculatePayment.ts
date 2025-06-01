@@ -7,7 +7,7 @@ export interface PaymentResult {
 }
 
 export const calculatePaymentSchedule = (schedule: PaymentSchedule): PaymentResult => {
-  Logger.info(`calculatePaymentSchedule - frequency: ${schedule.frequency}, amount: ${schedule.amount}`);
+  Logger.infoService(`calculatePaymentSchedule - frequency: ${schedule.frequency}, amount: ${schedule.amount}`);
   
   if (!schedule || !schedule.amount || schedule.frequency === 'none') {
     return { monthlyAmount: 0, annualAmount: 0 };
@@ -36,13 +36,13 @@ export const calculatePaymentSchedule = (schedule: PaymentSchedule): PaymentResu
   }
 
   const annualAmount = monthlyAmount * 12;
-  Logger.info(`Payment calculation result - monthly: ${monthlyAmount}, annual: ${annualAmount}`);
+  Logger.infoService(`Payment calculation result - monthly: ${monthlyAmount}, annual: ${annualAmount}`);
   
   return { monthlyAmount, annualAmount };
 };
 
 export const calculateDividendSchedule = (schedule: DividendSchedule, quantity: number): PaymentResult => {
-  Logger.info(`calculateDividendSchedule - amount: ${schedule?.amount}, frequency: ${schedule?.frequency}, quantity: ${quantity}`);
+  Logger.infoService(`calculateDividendSchedule - amount: ${schedule?.amount}, frequency: ${schedule?.frequency}, quantity: ${quantity}`);
   
   if (!schedule || !schedule.amount || schedule.frequency === 'none') {
     return { monthlyAmount: 0, annualAmount: 0 };
@@ -71,9 +71,8 @@ export const calculateDividendSchedule = (schedule: DividendSchedule, quantity: 
       monthlyAmount = 0;
   }
 
-  const annualAmount = monthlyAmount * 12;
-  Logger.info(`Dividend calculation result - monthly: ${monthlyAmount}, annual: ${annualAmount}`);
-
+  const annualAmount = monthlyAmount * 12;  Logger.infoService(`Dividend calculation result - monthly: ${monthlyAmount}, annual: ${annualAmount}`);
+  
   return { monthlyAmount, annualAmount };
 };
 

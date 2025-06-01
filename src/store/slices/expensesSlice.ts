@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Expense } from '../../types';
-import * as storageService from '../../service/storage';
+import sqliteService from '../../service/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
 
 interface ExpensesState {
@@ -17,7 +17,7 @@ const initialState: ExpensesState = {
 
 // Async Thunks
 export const fetchExpenses = createAsyncThunk('expenses/fetchExpenses', async () => {
-  return await storageService.getAll<Expense>('expenses');
+  return await sqliteService.getAll('expenses');
 });
 
 export const addExpense = createAsyncThunk(
@@ -30,7 +30,7 @@ export const addExpense = createAsyncThunk(
       createdAt: now,
       updatedAt: now
     };
-    await storageService.add('expenses', newExpense);
+    await sqliteService.add('expenses', newExpense);
     return newExpense;
   }
 );
@@ -40,12 +40,12 @@ export const updateExpense = createAsyncThunk('expenses/updateExpense', async (e
     ...expense,
     updatedAt: new Date().toISOString()
   };
-  await storageService.update('expenses', updatedExpense);
+  await sqliteService.update('expenses', updatedExpense);
   return updatedExpense;
 });
 
 export const deleteExpense = createAsyncThunk('expenses/deleteExpense', async (id: string) => {
-  await storageService.remove('expenses', id);
+  await sqliteService.remove('expenses', id);
   return id;
 });
 

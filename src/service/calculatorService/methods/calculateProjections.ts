@@ -27,7 +27,7 @@ export const calculateProjections = (
   // Calculate passive income from income sources only
   const passiveIncome = calculatePassiveIncome(income);
   
-  Logger.info(`Starting projection calculations - monthlyIncome: ${monthlyIncome}, monthlyExpenses: ${monthlyExpenses}, monthlyLiabilityPayments: ${monthlyLiabilityPayments}, passiveIncome: ${passiveIncome}`);
+  Logger.infoService(`Starting projection calculations - monthlyIncome: ${monthlyIncome}, monthlyExpenses: ${monthlyExpenses}, monthlyLiabilityPayments: ${monthlyLiabilityPayments}, passiveIncome: ${passiveIncome}`);
 
   // Generate projections for each month
   let accumulatedSavings = 0;
@@ -59,10 +59,10 @@ export const calculateProjections = (
       passiveIncomeCoverage: totalMonthlyObligations > 0 ? totalPassiveIncome / totalMonthlyObligations : 0
     };
 
-    Logger.info(`Month ${monthNumber} (${currentDate.toLocaleDateString()}): Asset income: ${monthlyAssetIncome}, Total income: ${totalIncome}, Net cash flow: ${netCashFlow}`);
+    Logger.infoService(`Month ${monthNumber} (${currentDate.toLocaleDateString()}): Asset income: ${monthlyAssetIncome}, Total income: ${totalIncome}, Net cash flow: ${netCashFlow}`);
     projections.push(projection);
   }
 
-  Logger.info(`Projections calculated - months: ${months}, final accumulated savings: ${accumulatedSavings}`);
+  Logger.infoService(`Projections calculated - months: ${months}, final accumulated savings: ${accumulatedSavings}`);
   return projections;
 };

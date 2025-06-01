@@ -4,7 +4,7 @@ export const formatNumber = (value: number, options?: {
   minimumFractionDigits?: number;
   maximumFractionDigits?: number;
 }): string => {
-  Logger.info(`Formatting number: ${value}`);
+  Logger.infoService(`Formatting number: ${value}`);
   return new Intl.NumberFormat('en-US', {
     style: 'decimal',
     minimumFractionDigits: options?.minimumFractionDigits ?? 0,
