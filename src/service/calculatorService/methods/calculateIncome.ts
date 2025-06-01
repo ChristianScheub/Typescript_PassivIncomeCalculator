@@ -1,5 +1,4 @@
 import { Income } from '../../../types';
-import { calculateAssetMonthlyIncome } from './calculateAssetIncome';
 
 export const calculateMonthlyIncome = (income: Income): number => {
     if (!income.paymentSchedule) {

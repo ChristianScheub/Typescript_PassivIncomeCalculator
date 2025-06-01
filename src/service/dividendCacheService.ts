@@ -1,7 +1,6 @@
-import { Asset, CachedDividends } from '../types';
+import { Asset } from '../types';
 import { AppDispatch } from '../store';
-import { updateAssetDividendCache } from '../store/slices/assetsSlice';
-import { calculateAssetMonthlyIncomeWithCache, updateAssetCacheData } from './calculatorService/methods/calculateAssetIncome';
+import { calculateAssetMonthlyIncomeWithCache } from './calculatorService/methods/calculateAssetIncome';
 import Logger from './Logger/logger';
 
 /**

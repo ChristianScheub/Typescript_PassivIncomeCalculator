@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Asset, Income, Expense, Liability, AssetAllocation } from '../../types';
+import { AssetAllocation } from '../../types';
 import calculatorService from '../../service/calculatorService';
 import { RootState } from '..';
 import { hydrateStore } from '../actions/hydrateAction';

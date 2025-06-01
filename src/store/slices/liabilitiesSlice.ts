@@ -1,9 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Liability } from '../../types';
 import sqliteService from '../../service/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
 import { hydrateStore } from '../actions/hydrateAction';
-import { RootState } from '..';
 
 interface LiabilitiesState {
   items: Liability[];
