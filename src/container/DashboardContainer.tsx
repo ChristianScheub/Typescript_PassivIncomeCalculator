@@ -3,48 +3,44 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { analytics } from '../service/analytics';
 import Logger from '../service/Logger/logger';
-import calculatorService from '../service/calculatorService';
 import DashboardView from '../view/DashboardView';
 import { createDividendCacheService } from '../service/dividendCacheService';
+import { updateDashboardValues } from '../store/slices/dashboardSlice';
 
 const DashboardContainer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  
+  // Get the base data
   const assets = useAppSelector(state => state.assets.items);
   const expenses = useAppSelector(state => state.expenses.items);
   const income = useAppSelector(state => state.income.items);
   const liabilities = useAppSelector(state => state.liabilities.items);
+
+  // Get the calculated values from the dashboard store
+  const {
+    totalMonthlyIncome,
+    totalMonthlyExpenses,
+    totalLiabilityPayments,
+    monthlyAssetIncome,
+    passiveIncome,
+    totalAssetValue,
+    totalLiabilityValue,
+    netWorth,
+    monthlyCashFlow,
+    passiveIncomeRatio,
+    assetAllocation,
+  } = useAppSelector(state => state.dashboard);
 
   // Initialize dividend cache service
   React.useEffect(() => {
     createDividendCacheService(dispatch);
   }, [dispatch]);
 
-  // Calculate totals
-  const totalMonthlyIncome = calculatorService.calculateTotalMonthlyIncome(income);
-  const totalMonthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
-  const totalLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
-
-  // Use cached calculation for monthly asset income
-  const monthlyAssetIncome = calculatorService.calculateTotalMonthlyAssetIncomeWithCache
-    ? calculatorService.calculateTotalMonthlyAssetIncomeWithCache(assets)
-    : calculatorService.calculateTotalMonthlyAssetIncome(assets);
-
-  // For passive income, we still use the regular calculation as it needs to check for overlapping income entries
-  const passiveIncome = calculatorService.calculatePassiveIncome(income, assets);
-
-  // Calculate derived values
-  const totalAssetValue = calculatorService.calculateTotalAssetValue(assets);
-  const totalLiabilityValue = calculatorService.calculateTotalDebt(liabilities);
-  const netWorth = calculatorService.calculateNetWorth(totalAssetValue, totalLiabilityValue);
-
-  const monthlyCashFlow = calculatorService.calculateMonthlyCashFlow(
-    totalMonthlyIncome + monthlyAssetIncome, 
-    totalMonthlyExpenses,
-    totalLiabilityPayments
-  );
-  const passiveIncomeRatio = calculatorService.calculatePassiveIncomeRatio(totalMonthlyIncome, passiveIncome);
-  const assetAllocation = calculatorService.calculateAssetAllocation(assets);
+  // Update dashboard values whenever the underlying data changes
+  React.useEffect(() => {
+    dispatch(updateDashboardValues());
+  }, [dispatch, assets, income, expenses, liabilities]);
 
   const handleSettingsClick = () => {
     Logger.info('Settings button clicked');

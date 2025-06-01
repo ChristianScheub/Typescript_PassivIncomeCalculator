@@ -2,6 +2,8 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Liability } from '../../types';
 import sqliteService from '../../service/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
+import { hydrateStore } from '../actions/hydrateAction';
+import { RootState } from '..';
 
 interface LiabilitiesState {
   items: Liability[];
@@ -56,6 +58,17 @@ const liabilitiesSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(hydrateStore, (state, action) => {
+        if (action.payload.liabilities) {
+          return {
+            ...state,
+            ...action.payload.liabilities,
+            status: 'idle',
+            error: null
+          };
+        }
+        return state;
+      })
       // Fetch liabilities
       .addCase(fetchLiabilities.pending, (state) => {
         state.status = 'loading';
@@ -89,4 +102,5 @@ const liabilitiesSlice = createSlice({
   }
 });
 
-export default liabilitiesSlice.reducer;
+const liabilitiesReducer = liabilitiesSlice.reducer;
+export default liabilitiesReducer;

@@ -4,6 +4,7 @@ import sqliteService from '../../service/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
 import Logger from '../../service/Logger/logger';
 import { shouldInvalidateCache } from '../../utils/dividendCacheUtils';
+import { hydrateStore } from '../actions/hydrateAction';
 
 interface AssetsState {
   items: Asset[];
@@ -100,6 +101,17 @@ const assetsSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(hydrateStore, (state, action) => {
+        if (action.payload.assets) {
+          return {
+            ...state,
+            ...action.payload.assets,
+            status: 'idle',
+            error: null
+          };
+        }
+        return state;
+      })
       // Fetch assets
       .addCase(fetchAssets.pending, (state) => {
         state.status = 'loading';

@@ -1,7 +1,9 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Income } from '../../types';
 import sqliteService from '../../service/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
+import { hydrateStore } from '../actions/hydrateAction';
+import { RootState } from '..';
 
 interface IncomeState {
   items: Income[];
@@ -56,6 +58,17 @@ const incomeSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(hydrateStore, (state, action) => {
+        if (action.payload.income) {
+          return {
+            ...state,
+            ...action.payload.income,
+            status: 'idle',
+            error: null
+          };
+        }
+        return state;
+      })
       // Fetch income
       .addCase(fetchIncome.pending, (state) => {
         state.status = 'loading';
@@ -89,4 +102,5 @@ const incomeSlice = createSlice({
   }
 });
 
-export default incomeSlice.reducer;
+const incomeReducer = incomeSlice.reducer;
+export default incomeReducer;

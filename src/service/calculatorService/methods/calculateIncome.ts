@@ -1,4 +1,4 @@
-import { Income, Asset } from '../../../types';
+import { Income } from '../../../types';
 import { calculateAssetMonthlyIncome } from './calculateAssetIncome';
 
 export const calculateMonthlyIncome = (income: Income): number => {
@@ -32,16 +32,9 @@ export const calculateAnnualIncome = (monthlyIncome: number): number => {
     return monthlyIncome * 12;
 };
 
-export const calculatePassiveIncome = (incomes: Income[], assets: Asset[] = []): number => {
-    // Get passive income from Income entries
-    const regularPassiveIncome = incomes
+export const calculatePassiveIncome = (incomes: Income[]): number => {
+    // Only consider income entries marked as passive
+    return incomes
         .filter(income => income.isPassive)
         .reduce((total, income) => total + calculateMonthlyIncome(income), 0);
-
-    // Get passive income from assets (if not already counted in Income)
-    const assetPassiveIncome = assets
-        .filter(asset => !incomes.some(inc => inc.sourceId === asset.id))
-        .reduce((total, asset) => total + calculateAssetMonthlyIncome(asset), 0);
-
-    return regularPassiveIncome + assetPassiveIncome;
 };

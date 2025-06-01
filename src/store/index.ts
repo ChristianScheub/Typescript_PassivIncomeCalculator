@@ -3,6 +3,48 @@ import assetsReducer from './slices/assetsSlice';
 import liabilitiesReducer from './slices/liabilitiesSlice';
 import expensesReducer from './slices/expensesSlice';
 import incomeReducer from './slices/incomeSlice';
+import dashboardReducer from './slices/dashboardSlice';
+
+type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
+
+// Versuche den gespeicherten State zu laden
+const loadState = () => {
+  try {
+    const serializedState = localStorage.getItem('passiveIncomeCalculator');
+    if (serializedState === null) {
+      return undefined;
+    }
+    const state = JSON.parse(serializedState);
+    return {
+      assets: { 
+        items: state.assets?.items || [],
+        status: 'idle' as Status,
+        error: null
+      },
+      liabilities: {
+        items: state.liabilities?.items || [],
+        status: 'idle' as Status,
+        error: null
+      },
+      expenses: {
+        items: state.expenses?.items || [],
+        status: 'idle' as Status,
+        error: null
+      },
+      income: {
+        items: state.income?.items || [],
+        status: 'idle' as Status,
+        error: null
+      },
+      dashboard: state.dashboard || {}
+    };
+  } catch (err) {
+    console.error('Error loading state:', err);
+    return undefined;
+  }
+};
+
+const persistedState = loadState();
 
 export const store = configureStore({
   reducer: {
@@ -10,11 +52,38 @@ export const store = configureStore({
     liabilities: liabilitiesReducer,
     expenses: expensesReducer,
     income: incomeReducer,
+    dashboard: dashboardReducer,
   },
+  preloadedState: persistedState,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false, // For storing Date objects in state
-    }),
+    })
+});
+
+// Subscribe to store changes and save to localStorage
+store.subscribe(() => {
+  const state = store.getState();
+  try {
+    const stateToSave = {
+      assets: { 
+        items: state.assets.items
+      },
+      liabilities: {
+        items: state.liabilities.items
+      },
+      expenses: {
+        items: state.expenses.items
+      },
+      income: {
+        items: state.income.items
+      },
+      dashboard: state.dashboard
+    };
+    localStorage.setItem('passiveIncomeCalculator', JSON.stringify(stateToSave));
+  } catch (err) {
+    console.error('Error saving state:', err);
+  }
 });
 
 export type RootState = ReturnType<typeof store.getState>;
