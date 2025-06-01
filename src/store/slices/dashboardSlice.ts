@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AssetAllocation } from '../../types';
 import calculatorService from '../../service/calculatorService';
 import { RootState } from '..';
+import Logger from '../../service/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
 
 interface DashboardState {
@@ -36,6 +37,7 @@ const initialState: DashboardState = {
 export const updateDashboardValues = createAsyncThunk(
   'dashboard/updateValues',
   async (_, { getState }) => {
+    Logger.infoRedux('Starting dashboard values update');
     const state = getState() as RootState;
     const { assets, income, expenses, liabilities } = state;
 
@@ -65,7 +67,7 @@ export const updateDashboardValues = createAsyncThunk(
     const passiveIncomeRatio = calculatorService.calculatePassiveIncomeRatio(totalMonthlyIncome, passiveIncome);
     const assetAllocation = calculatorService.calculateAssetAllocation(assets.items);
 
-    return {
+    const values = {
       totalMonthlyIncome,
       totalMonthlyExpenses,
       totalLiabilityPayments,
@@ -78,6 +80,15 @@ export const updateDashboardValues = createAsyncThunk(
       passiveIncomeRatio,
       assetAllocation,
     };
+
+    Logger.infoRedux(`Dashboard values updated: ${JSON.stringify({
+      monthlyIncome: totalMonthlyIncome,
+      monthlyExpenses: totalMonthlyExpenses,
+      netWorth,
+      passiveIncomeRatio: Math.round(passiveIncomeRatio * 100) / 100
+    })}`);
+
+    return values;
   }
 );
 
@@ -87,14 +98,22 @@ const dashboardSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(updateDashboardValues.pending, (state) => {
+        Logger.infoRedux('Updating dashboard values...');
+      })
       .addCase(updateDashboardValues.fulfilled, (state, action) => {
+        Logger.infoRedux('Dashboard values updated successfully');
         return {
           ...state,
           ...action.payload,
         };
       })
+      .addCase(updateDashboardValues.rejected, (state, action) => {
+        Logger.infoRedux(`Failed to update dashboard values: ${action.error.message}`);
+      })
       .addCase(hydrateStore, (state, action) => {
         if (action.payload.dashboard) {
+          Logger.infoRedux('Hydrating dashboard state');
           return {
             ...state,
             ...action.payload.dashboard

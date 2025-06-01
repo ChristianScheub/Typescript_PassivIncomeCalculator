@@ -20,12 +20,13 @@ const initialState: AssetsState = {
 
 // Async Thunks
 export const fetchAssets = createAsyncThunk('assets/fetchAssets', async () => {
+  Logger.infoRedux('Fetching all assets');
   return await sqliteService.getAll('assets');
 });
 
 export const addAsset = createAsyncThunk('assets/addAsset', async (asset: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'>) => {
   try {
-    Logger.info(`Redux addAsset thunk - Received asset data: ${JSON.stringify(asset)}`);
+    Logger.infoRedux(`Received asset data: ${JSON.stringify(asset)}`);
     
     const now = new Date().toISOString();
     const newAsset: Asset = {
@@ -35,14 +36,14 @@ export const addAsset = createAsyncThunk('assets/addAsset', async (asset: Omit<A
       updatedAt: now
     };
     
-    Logger.info(`Redux addAsset thunk - Asset with ID created: ${JSON.stringify(newAsset)}`);
+    Logger.infoRedux(`Asset with ID created: ${JSON.stringify(newAsset)}`);
     
     await sqliteService.add('assets', newAsset);
-    Logger.info(`Redux addAsset thunk - Asset saved to storage successfully`);
+    Logger.infoRedux(`Asset saved to storage successfully`);
     
     return newAsset;
   } catch (error) {
-    Logger.error(`Redux addAsset thunk - Error: ${JSON.stringify(error)}`);
+    Logger.infoRedux(`Failed to add asset: ${JSON.stringify(error)}`);
     throw error;
   }
 });
@@ -59,16 +60,20 @@ export const updateAsset = createAsyncThunk('assets/updateAsset', async (asset: 
   // Clear cache if dividend-relevant data changed
   if (oldAsset && shouldInvalidateCache(oldAsset, updatedAsset)) {
     updatedAsset.cachedDividends = undefined;
+    Logger.infoRedux('Cache invalidated due to dividend-relevant data change');
   } else if (oldAsset?.cachedDividends) {
     // Keep existing cache if data didn't change
     updatedAsset.cachedDividends = oldAsset.cachedDividends;
+    Logger.infoRedux('Keeping existing dividend cache');
   }
   
   await sqliteService.update('assets', updatedAsset);
+  Logger.infoRedux(`Asset updated successfully: ${JSON.stringify(updatedAsset)}`);
   return updatedAsset;
 });
 
 export const deleteAsset = createAsyncThunk('assets/deleteAsset', async (id: string) => {
+  Logger.infoRedux(`Deleting asset with ID: ${id}`);
   await sqliteService.remove('assets', id);
   return id;
 });
@@ -127,16 +132,16 @@ const assetsSlice = createSlice({
       
       // Add asset
       .addCase(addAsset.pending, (state) => {
-        Logger.info('Redux addAsset pending');
+        Logger.infoRedux('Asset add operation pending');
         state.status = 'loading';
       })
       .addCase(addAsset.fulfilled, (state, action) => {
-        Logger.info(`Redux addAsset fulfilled - Asset added: ${JSON.stringify(action.payload)}`);
+        Logger.infoRedux(`Asset added successfully: ${JSON.stringify(action.payload)}`);
         state.status = 'succeeded';
         state.items.push(action.payload);
       })
       .addCase(addAsset.rejected, (state, action) => {
-        Logger.error(`Redux addAsset rejected - Error: ${action.error.message}`);
+        Logger.infoRedux(`Failed to add asset: ${action.error.message}`);
         state.status = 'failed';
         state.error = action.error.message || 'Failed to add asset';
       })
