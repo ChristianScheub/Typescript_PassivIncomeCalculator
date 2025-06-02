@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../Card';
-import { CustomPieTooltip } from '../CustomPieTooltip';
 import { ExpenseBreakdown } from '../../types';
 import { COLORS } from '../../utils/constants';
 import formatService from '../../service/formatService';
@@ -10,6 +9,7 @@ import formatService from '../../service/formatService';
 interface CombinedDataItem {
   readonly category: string;
   readonly amount: number;
+  readonly percentage: number;
   readonly type: 'expense' | 'liability';
   readonly id: string;
 }
@@ -25,6 +25,17 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  // Calculate total first for percentage calculation
+  const total = React.useMemo(() => {
+    const expenseTotal = expenseBreakdown
+      .filter(expense => expense?.category && expense?.amount)
+      .reduce((sum, expense) => sum + expense.amount, 0);
+    const liabilityTotal = liabilities
+      .filter(liability => liability?.category && liability?.amount)
+      .reduce((sum, liability) => sum + liability.amount, 0);
+    return expenseTotal + liabilityTotal;
+  }, [expenseBreakdown, liabilities]);
+
   // Create mutable array for Recharts compatibility while keeping our business logic immutable
   const combinedData = React.useMemo(() => Array.from([
     ...expenseBreakdown
@@ -32,6 +43,7 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
       .map(expense => ({
         category: expense.category,
         amount: expense.amount,
+        percentage: total > 0 ? (expense.amount / total) * 100 : 0,
         type: 'expense' as const,
         id: `expense-${expense.category}`
       })),
@@ -40,16 +52,11 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
       .map(liability => ({
         category: liability.category,
         amount: liability.amount,
+        percentage: total > 0 ? (liability.amount / total) * 100 : 0,
         type: 'liability' as const,
         id: `liability-${liability.category}`
       }))
-  ]), [expenseBreakdown, liabilities]);
-
-  // Calculate total for percentage using useMemo to avoid recalculation
-  const total = React.useMemo(() => 
-    combinedData.reduce((sum, item) => sum + item.amount, 0),
-    [combinedData]
-  );
+  ]), [expenseBreakdown, liabilities, total]);
 
   return (
     <Card title={t('forecast.expenseBreakdown')}>
@@ -82,12 +89,24 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
                 ))}
               </Pie>
               <Tooltip 
-                content={
-                  <CustomPieTooltip 
-                    formatCurrency={formatService.formatCurrency} 
-                    formatPercentage={(value) => total > 0 ? `${((value / total) * 100).toFixed(1)}%` : '0%'} 
-                  />
-                } 
+                content={({ active, payload }) => {
+                  if (!active || !payload?.length) return null;
+                  
+                  const data = payload[0]?.payload;
+                  if (!data) return null;
+                  
+                  const name = data.type === 'liability'
+                    ? t(`liabilities.types.${data.category}`)
+                    : t(`expenses.categories.${data.category}`);
+                      
+                  return (
+                    <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
+                      <p className="text-sm font-medium">{name}</p>
+                      <p className="text-sm">{formatService.formatCurrency(data.amount)}</p>
+                      <p className="text-sm">({data.percentage.toFixed(1)}%)</p>
+                    </div>
+                  );
+                }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -117,7 +136,7 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
                 </div>
                 <div className="text-sm text-gray-500">
                   {formatService.formatCurrency(item.amount)}
-                  {total > 0 && ` (${((item.amount / total) * 100).toFixed(1)}%)`}
+                  {total > 0 && ` (${item.percentage.toFixed(1)}%)`}
                 </div>
               </div>
             </div>

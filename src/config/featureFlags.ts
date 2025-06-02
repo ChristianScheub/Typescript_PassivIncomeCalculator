@@ -11,6 +11,6 @@ const featureFlag_Debug_Log_Info: boolean = true; //Show info logs in the consol
 const featureFlag_Debug_Log_Warning: boolean = false; //Show warning logs in the console
 const featureFlag_Debug_Log_Error: boolean = false; //Show error logs in the console
 const featureFlag_Debug_Log_Analytics: boolean = false; //Show analytics logs in the console
-const featureFlag_Debug_Log_Cache: boolean = true; //Show cache logs in the console
+const featureFlag_Debug_Log_Cache: boolean = false; //Show cache logs in the console
 
 export {featureFlag_Debug_Log_Analytics,featureFlag_Debug_Settings_View,featureFlag_Debug_View, featureFlag_Debug_StoreLogs, featureFlag_Debug_Log_Service, featureFlag_Debug_AllLogs, featureFlag_Debug_Log_infoRedux,featureFlag_Debug_Log_Error,featureFlag_Debug_Log_Warning,featureFlag_Debug_Log_Info, featureFlag_Debug_Log_Cache};

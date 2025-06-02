@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { MonthlyProjection, AssetAllocation, ExpenseBreakdown, IncomeAllocation } from '../../types';
 import calculatorService from '../../service/calculatorService';
+import { calculateLiabilityMonthlyPayment } from '../../service/calculatorService/methods/calculateLiabilities';
 import { RootState } from '..';
 import Logger from '../../service/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
@@ -75,7 +76,7 @@ export const updateForecastValues = createAsyncThunk(
     
     const transformedLiabilities = liabilities.items.map(liability => ({
       category: liability.type,
-      amount: liability.currentBalance
+      amount: calculateLiabilityMonthlyPayment(liability)
     }));
 
     const values = {

@@ -7,7 +7,7 @@ import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { DataSummaryCard } from '../ui/DataSummaryCard';
 import { Modal } from '../ui/Modal';
 import { EmptyState } from '../ui/EmptyState';
-import { Income, IncomeFormData } from '../types';
+import { Income } from '../types';
 import { MaterialIncomeForm } from '../container/forms/MaterialIncomeForm';
 import formatService from '../service/formatService';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
@@ -53,6 +53,7 @@ const IncomeView: React.FC<IncomeViewProps> = ({
   const summaryItems = [
     [
       {
+        id: 'monthly-income',
         label: t('pages.totalMonthlyIncome'),
         value: formatService.formatCurrency(totalMonthlyIncome),
         subValue: `${formatService.formatCurrency(annualIncome)} ${t('pages.yearly')}`,
@@ -146,7 +147,7 @@ const IncomeView: React.FC<IncomeViewProps> = ({
       >
         <MaterialIncomeForm
           initialData={editingIncome || undefined}
-          onSubmit={(data: IncomeFormData) => {
+          onSubmit={(data: any) => {
             const income: Income = {
               id: editingIncome?.id || Date.now().toString(),
               name: data.name,
@@ -158,16 +159,12 @@ const IncomeView: React.FC<IncomeViewProps> = ({
               endDate: data.endDate,
               notes: data.notes,
               paymentSchedule: {
-                frequency: data.paymentFrequency,
-                amount: data.amount,
-                months: data.customSchedule
+                frequency: data.paymentSchedule.frequency,
+                amount: data.paymentSchedule.amount,
+                months: data.paymentSchedule.months
               }
             };
             return editingIncome ? onUpdateIncome(income) : onAddIncome(income);
-          }}
-          onCancel={() => {
-            onSetIsAddingIncome(false);
-            onSetEditingIncome(null);
           }}
         />
       </Modal>

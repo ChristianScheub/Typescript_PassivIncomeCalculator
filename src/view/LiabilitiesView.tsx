@@ -48,11 +48,13 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
 
   const summaryItems = [
     [{
+      id: 'total-debt',
       label: t('liabilities.totalDebt'),
       value: formatService.formatCurrency(totalDebt),
       valueClassName: 'text-red-500 dark:text-red-400'
     }],
     [{
+      id: 'monthly-payments',
       label: t('liabilities.monthlyPayments'),
       value: formatService.formatCurrency(totalMonthlyPayment),
       valueClassName: 'text-red-500 dark:text-red-400',
@@ -151,10 +153,6 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
         <MaterialLiabilityForm
           initialData={editingLiability || undefined}
           onSubmit={editingLiability ? onUpdateLiability : onAddLiability}
-          onCancel={() => {
-            onSetIsAddingLiability(false);
-            onSetEditingLiability(null);
-          }}
         />
       </Modal>
     </div>
