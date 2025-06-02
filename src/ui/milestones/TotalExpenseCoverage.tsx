@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 import { Target } from 'lucide-react';
 import formatService from '../../service/formatService';
+import { getHighestMilestone, getMilestoneKey } from '../../utils/milestoneUtils';
+import './milestones.css';
 
 interface TotalExpenseCoverageProps {
   monthlyPassiveIncome: number;
@@ -66,40 +68,33 @@ const TotalExpenseCoverage: React.FC<TotalExpenseCoverageProps> = ({
           </div>
           
           <div className="flex justify-between text-sm">
-            <div>
+            <div className="space-y-2">
               <p className="font-semibold text-emerald-600 dark:text-emerald-400">
                 {t('forecast.milestones.totalExpenseCoverage.percentCovered', { percent: percentage.toFixed(1) })}
               </p>
               <p className="text-gray-500 dark:text-gray-400">
                 {t('forecast.milestones.totalExpenseCoverage.totalMonthlyExpenses', { amount: formatService.formatCurrency(totalMonthlyExpenses) })}
               </p>
-              <p className="text-gray-500 dark:text-gray-400">
-                {t('forecast.milestones.totalExpenseCoverage.breakdown', { expenses: formatService.formatCurrency(monthlyExpenses), debts: formatService.formatCurrency(monthlyLiabilityPayments) })}
-              </p>
+              
+              <div className="text-xs text-gray-400 dark:text-gray-500 space-y-1">
+                <p className="font-medium">{t('forecast.milestones.totalExpenseCoverage.breakdownTitle')}</p>
+                <p className="ml-2">{t('forecast.milestones.totalExpenseCoverage.regularExpenses', { expenses: formatService.formatCurrency(monthlyExpenses) })}</p>
+                <p className="ml-2">{t('forecast.milestones.totalExpenseCoverage.liabilityPayments', { debts: formatService.formatCurrency(monthlyLiabilityPayments) })}</p>
+              </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            {percentage >= 25 && (
-              <div className={`milestone ${percentage >= 25 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.totalExpenseCoverage.milestone25')}
-              </div>
-            )}
-            {percentage >= 50 && (
-              <div className={`milestone ${percentage >= 50 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.totalExpenseCoverage.milestone50')}
-              </div>
-            )}
-            {percentage >= 75 && (
-              <div className={`milestone ${percentage >= 75 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.totalExpenseCoverage.milestone75')}
-              </div>
-            )}
-            {percentage >= 100 && (
-              <div className={`milestone ${percentage >= 100 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.totalExpenseCoverage.milestone100')}
-              </div>
-            )}
+            {(() => {
+              const highestMilestone = getHighestMilestone(percentage);
+              if (!highestMilestone) return null;
+              
+              return (
+                <div className="milestone milestone-achieved">
+                  {t(`forecast.milestones.totalExpenseCoverage.${getMilestoneKey(highestMilestone)}`)}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </CardContent>

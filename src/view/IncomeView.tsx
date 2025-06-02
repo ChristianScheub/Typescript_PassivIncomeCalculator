@@ -8,7 +8,7 @@ import { DataSummaryCard } from '../ui/DataSummaryCard';
 import { Modal } from '../ui/Modal';
 import { EmptyState } from '../ui/EmptyState';
 import { Income, IncomeFormData } from '../types';
-import { MaterialIncomeForm } from '../container/MaterialIncomeForm';
+import { MaterialIncomeForm } from '../container/forms/MaterialIncomeForm';
 import formatService from '../service/formatService';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
 

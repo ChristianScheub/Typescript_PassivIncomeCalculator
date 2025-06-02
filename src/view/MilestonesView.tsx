@@ -51,19 +51,19 @@ const MilestonesView: React.FC<MilestonesViewProps> = ({
         />
       </div>
 
-      <FixedCostFreedom
-        monthlyPassiveIncome={monthlyPassiveIncome}
-        monthlyFixedCosts={monthlyFixedCosts}
-      />
-
       <LeisureMilestone
         monthlyPassiveIncome={monthlyPassiveIncome}
         monthlyLeisureExpenses={monthlyLeisureExpenses}
       />
 
+      <FixedCostFreedom
+        monthlyPassiveIncome={monthlyPassiveIncome}
+        monthlyFixedCosts={monthlyFixedCosts}
+      />
+
       <TotalExpenseCoverage
         monthlyPassiveIncome={monthlyPassiveIncome}
-        monthlyExpenses={monthlyTotalExpenses - monthlyLiabilityPayments}
+        monthlyExpenses={monthlyTotalExpenses}
         monthlyLiabilityPayments={monthlyLiabilityPayments}
       />
     </div>

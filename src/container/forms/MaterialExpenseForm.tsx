@@ -1,11 +1,11 @@
-import { Expense, ExpenseCategory, PaymentFrequency } from '../types';
-import { usePaymentSchedule } from '../hooks/usePaymentSchedule';
-import { useSharedForm } from '../hooks/useSharedForm';
-import { createValidationSchema, createPaymentScheduleSchema } from '../utils/validationSchemas';
+import { Expense, ExpenseCategory, PaymentFrequency } from '../../types';
+import { usePaymentSchedule } from '../../hooks/usePaymentSchedule';
+import { useSharedForm } from '../../hooks/useSharedForm';
+import { createValidationSchema, createPaymentScheduleSchema } from '../../utils/validationSchemas';
 import { useTranslation } from 'react-i18next';
-import Logger from '../service/Logger/logger';
+import Logger from '../../service/Logger/logger';
 import { z } from 'zod';
-import { MaterialExpenseFormView } from '../view/forms/MaterialExpenseFormView';
+import { MaterialExpenseFormView } from '../../view/forms/MaterialExpenseFormView';
 
 // Create expense schema using shared schema utilities
 const expenseSchema = createValidationSchema({

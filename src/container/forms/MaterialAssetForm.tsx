@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react';
-import { Asset, AssetType, DividendFrequency, PaymentFrequency } from '../types';
-import { usePaymentSchedule } from '../hooks/usePaymentSchedule';
-import { useSharedForm } from '../hooks/useSharedForm';
+import { Asset, AssetType, DividendFrequency, PaymentFrequency } from '../../types';
+import { usePaymentSchedule } from '../../hooks/usePaymentSchedule';
+import { useSharedForm } from '../../hooks/useSharedForm';
 import { useTranslation } from 'react-i18next';
-import Logger from '../service/Logger/logger';
-import { createAssetSchema } from '../utils/validationSchemas';
-import { MaterialAssetFormView } from '../view/forms/MaterialAssetFormView';
+import Logger from '../../service/Logger/logger';
+import { createAssetSchema } from '../../utils/validationSchemas';
+import { MaterialAssetFormView } from '../../view/forms/MaterialAssetFormView';
 
 interface AssetFormData {
   // Required fields

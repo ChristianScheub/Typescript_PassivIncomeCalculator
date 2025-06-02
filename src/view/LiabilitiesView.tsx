@@ -3,7 +3,7 @@ import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Plus, Trash2, Edit, Landmark } from 'lucide-react';
 import { Liability } from '../types';
-import { MaterialLiabilityForm } from '../container/MaterialLiabilityForm';
+import { MaterialLiabilityForm } from '../container/forms/MaterialLiabilityForm';
 import { useTranslation } from 'react-i18next';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { EmptyState } from '../ui/EmptyState';

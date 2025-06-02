@@ -32,3 +32,33 @@
   background-size: 200% 100%;
   animation: shimmer 2s infinite linear;
 }
+
+.milestone {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  color: #374151;
+  border: 2px solid transparent;
+}
+
+.milestone-achieved {
+  background: linear-gradient(135deg, #10b981, #065f46);
+  color: white;
+  border-color: #059669;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.dark .milestone {
+  background: linear-gradient(135deg, #374151, #1f2937);
+  color: #d1d5db;
+}
+
+.dark .milestone-achieved {
+  background: linear-gradient(135deg, #10b981, #065f46);
+  color: white;
+  border-color: #059669;
+}

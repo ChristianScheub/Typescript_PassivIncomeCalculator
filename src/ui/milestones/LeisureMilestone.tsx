@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 import { PartyPopper } from 'lucide-react';
 import formatService from '../../service/formatService';
+import { getHighestMilestone, getMilestoneKey } from '../../utils/milestoneUtils';
+import './milestones.css';
 
 interface LeisureMilestoneProps {
   monthlyPassiveIncome: number;
@@ -74,26 +76,16 @@ const LeisureMilestone: React.FC<LeisureMilestoneProps> = ({
           </div>
 
           <div className="space-y-2">
-            {percentage >= 25 && (
-              <div className={`milestone ${percentage >= 25 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.leisureMilestone.milestone25')}
-              </div>
-            )}
-            {percentage >= 50 && (
-              <div className={`milestone ${percentage >= 50 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.leisureMilestone.milestone50')}
-              </div>
-            )}
-            {percentage >= 75 && (
-              <div className={`milestone ${percentage >= 75 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.leisureMilestone.milestone75')}
-              </div>
-            )}
-            {percentage >= 100 && (
-              <div className={`milestone ${percentage >= 100 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.leisureMilestone.milestone100')}
-              </div>
-            )}
+            {(() => {
+              const highestMilestone = getHighestMilestone(percentage);
+              if (!highestMilestone) return null;
+              
+              return (
+                <div className="milestone milestone-achieved">
+                  {t(`forecast.milestones.leisureMilestone.${getMilestoneKey(highestMilestone)}`)}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </CardContent>

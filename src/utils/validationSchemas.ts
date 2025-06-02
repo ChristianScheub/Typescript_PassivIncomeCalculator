@@ -138,7 +138,7 @@ export const createAssetSchema = () => {
 // Liability Schema
 export const createLiabilitySchema = () => baseEntitySchema.extend({
   type: z.enum(['mortgage', 'personal_loan', 'credit_card', 'student_loan', 'auto_loan', 'other'] as const),
-  principalAmount: amountSchema,
+  initialBalance: amountSchema,
   currentBalance: amountSchema,
   interestRate: amountSchema,
   paymentSchedule: createPaymentScheduleSchema(),

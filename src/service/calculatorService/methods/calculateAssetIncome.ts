@@ -10,6 +10,14 @@ import {
 } from "../../../utils/dividendCacheUtils";
 
 export const calculateAssetMonthlyIncome = (asset: Asset): number => {
+  // Zuerst prüfen, ob gecachte Daten vorhanden sind
+  const cachedData = getCachedDividendData(asset);
+  if (cachedData) {
+    Logger.cache(`Cache hit for asset ${asset.name}, returning cached monthly income: ${cachedData.monthlyAmount}`);
+    return cachedData.monthlyAmount || 0;
+  }
+
+  Logger.cache(`Cache miss for asset ${asset.name}, calculating monthly income`);
   let income = 0;
 
   Logger.infoService(
@@ -52,6 +60,15 @@ export const calculateAssetIncomeForMonth = (
   asset: Asset,
   monthNumber: number
 ): number => {
+  // Zuerst prüfen, ob gecachte Daten vorhanden sind
+  const cachedData = getCachedDividendData(asset);
+  if (cachedData && cachedData.monthlyBreakdown) {
+    const cachedMonthlyIncome = cachedData.monthlyBreakdown[monthNumber] || 0;
+    Logger.cache(`Cache hit for asset ${asset.name} month ${monthNumber}, returning cached income: ${cachedMonthlyIncome}`);
+    return cachedMonthlyIncome;
+  }
+
+  Logger.cache(`Cache miss for asset ${asset.name} month ${monthNumber}, calculating income`);
   let income = 0;
 
   Logger.infoService(
@@ -246,4 +263,72 @@ export const updateAssetCacheData = (
     );
   }
   return null;
+};
+
+// Optimized function: Check if all assets have cached data
+export const areAssetsCached = (assets: Asset[]): boolean => {
+  return assets.every(asset => {
+    const cachedData = getCachedDividendData(asset);
+    return cachedData !== null;
+  });
+};
+
+// Optimized function: Get total monthly income only from cached data
+export const calculateTotalMonthlyAssetIncomeFromCache = (assets: Asset[]): number | null => {
+  let totalIncome = 0;
+  let allCached = true;
+
+  Logger.cache(`Checking cache status for ${assets.length} assets`);
+
+  for (const asset of assets) {
+    const cachedData = getCachedDividendData(asset);
+    if (cachedData) {
+      totalIncome += cachedData.monthlyAmount || 0;
+      Logger.cache(`Asset ${asset.name}: using cached income ${cachedData.monthlyAmount}`);
+    } else {
+      allCached = false;
+      Logger.cache(`Asset ${asset.name}: no cached data available`);
+      break; // Exit early if any asset is not cached
+    }
+  }
+
+  if (allCached) {
+    Logger.cache(`All assets cached, total monthly income: ${totalIncome}`);
+    return totalIncome;
+  } else {
+    Logger.cache(`Not all assets cached, fallback to individual calculations needed`);
+    return null;
+  }
+};
+
+// Optimized function: Get total income for specific month only from cached data
+export const calculateTotalAssetIncomeForMonthFromCache = (
+  assets: Asset[], 
+  monthNumber: number
+): number | null => {
+  let totalIncome = 0;
+  let allCached = true;
+
+  Logger.cache(`Checking cache status for ${assets.length} assets for month ${monthNumber}`);
+
+  for (const asset of assets) {
+    const cachedData = getCachedDividendData(asset);
+    if (cachedData && cachedData.monthlyBreakdown) {
+      const monthlyIncome = cachedData.monthlyBreakdown[monthNumber] || 0;
+      totalIncome += monthlyIncome;
+      Logger.cache(`Asset ${asset.name} month ${monthNumber}: using cached income ${monthlyIncome}`);
+    } else {
+      allCached = false;
+      Logger.cache(`Asset ${asset.name} month ${monthNumber}: no cached data available`);
+      break; // Exit early if any asset is not cached
+    }
+  }
+
+  if (allCached) {
+    Logger.cache(`All assets cached for month ${monthNumber}, total income: ${totalIncome}`);
+    return totalIncome;
+  } else {
+    Logger.cache(`Not all assets cached for month ${monthNumber}, fallback needed`);
+    return null;
+  }
 };

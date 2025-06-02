@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import formatService from '../service/formatService';
 import { Modal } from '../ui/Modal';
 import { DataSummaryCard } from '../ui/DataSummaryCard';
-import { MaterialAssetForm } from '../container/MaterialAssetForm';
+import { MaterialAssetForm } from '../container/forms/MaterialAssetForm';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';

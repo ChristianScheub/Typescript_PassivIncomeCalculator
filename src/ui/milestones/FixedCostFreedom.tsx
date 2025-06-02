@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 import { Home } from 'lucide-react';
 import formatService from '../../service/formatService';
+import { getHighestMilestone, getMilestoneKey } from '../../utils/milestoneUtils';
+import './milestones.css';
 
 interface FixedCostFreedomProps {
   monthlyPassiveIncome: number;
@@ -50,9 +52,21 @@ const FixedCostFreedom: React.FC<FixedCostFreedomProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-          {t('forecast.milestones.fixedCostFreedom.description')}
-        </p>
+        <div className="space-y-3 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t('forecast.milestones.fixedCostFreedom.mainDescription')}
+          </p>
+          
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="font-medium mb-1">{t('forecast.milestones.fixedCostFreedom.includedCosts')}</p>
+            <p className="ml-2">{t('forecast.milestones.fixedCostFreedom.categories')}</p>
+            <p className="ml-2">{t('forecast.milestones.fixedCostFreedom.debtPayments')}</p>
+          </div>
+          
+          <div className="text-xs text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 p-2 rounded-md">
+            {t('forecast.milestones.fixedCostFreedom.exclusionNote')}
+          </div>
+        </div>
         
         <div className="space-y-4">
           <div className="relative h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -74,26 +88,16 @@ const FixedCostFreedom: React.FC<FixedCostFreedomProps> = ({
           </div>
 
           <div className="space-y-2">
-            {percentage >= 25 && (
-              <div className={`milestone ${percentage >= 25 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.fixedCostFreedom.milestone25')}
-              </div>
-            )}
-            {percentage >= 50 && (
-              <div className={`milestone ${percentage >= 50 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.fixedCostFreedom.milestone50')}
-              </div>
-            )}
-            {percentage >= 75 && (
-              <div className={`milestone ${percentage >= 75 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.fixedCostFreedom.milestone75')}
-              </div>
-            )}
-            {percentage >= 100 && (
-              <div className={`milestone ${percentage >= 100 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.fixedCostFreedom.milestone100')}
-              </div>
-            )}
+            {(() => {
+              const highestMilestone = getHighestMilestone(percentage);
+              if (!highestMilestone) return null;
+              
+              return (
+                <div className="milestone milestone-achieved">
+                  {t(`forecast.milestones.fixedCostFreedom.${getMilestoneKey(highestMilestone)}`)}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </CardContent>

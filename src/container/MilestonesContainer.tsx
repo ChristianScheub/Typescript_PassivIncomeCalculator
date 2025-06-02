@@ -14,29 +14,40 @@ const MilestonesContainer: React.FC = () => {
   const monthlyPassiveIncome = calculatorService.calculatePassiveIncome(income) +
                               calculatorService.calculateTotalMonthlyAssetIncome(assets);
 
-  // Calculate fixed costs (only specific categories + liabilities)
-  const monthlyFixedCosts = expenses
+  // Calculate fixed costs (only specific categories - WITHOUT liabilities for cleaner calculation)
+  const monthlyFixedExpenses = expenses
     .filter(expense => ['housing', 'transportation', 'utilities', 'insurance', 'health'].includes(expense.category))
-    .reduce((total, expense) => total + calculatorService.calculateMonthlyExpense(expense), 0) +
-    calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
+    .reduce((total, expense) => total + calculatorService.calculateMonthlyExpense(expense), 0);
 
-  const totalDebt = calculatorService.calculateTotalDebt(liabilities);
   const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
+  
+  // Fixed costs includes fixed expenses + liability payments
+  const monthlyFixedCosts = monthlyFixedExpenses + monthlyLiabilityPayments;
 
   const liquidAssets = calculatorService.calculateLiquidAssetValue(assets);
 
   // Transform data for DebtBreaker component
-  const debts = liabilities.map(liability => ({
-    name: liability.name,
-    type: liability.type,
-    initialAmount: liability.initialBalance,
-    currentAmount: liability.currentBalance,
-    progress: ((liability.initialBalance - liability.currentBalance) / liability.initialBalance) * 100
-  }));
+  const debts = liabilities.map(liability => {
+    // Avoid division by zero and ensure valid numbers
+    const initialAmount = liability.initialBalance || 0;
+    const currentAmount = liability.currentBalance || 0;
+    const paidAmount = Math.max(0, initialAmount - currentAmount);
+    const progress = initialAmount > 0 ? (paidAmount / initialAmount) * 100 : 0;
+    
+    return {
+      name: liability.name,
+      type: liability.type,
+      initialAmount,
+      currentAmount,
+      progress: Math.min(100, Math.max(0, progress)) // Clamp between 0-100%
+    };
+  });
 
-  const totalProgress = totalDebt > 0 ? 
-    ((liabilities.reduce((sum, l) => sum + l.initialBalance, 0) - totalDebt) / 
-    liabilities.reduce((sum, l) => sum + l.initialBalance, 0)) * 100 : 0;
+  // Calculate total progress based on how much debt has been paid off
+  const totalInitialDebt = liabilities.reduce((sum, l) => sum + (l.initialBalance || 0), 0);
+  const totalCurrentDebt = liabilities.reduce((sum, l) => sum + (l.currentBalance || 0), 0);
+  const totalPaidDebt = Math.max(0, totalInitialDebt - totalCurrentDebt);
+  const totalProgress = totalInitialDebt > 0 ? (totalPaidDebt / totalInitialDebt) * 100 : 0;
 
   // Transform data for DebtCoverage component  
   const debtCoverageData = liabilities.map(liability => {
@@ -56,7 +67,8 @@ const MilestonesContainer: React.FC = () => {
     .filter(expense => expense.category === 'entertainment' || expense.category === 'personal')
     .reduce((total, expense) => total + calculatorService.calculateMonthlyExpense(expense), 0);
 
-  const monthlyTotalExpenses = monthlyFixedCosts + monthlyLeisureExpenses;
+  // Calculate ALL monthly expenses (using the calculator service)
+  const monthlyTotalExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
 
   return (
     <MilestonesView

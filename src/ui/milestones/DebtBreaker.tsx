@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 import { CreditCard } from 'lucide-react';
 import formatService from '../../service/formatService';
 import type { LiabilityType } from '../../types';
+import { getHighestMilestone, getMilestoneKey } from '../../utils/milestoneUtils';
+import './milestones.css';
 
 interface DebtEntry {
   name: string;
@@ -80,6 +82,19 @@ const DebtBreaker: React.FC<DebtBreakerProps> = ({
               </div>
             )}
           </div>
+
+          <div className="space-y-2">
+            {(() => {
+              const highestMilestone = getHighestMilestone(totalProgress);
+              if (!highestMilestone) return null;
+              
+              return (
+                <div className="milestone milestone-achieved">
+                  {t(`forecast.milestones.debtBreaker.${getMilestoneKey(highestMilestone)}`)}
+                </div>
+              );
+            })()}
+          </div>
         </div>
 
         {/* Individual Debt Progress */}
@@ -87,22 +102,27 @@ const DebtBreaker: React.FC<DebtBreakerProps> = ({
           {debts.map((debt) => (
             <div key={debt.name} className="space-y-2">
               <div className="flex justify-between items-start">
-                <div>
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-gray-600 dark:text-gray-300">
                     {t(`liabilities.types.${debt.type}`)}
-                  </span>
-                  <br />
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
                     {t('forecast.milestones.debtBreaker.perDebt', {
                       name: t(`liabilities.types.${debt.type}`),
                       percent: debt.progress.toFixed(1)
                     })}
-                  </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
-                    {formatService.formatCurrency(debt.currentAmount)} / {formatService.formatCurrency(debt.initialAmount)}
-                  </span>
+                <div className="text-right flex-shrink-0">
+                  <div className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-1">
+                    <span>{formatService.formatCurrency(debt.currentAmount)}</span>
+                    <span className="text-gray-500 dark:text-gray-400">
+                      / {formatService.formatCurrency(debt.initialAmount)}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400">
+                    {t('forecast.milestones.debtBreaker.remainingDebt')}
+                  </div>
                 </div>
               </div>
               <div className="relative h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">

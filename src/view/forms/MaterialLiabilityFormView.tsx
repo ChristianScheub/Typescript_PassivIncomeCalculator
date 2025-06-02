@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 interface LiabilityFormData {
   name: string;
   type: LiabilityType;
-  principalAmount: number;
+  initialBalance: number;
   currentBalance: number;
   interestRate: number;
   paymentSchedule: {
@@ -118,13 +118,13 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
 
               <Box gridColumn={{ xs: "span 12", md: "span 6" }}>
                 <SharedFormField
-                  label={t('liabilities.form.principalAmount')}
-                  name="principalAmount"
+                  label={t('liabilities.form.initialBalance')}
+                  name="initialBalance"
                   type="number"
                   required
-                  error={errors.principalAmount?.message}
-                  value={watch('principalAmount')}
-                  onChange={(value: number) => setValue('principalAmount', value)}
+                  error={errors.initialBalance?.message}
+                  value={watch('initialBalance')}
+                  onChange={(value: number) => setValue('initialBalance', value)}
                   step={0.01}
                   min={0}
                 />

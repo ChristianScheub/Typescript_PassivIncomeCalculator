@@ -15,12 +15,6 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({ children }) => {
       {/* Header */}
       <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-sm">
         <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-          <h1 className="text-lg font-bold text-blue-600 dark:text-blue-400">FinanceTrack</h1>
-          <div className="flex items-center space-x-3">
-            <NavLink to="/settings" className={({isActive}) => `p-1 rounded-full ${isActive ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300'}`}>
-              <Settings size={20} />
-            </NavLink>
-          </div>
         </div>
       </header>
       

@@ -79,4 +79,17 @@ export interface ICalculatorService {
     assets?: Asset[],
     months?: number
   ) => MonthlyProjection[];
+  calculateProjectionsWithCache: (
+    baseValues: {
+      totalMonthlyIncome: number;
+      totalMonthlyExpenses: number;
+      totalLiabilityPayments: number;
+      passiveIncome: number;
+    },
+    monthlyAssetIncomeCache: Record<number, number>,
+    months?: number
+  ) => MonthlyProjection[];
+
+  // Cache status helpers
+  areAssetsCached?: (assets: Asset[]) => boolean;
 }

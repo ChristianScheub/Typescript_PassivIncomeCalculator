@@ -1,5 +1,12 @@
 import { ICalculatorService } from './interfaces/ICalculatorService';
-import { calculateAssetMonthlyIncome, calculateAssetIncomeForMonth, calculateTotalAssetIncomeForMonth } from './methods/calculateAssetIncome';
+import { 
+  calculateAssetMonthlyIncome, 
+  calculateAssetIncomeForMonth, 
+  calculateTotalAssetIncomeForMonth,
+  calculateTotalMonthlyAssetIncomeFromCache,
+  calculateTotalAssetIncomeForMonthFromCache,
+  areAssetsCached
+} from './methods/calculateAssetIncome';
 import { 
   calculateMonthlyIncome, 
   calculateTotalMonthlyIncome, 
@@ -21,7 +28,7 @@ import { calculateNetWorth } from './methods/calculateNetWorth';
 import { calculateMonthlyCashFlow } from './methods/calculateCashFlow';
 import { calculateAssetAllocation, calculateIncomeAllocation } from './methods/calculateAllocations';
 import { calculateExpenseBreakdown } from './methods/calculateExpenseBreakdown';
-import { calculateProjections } from './methods/calculateProjections';
+import { calculateProjections, calculateProjectionsWithCache } from './methods/calculateProjections';
 import { getDividendCacheService } from '../dividendCacheService';
 
 const calculatorService: ICalculatorService = {
@@ -37,9 +44,24 @@ const calculatorService: ICalculatorService = {
   calculateLiquidAssetValue: (assets) => assets
     .filter(asset => ['stock', 'bond', 'cash'].includes(asset.type))
     .reduce((sum, asset) => sum + asset.value, 0),
-  calculateTotalMonthlyAssetIncome: (assets) => 
-    assets.reduce((sum, asset) => sum + calculateAssetMonthlyIncome(asset), 0),
-  calculateTotalAssetIncomeForMonth,
+  calculateTotalMonthlyAssetIncome: (assets) => {
+    // Try cache-only approach first for maximum performance
+    const cachedTotal = calculateTotalMonthlyAssetIncomeFromCache(assets);
+    if (cachedTotal !== null) {
+      return cachedTotal;
+    }
+    // Fallback to individual calculations (which also use cache where available)
+    return assets.reduce((sum, asset) => sum + calculateAssetMonthlyIncome(asset), 0);
+  },
+  calculateTotalAssetIncomeForMonth: (assets, monthNumber) => {
+    // Try cache-only approach first for maximum performance
+    const cachedTotal = calculateTotalAssetIncomeForMonthFromCache(assets, monthNumber);
+    if (cachedTotal !== null) {
+      return cachedTotal;
+    }
+    // Fallback to original function (which also uses cache where available)
+    return calculateTotalAssetIncomeForMonth(assets, monthNumber);
+  },
   calculateAnnualAssetIncome: (monthlyIncome) => monthlyIncome * 12,
 
   // Cached asset calculations
@@ -63,22 +85,37 @@ const calculatorService: ICalculatorService = {
       },
     };
   },
-  
-  calculateTotalMonthlyAssetIncomeWithCache: (assets) => {
+   calculateTotalMonthlyAssetIncomeWithCache: (assets) => {
+    // First try pure cache approach for best performance
+    const cachedTotal = calculateTotalMonthlyAssetIncomeFromCache(assets);
+    if (cachedTotal !== null) {
+      return cachedTotal;
+    }
+    
+    // Fallback to cache service if available
     const cacheService = getDividendCacheService();
     if (cacheService) {
       return cacheService.calculateTotalMonthlyAssetIncomeWithCache(assets);
     }
-    // Fallback to non-cached calculation
+    
+    // Final fallback to non-cached calculation
     return assets.reduce((sum, asset) => sum + calculateAssetMonthlyIncome(asset), 0);
   },
-  
+
   calculateTotalAssetIncomeForMonthWithCache: (assets, monthNumber) => {
+    // First try pure cache approach for best performance
+    const cachedTotal = calculateTotalAssetIncomeForMonthFromCache(assets, monthNumber);
+    if (cachedTotal !== null) {
+      return cachedTotal;
+    }
+    
+    // Fallback to cache service if available
     const cacheService = getDividendCacheService();
     if (cacheService) {
       return cacheService.calculateTotalAssetIncomeForMonthWithCache(assets, monthNumber);
     }
-    // Fallback to non-cached calculation
+    
+    // Final fallback to non-cached calculation
     return calculateTotalAssetIncomeForMonth(assets, monthNumber);
   },
 
@@ -111,6 +148,10 @@ const calculatorService: ICalculatorService = {
   calculateIncomeAllocation,
   calculateExpenseBreakdown,
   calculateProjections,
+  calculateProjectionsWithCache,
+
+  // Cache status helpers
+  areAssetsCached: (assets) => areAssetsCached(assets),
 };
 
 export default calculatorService;

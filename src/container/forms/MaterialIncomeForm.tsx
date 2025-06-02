@@ -1,11 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Income, IncomeType, PaymentFrequency } from '../types';
-import { useSharedForm } from '../hooks/useSharedForm';
-import { createIncomeSchema } from '../utils/validationSchemas';
-import Logger from '../service/Logger/logger';
+import { Income, IncomeType, PaymentFrequency } from '../../types';
+import { useSharedForm } from '../../hooks/useSharedForm';
+import { createIncomeSchema } from '../../utils/validationSchemas';
+import Logger from '../../service/Logger/logger';
 import { z } from 'zod';
-import { MaterialIncomeFormView } from '../view/forms/MaterialIncomeFormView';
+import { MaterialIncomeFormView } from '../../view/forms/MaterialIncomeFormView';
 
 const incomeSchema = createIncomeSchema();
 

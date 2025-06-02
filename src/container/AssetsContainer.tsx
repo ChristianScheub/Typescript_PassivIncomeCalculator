@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchAssets, addAsset, updateAsset, deleteAsset, updateAssetDividendCache } from '../store/slices/assetsSlice';
 import { Asset, AssetType } from '../types';
@@ -16,9 +16,6 @@ const AssetsContainer: React.FC = () => {
   const { items: assets, status } = useAppSelector(state => state.assets);
   const [isAddingAsset, setIsAddingAsset] = useState(false);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
-  
-  // Cache für die berechneten Werte pro Asset
-  const assetIncomeCache = useMemo(() => new Map<string, number>(), []);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -31,34 +28,32 @@ const AssetsContainer: React.FC = () => {
   }, [dispatch, status]);
 
   const calculateAssetMonthlyIncome = useCallback((asset: Asset): number => {
-    // Prüfe zuerst den lokalen Cache
-    if (assetIncomeCache.has(asset.id)) {
-      return assetIncomeCache.get(asset.id)!;
-    }
-
-    let result: number;
+    // Verwende immer die gecachte Version direkt vom CacheService
     if (calculatorService.calculateAssetMonthlyIncomeWithCache) {
       const cacheResult = calculatorService.calculateAssetMonthlyIncomeWithCache(asset);
-      if (cacheResult.cacheHit) {
-        result = cacheResult.monthlyAmount;
-      } else if (cacheResult.cacheDataToUpdate) {
-        result = cacheResult.cacheDataToUpdate.monthlyAmount;
-      } else {
-        result = calculatorService.calculateAssetMonthlyIncome(asset);
+      
+      // Update Redux cache if we got new calculation data
+      if (!cacheResult.cacheHit && cacheResult.cacheDataToUpdate) {
+        const { monthlyAmount, annualAmount, monthlyBreakdown } = cacheResult.cacheDataToUpdate;
+        if (monthlyAmount > 0 || annualAmount > 0) {
+          const cachedDividends = createCachedDividends(
+            monthlyAmount,
+            annualAmount, 
+            monthlyBreakdown,
+            asset
+          );
+          dispatch(updateAssetDividendCache({ assetId: asset.id, cachedDividends }));
+        }
       }
-    } else {
-      result = calculatorService.calculateAssetMonthlyIncome(asset);
+      
+      return cacheResult.monthlyAmount;
     }
+    
+    // Fallback zur nicht-gecachten Version
+    return calculatorService.calculateAssetMonthlyIncome(asset);
+  }, [dispatch]);
 
-    // Speichere das Ergebnis im lokalen Cache
-    assetIncomeCache.set(asset.id, result);
-    return result;
-  }, [assetIncomeCache]);
 
-  // Cache leeren wenn sich Assets ändern
-  useEffect(() => {
-    assetIncomeCache.clear();
-  }, [assets, assetIncomeCache]);
 
   const { totalAssetValue, monthlyAssetIncome, annualAssetIncome } = useMemo(() => {
     const total = calculatorService.calculateTotalAssetValue(assets);
@@ -79,9 +74,6 @@ const AssetsContainer: React.FC = () => {
       analytics.trackEvent('asset_add', { type: data.type });
       await dispatch(addAsset(data));
       setIsAddingAsset(false);
-      
-      // Clear the cache after adding
-      assetIncomeCache.clear();
       
       // Nach dem Hinzufügen: Asset aus dem Store holen (das letzte Element)
       const newAsset = assets[assets.length - 1];
@@ -112,9 +104,6 @@ const AssetsContainer: React.FC = () => {
         analytics.trackEvent('asset_update', { id: editingAsset.id, type: data.type });
         await dispatch(updateAsset({ ...data, id: editingAsset.id }));
         setEditingAsset(null);
-        
-        // Clear the cache after updating
-        assetIncomeCache.clear();
         
         // Nach dem Aktualisieren: Asset aus dem Store holen (per ID)
         const updatedAsset = assets.find(a => a.id === editingAsset.id);

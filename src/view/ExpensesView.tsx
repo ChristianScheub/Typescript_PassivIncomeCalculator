@@ -3,7 +3,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Plus, Trash2, Edit, ReceiptText } from 'lucide-react';
 import { Expense } from '../types';
-import { MaterialExpenseForm } from '../container/MaterialExpenseForm';
+import { MaterialExpenseForm } from '../container/forms/MaterialExpenseForm';
 import { useTranslation } from 'react-i18next';
 import formatService from '../service/formatService';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';

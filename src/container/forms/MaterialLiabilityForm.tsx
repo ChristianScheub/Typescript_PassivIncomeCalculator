@@ -1,16 +1,16 @@
-import { Liability, LiabilityType, PaymentFrequency } from '../types';
-import { usePaymentSchedule } from '../hooks/usePaymentSchedule';
-import { useSharedForm } from '../hooks/useSharedForm';
-import { createValidationSchema, createPaymentScheduleSchema } from '../utils/validationSchemas';
+import { Liability, LiabilityType, PaymentFrequency } from '../../types';
+import { usePaymentSchedule } from '../../hooks/usePaymentSchedule';
+import { useSharedForm } from '../../hooks/useSharedForm';
+import { createValidationSchema, createPaymentScheduleSchema } from '../../utils/validationSchemas';
 import { useTranslation } from 'react-i18next';
-import Logger from '../service/Logger/logger';
+import Logger from '../../service/Logger/logger';
 import { z } from 'zod';
-import { MaterialLiabilityFormView } from '../view/forms/MaterialLiabilityFormView';
+import { MaterialLiabilityFormView } from '../../view/forms/MaterialLiabilityFormView';
 
 // Create liability schema using shared schema utilities
 const liabilitySchema = createValidationSchema({
   type: z.enum(['mortgage', 'personal_loan', 'credit_card', 'student_loan', 'auto_loan', 'other']),
-  principalAmount: z.number().min(0, 'Principal amount must be positive'),
+  initialBalance: z.number().min(0, 'Initial balance must be positive'),
   currentBalance: z.number().min(0, 'Current balance must be positive'),
   interestRate: z.number().min(0, 'Interest rate must be positive'),
   paymentSchedule: createPaymentScheduleSchema(),

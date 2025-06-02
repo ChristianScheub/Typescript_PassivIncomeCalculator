@@ -4,6 +4,8 @@ import liabilitiesReducer from './slices/liabilitiesSlice';
 import expensesReducer from './slices/expensesSlice';
 import incomeReducer from './slices/incomeSlice';
 import dashboardReducer from './slices/dashboardSlice';
+import forecastReducer from './slices/forecastSlice';
+import dataChangeMiddleware from './middleware/dataChangeMiddleware';
 
 type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
 
@@ -36,7 +38,8 @@ const loadState = () => {
         status: 'idle' as Status,
         error: null
       },
-      dashboard: state.dashboard || {}
+      dashboard: state.dashboard || {},
+      forecast: state.forecast || {}
     };
   } catch (err) {
     console.error('Error loading state:', err);
@@ -53,12 +56,13 @@ export const store = configureStore({
     expenses: expensesReducer,
     income: incomeReducer,
     dashboard: dashboardReducer,
+    forecast: forecastReducer,
   },
   preloadedState: persistedState,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false, // For storing Date objects in state
-    })
+    }).concat(dataChangeMiddleware)
 });
 
 // Subscribe to store changes and save to localStorage
@@ -78,7 +82,8 @@ store.subscribe(() => {
       income: {
         items: state.income.items
       },
-      dashboard: state.dashboard
+      dashboard: state.dashboard,
+      forecast: state.forecast
     };
     localStorage.setItem('passiveIncomeCalculator', JSON.stringify(stateToSave));
   } catch (err) {

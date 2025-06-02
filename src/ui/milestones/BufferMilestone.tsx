@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 import { Shield } from 'lucide-react';
 import formatService from '../../service/formatService';
+import { getHighestBufferMilestone, getBufferMilestoneKey } from '../../utils/milestoneUtils';
+import './milestones.css';
 
 interface BufferMilestoneProps {
   liquidAssets: number;
@@ -76,21 +78,16 @@ const BufferMilestone: React.FC<BufferMilestoneProps> = ({
           </div>
 
           <div className="space-y-2">
-            {percentage >= 33.33 && (
-              <div className={`milestone ${percentage >= 33.33 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.bufferMilestone.milestone2')}
-              </div>
-            )}
-            {percentage >= 66.66 && (
-              <div className={`milestone ${percentage >= 66.66 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.bufferMilestone.milestone4')}
-              </div>
-            )}
-            {percentage >= 100 && (
-              <div className={`milestone ${percentage >= 100 ? 'milestone-achieved' : ''}`}>
-                {t('forecast.milestones.bufferMilestone.milestone6')}
-              </div>
-            )}
+            {(() => {
+              const highestMilestone = getHighestBufferMilestone(percentage);
+              if (!highestMilestone) return null;
+              
+              return (
+                <div className="milestone milestone-achieved">
+                  {t(`forecast.milestones.bufferMilestone.${getBufferMilestoneKey(highestMilestone)}`)}
+                </div>
+              );
+            })()}
           </div>
         </div>
       </CardContent>
