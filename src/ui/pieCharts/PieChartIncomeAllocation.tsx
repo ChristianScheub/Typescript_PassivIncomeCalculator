@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../Card';
-import { CustomPieTooltip } from '../CustomPieTooltip';
 import { IncomeAllocation } from '../../types';
 import { COLORS } from '../../utils/constants';
 import formatService from '../../service/formatService';
@@ -10,6 +9,29 @@ import formatService from '../../service/formatService';
 interface PieChartIncomeAllocationProps {
   readonly incomeAllocation: ReadonlyArray<IncomeAllocation>;
 }
+
+// Custom tooltip for income allocation
+const IncomeTooltip: React.FC<{
+  active?: boolean;
+  payload?: any[];
+}> = ({ active, payload }) => {
+  const { t } = useTranslation();
+  
+  if (!active || !payload?.length) return null;
+  
+  const data = payload?.[0]?.payload;
+  if (!data) return null;
+  
+  const name = t(`income.types.${data.type}`);
+      
+  return (
+    <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
+      <p className="text-sm font-medium">{name}</p>
+      <p className="text-sm">{formatService.formatCurrency(data.amount)}</p>
+      <p className="text-sm">({data.percentage.toFixed(1)}%)</p>
+    </div>
+  );
+};
 
 const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
   incomeAllocation = []
@@ -51,7 +73,7 @@ const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
                   <Cell key={income.id} fill={COLORS[chartData.findIndex(i => i.type === income.type) % COLORS.length]} />
                 ))}
               </Pie>
-              <Tooltip content={<CustomPieTooltip formatCurrency={formatService.formatCurrency} formatPercentage={(value) => `${(value * 100).toFixed(1)}%`} />} />
+              <Tooltip content={<IncomeTooltip />} />
             </PieChart>
           </ResponsiveContainer>
         ) : (
@@ -72,7 +94,7 @@ const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
               <div>
                 <div className="text-sm font-medium">{t(`income.types.${income.type}`)}</div>
                 <div className="text-sm text-gray-500">
-                  {formatService.formatCurrency(income.amount)}
+                  {formatService.formatCurrency(income.amount)} ({income.percentage.toFixed(1)}%)
                 </div>
               </div>
             </div>

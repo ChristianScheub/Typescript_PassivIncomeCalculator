@@ -30,8 +30,20 @@ export const calculateIncomeAllocation = (income: Income[], assets: Asset[]): In
 
     let incomeType: IncomeType;
     switch(asset.type) {
+      case 'stock':
+        incomeType = 'dividend';
+        break;
       case 'bond':
         incomeType = 'interest';
+        break;
+      case 'real_estate':
+        incomeType = 'rental';
+        break;
+      case 'crypto':
+        incomeType = 'interest'; // Crypto kann Staking-Rewards haben
+        break;
+      case 'cash':
+        incomeType = 'interest'; // Zinsen auf Bargeld/Sparkonten
         break;
       default:
         incomeType = 'other';

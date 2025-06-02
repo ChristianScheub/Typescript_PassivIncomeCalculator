@@ -58,7 +58,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
   const { t } = useTranslation();
   const theme = useTheme();
 
-  // Updated type options without rental and dividend
+  // Type options for manual income entry (excludes auto-generated asset income)
   const typeOptions = [
     { value: 'salary', label: t('income.types.salary') },
     { value: 'interest', label: t('income.types.interest') },

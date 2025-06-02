@@ -112,7 +112,7 @@ export interface Expense extends BaseEntity {
 }
 
 // Income Types
-export type IncomeType = 'salary' | 'interest' | 'side_hustle' | 'other';
+export type IncomeType = 'salary' | 'interest' | 'dividend' | 'rental' | 'side_hustle' | 'other';
 
 export interface Income extends BaseEntity {
   type: IncomeType;
