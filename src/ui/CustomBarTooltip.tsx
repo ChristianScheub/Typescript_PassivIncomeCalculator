@@ -13,8 +13,8 @@ export const CustomBarTooltip: React.FC<CustomBarTooltipProps> = ({ active, payl
     return (
       <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
         <p className="text-sm font-medium">{label}</p>
-        {payload.map((item, index) => (
-          <p key={index} className="text-sm">
+        {payload.map((item) => (
+          <p key={`${item.dataKey}-${item.value}`} className="text-sm">
             {t(`dashboard.${item.dataKey}`)}: {formatCurrency(item.value)}
           </p>
         ))}

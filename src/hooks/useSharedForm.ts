@@ -45,7 +45,13 @@ export function useSharedForm<T extends FieldValues>({
     const onValidSubmit: SubmitHandler<T> = async (data) => {
       try {
         Logger.info(JSON.stringify(data));
-        await onSubmit(data);
+        const result = onSubmit(data);
+        if (typeof result !== 'undefined' && result !== null) {
+          const isPromise = typeof result === 'object' && 'then' in result;
+          if (isPromise) {
+            await result;
+          }
+        }
       } catch (error) {
         Logger.error(error instanceof Error ? error.message : 'Unknown error');
         if (onError) {

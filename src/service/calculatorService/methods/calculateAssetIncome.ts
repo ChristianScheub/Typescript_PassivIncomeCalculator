@@ -7,7 +7,6 @@ import {
 import {
   getCachedDividendData,
   createCachedDividends,
-  isDividendCacheValid,
 } from "../../../utils/dividendCacheUtils";
 
 export const calculateAssetMonthlyIncome = (asset: Asset): number => {

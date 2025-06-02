@@ -24,9 +24,9 @@ export function useFormConfig<T extends FieldValues>({
   const methods = useForm<T>(formProps);
   const { handleSubmit, formState: { errors } } = methods;
 
-  const onFormSubmit = async (data: T) => {
+  const onFormSubmit = (data: T) => {
     try {
-      await onSubmit(data);
+      onSubmit(data);
     } catch (error) {
       console.error('Form submission error:', error);
     }

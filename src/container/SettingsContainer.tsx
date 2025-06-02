@@ -19,15 +19,15 @@ const SettingsContainer: React.FC = () => {
   const [showLogs, setShowLogs] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
 
+  const loadLogs = () => {
+    const storedLogs = localStorage.getItem("app_logs");
+    if (storedLogs) {
+      setLogs(JSON.parse(storedLogs));
+    }
+  };
+
   // Load logs on component mount and periodically if auto-refresh is enabled
   useEffect(() => {
-    const loadLogs = () => {
-      const storedLogs = localStorage.getItem("app_logs");
-      if (storedLogs) {
-        setLogs(JSON.parse(storedLogs));
-      }
-    };
-
     loadLogs();
 
     if (autoRefresh) {
@@ -36,12 +36,7 @@ const SettingsContainer: React.FC = () => {
     }
   }, [autoRefresh]);
 
-  const handleRefreshLogs = () => {
-    const storedLogs = localStorage.getItem("app_logs");
-    if (storedLogs) {
-      setLogs(JSON.parse(storedLogs));
-    }
-  };
+  const handleRefreshLogs = loadLogs;
 
   const handleExportData = async () => {
     try {

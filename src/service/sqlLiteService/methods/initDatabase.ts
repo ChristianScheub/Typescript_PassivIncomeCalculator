@@ -1,6 +1,5 @@
 import { openDB } from 'idb';
-import { StoreNames, FinanceDB } from '../interfaces/ISQLiteService';
-import Logger from '../../Logger/logger';
+import { FinanceDB } from '../interfaces/ISQLiteService';
 
 const DB_NAME = 'finance-tracker';
 const DB_VERSION = 1;

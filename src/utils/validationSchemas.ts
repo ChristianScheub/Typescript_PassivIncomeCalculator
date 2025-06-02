@@ -23,9 +23,9 @@ export const amountSchema = z.number().min(0, 'Amount must be positive');
 // Asset Specific Schemas
 export const stockFields = {
   ticker: z.string().optional(),
-  quantity: amountSchema.optional(),
-  purchasePrice: amountSchema.optional(),
-  currentPrice: amountSchema.optional(),
+  quantity: amountSchema,  // Required for stocks
+  purchasePrice: amountSchema,  // Required for stocks
+  currentPrice: amountSchema,  // Required for stocks
   dividendFrequency: z.enum(['monthly', 'quarterly', 'annually', 'custom', 'none'] as const).optional(),
   dividendAmount: amountSchema.optional(),
   dividendMonths: z.array(z.number()).optional(),
@@ -50,17 +50,61 @@ export const cryptoFields = {
 };
 
 // Asset Schema
-export const createAssetSchema = () => baseEntitySchema.extend({
-  type: z.enum(['stock', 'bond', 'real_estate', 'crypto', 'cash', 'other'] as const),
-  value: amountSchema,
-  country: z.string().optional(),
-  continent: z.string().optional(),
-  sector: z.string().optional(),
-  ...stockFields,
-  ...realEstateFields,
-  ...bondFields,
-  ...cryptoFields,
-});
+export const createAssetSchema = () => {
+  const baseSchema = baseEntitySchema.extend({
+    type: z.enum(['stock', 'bond', 'real_estate', 'crypto', 'cash', 'other'] as const),
+    value: z.number().min(0).optional(),  // Optional for stocks as it's calculated
+    country: z.string().optional(),
+    continent: z.string().optional(),
+    sector: z.string().optional(),
+    // Stock fields
+    ticker: z.string().optional(),
+    quantity: z.number().min(0).optional(),
+    purchasePrice: z.number().min(0).optional(),
+    currentPrice: z.number().min(0).optional(),
+    dividendFrequency: z.enum(['monthly', 'quarterly', 'annually', 'custom', 'none'] as const).optional(),
+    dividendAmount: z.number().min(0).optional(),
+    dividendMonths: z.array(z.number()).optional(),
+    dividendPaymentMonths: z.array(z.number()).optional(),
+    customDividendAmounts: z.record(z.number()).optional(),
+  });
+
+  return baseSchema.superRefine((data, ctx) => {
+    if (data.type === 'stock') {
+      // For stocks, require quantity and prices
+      if (!data.quantity || data.quantity <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Quantity is required for stocks",
+          path: ["quantity"]
+        });
+      }
+      if (!data.purchasePrice || data.purchasePrice <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Purchase price is required for stocks",
+          path: ["purchasePrice"]
+        });
+      }
+      if (!data.currentPrice || data.currentPrice <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Current price is required for stocks",
+          path: ["currentPrice"]
+        });
+      }
+    } else {
+      // For non-stocks, require value
+      if (!data.value || data.value <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Value is required for non-stock assets",
+          path: ["value"]
+        });
+      }
+    }
+  });
+};
 
 // Liability Schema
 export const createLiabilitySchema = () => baseEntitySchema.extend({

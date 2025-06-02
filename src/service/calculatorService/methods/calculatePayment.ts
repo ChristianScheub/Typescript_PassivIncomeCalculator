@@ -7,33 +7,30 @@ export interface PaymentResult {
 }
 
 export const calculatePaymentSchedule = (schedule: PaymentSchedule): PaymentResult => {
-  Logger.infoService(`calculatePaymentSchedule - frequency: ${schedule.frequency}, amount: ${schedule.amount}`);
+  Logger.infoService(`calculatePaymentSchedule - frequency: ${schedule?.frequency}, amount: ${schedule?.amount}`);
   
-  if (!schedule || !schedule.amount || schedule.frequency === 'none') {
+  if (!schedule?.amount || schedule?.frequency === 'none') {
     return { monthlyAmount: 0, annualAmount: 0 };
   }
 
-  let monthlyAmount = 0;
-  
-  switch (schedule.frequency) {
-    case 'monthly':
-      monthlyAmount = schedule.amount;
-      break;
-    case 'quarterly':
-      monthlyAmount = schedule.amount / 3;
-      break;
-    case 'annually':
-      monthlyAmount = schedule.amount / 12;
-      break;
-    case 'custom':
-      if (schedule.months) {
-        const monthCount = schedule.months.length;
-        monthlyAmount = (schedule.amount * monthCount) / 12;
-      }
-      break;
-    default:
-      monthlyAmount = 0;
-  }
+  const monthlyAmount = (() => {
+    switch (schedule.frequency) {
+      case 'monthly':
+        return schedule.amount;
+      case 'quarterly':
+        return schedule.amount / 3;
+      case 'annually':
+        return schedule.amount / 12;
+      case 'custom':
+        if (schedule.months) {
+          const monthCount = schedule.months.length;
+          return (schedule.amount * monthCount) / 12;
+        }
+        return 0;
+      default:
+        return 0;
+    }
+  })();
 
   const annualAmount = monthlyAmount * 12;
   Logger.infoService(`Payment calculation result - monthly: ${monthlyAmount}, annual: ${annualAmount}`);
@@ -44,32 +41,29 @@ export const calculatePaymentSchedule = (schedule: PaymentSchedule): PaymentResu
 export const calculateDividendSchedule = (schedule: DividendSchedule, quantity: number): PaymentResult => {
   Logger.infoService(`calculateDividendSchedule - amount: ${schedule?.amount}, frequency: ${schedule?.frequency}, quantity: ${quantity}`);
   
-  if (!schedule || !schedule.amount || schedule.frequency === 'none') {
+  if (!schedule?.amount || schedule?.frequency === 'none') {
     return { monthlyAmount: 0, annualAmount: 0 };
   }
 
   const totalAmount = schedule.amount * quantity;
-  let monthlyAmount = 0;
-
-  switch (schedule.frequency) {
-    case 'monthly':
-      monthlyAmount = totalAmount;
-      break;
-    case 'quarterly':
-      monthlyAmount = totalAmount / 3;
-      break;
-    case 'annually':
-      monthlyAmount = totalAmount / 12;
-      break;
-    case 'custom':
-      if (schedule.months) {
-        const monthCount = schedule.months.length;
-        monthlyAmount = (totalAmount * monthCount) / 12;
-      }
-      break;
-    default:
-      monthlyAmount = 0;
-  }
+  const monthlyAmount = (() => {
+    switch (schedule.frequency) {
+      case 'monthly':
+        return totalAmount;
+      case 'quarterly':
+        return totalAmount / 3;
+      case 'annually':
+        return totalAmount / 12;
+      case 'custom':
+        if (schedule.months) {
+          const monthCount = schedule.months.length;
+          return (totalAmount * monthCount) / 12;
+        }
+        return 0;
+      default:
+        return 0;
+    }
+  })();
 
   const annualAmount = monthlyAmount * 12;  Logger.infoService(`Dividend calculation result - monthly: ${monthlyAmount}, annual: ${annualAmount}`);
   
@@ -78,7 +72,7 @@ export const calculateDividendSchedule = (schedule: DividendSchedule, quantity: 
 
 // Neue Funktion: Berechnet die Dividende für einen spezifischen Monat
 export const calculateDividendForMonth = (schedule: DividendSchedule, quantity: number, monthNumber: number): number => {
-  if (!schedule || !schedule.amount || schedule.frequency === 'none' || !quantity) {
+  if (!schedule?.amount || schedule?.frequency === 'none' || !quantity) {
     return 0;
   }
 

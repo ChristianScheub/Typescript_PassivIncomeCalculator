@@ -7,10 +7,9 @@ import Logger from './Logger/logger';
  * Cache service for managing dividend calculations
  */
 export class DividendCacheService {
-  private dispatch: AppDispatch;
-
-  constructor(dispatch: AppDispatch) {
-    this.dispatch = dispatch;
+  constructor(_dispatch: AppDispatch) {
+    // Dispatch parameter is kept for backward compatibility but currently unused
+    Logger.info('Initialized DividendCacheService');
   }
 
   /**

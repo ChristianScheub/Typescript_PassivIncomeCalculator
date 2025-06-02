@@ -44,10 +44,10 @@ export const ChartPieTooltip: React.FC<ChartPieTooltipProps> = ({
   const { t } = useTranslation();
   if (!active || !payload?.length) return null;
 
-  const data = payload[0]?.payload;
+  const data = payload?.[0]?.payload;
   if (!data) return null;
 
-  const name = data.category && translationPrefix 
+  const name = data?.category && translationPrefix 
     ? t(`${translationPrefix}.${data.category}`)
     : data.name;
       

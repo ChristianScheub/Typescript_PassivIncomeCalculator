@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Grid } from '@mui/material';
 import { Asset, AssetType, DividendFrequency } from '../types';
 import { 
@@ -171,6 +171,17 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
 
   const assetType = watch('type');
   const dividendFrequency = watch('dividendFrequency');
+  
+  // Calculate value for stocks based on quantity and currentPrice
+  useEffect(() => {
+    if (assetType === 'stock') {
+      const quantity = watch('quantity');
+      const currentPrice = watch('currentPrice');
+      if (quantity && currentPrice) {
+        setValue('value', quantity * currentPrice);
+      }
+    }
+  }, [assetType, watch('quantity'), watch('currentPrice'), setValue]);
 
   return (
     <MaterialForm 
@@ -203,20 +214,22 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
               onChange={(value) => setValue('type', value as AssetType)}
             />
           </Grid>
-          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-            <SharedFormField
-              label={t('assets.form.value')}
-              name="value"
-              type="number"
-              required
-              error={errors.value?.message}
-              value={watch('value')}
-              onChange={(value) => setValue('value', value)}
-              placeholder="0.00"
-              step={0.01}
-              min={0}
-            />
-          </Grid>
+          {assetType !== 'stock' && (
+            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
+              <SharedFormField
+                label={t('assets.form.value')}
+                name="value"
+                type="number"
+                required
+                error={errors.value?.message}
+                value={watch('value')}
+                onChange={(value) => setValue('value', value)}
+                placeholder="0.00"
+                step={0.01}
+                min={0}
+              />
+            </Grid>
+          )}
         </Grid>
       </RequiredFieldsSection>
 
