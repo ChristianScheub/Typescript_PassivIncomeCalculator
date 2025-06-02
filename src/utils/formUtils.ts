@@ -28,69 +28,64 @@ export interface ValidationOptions {
   customValidation?: (value: any) => boolean;
 }
 
+const createStringValidation = (options: ValidationOptions): z.ZodType<any> => {
+  const schema = z.string();
+  const withPattern = options.pattern ? schema.regex(options.pattern) : schema;
+  return options.required ? withPattern.min(1, 'Field is required') : withPattern.optional();
+};
+
+const createNumberValidation = (options: ValidationOptions): z.ZodType<any> => {
+  const schema = z.number();
+  const withMinMax = options.max !== undefined 
+    ? (options.min !== undefined ? schema.min(options.min).max(options.max) : schema.max(options.max))
+    : (options.min !== undefined ? schema.min(options.min) : schema);
+  return options.required ? withMinMax : withMinMax.optional();
+};
+
+const createBooleanValidation = (options: ValidationOptions): z.ZodType<any> => {
+  const schema = z.boolean();
+  return options.required ? schema : schema.optional();
+};
+
+const createDateValidation = (options: ValidationOptions): z.ZodType<any> => {
+  const schema = z.string();
+  return options.required ? schema.min(1, 'Date is required') : schema.optional();
+};
+
 export const createFieldValidation = (
   type: 'string' | 'number' | 'boolean' | 'date',
   options: ValidationOptions = {}
 ) => {
-  let schema: z.ZodTypeAny;
+  let schema: z.ZodType<any>;
 
   switch (type) {
-    case 'string': {
-      let stringSchema = z.string();
-      if (options.pattern) {
-        stringSchema = stringSchema.regex(options.pattern);
-      }
-      schema = options.required
-        ? stringSchema.min(1, 'Field is required')
-        : stringSchema.optional();
+    case 'string':
+      schema = createStringValidation(options);
       break;
-    }
-
     case 'number':
-      let numberSchema = z.number();
-      if (options.min !== undefined) {
-        numberSchema = numberSchema.min(options.min);
-      }
-      if (options.max !== undefined) {
-        numberSchema = numberSchema.max(options.max);
-      }
-      schema = !options.required ? numberSchema.optional() : numberSchema;
+      schema = createNumberValidation(options);
       break;
-
     case 'boolean':
-      schema = z.boolean();
-      if (!options.required) {
-        schema = schema.optional();
-      }
+      schema = createBooleanValidation(options);
       break;
-
     case 'date':
-      let dateSchema = z.string();
-      schema = options.required
-        ? dateSchema.min(1, 'Date is required')
-        : dateSchema.optional();
+      schema = createDateValidation(options);
       break;
-
     default:
       throw new Error(`Unsupported field type: ${type}`);
   }
 
-  if (options.customValidation) {
-    schema = schema.refine(options.customValidation);
-  }
-
-  return schema;
+  return options.customValidation ? schema.refine(options.customValidation) : schema;
 };
 
-export function createValidationSchema<T extends Record<string, any>>(
-  fields: T
-): z.ZodObject<any> {
+export function createValidationSchema<T extends Record<string, any>>(fields: T): z.ZodObject<any> {
   const shape: Record<string, z.ZodType<any>> = {};
 
   for (const [key, config] of Object.entries(fields)) {
+    const defaultOptions = {};
     if (typeof config === 'string') {
       // Simple field type
-      shape[key] = createFieldValidation(config as any);
+      shape[key] = createFieldValidation(config as any, defaultOptions);
     } else if (typeof config === 'object') {
       // Complex field configuration
       const { type, ...options } = config;
@@ -101,28 +96,25 @@ export function createValidationSchema<T extends Record<string, any>>(
   return z.object(shape);
 }
 
-export const getDefaultValues = <T extends Record<string, any>>(
-  initialData: Partial<T> | undefined,
-  defaultValues: Partial<T>
-): Partial<T> => {
+// Re-export base fields for use in form schemas
+export { baseFields };
+
+// Helper functions for form arrays
+export const addArrayItem = <T>(array: T[] | null | undefined, item: T): T[] => {
+  return [...(array || []), item];
+};
+
+export const removeArrayItem = <T>(array: T[] | null | undefined, index: number): T[] => {
+  return (array || []).filter((_, i) => i !== index);
+};
+
+export const updateArrayItem = <T>(array: T[] | null | undefined, index: number, item: T): T[] => {
+  return (array || []).map((current, i) => (i === index ? item : current));
+};
+
+export const getDefaultValues = <T extends Record<string, any>>(initialData: Partial<T> | undefined | null, defaultValues: Partial<T>): Partial<T> => {
   if (initialData) {
     return { ...defaultValues, ...initialData };
   }
   return defaultValues;
 };
-
-// Helper functions for form arrays
-export const addArrayItem = <T>(array: T[] = [], item: T): T[] => {
-  return [...array, item];
-};
-
-export const removeArrayItem = <T>(array: T[] = [], index: number): T[] => {
-  return array.filter((_, i) => i !== index);
-};
-
-export const updateArrayItem = <T>(array: T[] = [], index: number, item: T): T[] => {
-  return array.map((current, i) => (i === index ? item : current));
-};
-
-// Re-export base fields for use in form schemas
-export { baseFields };

@@ -4,9 +4,10 @@ import { cn } from '../utils/cn';
 
 interface SummaryItem {
   label: string;
-  value: string;
+  value: string | number;
   subValue?: string;
   valueClassName?: string;
+  id: string;
 }
 
 interface DataSummaryCardProps {
@@ -27,10 +28,10 @@ export const DataSummaryCard: React.FC<DataSummaryCardProps> = ({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {items.map((row, rowIndex) => (
-            <React.Fragment key={rowIndex}>
-              {row.map((item, colIndex) => (
-                <div key={colIndex}>
+          {items.map((row) => (
+            <React.Fragment key={row.map(item => item.id).join('-')}>
+              {row.map((item) => (
+                <div key={item.id}>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {item.label}
                   </p>

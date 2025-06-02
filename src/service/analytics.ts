@@ -2,7 +2,7 @@ import Logger from './Logger/logger';
 import { featureFlag_Debug_Log_Analytics } from '../config/featureFlags';
 
 class AnalyticsService {
-  private sessionStartTime: number;
+  private readonly sessionStartTime: number;
   private events: Array<{
     type: string;
     timestamp: number;

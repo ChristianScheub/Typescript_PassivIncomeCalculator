@@ -16,19 +16,18 @@ export const ChartBarTooltip: React.FC<ChartBarTooltipProps> = ({
   translationPrefix = 'dashboard'
 }) => {
   const { t } = useTranslation();
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
-        <p className="text-sm font-medium">{label}</p>
-        {payload.map((item, index) => (
-          <p key={index} className="text-sm">
-            {t(`${translationPrefix}.${item.dataKey}`)}: {formatService.formatCurrency(item.value)}
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
+  if (!active || !payload?.length) return null;
+
+  return (
+    <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
+      <p className="text-sm font-medium">{label}</p>
+      {payload.map((item, index) => (
+        <p key={`${item.dataKey}-${index}`} className="text-sm">
+          {t(`${translationPrefix}.${item.dataKey}`)}: {formatService.formatCurrency(item.value)}
+        </p>
+      ))}
+    </div>
+  );
 };
 
 interface ChartPieTooltipProps {
@@ -43,25 +42,22 @@ export const ChartPieTooltip: React.FC<ChartPieTooltipProps> = ({
   translationPrefix
 }) => {
   const { t } = useTranslation();
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    let name;
-    
-    if (data.category && translationPrefix) {
-      name = t(`${translationPrefix}.${data.category}`);
-    } else {
-      name = data.name;
-    }
+  if (!active || !payload?.length) return null;
+
+  const data = payload[0]?.payload;
+  if (!data) return null;
+
+  const name = data.category && translationPrefix 
+    ? t(`${translationPrefix}.${data.category}`)
+    : data.name;
       
-    return (
-      <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
-        <p className="text-sm font-medium">{name}</p>
-        <p className="text-sm">{formatService.formatCurrency(data.value || data.amount)}</p>
-        <p className="text-sm">({formatService.formatPercentage(data.percentage)})</p>
-      </div>
-    );
-  }
-  return null;
+  return (
+    <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
+      <p className="text-sm font-medium">{name}</p>
+      <p className="text-sm">{formatService.formatCurrency(data.value || data.amount)}</p>
+      <p className="text-sm">({formatService.formatPercentage(data.percentage)})</p>
+    </div>
+  );
 };
 
 interface CustomBarTooltipProps {
@@ -91,39 +87,30 @@ export const CustomBarTooltip: React.FC<CustomBarTooltipProps> = ({
 interface CustomStackedBarTooltipProps {
   active?: boolean;
   payload?: any[];
-  stackId?: string;
   firstBarColor?: string;
-  secondBarColor?: string;
-  firstBarLabel?: string;
-  secondBarLabel?: string;
 }
 
-export const CustomStackedBarTooltip: React.FC<CustomStackedBarTooltipProps> = ({
-  active,
+export const CustomStackedBarTooltip: React.FC<CustomStackedBarTooltipProps> = ({ 
+  active, 
   payload,
-  stackId,
-  firstBarColor,
-  secondBarColor,
-  firstBarLabel,
-  secondBarLabel
+  firstBarColor 
 }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
-        <p className="text-sm font-medium">{payload[0].payload.name}</p>
-        <div className="space-y-1">
-          {payload.map((entry, index) => (
-            <p 
-              key={index} 
-              className="text-sm"
-              style={{ color: index === 0 ? firstBarColor : secondBarColor }}
-            >
-              {index === 0 ? firstBarLabel : secondBarLabel}: {formatService.formatCurrency(entry.value)}
-            </p>
-          ))}
-        </div>
-      </div>
-    );
-  }
-  return null;
+  if (!active || !payload?.length) return null;
+  const data = payload[0]?.payload;
+  if (!data) return null;
+
+  return (
+    <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
+      <p className="text-sm font-medium">{data.name}</p>
+      {payload.map((bar, index) => (
+        <p 
+          key={`${bar.dataKey}-${index}`} 
+          className="text-sm"
+          style={{ color: index === 0 ? firstBarColor : undefined }}
+        >
+          {bar.name}: {formatService.formatCurrency(bar.value)}
+        </p>
+      ))}
+    </div>
+  );
 };

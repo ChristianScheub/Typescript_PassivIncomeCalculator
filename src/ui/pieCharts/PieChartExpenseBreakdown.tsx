@@ -8,37 +8,48 @@ import { COLORS } from '../../utils/constants';
 import formatService from '../../service/formatService';
 
 interface CombinedDataItem {
-  category: string;
-  amount: number;
-  type: 'expense' | 'liability';
+  readonly category: string;
+  readonly amount: number;
+  readonly type: 'expense' | 'liability';
+  readonly id: string;
 }
 
 interface PieChartExpenseBreakdownProps {
-  expenseBreakdown: ExpenseBreakdown[];
-  liabilities?: { category: string; amount: number }[];
+  readonly expenseBreakdown: ReadonlyArray<ExpenseBreakdown>;
+  readonly liabilities?: ReadonlyArray<{ readonly category: string; readonly amount: number }>;
 }
 
 const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
-  expenseBreakdown = [], // Standardwert, falls keine Ausgaben übergeben werden
-  liabilities = [] // Standardwert, falls keine Verbindlichkeiten übergeben werden
+  expenseBreakdown = [],
+  liabilities = []
 }) => {
   const { t } = useTranslation();
 
-  const combinedData: CombinedDataItem[] = [
-    ...expenseBreakdown.filter(expense => expense?.category && expense?.amount).map(expense => ({
-      category: expense.category,
-      amount: expense.amount,
-      type: 'expense' as const
-    })),
-    ...liabilities.filter(liability => liability?.category && liability?.amount).map(liability => ({
-      category: liability.category,
-      amount: liability.amount,
-      type: 'liability' as const
-    }))
-  ];
+  // Create mutable array for Recharts compatibility while keeping our business logic immutable
+  const combinedData = React.useMemo(() => Array.from([
+    ...expenseBreakdown
+      .filter(expense => expense?.category && expense?.amount)
+      .map(expense => ({
+        category: expense.category,
+        amount: expense.amount,
+        type: 'expense' as const,
+        id: `expense-${expense.category}`
+      })),
+    ...liabilities
+      .filter(liability => liability?.category && liability?.amount)
+      .map(liability => ({
+        category: liability.category,
+        amount: liability.amount,
+        type: 'liability' as const,
+        id: `liability-${liability.category}`
+      }))
+  ]), [expenseBreakdown, liabilities]);
 
-  // Gesamtsumme für Prozentsatz berechnen
-  const total = combinedData.reduce((sum, item) => sum + item.amount, 0);
+  // Calculate total for percentage using useMemo to avoid recalculation
+  const total = React.useMemo(() => 
+    combinedData.reduce((sum, item) => sum + item.amount, 0),
+    [combinedData]
+  );
 
   return (
     <Card title={t('forecast.expenseBreakdown')}>
@@ -63,10 +74,10 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
                 fill="#8884d8"
                 dataKey="amount"
               >
-                {combinedData.map((entry, index) => (
+                {combinedData.map((entry) => (
                   <Cell 
-                    key={`cell-${index}`} 
-                    fill={entry.type === 'liability' ? '#ef4444' : COLORS[index % COLORS.length]} 
+                    key={entry.id}
+                    fill={entry.type === 'liability' ? '#ef4444' : COLORS[combinedData.findIndex(d => d.category === entry.category) % COLORS.length]} 
                   />
                 ))}
               </Pie>
@@ -89,12 +100,12 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
       
       {combinedData.length > 0 && (
         <div className="mt-4 grid grid-cols-2 gap-3">
-          {combinedData.map((item, index) => (
-            <div key={`${item.category}-${index}`} className="flex items-center space-x-2">
+          {combinedData.map((item) => (
+            <div key={item.id} className="flex items-center space-x-2">
               <div 
                 className="w-3 h-3 rounded-full" 
                 style={{ 
-                  backgroundColor: item.type === 'liability' ? '#ef4444' : COLORS[index % COLORS.length]
+                  backgroundColor: item.type === 'liability' ? '#ef4444' : COLORS[combinedData.findIndex(d => d.category === item.category) % COLORS.length]
                 }}
               />
               <div>

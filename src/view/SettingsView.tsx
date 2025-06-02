@@ -115,8 +115,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             >
               <Download size={16} />
               <span>
-                {exportStatus === 'loading' ? t('settings.exporting') : 
-                 exportStatus === 'success' ? t('settings.exported') : t('settings.export')}
+                {(() => {
+                  if (exportStatus === 'loading') return t('settings.exporting');
+                  if (exportStatus === 'success') return t('settings.exported');
+                  return t('settings.export');
+                })()}
               </span>
             </Button>
           </div>
@@ -146,8 +149,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               >
                 <Upload size={16} />
                 <span>
-                  {importStatus === 'loading' ? t('settings.importing') : 
-                   importStatus === 'success' ? t('settings.imported') : t('settings.import')}
+                  {(() => {
+                    if (importStatus === 'loading') return t('settings.importing');
+                    if (importStatus === 'success') return t('settings.imported');
+                    return t('settings.import');
+                  })()}
                 </span>
               </Button>
             </div>

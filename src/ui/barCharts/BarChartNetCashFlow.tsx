@@ -114,9 +114,9 @@ const BarChartNetCashFlow: React.FC<BarChartNetCashFlowProps> = ({
               />
               <Tooltip content={<CustomNetTooltip />} />
               <Bar dataKey="netCashFlow" name={t('forecast.net')} radius={[4, 4, 0, 0]}>
-                {projections.map((entry, index) => (
+                {projections.map((entry) => (
                   <Cell 
-                    key={`cell-${index}`} 
+                    key={entry.month} 
                     fill={entry.netCashFlow >= 0 ? '#16a34a' : '#ef4444'}
                   />
                 ))}

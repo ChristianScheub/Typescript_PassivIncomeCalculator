@@ -11,7 +11,6 @@ interface MonthlyBreakdownCardProps {
   monthlyAssetIncome: number;
   passiveIncome: number;
   monthlyCashFlow: number;
-  passiveIncomeRatio: number;
 }
 
 const MonthlyBreakdownCard: React.FC<MonthlyBreakdownCardProps> = ({

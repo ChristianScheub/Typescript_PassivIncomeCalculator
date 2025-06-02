@@ -11,11 +11,11 @@ import { Save } from '@mui/icons-material';
 import { Income, IncomeType, PaymentFrequency } from '../types';
 import { 
   MaterialForm, 
+  MaterialFormField,
   SectionTitle,
   RequiredFieldsSection,
   OptionalFieldsSection
 } from '../ui/MaterialForm';
-import { MaterialFormField } from '../ui/MaterialForm';
 import FloatingBtn, { ButtonAlignment } from '../ui/floatingBtn';
 import { useSharedForm } from '../hooks/useSharedForm';
 import { createIncomeSchema } from '../utils/validationSchemas';
@@ -29,8 +29,6 @@ type IncomeFormData = z.infer<typeof incomeSchema>;
 interface IncomeFormProps {
   initialData?: Income;
   onSubmit: (data: IncomeFormData) => void;
-  onCancel: () => void;
-  assets?: Array<{ id: string; name: string }>;
 }
 
 export const MaterialIncomeForm: React.FC<IncomeFormProps> = ({ initialData, onSubmit }) => {

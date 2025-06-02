@@ -33,24 +33,20 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           if (entry.value === 0) return null;
           
           let entryLabel = '';
-          let isIncome = false;
+          const isIncome = ['activeIncome', 'assetIncome'].includes(entry.dataKey);
           
           switch (entry.dataKey) {
             case 'activeIncome':
               entryLabel = t('dashboard.income');
-              isIncome = true;
               break;
             case 'assetIncome':
               entryLabel = t('dashboard.assetIncome');
-              isIncome = true;
               break;
             case 'expenseTotal':
               entryLabel = t('forecast.expenses');
-              isIncome = false;
               break;
             case 'liabilityPayments':
               entryLabel = t('dashboard.liabilities');
-              isIncome = false;
               break;
             default:
               return null;

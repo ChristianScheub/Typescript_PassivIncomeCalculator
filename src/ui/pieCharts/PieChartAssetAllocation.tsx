@@ -55,8 +55,8 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {assetAllocation.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {assetAllocation.map((item) => (
+                      <Cell key={item.name} fill={COLORS[assetAllocation.findIndex(a => a.name === item.name) % COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip content={<CustomPieTooltip formatCurrency={formatService.formatCurrency} formatPercentage={(value) => `${(value).toFixed(1)}%`} />} />

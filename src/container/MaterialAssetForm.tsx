@@ -132,7 +132,7 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
     onSubmit: (data: AssetFormData) => {
       Logger.info(`MaterialAssetForm submit: ${JSON.stringify(data)}`);
       try {
-        let transformedData: any = {
+        const transformedData: any = {
           ...data,
           id: initialData?.id || Date.now().toString(),
           createdAt: initialData?.createdAt || new Date().toISOString(),

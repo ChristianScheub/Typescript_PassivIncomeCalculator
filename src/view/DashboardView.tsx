@@ -5,7 +5,7 @@ import { CiSettings } from "react-icons/ci";
 import MonthlyBreakdownCard from "./MonthlyBreakdownCard";
 import NetWorthCard from "./NetWorthCard";
 import AssetAllocationChart from "../ui/pieCharts/PieChartAssetAllocation";
-import { Asset, Income, Expense, Liability, AssetAllocation } from "../types";
+import { AssetAllocation } from "../types";
 import { useNavigate } from "react-router-dom";
 import { LineChart } from "lucide-react";
 
@@ -20,10 +20,6 @@ interface DashboardViewProps {
   passiveIncome: number;
   monthlyCashFlow: number;
   passiveIncomeRatio: number;
-  assets: Asset[];
-  liabilities: Liability[];
-  expenses: Expense[];
-  income: Income[];
   handleSettingsClick: () => void;
   assetAllocation: AssetAllocation[];
 }

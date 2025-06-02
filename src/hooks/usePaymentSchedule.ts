@@ -1,7 +1,6 @@
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PaymentSchedule, PaymentFrequency } from '../types';
-import { UseFormReturn } from 'react-hook-form';
 import { createPaymentScheduleSchema } from '../utils/validationSchemas';
 import Logger from '../service/Logger/logger';
 

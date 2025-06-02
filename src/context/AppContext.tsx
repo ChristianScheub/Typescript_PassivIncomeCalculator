@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -52,8 +52,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const value = useMemo(() => ({
+    theme,
+    toggleTheme,
+    isMobile
+  }), [theme, isMobile]);
+
   return (
-    <AppContext.Provider value={{ theme, toggleTheme, isMobile }}>
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   );

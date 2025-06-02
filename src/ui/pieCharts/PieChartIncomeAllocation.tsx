@@ -8,18 +8,26 @@ import { COLORS } from '../../utils/constants';
 import formatService from '../../service/formatService';
 
 interface PieChartIncomeAllocationProps {
-  incomeAllocation: IncomeAllocation[];
+  readonly incomeAllocation: ReadonlyArray<IncomeAllocation>;
 }
 
 const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
-  incomeAllocation
+  incomeAllocation = []
 }) => {
   const { t } = useTranslation();
+
+  // Transform the data with unique IDs and computed indices
+  const chartData = React.useMemo(() => Array.from(
+    incomeAllocation.map((income) => ({
+      ...income,
+      id: `income-${income.type}`
+    }))
+  ), [incomeAllocation]);
 
   return (
     <Card title={t('forecast.incomeAllocation')}>
       <div className="h-[400px]">
-        {incomeAllocation.length > 0 ? (
+        {chartData.length > 0 ? (
           <ResponsiveContainer>
             <PieChart>
               <text
@@ -31,7 +39,7 @@ const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
                 {t('forecast.incomeAllocation')}
               </text>
               <Pie
-                data={incomeAllocation}
+                data={chartData}
                 cx="50%"
                 cy="55%"
                 outerRadius={120}
@@ -39,8 +47,8 @@ const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
                 fill="#8884d8"
                 dataKey="amount"
               >
-                {incomeAllocation.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                {chartData.map((income) => (
+                  <Cell key={income.id} fill={COLORS[chartData.findIndex(i => i.type === income.type) % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip content={<CustomPieTooltip formatCurrency={formatService.formatCurrency} formatPercentage={(value) => `${(value * 100).toFixed(1)}%`} />} />
@@ -53,13 +61,13 @@ const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
         )}
       </div>
       
-      {incomeAllocation.length > 0 && (
+      {chartData.length > 0 && (
         <div className="mt-4 grid grid-cols-2 gap-3">
-          {incomeAllocation.map((income, index) => (
-            <div key={income.type} className="flex items-center space-x-2">
+          {chartData.map((income) => (
+            <div key={income.id} className="flex items-center space-x-2">
               <div 
                 className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                style={{ backgroundColor: COLORS[chartData.findIndex(i => i.type === income.type) % COLORS.length] }}
               />
               <div>
                 <div className="text-sm font-medium">{t(`income.types.${income.type}`)}</div>

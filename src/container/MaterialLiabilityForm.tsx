@@ -31,7 +31,6 @@ type LiabilityFormData = z.infer<typeof liabilitySchema>;
 interface LiabilityFormProps {
   initialData?: Liability;
   onSubmit: (data: LiabilityFormData) => void;
-  onCancel: () => void;
 }
 
 export const MaterialLiabilityForm = ({ initialData, onSubmit }: LiabilityFormProps) => {
