@@ -6,84 +6,71 @@ export interface BaseEntity {
   updatedAt: string;
 }
 
+// Milestone Types
+export interface DebtEntry {
+  name: string;
+  type: LiabilityType;
+  initialAmount: number;
+  currentAmount: number;
+  progress: number;
+}
+
+export interface DebtWithCoverage {
+  name: string;
+  type: string;
+  monthlyPayment: number;
+  coverage: number;
+}
+
 // Asset Types
 export type AssetType = 'stock' | 'bond' | 'real_estate' | 'crypto' | 'cash' | 'other';
 
 export type DividendFrequency = 'monthly' | 'quarterly' | 'annually' | 'custom' | 'none';
-
-export interface DividendSchedule {
-  frequency: DividendFrequency;
-  amount: number;
-  months?: number[]; // For custom frequency, array of months (1-12)
-  customAmounts?: Record<number, number>; // For custom amounts per month
-  
-  // For quarterly and annually - specify which months payments occur
-  paymentMonths?: number[]; // e.g., [3, 6, 9, 12] for quarterly, [12] for annually
-  
-  lastIncrease?: {
-    date: string;
-    previousAmount: number;
-    newAmount: number;
-  };
-}
-
-// Cached dividend calculations
-export interface CachedDividends {
-  monthlyAmount: number;
-  annualAmount: number;
-  monthlyBreakdown: Record<number, number>; // Month (1-12) -> Amount
-  lastCalculated: string; // ISO date string
-  calculationHash: string; // Hash of dividend info + quantity for invalidation
-}
-
-export interface Asset extends BaseEntity {
-  type: AssetType;
-  value: number;
-  notes?: string;
-  country?: string;
-  continent?: string;
-  sector?: string;
-  
-  // Stock specific
-  ticker?: string;
-  quantity?: number;
-  purchasePrice?: number;
-  currentPrice?: number;
-  dividendInfo?: DividendSchedule;
-  lastPriceUpdate?: string;
-  
-  // Bond specific
-  interestRate?: number;
-  maturityDate?: string;
-  nominalValue?: number;
-  
-  // Real Estate specific
-  propertyValue?: number; // Changed from purchasePrice to avoid duplicate
-  mortgageBalance?: number;
-  estimatedValue?: number;
-  rentalIncome?: {
-    amount: number;
-  };
-  
-  // Crypto specific
-  symbol?: string;
-  acquisitionCost?: number;
-  
-  // Cached dividend calculations
-  cachedDividends?: CachedDividends;
-}
-
-// Payment Types
-export type PaymentFrequency = 'monthly' | 'quarterly' | 'annually' | 'custom' | 'none';
+export type PaymentFrequency = 'monthly' | 'quarterly' | 'annually' | 'custom';
 
 export interface PaymentSchedule {
   frequency: PaymentFrequency;
   amount: number;
-  months?: number[]; // For custom frequency
-  customAmounts?: Record<number, number>; // For custom amounts per month
-  
-  // For quarterly and annually - specify which months payments occur
-  paymentMonths?: number[]; // e.g., [3, 6, 9, 12] for quarterly, [12] for annually
+  months?: number[];
+  customAmounts?: Record<number, number>;
+}
+
+export interface DividendSchedule {
+  frequency: DividendFrequency;
+  amount: number;
+  months?: number[];
+  paymentMonths?: number[];
+  customAmounts?: Record<number, number>;
+}
+
+export interface Asset extends BaseEntity {
+  name: string;
+  type: AssetType;
+  value: number;
+  propertyValue?: number;
+  quantity?: number;
+  purchasePrice?: number;
+  currentPrice?: number;
+  ticker?: string;
+  interestRate?: number;
+  maturityDate?: string;
+  nominalValue?: number;
+  symbol?: string;
+  acquisitionCost?: number;
+  country?: string;
+  continent?: string;
+  sector?: string;
+  dividendInfo?: {
+    frequency: DividendFrequency;
+    amount: number;
+    months?: number[];
+    paymentMonths?: number[];
+    customAmounts?: Record<number, number>;
+  };
+  rentalIncome?: {
+    amount: number;
+  };
+  notes?: string;
 }
 
 // Liability Types
@@ -91,11 +78,11 @@ export type LiabilityType = 'mortgage' | 'personal_loan' | 'credit_card' | 'stud
 
 export interface Liability extends BaseEntity {
   type: LiabilityType;
-  principalAmount: number;
+  initialBalance: number;
   currentBalance: number;
-  interestRate: number;
-  paymentSchedule: PaymentSchedule;
-  startDate: string;
+  interestRate?: number;
+  paymentSchedule?: PaymentSchedule;
+  startDate?: string;
   endDate?: string;
   notes?: string;
 }
@@ -139,7 +126,7 @@ export interface Income extends BaseEntity {
 
 export interface IncomeFormData {
   name: string;
-  type: 'salary' | 'rental' | 'dividend' | 'interest' | 'side_hustle' | 'other';
+  type: 'salary' | 'interest' | 'side_hustle' | 'other';
   paymentFrequency: 'monthly' | 'quarterly' | 'annually' | 'custom';
   amount: number;
   isPassive: boolean;

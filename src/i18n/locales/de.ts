@@ -88,6 +88,7 @@ export default {
       title: 'Finanzprognose',
       projections: 'Projektionen',
       allocations: 'Zuordnungen',
+      fire: 'Meilensteine',
       cashFlowProjection: 'Monatliche Cashflow-Prognose',
       passiveIncomeCoverage: 'Deckung aller Ausgaben durch passives Einkommen',
       assetAllocation: 'Vermögensaufteilung',
@@ -104,6 +105,71 @@ export default {
       dividendPayment: 'Dividendenzahlung',
       expenseCoverage: 'Deckung aller Ausgaben',
       loading: 'Prognosedaten werden geladen...',
+      milestones: {
+        bufferMilestone: {
+          title: 'Sicherheitspuffer',
+          description: 'Verfolge, wie viele Monate der Gesamtausgaben (Fixkosten und bekannte variable Ausgaben) deine liquiden Mittel abdecken könnten. Dieser finanzielle Puffer bietet Sicherheit und Vertrauen für Investitionsentscheidungen.',
+          noExpenses: 'Noch keine Ausgaben erfasst. Füge deine wiederkehrenden Ausgaben hinzu, um deinen Sicherheitspuffer aufzubauen.',
+          monthsCovered: '{{months}} Monate Ausgaben gedeckt',
+          milestone2: '2 Monate Ausgaben gedeckt - Basis-Notgroschen geschafft!',
+          milestone4: '4 Monate Ausgaben gedeckt - Sicherheitsnetz wächst!',
+          milestone6: 'Voller 6-Monats-Puffer erreicht! 🛡️'
+        },
+        totalExpenseCoverage: {
+          title: 'Gesamtausgabendeckung',
+          description: 'Verfolge den Prozentsatz deiner monatlichen Gesamtausgaben, der durch passives Einkommen gedeckt wird. Dies umfasst alle Ausgaben, einschließlich Fixkosten, variable Kosten und Schuldenrückzahlungen.',
+          noExpenses: 'Noch keine Ausgaben erfasst. Füge deine Ausgaben hinzu, um die Gesamtausgabendeckung zu überwachen.',
+          percentCovered: '{{percent}}% der Ausgaben gedeckt',
+          totalMonthlyExpenses: 'Gesamte monatliche Ausgaben: {{amount}}/Monat',
+          breakdown: 'Aufschlüsselung:\n• Monatliche Ausgaben: {{expenses}}/Monat\n• Monatliche Schuldenrückzahlungen: {{debts}}/Monat',
+          milestone25: '25% der Gesamtausgaben durch passives Einkommen gedeckt!',
+          milestone50: 'Halbzeit! 50% der Ausgaben durch passives Einkommen gedeckt',
+          milestone75: 'Fast geschafft! 75% der Ausgaben durch passives Einkommen gedeckt',
+          milestone100: 'Vollständige finanzielle Freiheit erreicht! Alle Ausgaben durch passives Einkommen gedeckt 🎉'
+        },
+        leisureMilestone: {
+          title: 'Freizeitabdeckung',
+          description: 'Sieh, wie viel deiner persönlichen und Unterhaltungsausgaben durch passives Einkommen gedeckt sind. FIRE bedeutet nicht nur Notwendigkeiten, sondern auch Lebensgenuss.',
+          noExpenses: 'Noch keine Freizeitausgaben erfasst. Füge deine Unterhaltungs- und persönlichen Ausgaben hinzu.',
+          percentCovered: '{{percent}}% der Freizeitkosten gedeckt',
+          milestone25: '25% der Freizeitkosten durch passives Einkommen gedeckt!',
+          milestone50: 'Die Hälfte deines Spaßgeldes ist jetzt passiv! 🎉',
+          milestone75: '75% der Freizeitkosten gedeckt - Freiheit ist nah!',
+          milestone100: 'Alle Freizeitkosten durch passives Einkommen gedeckt! 🎮'
+        },
+        fixedCostFreedom: {
+          title: 'Fixkosten-Freiheit',
+          description: 'Verfolge den Prozentsatz deiner monatlichen Fixkosten, der durch passives Einkommen gedeckt wird. Fixkosten umfassen:\n1. Monatliche wiederkehrende Ausgaben in diesen Kategorien: Wohnen, Transport, Nebenkosten, Versicherung und Gesundheit\n2. Alle monatlichen Schuldenrückzahlungen (Hypotheken, Kredite, Kreditkarten, etc.)',
+          totalFixedCosts: 'Gesamte Fixkosten: {{amount}}/Monat',
+          breakdown: 'Aufschlüsselung:\n• Monatliche wiederkehrende Ausgaben: {{expenses}}/Monat\n• Monatliche Schuldenrückzahlungen: {{debts}}/Monat',
+          percentCovered: '{{percent}}% durch passives Einkommen gedeckt',
+          milestone25: '25% der Fixkosten durch passives Einkommen gedeckt!',
+          milestone50: 'Halbzeit! 50% der Fixkosten gedeckt',
+          milestone75: 'Fast geschafft! 75% der Fixkosten gedeckt',
+          milestone100: 'Finanzielle Freiheit erreicht! Alle Fixkosten durch passives Einkommen gedeckt 🎉',
+          noFixedCosts: 'Noch keine Fixkosten erfasst. Füge deine wiederkehrenden Ausgaben und Schuldenrückzahlungen hinzu, um mit der Verfolgung zu beginnen.'
+        },
+        debtBreaker: {
+          title: 'Schuldenfreiheit',
+          description: 'Verfolge den Fortschritt auf dem Weg zur vollständigen Schuldenfreiheit. Sieh, wie viel deiner Schulden durch deine Zahlungen und dein passives Einkommen abgedeckt ist.',
+          noDebts: 'Noch keine Schulden erfasst. Füge deine Verbindlichkeiten hinzu, um deinen Fortschritt zur Schuldenfreiheit zu verfolgen.',
+          percentCovered: '{{percent}}% der Schulden abgedeckt',
+          milestone10: '10% der Schulden abgedeckt - Der erste Schritt zur Freiheit!',
+          milestone25: '25% der Schulden abgedeckt - Weiter so!',
+          milestone50: '50% der Schulden abgedeckt - Halbzeit auf dem Weg zur Freiheit!',
+          milestone100: 'Alle Schulden beglichen! Du bist jetzt schuldenfrei! 🎉',
+        },
+        debtCoverage: {
+          title: 'Schuldenabdeckung',
+          description: 'Überwache, wie gut dein passives Einkommen deine Schulden deckt. Eine höhere Abdeckung bedeutet weniger finanziellen Stress und mehr Freiheit.',
+          noDebts: 'Noch keine Schulden erfasst. Füge deine Verbindlichkeiten hinzu, um deine Schuldenabdeckung zu überwachen.',
+          percentCovered: '{{percent}}% der Schulden durch passives Einkommen gedeckt',
+          milestone10: '10% der Schulden durch passives Einkommen gedeckt - Ein guter Anfang!',
+          milestone25: '25% der Schulden durch passives Einkommen gedeckt - Auf dem richtigen Weg!',
+          milestone50: '50% der Schulden durch passives Einkommen gedeckt - Halbzeit zur finanziellen Freiheit!',
+          milestone100: 'Alle Schulden durch passives Einkommen gedeckt! Du bist jetzt schuldenfrei! 🎉',
+        }
+      }
     },
     common: {
       add: 'Hinzufügen',
@@ -145,6 +211,10 @@ export default {
         currentPrice: 'Aktueller Preis',
         quantity: 'Menge',
         ticker: 'Tickersymbol',
+        stockSpecific: 'Aktienspezifische Informationen',
+        bondSpecific: 'Anleihespezifische Informationen',
+        realEstateSpecific: 'Immobilienspezifische Informationen',
+        cryptoSpecific: 'Kryptospezifische Informationen',
         dividendInfo: 'Dividendeninformationen',
         dividendFrequency: 'Dividendenhäufigkeit',
         dividendAmount: 'Dividendenbetrag',
@@ -184,7 +254,6 @@ export default {
         adding: 'Hinzufügen...',
         addAsset: 'Vermögenswert hinzufügen',
         updateAsset: 'Vermögenswert aktualisieren',
-        stockSpecific: 'Aktienspezifische Informationen',
       },
       types: {
         stock: 'Aktie',
@@ -235,6 +304,7 @@ export default {
         endDateOptional: 'Enddatum (Optional)',
         addLiability: 'Verbindlichkeit hinzufügen',
         updateLiability: 'Verbindlichkeit aktualisieren',
+        type: 'Art der Verbindlichkeit'
       },
       types: {
         mortgage: 'Hypothek',
@@ -287,6 +357,7 @@ export default {
       noIncomeDesc: 'Fügen Sie Ihre Einkommensquellen hinzu, um Ihre Einnahmen zu verfolgen und Ihren Cashflow zu berechnen.',
       form: {
         type: 'Typ',
+        amount: 'Betrag',
         paymentFrequency: 'Zahlungshäufigkeit',
         paymentAmount: 'Zahlungsbetrag',
         paymentDay: 'Zahltag',
@@ -313,4 +384,4 @@ export default {
       none: 'Keine',
     },
   },
-};
+}

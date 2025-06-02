@@ -42,16 +42,16 @@ export function useSharedForm<T extends FieldValues>({
       e.preventDefault();
     }
     
+    Logger.info('Shared Form submission started');
+    
     const onValidSubmit: SubmitHandler<T> = async (data) => {
       try {
-        Logger.info(JSON.stringify(data));
-        const result = onSubmit(data);
-        // Only handle result if it's a Promise
-        if (result instanceof Promise) {
-          await result;
-        }
+        Logger.info('Form validation passed, processing data: ' + JSON.stringify(data));
+        await Promise.resolve(onSubmit(data));
+        Logger.info('Form submission successful');
       } catch (error) {
-        Logger.error(error instanceof Error ? error.message : 'Unknown error');
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        Logger.error('Form submission error: ' + errorMessage);
         if (onError) {
           onError(error);
         }
@@ -59,14 +59,24 @@ export function useSharedForm<T extends FieldValues>({
     };
 
     const onInvalidSubmit = (errors: typeof form.formState.errors) => {
-      Logger.error(JSON.stringify(errors));
+      Logger.error('Form validation failed with errors: ' + JSON.stringify(errors));
+      
+      // Log specific field errors for debugging
+      Object.entries(errors).forEach(([field, error]) => {
+        if (error?.message) {
+          Logger.error(`Validation error in field "${field}": ${error.message}`);
+        }
+      });
+      
+      // Trigger validation for all fields to show all errors
+      form.trigger();
       if (onError) {
         onError(errors);
       }
     };
 
     return handleSubmit(onValidSubmit, onInvalidSubmit)(e);
-  }, [handleSubmit, onSubmit, onError]);
+  }, [handleSubmit, onSubmit, onError, form]);
 
   const { handleSubmit: _, ...restForm } = form;
 

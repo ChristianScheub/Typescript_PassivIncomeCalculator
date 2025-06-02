@@ -1,20 +1,11 @@
 import React, { useEffect } from 'react';
-import { Grid } from '@mui/material';
-import { Asset, AssetType, DividendFrequency } from '../types';
-import { 
-  MaterialForm, 
-  FormSection,
-  SectionTitle,
-  RequiredFieldsSection,
-  OptionalFieldsSection
-} from '../ui/MaterialForm';
-import { MonthSelector } from '../ui/MonthSelector';
+import { Asset, AssetType, DividendFrequency, PaymentFrequency } from '../types';
 import { usePaymentSchedule } from '../hooks/usePaymentSchedule';
 import { useSharedForm } from '../hooks/useSharedForm';
 import { useTranslation } from 'react-i18next';
-import { SharedFormField } from '../components/SharedFormField';
 import Logger from '../service/Logger/logger';
 import { createAssetSchema } from '../utils/validationSchemas';
+import { MaterialAssetFormView } from '../view/forms/MaterialAssetFormView';
 
 interface AssetFormData {
   // Required fields
@@ -58,24 +49,6 @@ interface AssetFormData {
   updatedAt?: string;
 }
 
-// Existing code for assetTypeOptions...
-const assetTypeOptions = [
-  { value: 'stock', label: 'Stock' },
-  { value: 'bond', label: 'Bond' },
-  { value: 'real_estate', label: 'Real Estate' },
-  { value: 'crypto', label: 'Crypto' },
-  { value: 'cash', label: 'Cash' },
-  { value: 'other', label: 'Other' }
-];
-
-const dividendFrequencyOptions = [
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'quarterly', label: 'Quarterly' },
-  { value: 'annually', label: 'Annually' },
-  { value: 'custom', label: 'Custom' },
-  { value: 'none', label: 'None' }
-];
-
 // Create asset validation schema using shared utilities
 const assetSchema = createAssetSchema();
 
@@ -111,16 +84,7 @@ const getDefaultValues = (initialData?: Asset): Partial<AssetFormData> => {
 
 export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSubmit }) => {
   const { t } = useTranslation();
-  const { fields: paymentFields, handleMonthChange } = usePaymentSchedule(
-    initialData?.dividendInfo ? {
-      frequency: initialData.dividendInfo.frequency,
-      amount: initialData.dividendInfo.amount,
-      months: initialData.dividendInfo.months,
-      paymentMonths: initialData.dividendInfo.paymentMonths,
-      customAmounts: initialData.dividendInfo.customAmounts,
-    } : undefined
-  );
-
+  
   const {
     watch,
     setValue,
@@ -129,344 +93,120 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
   } = useSharedForm<AssetFormData>({
     validationSchema: assetSchema,
     defaultValues: getDefaultValues(initialData) as AssetFormData,
-    onSubmit: (data: AssetFormData) => {
-      Logger.info(`MaterialAssetForm submit: ${JSON.stringify(data)}`);
+    onSubmit: async (data: AssetFormData) => {
       try {
-        const transformedData: any = {
-          ...data,
+        Logger.info('Form submission started with data: ' + JSON.stringify(data));
+        
+        // For stocks, ensure value is calculated from quantity * currentPrice
+        let finalValue = data.value;
+        if (data.type === 'stock' && data.quantity && data.currentPrice) {
+          finalValue = data.quantity * data.currentPrice;
+          Logger.info(`Stock value calculated: ${data.quantity} × ${data.currentPrice} = ${finalValue}`);
+        }
+        
+        // Create the base transformed data
+        const transformedData: Asset = {
           id: initialData?.id || Date.now().toString(),
+          name: data.name,
+          type: data.type,
+          value: finalValue || 0,
           createdAt: initialData?.createdAt || new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
+          // Add common optional fields
+          country: data.country,
+          continent: data.continent,
+          sector: data.sector,
+          notes: data.notes
         };
 
-        if (data.type === 'stock' && data.dividendFrequency !== 'none' && data.dividendAmount) {
-          transformedData.dividendInfo = {
-            frequency: data.dividendFrequency,
-            amount: data.dividendAmount,
-            months: data.dividendMonths,
-            paymentMonths: data.dividendPaymentMonths,
-            customAmounts: data.customDividendAmounts
-          };
+        // Add type-specific fields based on asset type
+        switch (data.type) {
+          case 'stock':
+            transformedData.quantity = data.quantity;
+            transformedData.purchasePrice = data.purchasePrice;
+            transformedData.currentPrice = data.currentPrice;
+            transformedData.ticker = data.ticker;
+            if (data.dividendFrequency && data.dividendFrequency !== 'none') {
+              transformedData.dividendInfo = {
+                frequency: data.dividendFrequency,
+                amount: data.dividendAmount || 0,
+                months: data.dividendMonths || [],
+                paymentMonths: data.dividendPaymentMonths || [],
+                customAmounts: data.customDividendAmounts || {}
+              };
+            }
+            break;
+
+          case 'real_estate':
+            transformedData.propertyValue = data.propertyValue;
+            if (data.rentalAmount) {
+              transformedData.rentalIncome = {
+                amount: data.rentalAmount
+              };
+            }
+            break;
+
+          case 'bond':
+            transformedData.interestRate = data.interestRate;
+            transformedData.maturityDate = data.maturityDate;
+            transformedData.nominalValue = data.nominalValue;
+            break;
+
+          case 'crypto':
+            transformedData.symbol = data.symbol;
+            transformedData.acquisitionCost = data.acquisitionCost;
+            break;
         }
 
-        if (data.type === 'real_estate' && data.rentalAmount) {
-          transformedData.rentalIncome = {
-            amount: data.rentalAmount
-          };
-        }
-
-        delete transformedData.dividendFrequency;
-        delete transformedData.dividendAmount;
-        delete transformedData.dividendMonths;
-        delete transformedData.dividendPaymentMonths;
-        delete transformedData.customDividendAmounts;
-        delete transformedData.rentalAmount;
-        
-        onSubmit(transformedData);
+        Logger.info('Transformed data: ' + JSON.stringify(transformedData));
+        await onSubmit(transformedData);
+        Logger.info('Form submission completed successfully');
       } catch (error) {
-        Logger.error(`Form submission error: ${JSON.stringify(error)}`);
+        Logger.error('Form submission error: ' + JSON.stringify(error));
       }
     }
   });
 
+  const { fields: paymentFields, handleMonthChange } = usePaymentSchedule(
+    initialData?.dividendInfo ? {
+      frequency: initialData.dividendInfo.frequency as PaymentFrequency,
+      amount: initialData.dividendInfo.amount,
+      months: initialData.dividendInfo.paymentMonths || initialData.dividendInfo.months,
+      customAmounts: initialData.dividendInfo.customAmounts,
+    } : undefined
+  );
+
+  // Watch fields that affect validation
   const assetType = watch('type');
   const dividendFrequency = watch('dividendFrequency');
   
   // Calculate value for stocks based on quantity and currentPrice
+  const quantity = watch('quantity');
+  const currentPrice = watch('currentPrice');
+  
   useEffect(() => {
     if (assetType === 'stock') {
-      const quantity = watch('quantity');
-      const currentPrice = watch('currentPrice');
-      if (quantity && currentPrice) {
-        setValue('value', quantity * currentPrice);
+      if (quantity && currentPrice && quantity > 0 && currentPrice > 0) {
+        const calculatedValue = quantity * currentPrice;
+        setValue('value', calculatedValue);
+        Logger.info(`Auto-calculated stock value: ${quantity} × ${currentPrice} = ${calculatedValue}`);
       }
     }
-  }, [assetType, watch('quantity'), watch('currentPrice'), setValue]);
+  }, [assetType, quantity, currentPrice, setValue]);
 
   return (
-    <MaterialForm 
+    <MaterialAssetFormView 
+      assetType={assetType}
+      dividendFrequency={dividendFrequency}
+      quantity={quantity}
+      currentPrice={currentPrice}
+      errors={errors}
+      watch={watch}
+      setValue={setValue}
+      onFormSubmit={onFormSubmit}
+      paymentFields={paymentFields}
+      handleMonthChange={handleMonthChange}
       title={initialData ? t('assets.editAsset') : t('assets.addAsset')}
-      onSubmit={onFormSubmit}
-    >
-      <RequiredFieldsSection>
-        <SectionTitle>{t('common.requiredFields')}</SectionTitle>
-        <Grid container spacing={3}>
-          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-            <SharedFormField
-              label={t('common.name')}
-              name="name"
-              required
-              error={errors.name?.message}
-              value={watch('name')}
-              onChange={(value) => setValue('name', value)}
-              placeholder={t('assets.form.enterAssetName')}
-            />
-          </Grid>
-          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-            <SharedFormField
-              label={t('common.type')}
-              name="type"
-              type="select"
-              required
-              options={assetTypeOptions}
-              error={errors.type?.message}
-              value={watch('type')}
-              onChange={(value) => setValue('type', value as AssetType)}
-            />
-          </Grid>
-          {assetType !== 'stock' && (
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.value')}
-                name="value"
-                type="number"
-                required
-                error={errors.value?.message}
-                value={watch('value')}
-                onChange={(value) => setValue('value', value)}
-                placeholder="0.00"
-                step={0.01}
-                min={0}
-              />
-            </Grid>
-          )}
-        </Grid>
-      </RequiredFieldsSection>
-
-      {/* Asset Type Specific Fields */}
-      {assetType === 'stock' && (
-        <FormSection>
-          <SectionTitle>{t('assets.form.stockSpecific')}</SectionTitle>
-          <Grid container spacing={3}>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.ticker')}
-                name="ticker"
-                value={watch('ticker')}
-                onChange={(value) => setValue('ticker', value)}
-                placeholder={t('assets.form.tickerPlaceholder')}
-              />
-            </Grid>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.quantity')}
-                name="quantity"
-                type="number"
-                value={watch('quantity')}
-                onChange={(value) => setValue('quantity', value)}
-                placeholder="0"
-                step={1}
-                min={0}
-              />
-            </Grid>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.purchasePrice')}
-                name="purchasePrice"
-                type="number"
-                value={watch('purchasePrice')}
-                onChange={(value) => setValue('purchasePrice', value)}
-                placeholder="0.00"
-                step={0.01}
-                min={0}
-              />
-            </Grid>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.currentPrice')}
-                name="currentPrice"
-                type="number"
-                value={watch('currentPrice')}
-                onChange={(value) => setValue('currentPrice', value)}
-                placeholder="0.00"
-                step={0.01}
-                min={0}
-              />
-            </Grid>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.dividendFrequency')}
-                name="dividendFrequency"
-                type="select"
-                options={dividendFrequencyOptions}
-                value={watch('dividendFrequency')}
-                onChange={(value) => setValue('dividendFrequency', value as DividendFrequency)}
-              />
-            </Grid>
-            {dividendFrequency !== 'none' && (
-              <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-                <SharedFormField
-                  label={t('assets.form.dividendAmountPerShare')}
-                  name="dividendAmount"
-                  type="number"
-                  value={watch('dividendAmount')}
-                  onChange={(value) => setValue('dividendAmount', value)}
-                  step={0.01}
-                  min={0}
-                />
-              </Grid>
-            )}
-            {(dividendFrequency === 'quarterly' || dividendFrequency === 'annually') && (
-              <Grid sx={{ gridColumn: 'span 12' }} component="div">
-                <MonthSelector
-                  selectedMonths={paymentFields.paymentMonths || []}
-                  onChange={handleMonthChange}
-                  label={dividendFrequency === 'quarterly' ? 
-                    t('assets.form.quarterlyPaymentMonths') : 
-                    t('assets.form.annualPaymentMonth')}
-                />
-              </Grid>
-            )}
-            {dividendFrequency === 'custom' && (
-              <Grid sx={{ gridColumn: 'span 12' }} component="div">
-                <MonthSelector
-                  selectedMonths={paymentFields.months || []}
-                  onChange={handleMonthChange}
-                  label={t('assets.form.customDividendMonths')}
-                />
-              </Grid>
-            )}
-          </Grid>
-        </FormSection>
-      )}
-
-      {assetType === 'real_estate' && (
-        <FormSection>
-          <SectionTitle>{t('assets.form.realEstateSpecific')}</SectionTitle>
-          <Grid container spacing={3}>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.propertyValue')}
-                name="propertyValue"
-                type="number"
-                value={watch('propertyValue')}
-                onChange={(value) => setValue('propertyValue', value)}
-                placeholder="0.00"
-                step={0.01}
-                min={0}
-              />
-            </Grid>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.monthlyRentalIncome')}
-                name="rentalAmount"
-                type="number"
-                value={watch('rentalAmount')}
-                onChange={(value) => setValue('rentalAmount', value)}
-                placeholder="0.00"
-                step={0.01}
-                min={0}
-              />
-            </Grid>
-          </Grid>
-        </FormSection>
-      )}
-
-      {assetType === 'bond' && (
-        <FormSection>
-          <SectionTitle>{t('assets.form.bondSpecific')}</SectionTitle>
-          <Grid container spacing={3}>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.interestRatePercent')}
-                name="interestRate"
-                type="number"
-                value={watch('interestRate')}
-                onChange={(value) => setValue('interestRate', value)}
-                step={0.01}
-                min={0}
-              />
-            </Grid>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.maturityDate')}
-                name="maturityDate"
-                type="date"
-                value={watch('maturityDate')}
-                onChange={(value) => setValue('maturityDate', value)}
-              />
-            </Grid>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.nominalValue')}
-                name="nominalValue"
-                type="number"
-                value={watch('nominalValue')}
-                onChange={(value) => setValue('nominalValue', value)}
-                step={0.01}
-                min={0}
-              />
-            </Grid>
-          </Grid>
-        </FormSection>
-      )}
-
-      {assetType === 'crypto' && (
-        <FormSection>
-          <SectionTitle>{t('assets.form.cryptoSpecific')}</SectionTitle>
-          <Grid container spacing={3}>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.tokenSymbol')}
-                name="symbol"
-                value={watch('symbol')}
-                onChange={(value) => setValue('symbol', value)}
-              />
-            </Grid>
-            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-              <SharedFormField
-                label={t('assets.form.acquisitionCost')}
-                name="acquisitionCost"
-                type="number"
-                value={watch('acquisitionCost')}
-                onChange={(value) => setValue('acquisitionCost', value)}
-                step={0.01}
-                min={0}
-              />
-            </Grid>
-          </Grid>
-        </FormSection>
-      )}
-
-      <OptionalFieldsSection>
-        <SectionTitle>{t('common.optionalFields')}</SectionTitle>
-        <Grid container spacing={3}>
-          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-            <SharedFormField
-              label={t('assets.form.country')}
-              name="country"
-              value={watch('country')}
-              onChange={(value) => setValue('country', value)}
-            />
-          </Grid>
-          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-            <SharedFormField
-              label={t('assets.form.continent')}
-              name="continent"
-              value={watch('continent')}
-              onChange={(value) => setValue('continent', value)}
-            />
-          </Grid>
-          <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
-            <SharedFormField
-              label={t('assets.form.sector')}
-              name="sector"
-              value={watch('sector')}
-              onChange={(value) => setValue('sector', value)}
-            />
-          </Grid>
-          <Grid sx={{ gridColumn: 'span 12' }} component="div">
-            <SharedFormField
-              label={t('common.notes')}
-              name="notes"
-              type="textarea"
-              value={watch('notes')}
-              onChange={(value) => setValue('notes', value)}
-              rows={3}
-            />
-          </Grid>
-        </Grid>
-      </OptionalFieldsSection>
-    </MaterialForm>
+    />
   );
 };

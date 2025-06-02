@@ -211,22 +211,29 @@ export const MaterialFormField: React.FC<FormFieldProps> = ({
   );
 };
 
-interface MaterialFormProps {
+export interface MaterialFormProps {
   title: string;
   children: React.ReactNode;
   onSubmit?: (e: React.FormEvent) => void;
+  formRef?: React.RefObject<HTMLFormElement>;
 }
 
 export const MaterialForm: React.FC<MaterialFormProps> = ({
   title,
   children,
   onSubmit,
+  formRef
 }) => {
   const theme = useTheme();
 
   return (
     <StyledPaper elevation={2}>
-      <Box component="form" onSubmit={onSubmit} noValidate>
+      <Box 
+        component="form" 
+        onSubmit={onSubmit} 
+        noValidate 
+        ref={formRef}
+      >
         <Typography 
           variant="h5" 
           component="h2" 

@@ -1,0 +1,110 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Card, CardContent, CardHeader, CardTitle } from '../Card';
+import { Target } from 'lucide-react';
+import formatService from '../../service/formatService';
+
+interface TotalExpenseCoverageProps {
+  monthlyPassiveIncome: number;
+  monthlyExpenses: number;
+  monthlyLiabilityPayments: number;
+}
+
+const TotalExpenseCoverage: React.FC<TotalExpenseCoverageProps> = ({
+  monthlyPassiveIncome,
+  monthlyExpenses,
+  monthlyLiabilityPayments,
+}) => {
+  const { t } = useTranslation();
+  
+  const totalMonthlyExpenses = monthlyExpenses + monthlyLiabilityPayments;
+  const percentage = totalMonthlyExpenses > 0 
+    ? Math.min((monthlyPassiveIncome / totalMonthlyExpenses) * 100, 100)
+    : 0;
+
+  if (totalMonthlyExpenses === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center space-x-2">
+            <div className="bg-emerald-100 dark:bg-emerald-900 p-2 rounded-full">
+              <Target className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <CardTitle>{t('forecast.milestones.totalExpenseCoverage.title')}</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-500 dark:text-gray-400">
+            {t('forecast.milestones.totalExpenseCoverage.noExpenses')}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center space-x-2">
+          <div className="bg-emerald-100 dark:bg-emerald-900 p-2 rounded-full">
+            <Target className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <CardTitle>{t('forecast.milestones.totalExpenseCoverage.title')}</CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+          {t('forecast.milestones.totalExpenseCoverage.description')}
+        </p>
+
+        <div className="space-y-4">
+          <div className="relative h-4 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div 
+              className="absolute left-0 top-0 h-full bg-emerald-500 dark:bg-emerald-600 transition-all duration-500"
+              style={{ width: `${percentage}%` }}
+            />
+          </div>
+          
+          <div className="flex justify-between text-sm">
+            <div>
+              <p className="font-semibold text-emerald-600 dark:text-emerald-400">
+                {t('forecast.milestones.totalExpenseCoverage.percentCovered', { percent: percentage.toFixed(1) })}
+              </p>
+              <p className="text-gray-500 dark:text-gray-400">
+                {t('forecast.milestones.totalExpenseCoverage.totalMonthlyExpenses', { amount: formatService.formatCurrency(totalMonthlyExpenses) })}
+              </p>
+              <p className="text-gray-500 dark:text-gray-400">
+                {t('forecast.milestones.totalExpenseCoverage.breakdown', { expenses: formatService.formatCurrency(monthlyExpenses), debts: formatService.formatCurrency(monthlyLiabilityPayments) })}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            {percentage >= 25 && (
+              <div className={`milestone ${percentage >= 25 ? 'milestone-achieved' : ''}`}>
+                {t('forecast.milestones.totalExpenseCoverage.milestone25')}
+              </div>
+            )}
+            {percentage >= 50 && (
+              <div className={`milestone ${percentage >= 50 ? 'milestone-achieved' : ''}`}>
+                {t('forecast.milestones.totalExpenseCoverage.milestone50')}
+              </div>
+            )}
+            {percentage >= 75 && (
+              <div className={`milestone ${percentage >= 75 ? 'milestone-achieved' : ''}`}>
+                {t('forecast.milestones.totalExpenseCoverage.milestone75')}
+              </div>
+            )}
+            {percentage >= 100 && (
+              <div className={`milestone ${percentage >= 100 ? 'milestone-achieved' : ''}`}>
+                {t('forecast.milestones.totalExpenseCoverage.milestone100')}
+              </div>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default TotalExpenseCoverage;

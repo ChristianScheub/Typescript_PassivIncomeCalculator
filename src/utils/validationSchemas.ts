@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Payment Schedule Schema
 export const createPaymentScheduleSchema = () => z.object({
-  frequency: z.enum(['monthly', 'quarterly', 'annually', 'custom', 'none'] as const),
+  frequency: z.enum(['monthly', 'quarterly', 'annually', 'custom'] as const),
   amount: z.number().min(0, 'Amount must be positive'),
   months: z.array(z.number().min(1).max(12)).optional(),
   customAmounts: z.record(z.number()).optional(),
@@ -50,28 +50,58 @@ export const cryptoFields = {
 };
 
 // Asset Schema
+// Asset Schema - separate from baseEntitySchema since assets don't have start/end dates
 export const createAssetSchema = () => {
-  const baseSchema = baseEntitySchema.extend({
-    type: z.enum(['stock', 'bond', 'real_estate', 'crypto', 'cash', 'other'] as const),
-    value: z.number().min(0).optional(),  // Optional for stocks as it's calculated
+  const assetSchema = z.object({
+    name: z.string({
+      required_error: "Asset name is required",
+      invalid_type_error: "Asset name must be a string"
+    }).min(1, "Asset name is required"),
+    type: z.enum(['stock', 'bond', 'real_estate', 'crypto', 'cash', 'other'] as const, {
+      required_error: "Asset type is required",
+      invalid_type_error: "Please select a valid asset type"
+    }),
+    value: z.number({
+      required_error: "Asset value is required",
+      invalid_type_error: "Asset value must be a number"
+    }).min(0, "Asset value must be positive").optional(),  // Optional for stocks as it's calculated
+    // Optional fields
+    notes: z.string().optional(),
     country: z.string().optional(),
     continent: z.string().optional(),
     sector: z.string().optional(),
-    // Stock fields
+    // Stock specific fields
     ticker: z.string().optional(),
-    quantity: z.number().min(0).optional(),
-    purchasePrice: z.number().min(0).optional(),
-    currentPrice: z.number().min(0).optional(),
+    quantity: z.number({
+      invalid_type_error: "Quantity must be a number"
+    }).min(0, "Quantity must be positive").optional(),
+    purchasePrice: z.number({
+      invalid_type_error: "Purchase price must be a number"
+    }).min(0, "Purchase price must be positive").optional(),
+    currentPrice: z.number({
+      invalid_type_error: "Current price must be a number"
+    }).min(0, "Current price must be positive").optional(),
+    // Real estate specific fields
+    propertyValue: z.number().min(0).optional(),
+    rentalAmount: z.number().min(0).optional(),
+    // Bond specific fields
+    interestRate: z.number().min(0).optional(),
+    maturityDate: z.string().optional(),
+    nominalValue: z.number().min(0).optional(),
+    // Crypto specific fields
+    symbol: z.string().optional(),
+    acquisitionCost: z.number().min(0).optional(),
+    // Dividend related fields
     dividendFrequency: z.enum(['monthly', 'quarterly', 'annually', 'custom', 'none'] as const).optional(),
     dividendAmount: z.number().min(0).optional(),
-    dividendMonths: z.array(z.number()).optional(),
-    dividendPaymentMonths: z.array(z.number()).optional(),
+    dividendMonths: z.array(z.number().min(1).max(12)).optional(),
+    dividendPaymentMonths: z.array(z.number().min(1).max(12)).optional(),
     customDividendAmounts: z.record(z.number()).optional(),
   });
 
-  return baseSchema.superRefine((data, ctx) => {
+  return assetSchema.superRefine((data, ctx) => {
     if (data.type === 'stock') {
-      // For stocks, require quantity and prices
+      // For stocks, require quantity and prices - value will be calculated automatically
       if (!data.quantity || data.quantity <= 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -93,6 +123,7 @@ export const createAssetSchema = () => {
           path: ["currentPrice"]
         });
       }
+      // Note: value is not required for stocks as it's calculated from quantity * currentPrice
     } else if (!data.value || data.value <= 0) {
       // For non-stocks, require value
       ctx.addIssue({
@@ -115,7 +146,7 @@ export const createLiabilitySchema = () => baseEntitySchema.extend({
 
 // Income Schema
 export const createIncomeSchema = () => baseEntitySchema.extend({
-  type: z.enum(['salary', 'rental', 'dividend', 'interest', 'side_hustle', 'other'] as const),
+  type: z.enum(['salary', 'interest', 'side_hustle', 'other'] as const),
   paymentSchedule: createPaymentScheduleSchema(),
   isPassive: z.boolean(),
   sourceId: z.string().optional(),

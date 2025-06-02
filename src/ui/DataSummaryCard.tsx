@@ -3,11 +3,11 @@ import { Card, CardHeader, CardTitle, CardContent } from './Card';
 import { cn } from '../utils/cn';
 
 interface SummaryItem {
+  id: string;
   label: string;
   value: string | number;
   subValue?: string;
   valueClassName?: string;
-  id: string;
 }
 
 interface DataSummaryCardProps {
@@ -28,10 +28,10 @@ export const DataSummaryCard: React.FC<DataSummaryCardProps> = ({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {items.map((row) => (
-            <React.Fragment key={row.map(item => item.id).join('-')}>
+          {items.map((row, rowIndex) => (
+            <div key={`row-${rowIndex}`} className="space-y-4">
               {row.map((item) => (
-                <div key={item.id}>
+                <div key={item.id} className="space-y-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     {item.label}
                   </p>
@@ -42,13 +42,13 @@ export const DataSummaryCard: React.FC<DataSummaryCardProps> = ({
                     {item.value}
                   </div>
                   {item.subValue && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {item.subValue}
                     </p>
                   )}
                 </div>
               ))}
-            </React.Fragment>
+            </div>
           ))}
         </div>
       </CardContent>

@@ -8,16 +8,17 @@ import PieChartExpenseBreakdown from '../ui/pieCharts/PieChartExpenseBreakdown';
 import BarChartCashFlowProjection from '../ui/barCharts/BarChartCashFlowProjection';
 import BarChartNetCashFlow from '../ui/barCharts/BarChartNetCashFlow';
 import BarChartExpenseCoverage from '../ui/barCharts/BarChartExpenseCoverage';
+import MilestonesContainer from '../container/MilestonesContainer';
 
 interface ForecastViewProps {
-  selectedTab: 'projections' | 'allocations';
+  selectedTab: 'projections' | 'allocations' | 'fire';
   isLoading: boolean;
   projections: MonthlyProjection[];
   assetAllocation: AssetAllocation[];
   expenseBreakdown: ExpenseBreakdown[];
   incomeAllocation: IncomeAllocation[];
   liabilities: { category: string; amount: number }[];
-  onTabChange: (tab: 'projections' | 'allocations') => void;
+  onTabChange: (tab: 'projections' | 'allocations' | 'fire') => void;
 }
 
 const ForecastView: React.FC<ForecastViewProps> = ({
@@ -33,7 +34,8 @@ const ForecastView: React.FC<ForecastViewProps> = ({
   const { t } = useTranslation();
   const tabs = [
     { id: 'projections', label: t('forecast.projections') },
-    { id: 'allocations', label: t('forecast.allocations') }
+    { id: 'allocations', label: t('forecast.allocations') },
+    { id: 'fire', label: t('forecast.fire') }
   ];
 
   if (isLoading) {
@@ -44,46 +46,44 @@ const ForecastView: React.FC<ForecastViewProps> = ({
     );
   }
 
-  if (selectedTab === 'projections') {
-    return (
-      <div className="space-y-6">
-        <TabSelector
-          tabs={tabs}
-          selectedTab={selectedTab}
-          onTabChange={(id) => onTabChange(id as 'projections' | 'allocations')}
-        />
+  const renderContent = () => {
+    switch (selectedTab) {
+      case 'projections':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <BarChartCashFlowProjection projections={projections} />
+            <BarChartNetCashFlow projections={projections} />
+            <BarChartExpenseCoverage projections={projections} />
+          </div>
+        );
+      case 'allocations':
+        return (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <AssetAllocationChart
+              title={t('forecast.assetAllocation')}
+              assetAllocation={assetAllocation}
+            />
+            <PieChartIncomeAllocation incomeAllocation={incomeAllocation} />
+            <PieChartExpenseBreakdown expenseBreakdown={expenseBreakdown} liabilities={liabilities} />
+          </div>
+        );
+      case 'fire':
+        return <MilestonesContainer />; // MilestonesContainer handles its own data fetching
+      default:
+        return null;
+    }
+  };
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <BarChartCashFlowProjection projections={projections} />
-          <BarChartNetCashFlow projections={projections} />
-          <BarChartExpenseCoverage projections={projections} />
-        </div>
-      </div>
-    );
-  }
-
-  if (selectedTab === 'allocations') {
-    return (
-      <div className="space-y-6">
-        <TabSelector
-          tabs={tabs}
-          selectedTab={selectedTab}
-          onTabChange={(id) => onTabChange(id as 'projections' | 'allocations')}
-        />
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <AssetAllocationChart
-            title={t('forecast.assetAllocation')}
-            assetAllocation={assetAllocation}
-          />
-          <PieChartIncomeAllocation incomeAllocation={incomeAllocation} />
-          <PieChartExpenseBreakdown expenseBreakdown={expenseBreakdown} liabilities={liabilities} />
-        </div>
-      </div>
-    );
-  }
-
-  return null;
+  return (
+    <div className="space-y-6">
+      <TabSelector
+        tabs={tabs}
+        selectedTab={selectedTab}
+        onTabChange={(id) => onTabChange(id as 'projections' | 'allocations' | 'fire')}
+      />
+      {renderContent()}
+    </div>
+  );
 };
 
 export default ForecastView;

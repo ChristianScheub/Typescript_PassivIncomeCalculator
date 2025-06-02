@@ -5,12 +5,11 @@ import Logger from '../service/Logger/logger';
 import ForecastView from '../view/ForecastView';
 
 const ForecastContainer: React.FC = () => {
-
   const { items: assets, status: assetsStatus } = useAppSelector(state => state.assets);
   const { items: income, status: incomeStatus } = useAppSelector(state => state.income);
   const { items: expenses, status: expensesStatus } = useAppSelector(state => state.expenses);
   const { items: liabilities, status: liabilitiesStatus } = useAppSelector(state => state.liabilities);
-  const [selectedTab, setSelectedTab] = useState<'projections' | 'allocations'>('projections');
+  const [selectedTab, setSelectedTab] = useState<'projections' | 'allocations' | 'fire'>('fire');
 
   const isLoading = useMemo(() => {
     const isAnyLoading = ['loading'].includes(assetsStatus) || 
@@ -26,6 +25,10 @@ const ForecastContainer: React.FC = () => {
   const assetAllocation = useMemo(() => calculatorService.calculateAssetAllocation(assets), [assets]);
   const expenseBreakdown = useMemo(() => calculatorService.calculateExpenseBreakdown(expenses), [expenses]);
   const incomeAllocation = useMemo(() => calculatorService.calculateIncomeAllocation(income, assets), [income, assets]);
+  const transformedLiabilities = useMemo(() => liabilities.map(liability => ({
+    category: liability.type,
+    amount: liability.currentBalance
+  })), [liabilities]);
 
   return (
     <ForecastView
@@ -35,6 +38,7 @@ const ForecastContainer: React.FC = () => {
       assetAllocation={assetAllocation}
       expenseBreakdown={expenseBreakdown}
       incomeAllocation={incomeAllocation}
+      liabilities={transformedLiabilities}
       onTabChange={setSelectedTab}
     />
   );

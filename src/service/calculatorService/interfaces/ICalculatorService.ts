@@ -21,11 +21,12 @@ export interface ICalculatorService {
   calculateAssetMonthlyIncome: (asset: Asset) => number;
   calculateAssetIncomeForMonth: (asset: Asset, monthNumber: number) => number;
   calculateTotalAssetValue: (assets: Asset[]) => number;
+  calculateLiquidAssetValue: (assets: Asset[]) => number;
   calculateTotalMonthlyAssetIncome: (assets: Asset[]) => number;
   calculateTotalAssetIncomeForMonth: (assets: Asset[], monthNumber: number) => number;
   calculateAnnualAssetIncome: (monthlyIncome: number) => number;
   
-  // Cached asset calculations
+  // Cached asset calculations 
   calculateAssetMonthlyIncomeWithCache?: (asset: Asset) => { 
     monthlyAmount: number; 
     annualAmount: number; 
@@ -50,6 +51,7 @@ export interface ICalculatorService {
   // Liability calculations
   calculateTotalDebt: (liabilities: Liability[]) => number;
   calculateTotalMonthlyLiabilityPayments: (liabilities: Liability[]) => number;
+  calculateLiabilityMonthlyPayment: (liability: Liability) => number;
 
   // Expense calculations
   calculateMonthlyExpense: (expense: Expense) => number;

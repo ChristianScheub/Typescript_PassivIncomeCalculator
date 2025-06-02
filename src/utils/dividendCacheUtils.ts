@@ -1,4 +1,4 @@
-import { Asset, CachedDividends } from '../types';
+import { Asset } from '../types';
 
 /**
  * Simple hash function for browser environments

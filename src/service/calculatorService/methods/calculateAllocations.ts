@@ -30,12 +30,6 @@ export const calculateIncomeAllocation = (income: Income[], assets: Asset[]): In
 
     let incomeType: IncomeType;
     switch(asset.type) {
-      case 'stock':
-        incomeType = 'dividend';
-        break;
-      case 'real_estate':
-        incomeType = 'rental';
-        break;
       case 'bond':
         incomeType = 'interest';
         break;

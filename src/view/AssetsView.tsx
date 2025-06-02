@@ -55,6 +55,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
   const summaryItems = [
     [
       {
+        id: 'total-value',
         label: t('pages.totalValue'),
         value: formatService.formatCurrency(totalAssetValue),
         subValue: t('pages.totalAcross', { count: assets.length }),
@@ -63,6 +64,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
     ],
     [
       {
+        id: 'monthly-income',
         label: t('pages.monthlyPassiveIncome'),
         value: formatService.formatCurrency(monthlyAssetIncome),
         subValue: `${formatService.formatCurrency(annualAssetIncome)} ${t('pages.yearly')}`,
@@ -163,8 +165,12 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
       >
         <MaterialAssetForm
           initialData={editingAsset || undefined}
-          onSubmit={editingAsset ? onUpdateAsset : onAddAsset}
-          onCancel={() => {
+          onSubmit={async (data) => {
+            if (editingAsset) {
+              await onUpdateAsset(data);
+            } else {
+              await onAddAsset(data);
+            }
             onSetIsAddingAsset(false);
             onSetEditingAsset(null);
           }}

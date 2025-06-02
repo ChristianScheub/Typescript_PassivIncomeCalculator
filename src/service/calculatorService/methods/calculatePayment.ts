@@ -1,4 +1,4 @@
-import { DividendSchedule, PaymentSchedule } from '../../../types';
+import { DividendSchedule, PaymentSchedule, PaymentFrequency } from '../../../types';
 import Logger from '../../Logger/logger';
 import {
   calculateMonthlyAmountFromFrequency,
@@ -13,7 +13,7 @@ export interface PaymentResult {
 export const calculatePaymentSchedule = (schedule: PaymentSchedule): PaymentResult => {
   Logger.infoService(`calculatePaymentSchedule - frequency: ${schedule?.frequency}, amount: ${schedule?.amount}`);
   
-  if (!schedule?.amount || schedule?.frequency === 'none') {
+  if (!schedule?.amount || !isFinite(schedule.amount)) {
     return { monthlyAmount: 0, annualAmount: 0 };
   }
 
@@ -26,7 +26,10 @@ export const calculatePaymentSchedule = (schedule: PaymentSchedule): PaymentResu
   const annualAmount = monthlyAmount * 12;
   Logger.infoService(`Payment calculation result - monthly: ${monthlyAmount}, annual: ${annualAmount}`);
   
-  return { monthlyAmount, annualAmount };
+  return { 
+    monthlyAmount: isFinite(monthlyAmount) ? monthlyAmount : 0, 
+    annualAmount: isFinite(annualAmount) ? annualAmount : 0 
+  };
 };
 
 export const calculateDividendSchedule = (
@@ -34,23 +37,30 @@ export const calculateDividendSchedule = (
   quantity: number
 ): PaymentResult => {
   Logger.infoService(
-    `calculateDividendSchedule - amount: ${schedule?.amount}, frequency: ${schedule?.frequency}, quantity: ${quantity}`
+    `calculateDividendSchedule - frequency: ${schedule?.frequency}, amount: ${schedule?.amount}, quantity: ${quantity}`
   );
-
-  if (!schedule?.amount || schedule?.frequency === 'none' || !quantity) {
+  
+  if (!schedule?.amount || !isFinite(schedule.amount) || !isFinite(quantity) || schedule.frequency === 'none') {
     return { monthlyAmount: 0, annualAmount: 0 };
   }
 
-  const monthlyAmount = calculateMonthlyAmountFromFrequency(
-    schedule.amount * quantity,
-    schedule.frequency,
-    schedule.months
+  // Convert DividendSchedule to PaymentSchedule
+  const paymentSchedule: PaymentSchedule = {
+    frequency: schedule.frequency as PaymentFrequency, // Safe because we checked for 'none' above
+    amount: schedule.amount * quantity,
+    months: schedule.months,
+  };
+
+  const baseResult = calculatePaymentSchedule(paymentSchedule);
+
+  Logger.infoService(
+    `Dividend calculation result - monthly: ${baseResult.monthlyAmount}, annual: ${baseResult.annualAmount}`
   );
-
-  const annualAmount = monthlyAmount * 12;
-  Logger.infoService(`Dividend calculation result - monthly: ${monthlyAmount}, annual: ${annualAmount}`);
-
-  return { monthlyAmount, annualAmount };
+  
+  return { 
+    monthlyAmount: isFinite(baseResult.monthlyAmount) ? baseResult.monthlyAmount : 0,
+    annualAmount: isFinite(baseResult.annualAmount) ? baseResult.annualAmount : 0
+  };
 };
 
 export const calculateDividendForMonth = (

@@ -9,7 +9,8 @@ import {
 import { calculatePaymentSchedule, calculateDividendSchedule, calculateDividendForMonth } from './methods/calculatePayment';
 import { 
   calculateTotalDebt,
-  calculateTotalMonthlyLiabilityPayments 
+  calculateTotalMonthlyLiabilityPayments,
+  calculateLiabilityMonthlyPayment 
 } from './methods/calculateLiabilities';
 import {
   calculateMonthlyExpense,
@@ -33,6 +34,9 @@ const calculatorService: ICalculatorService = {
   calculateAssetMonthlyIncome,
   calculateAssetIncomeForMonth,
   calculateTotalAssetValue: (assets) => assets.reduce((sum, asset) => sum + asset.value, 0),
+  calculateLiquidAssetValue: (assets) => assets
+    .filter(asset => ['stock', 'bond', 'cash'].includes(asset.type))
+    .reduce((sum, asset) => sum + asset.value, 0),
   calculateTotalMonthlyAssetIncome: (assets) => 
     assets.reduce((sum, asset) => sum + calculateAssetMonthlyIncome(asset), 0),
   calculateTotalAssetIncomeForMonth,
@@ -89,9 +93,10 @@ const calculatorService: ICalculatorService = {
   // Liability calculations
   calculateTotalDebt,
   calculateTotalMonthlyLiabilityPayments,
+  calculateLiabilityMonthlyPayment,
 
   // Expense calculations
-  calculateMonthlyExpense: calculateMonthlyExpense,
+  calculateMonthlyExpense,
   calculateTotalMonthlyExpenses,
   calculateAnnualExpenses,
 

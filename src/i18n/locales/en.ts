@@ -8,6 +8,7 @@ export default {
       title: 'Financial Forecast',
       projections: 'Projections',
       allocations: 'Allocations',
+      fire: 'Milestones',
       cashFlowProjection: 'Monthly Cash Flow Projection',
       passiveIncomeCoverage: 'Passive Income Coverage of All Expenses',
       assetAllocation: 'Asset Allocation',
@@ -30,6 +31,67 @@ export default {
       monthlyCashFlow: 'Monthly Cash Flow',
       expenseCoverage: 'Total Expense Coverage',
       loading: 'Loading forecast data...',
+      milestones: {
+        bufferMilestone: {
+          title: 'Safety Buffer',
+          description: 'Track how many months of total expenses (fixed costs and known variable expenses) your liquid assets could cover. This financial buffer provides security and confidence for investment decisions.',
+          noExpenses: 'No expenses tracked yet. Add your recurring expenses to start building your safety buffer.',
+          monthsCovered: '{{months}} months of expenses covered',
+          milestone2: '2 months of expenses covered - Basic emergency fund established!',
+          milestone4: '4 months of expenses covered - Growing safety net!',
+          milestone6: 'Full 6-month safety buffer achieved! 🛡️'
+        },
+        leisureMilestone: {
+          title: 'Leisure Coverage',
+          description: 'See how much of your personal and entertainment expenses are covered by passive income, showing that FIRE is not just about necessities but also about enjoying life.',
+          noExpenses: 'No leisure expenses tracked yet. Add your entertainment and personal expenses to start tracking.',
+          percentCovered: '{{percent}}% of leisure costs covered',
+          milestone25: '25% of leisure costs covered by passive income!',
+          milestone50: 'Half of your fun money is now passive! 🎉',
+          milestone75: '75% of leisure costs covered - Freedom is near!',
+          milestone100: 'All leisure costs covered by passive income! 🎮'
+        },
+        fixedCostFreedom: {
+          title: 'Fixed Cost Freedom',
+          description: 'Track the percentage of your fixed monthly costs covered by passive income. Fixed costs include:\n1. Monthly recurring expenses in these categories: Housing, Transportation, Utilities, Insurance, and Healthcare\n2. All monthly debt payments (mortgages, loans, credit cards, etc)',
+          totalFixedCosts: 'Total fixed costs: {{amount}}/month',
+          breakdown: 'Breakdown:\n• Monthly recurring expenses: {{expenses}}/month\n• Monthly debt payments: {{debts}}/month',
+          percentCovered: '{{percent}}% covered by passive income',
+          milestone25: '25% of fixed costs covered by passive income!',
+          milestone50: 'Halfway there! 50% of fixed costs covered',
+          milestone75: 'Almost there! 75% of fixed costs covered',
+          milestone100: 'Financial freedom achieved! All fixed costs covered by passive income 🎉',
+          noFixedCosts: 'No fixed costs tracked yet. Add your recurring expenses and debt payments to start tracking.'
+        },
+        totalExpenseCoverage: {
+          title: 'Total Expense Coverage',
+          description: 'Track how much of your total monthly expenses (including all fixed costs, variable expenses, and liability payments) are covered by passive income from your assets.',
+          totalMonthlyExpenses: 'Total monthly expenses: {{amount}}/month',
+          breakdown: 'Breakdown:\n• Regular expenses: {{expenses}}/month\n• Liability payments: {{debts}}/month',
+          percentCovered: '{{percent}}% covered by passive income',
+          milestone25: '25% of all expenses covered by passive income!',
+          milestone50: 'Halfway to total freedom! 50% of all expenses covered',
+          milestone75: '75% of all expenses covered - Almost completely passive!',
+          milestone100: 'Complete financial independence achieved! All expenses covered by passive income 🎯',
+          noExpenses: 'No expenses tracked yet. Add your expenses and liabilities to start tracking your path to financial independence.'
+        },
+        debtBreaker: {
+          title: 'Debt Reduction Progress',
+          description: 'Track your progress in paying off debts',
+          totalProgress: 'Total debt reduction: {{percent}}%',
+          debtFree: 'Debt free! 🎉',
+          perDebt: '{{name}}: {{percent}}% paid off',
+          noDebt: 'No debts tracked yet'
+        },
+        debtCoverage: {
+          title: 'Debt Payment Coverage',
+          description: 'Track how much of your monthly debt payments can be covered by passive income',
+          totalCoverage: '{{percent}}% of monthly payments covered',
+          perDebt: '{{name}}: {{percent}}% covered',
+          monthlyCost: 'Monthly payments: {{amount}}',
+          noDebt: 'No monthly debt payments'
+        }
+      }
     },
     navigation: {
       home: 'Home',
