@@ -93,15 +93,13 @@ export const createAssetSchema = () => {
           path: ["currentPrice"]
         });
       }
-    } else {
+    } else if (!data.value || data.value <= 0) {
       // For non-stocks, require value
-      if (!data.value || data.value <= 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Value is required for non-stock assets",
-          path: ["value"]
-        });
-      }
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Value is required for non-stock assets",
+        path: ["value"]
+      });
     }
   });
 };

@@ -36,10 +36,17 @@ const createStringValidation = (options: ValidationOptions): z.ZodType<any> => {
 
 const createNumberValidation = (options: ValidationOptions): z.ZodType<any> => {
   const schema = z.number();
-  const withMinMax = options.max !== undefined 
-    ? (options.min !== undefined ? schema.min(options.min).max(options.max) : schema.max(options.max))
-    : (options.min !== undefined ? schema.min(options.min) : schema);
-  return options.required ? withMinMax : withMinMax.optional();
+  
+  let withBounds = schema;
+  if (options.max !== undefined && options.min !== undefined) {
+    withBounds = schema.min(options.min).max(options.max);
+  } else if (options.max !== undefined) {
+    withBounds = schema.max(options.max);
+  } else if (options.min !== undefined) {
+    withBounds = schema.min(options.min);
+  }
+  
+  return options.required ? withBounds : withBounds.optional();
 };
 
 const createBooleanValidation = (options: ValidationOptions): z.ZodType<any> => {

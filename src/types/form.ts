@@ -37,6 +37,6 @@ export type ValidationSchema = z.ZodType<any, any>;
 export interface UseFormConfig<T> {
   validationSchema: ValidationSchema;
   defaultValues: Partial<T>;
-  onSubmit: (data: T) => void;
+  onSubmit: (data: T) => void | Promise<any>;
   onError?: (errors: any) => void;
 }

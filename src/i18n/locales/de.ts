@@ -124,7 +124,12 @@ export default {
       paymentDay: 'Zahltag',
       deleteConfirm: 'Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?',
       across: '{{count}} Einträge',
-      viewDetails: 'Details anzeigen'
+      viewDetails: 'Details anzeigen',
+      requiredFields: 'Pflichtfelder',
+      optionalFields: 'Optionale Felder',
+      required: 'Pflichtfeld',
+      total: 'Gesamt',
+      perMonth: 'pro Monat',
     },
     assets: {
       title: 'Vermögenswerte',
@@ -179,6 +184,7 @@ export default {
         adding: 'Hinzufügen...',
         addAsset: 'Vermögenswert hinzufügen',
         updateAsset: 'Vermögenswert aktualisieren',
+        stockSpecific: 'Aktienspezifische Informationen',
       },
       types: {
         stock: 'Aktie',

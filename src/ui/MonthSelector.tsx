@@ -1,6 +1,5 @@
 import React from 'react';
 import { Chip, Box, Typography } from '@mui/material';
-import { useTranslation } from 'react-i18next';
 
 interface MonthSelectorProps {
   selectedMonths: number[];
@@ -13,8 +12,6 @@ export const MonthSelector: React.FC<MonthSelectorProps> = ({
   onChange,
   label,
 }) => {
-  const { t } = useTranslation();
-
   return (
     <Box sx={{ width: '100%' }}>
       <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>

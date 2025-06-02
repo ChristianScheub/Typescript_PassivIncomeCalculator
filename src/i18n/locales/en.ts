@@ -122,7 +122,12 @@ export default {
       paymentDay: 'Payment Day',
       deleteConfirm: 'Are you sure you want to delete this item?',
       across: '{{count}} items',
-      viewDetails: 'View Details'
+      viewDetails: 'View Details',
+      requiredFields: 'Required Fields',
+      optionalFields: 'Optional Fields',
+      required: 'Required',
+      total: 'Total',
+      perMonth: 'per month',
     },
     assets: {
       title: 'Assets',
@@ -177,6 +182,7 @@ export default {
         adding: 'Adding...',
         addAsset: 'Add Asset',
         updateAsset: 'Update Asset',
+        stockSpecific: 'Stock Specific Information',
       },
       types: {
         stock: 'Stock',

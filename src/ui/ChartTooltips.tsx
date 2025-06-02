@@ -95,22 +95,29 @@ export const CustomStackedBarTooltip: React.FC<CustomStackedBarTooltipProps> = (
   payload,
   firstBarColor 
 }) => {
+  const { t } = useTranslation();
   if (!active || !payload?.length) return null;
-  const data = payload[0]?.payload;
+  const data = payload?.[0]?.payload;
   if (!data) return null;
+
+  const { amount, percentage, firstBar, secondBar } = data;
 
   return (
     <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
-      <p className="text-sm font-medium">{data.name}</p>
-      {payload.map((bar, index) => (
-        <p 
-          key={`${bar.dataKey}-${index}`} 
-          className="text-sm"
-          style={{ color: index === 0 ? firstBarColor : undefined }}
-        >
-          {bar.name}: {formatService.formatCurrency(bar.value)}
-        </p>
-      ))}
+      <div className="space-y-1">
+        {firstBar?.value && (
+          <p className="text-sm" style={{ color: firstBarColor }}>
+            {firstBar.name}: {formatService.formatCurrency(firstBar.value)}
+          </p>
+        )}
+        {secondBar?.value && (
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {secondBar.name}: {formatService.formatCurrency(secondBar.value)}
+          </p>
+        )}
+        {amount && <p className="text-sm">{t('common.total')}: {formatService.formatCurrency(amount)}</p>}
+        {percentage && <p className="text-sm">({formatService.formatPercentage(percentage)})</p>}
+      </div>
     </div>
   );
 };

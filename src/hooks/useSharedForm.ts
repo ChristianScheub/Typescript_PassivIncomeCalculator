@@ -46,11 +46,9 @@ export function useSharedForm<T extends FieldValues>({
       try {
         Logger.info(JSON.stringify(data));
         const result = onSubmit(data);
-        if (typeof result !== 'undefined' && result !== null) {
-          const isPromise = typeof result === 'object' && 'then' in result;
-          if (isPromise) {
-            await result;
-          }
+        // Only handle result if it's a Promise
+        if (result instanceof Promise) {
+          await result;
         }
       } catch (error) {
         Logger.error(error instanceof Error ? error.message : 'Unknown error');

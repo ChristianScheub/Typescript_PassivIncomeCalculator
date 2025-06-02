@@ -111,13 +111,13 @@ const DebugSettings: React.FC<DebugSettingsProps> = ({
               {logs.length === 0 ? (
                 <p className="text-gray-500 dark:text-gray-400 text-sm">No logs available</p>
               ) : (
-                logs.slice(-50).reverse().map((logEntry, index) => {
+                logs.slice(-50).reverse().map((logEntry) => {
                   const { timestamp, message } = formatLogEntry(logEntry);
                   const level = getLogLevel(message);
                   const colorClass = getLogLevelColor(level);
                   
                   return (
-                    <div key={index} className="text-xs font-mono border-b border-gray-200 dark:border-gray-700 pb-1 mb-1">
+                    <div key={`${timestamp}-${message.substring(0, 20)}`} className="text-xs font-mono border-b border-gray-200 dark:border-gray-700 pb-1 mb-1">
                       <div className="flex items-start space-x-2">
                         <span className="text-gray-400 dark:text-gray-500 whitespace-nowrap">
                           {timestamp.split(' ').slice(1, 3).join(' ')}
