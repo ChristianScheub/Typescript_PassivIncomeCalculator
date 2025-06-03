@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchLiabilities, addLiability, updateLiability, deleteLiability } from '../store/slices/liabilitiesSlice';
 import { Liability } from '../types';
@@ -7,6 +7,7 @@ import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import LiabilitiesView from '../view/LiabilitiesView';
+import { sortLiabilitiesByPayment, SortOrder } from '../utils/sortingUtils';
 
 const LiabilitiesContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -24,6 +25,11 @@ const LiabilitiesContainer: React.FC = () => {
 
   const totalDebt = calculatorService.calculateTotalDebt(liabilities);
   const totalMonthlyPayment = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
+
+  // Sort liabilities by monthly payment (highest to lowest)
+  const sortedLiabilities = useMemo(() => {
+    return sortLiabilitiesByPayment(liabilities, SortOrder.DESC);
+  }, [liabilities]);
 
   const handleAddLiability = async (data: any) => {
     try {
@@ -63,7 +69,7 @@ const LiabilitiesContainer: React.FC = () => {
 
   return (
     <LiabilitiesView
-      liabilities={liabilities}
+      liabilities={sortedLiabilities}
       status={status}
       totalDebt={totalDebt}
       totalMonthlyPayment={totalMonthlyPayment}

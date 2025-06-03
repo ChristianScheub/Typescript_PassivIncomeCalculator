@@ -18,8 +18,16 @@ const initialState: LiabilitiesState = {
 };
 
 // Async Thunks
-export const fetchLiabilities = createAsyncThunk('liabilities/fetchLiabilities', async () => {
-  Logger.infoRedux('Fetching all liabilities');
+export const fetchLiabilities = createAsyncThunk('liabilities/fetchLiabilities', async (_, { getState }) => {
+  const state = getState() as { liabilities: LiabilitiesState };
+  
+  // If we already have items (from localStorage), don't fetch from SQLite
+  if (state.liabilities.items.length > 0) {
+    Logger.infoRedux('Using liabilities from localStorage');
+    return state.liabilities.items;
+  }
+
+  Logger.infoRedux('Fetching all liabilities from SQLite');
   return await sqliteService.getAll('liabilities');
 });
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchIncome, addIncome, updateIncome, deleteIncome } from '../store/slices/incomeSlice';
 import { Income } from '../types';
@@ -7,6 +7,7 @@ import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import IncomeView from '../view/IncomeView';
+import { sortIncome, SortOrder } from '../utils/sortingUtils';
 
 const IncomeContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -28,6 +29,11 @@ const IncomeContainer: React.FC = () => {
 
   const totalMonthlyIncome = calculatorService.calculateTotalMonthlyIncome(incomeItems);
 
+  // Sort income items by monthly amount (highest to lowest)
+  const sortedIncomeItems = useMemo(() => {
+    return sortIncome(incomeItems, SortOrder.DESC);
+  }, [incomeItems]);
+
   const getIncomeTypeLabel = (type: string): string => {
     return t(`income.types.${type}`, type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' '));
   };
@@ -37,6 +43,7 @@ const IncomeContainer: React.FC = () => {
       Logger.info('Adding new income' + " - " + JSON.stringify(data));
       analytics.trackEvent('income_add', { type: data.type });
       await dispatch(addIncome(data));
+      setIsAddingIncome(false); // Close the form after successful addition
     } catch (error) {
       Logger.error('Failed to add income' + " - " + JSON.stringify(error as Error));
     }
@@ -70,7 +77,7 @@ const IncomeContainer: React.FC = () => {
 
   return (
     <IncomeView
-      items={incomeItems}
+      items={sortedIncomeItems}
       status={status}
       totalMonthlyIncome={totalMonthlyIncome}
       annualIncome={annualIncome}

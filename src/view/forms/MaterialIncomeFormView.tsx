@@ -78,6 +78,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
       <MaterialForm 
         title={title}
         onSubmit={onFormSubmit}
+        error={Object.keys(errors).length > 0 ? t('common.pleaseCheckRequiredFields') : undefined}
       >
         <RequiredFieldsSection>
           <SectionTitle>{t('common.requiredFields')}</SectionTitle>
@@ -113,6 +114,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
                 type="select"
                 required
                 options={frequencyOptions}
+                error={errors.paymentSchedule?.frequency?.message}
                 value={watch('paymentSchedule.frequency')}
                 onChange={(value: PaymentFrequency) => setValue('paymentSchedule.frequency', value)}
               />

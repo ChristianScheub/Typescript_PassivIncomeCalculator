@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import { Save } from '@mui/icons-material';
+import { Save, Close } from '@mui/icons-material';
 import { ExpenseCategory, PaymentFrequency } from '../../types';
 import { UseFormSetValue } from 'react-hook-form';
 import { 
@@ -40,6 +40,7 @@ interface MaterialExpenseFormViewProps {
   watch: (field: string) => any;
   setValue: UseFormSetValue<ExpenseFormData>;
   onFormSubmit: () => void;
+  onCancel?: () => void;
   
   // Payment schedule props
   paymentFields: {
@@ -57,6 +58,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
   watch,
   setValue,
   onFormSubmit,
+  onCancel,
   paymentFields,
   handleMonthChange,
   title
@@ -200,11 +202,21 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
         </OptionalFieldsSection>
       </MaterialForm>
 
-      <FloatingBtn
-        alignment={ButtonAlignment.RIGHT}
-        icon={Save}
-        onClick={onFormSubmit}
-      />
+      <Box sx={{ display: 'flex', gap: 2, position: 'fixed', bottom: '16px', right: '16px', zIndex: 1100 }}>
+        {onCancel && (
+          <FloatingBtn
+            alignment={ButtonAlignment.RIGHT}
+            icon={Close}
+            onClick={onCancel}
+            backgroundColor="error.main"
+          />
+        )}
+        <FloatingBtn
+          alignment={ButtonAlignment.RIGHT}
+          icon={Save}
+          onClick={onFormSubmit}
+        />
+      </Box>
     </Box>
   );
 };

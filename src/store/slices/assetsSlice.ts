@@ -19,8 +19,16 @@ const initialState: AssetsState = {
 };
 
 // Async Thunks
-export const fetchAssets = createAsyncThunk('assets/fetchAssets', async () => {
-  Logger.infoRedux('Fetching all assets');
+export const fetchAssets = createAsyncThunk('assets/fetchAssets', async (_, { getState }) => {
+  const state = getState() as { assets: AssetsState };
+  
+  // If we already have items (from localStorage), don't fetch from SQLite
+  if (state.assets.items.length > 0) {
+    Logger.infoRedux('Using assets from localStorage');
+    return state.assets.items;
+  }
+
+  Logger.infoRedux('Fetching all assets from SQLite');
   return await sqliteService.getAll('assets');
 });
 

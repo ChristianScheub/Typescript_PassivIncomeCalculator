@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Download, Upload, Moon, Sun } from 'lucide-react';
+import { Download, Upload, Moon, Sun, Eye, EyeOff, Key } from 'lucide-react';
 import LanguageSelector from '../ui/LanguageSelector';
 import DebugSettings from '../ui/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../config/featureFlags';
@@ -19,6 +19,10 @@ interface SettingsViewProps {
     getSessionDuration: () => number;
     getEventCount: (event?: string) => number;
   };
+  apiKey: string;
+  apiKeyStatus: 'idle' | 'saving' | 'success' | 'error';
+  apiKeyError: string | null;
+  currency: 'EUR' | 'USD';
   onThemeChange: () => void;
   onExportData: () => void;
   onImportData: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -27,6 +31,9 @@ interface SettingsViewProps {
   onExportLogs: () => void;
   onClearLogs: () => void;
   onAutoRefreshChange: (enabled: boolean) => void;
+  onApiKeyChange: (apiKey: string) => void;
+  onApiKeyRemove: () => void;
+  onCurrencyChange: (currency: 'EUR' | 'USD') => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
   getLogLevel: (message: string) => string;
   getLogLevelColor: (level: string) => string;
@@ -41,6 +48,10 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   showLogs,
   autoRefresh,
   analytics,
+  apiKey,
+  apiKeyStatus,
+  apiKeyError,
+  currency,
   onThemeChange,
   onExportData,
   onImportData,
@@ -49,15 +60,139 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onExportLogs,
   onClearLogs,
   onAutoRefreshChange,
+  onApiKeyChange,
+  onApiKeyRemove,
+  onCurrencyChange,
   formatLogEntry,
   getLogLevel,
   getLogLevelColor
 }) => {
   const { t } = useTranslation();
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [tempApiKey, setTempApiKey] = useState(apiKey);
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t('navigation.settings')}</h1>
+      
+      {/* API Configuration */}
+      <Card className="bg-white dark:bg-gray-800">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Key size={20} />
+            <span>Stock API Configuration</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <h3 className="font-medium">Finnhub API Key</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              Get your free API key from{' '}
+              <a 
+                href="https://finnhub.io" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:text-blue-600 underline"
+              >
+                finnhub.io
+              </a>
+              {' '}to enable stock data features.
+            </p>
+            
+            <div className="space-y-3">
+              <div className="relative">
+                <input
+                  type={showApiKey ? 'text' : 'password'}
+                  value={tempApiKey}
+                  onChange={(e) => setTempApiKey(e.target.value)}
+                  placeholder="Enter your Finnhub API key"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              
+              {apiKeyError && (
+                <p className="text-sm text-red-500">{apiKeyError}</p>
+              )}
+              
+              <div className="flex space-x-2">
+                <Button
+                  onClick={() => onApiKeyChange(tempApiKey)}
+                  disabled={apiKeyStatus === 'saving' || !tempApiKey.trim()}
+                  className="flex items-center space-x-2"
+                >
+                  <span>
+                    {(() => {
+                      if (apiKeyStatus === 'saving') return 'Saving...';
+                      if (apiKeyStatus === 'success') return 'Saved!';
+                      return 'Save API Key';
+                    })()}
+                  </span>
+                </Button>
+                
+                {apiKey && (
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      onApiKeyRemove();
+                      setTempApiKey('');
+                    }}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+              
+              {apiKey && (
+                <p className="text-sm text-green-600 dark:text-green-400">
+                  ✓ API key configured
+                </p>
+              )}
+            </div>
+          </div>
+          
+          <div>
+            <h3 className="font-medium">Stock Market Currency</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              Select the currency for displaying stock prices. USD shows original prices, EUR converts USD prices to Euro using live exchange rates.
+            </p>
+            
+            <div className="flex space-x-3">
+              <button
+                onClick={() => onCurrencyChange('EUR')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  currency === 'EUR'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                EUR (Auto-converted)
+              </button>
+              <button
+                onClick={() => onCurrencyChange('USD')}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                  currency === 'USD'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                USD (Original)
+              </button>
+            </div>
+            
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
+              Current: {currency === 'EUR' ? 'Euro - USD prices converted to EUR using live exchange rates' : 'US Dollar - Original USD prices from US exchanges'}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
       
       {/* Appearance */}
       <Card className="bg-white dark:bg-gray-800">

@@ -19,8 +19,16 @@ const initialState: ExpensesState = {
 
 export const fetchExpenses = createAsyncThunk(
   'expenses/fetchExpenses',
-  async () => {
-    Logger.infoRedux('Fetching all expenses');
+  async (_, { getState }) => {
+    const state = getState() as { expenses: ExpensesState };
+    
+    // If we already have items (from localStorage), don't fetch from SQLite
+    if (state.expenses.items.length > 0) {
+      Logger.infoRedux('Using expenses from localStorage');
+      return state.expenses.items;
+    }
+
+    Logger.infoRedux('Fetching all expenses from SQLite');
     return await sqliteService.getAll('expenses');
   }
 );

@@ -20,6 +20,7 @@ interface AssetFormData {
   name: string;
   type: AssetType;
   value: number;
+  purchaseDate?: string;
   ticker?: string;
   quantity?: number;
   purchasePrice?: number;
@@ -358,6 +359,25 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
           </FormSection>
         )}
 
+        {assetType === 'cash' && (
+          <FormSection>
+            <SectionTitle>{t('assets.form.cashSpecific') || 'Cash Details'}</SectionTitle>
+            <Grid container spacing={3}>
+              <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
+                <SharedFormField
+                  label={t('assets.form.interestRatePercent') || 'Interest Rate (%)'}
+                  name="interestRate"
+                  type="number"
+                  value={watch('interestRate')}
+                  onChange={(value) => setValue('interestRate', value)}
+                  step={0.01}
+                  min={0}
+                />
+              </Grid>
+            </Grid>
+          </FormSection>
+        )}
+
         {assetType === 'crypto' && (
           <FormSection>
             <SectionTitle>{t('assets.form.cryptoSpecific')}</SectionTitle>
@@ -388,6 +408,15 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
         <OptionalFieldsSection>
           <SectionTitle>{t('common.optionalFields')}</SectionTitle>
           <Grid container spacing={3}>
+            <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
+              <SharedFormField
+                label={t('assets.form.purchaseDate')}
+                name="purchaseDate"
+                type="date"
+                value={watch('purchaseDate')}
+                onChange={(value) => setValue('purchaseDate', value || new Date().getFullYear() + '-01-01')}
+              />
+            </Grid>
             <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">
               <SharedFormField
                 label={t('assets.form.country')}

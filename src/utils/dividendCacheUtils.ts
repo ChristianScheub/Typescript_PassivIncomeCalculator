@@ -1,4 +1,4 @@
-import { Asset } from '../types';
+import { Asset, CachedDividends } from '../types';
 
 /**
  * Simple hash function for browser environments
@@ -24,7 +24,9 @@ export function generateDividendCalculationHash(asset: Asset): string {
     dividendInfo: asset.dividendInfo,
     quantity: asset.quantity,
     currentPrice: asset.currentPrice,
-    type: asset.type
+    type: asset.type,
+    interestRate: asset.interestRate,
+    value: asset.value
   };
   
   const dataString = JSON.stringify(relevantData, Object.keys(relevantData).sort());

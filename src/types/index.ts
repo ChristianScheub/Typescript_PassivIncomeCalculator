@@ -43,10 +43,19 @@ export interface DividendSchedule {
   customAmounts?: Record<number, number>;
 }
 
+export interface CachedDividends {
+  monthlyAmount: number;
+  annualAmount: number;
+  monthlyBreakdown: Record<number, number>;
+  lastCalculated: string;
+  calculationHash: string;
+}
+
 export interface Asset extends BaseEntity {
   name: string;
   type: AssetType;
   value: number;
+  purchaseDate?: string;
   propertyValue?: number;
   quantity?: number;
   purchasePrice?: number;
@@ -71,6 +80,7 @@ export interface Asset extends BaseEntity {
     amount: number;
   };
   notes?: string;
+  cachedDividends?: CachedDividends;
 }
 
 // Liability Types

@@ -5,6 +5,7 @@ import { analytics } from "../service/analytics";
 import Logger from "../service/Logger/logger";
 import SettingsView from "../view/SettingsView";
 import { handleFileDownload } from "../service/helper/downloadFile";
+import { setApiKey, removeApiKey, getCurrency, setCurrency } from "../service/stockAPIService/utils/fetch";
 
 const SettingsContainer: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
@@ -18,6 +19,23 @@ const SettingsContainer: React.FC = () => {
   const [logs, setLogs] = useState<string[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [apiKey, setApiKeyState] = useState<string>("");
+  const [apiKeyStatus, setApiKeyStatus] = useState<
+    "idle" | "saving" | "success" | "error"
+  >("idle");
+  const [apiKeyError, setApiKeyError] = useState<string | null>(null);
+  const [currency, setCurrencyState] = useState<'EUR' | 'USD'>('EUR');
+
+  // Load API key and currency on mount
+  useEffect(() => {
+    const storedApiKey = localStorage.getItem('finnhub_api_key');
+    if (storedApiKey) {
+      setApiKeyState(storedApiKey);
+    }
+    
+    const storedCurrency = getCurrency();
+    setCurrencyState(storedCurrency);
+  }, []);
 
   const loadLogs = () => {
     const storedLogs = localStorage.getItem("app_logs");
@@ -204,6 +222,47 @@ const SettingsContainer: React.FC = () => {
     }
   };
 
+  const handleApiKeyChange = async (newApiKey: string) => {
+    if (!newApiKey.trim()) {
+      setApiKeyError("API key cannot be empty");
+      return;
+    }
+
+    setApiKeyStatus("saving");
+    setApiKeyError(null);
+
+    try {
+      setApiKey(newApiKey.trim());
+      setApiKeyState(newApiKey.trim());
+      setApiKeyStatus("success");
+      Logger.info("Finnhub API key saved successfully");
+      analytics.trackEvent("settings_api_key_saved");
+      setTimeout(() => setApiKeyStatus("idle"), 2000);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to save API key";
+      setApiKeyError(errorMessage);
+      setApiKeyStatus("error");
+      Logger.error(`Failed to save API key: ${errorMessage}`);
+      setTimeout(() => setApiKeyStatus("idle"), 3000);
+    }
+  };
+
+  const handleApiKeyRemove = () => {
+    if (window.confirm("Are you sure you want to remove your API key? This will disable stock data features.")) {
+      removeApiKey();
+      setApiKeyState("");
+      Logger.info("Finnhub API key removed");
+      analytics.trackEvent("settings_api_key_removed");
+    }
+  };
+
+  const handleCurrencyChange = (newCurrency: 'EUR' | 'USD') => {
+    setCurrency(newCurrency);
+    setCurrencyState(newCurrency);
+    Logger.info(`Currency changed to ${newCurrency}`);
+    analytics.trackEvent("settings_currency_changed", { currency: newCurrency });
+  };
+
   return (
     <SettingsView
       theme={theme}
@@ -214,6 +273,10 @@ const SettingsContainer: React.FC = () => {
       showLogs={showLogs}
       autoRefresh={autoRefresh}
       analytics={analytics}
+      apiKey={apiKey}
+      apiKeyStatus={apiKeyStatus}
+      apiKeyError={apiKeyError}
+      currency={currency}
       onThemeChange={handleThemeChange}
       onExportData={handleExportData}
       onImportData={handleImportData}
@@ -222,6 +285,9 @@ const SettingsContainer: React.FC = () => {
       onExportLogs={handleExportLogs}
       onClearLogs={handleClearLogs}
       onAutoRefreshChange={(enabled) => setAutoRefresh(enabled)}
+      onApiKeyChange={handleApiKeyChange}
+      onApiKeyRemove={handleApiKeyRemove}
+      onCurrencyChange={handleCurrencyChange}
       formatLogEntry={formatLogEntry}
       getLogLevel={getLogLevel}
       getLogLevelColor={getLogLevelColor}

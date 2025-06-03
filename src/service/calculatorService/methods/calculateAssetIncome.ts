@@ -38,6 +38,21 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
     income += isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
   }
 
+  // Handle bond and cash interest income
+  if ((asset.type === "bond" || asset.type === "cash") && asset.interestRate !== undefined && asset.value) {
+    // Convert annual interest rate to monthly income
+    // interestRate is input as percentage value (e.g., 5.0 for 5%)
+    const annualInterest = asset.interestRate * asset.value / 100;
+    const monthlyInterest = annualInterest / 12;
+    
+    Logger.infoService(
+      `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)} interest calculation for ${asset.name}: ${asset.interestRate}% of ${asset.value} = ${annualInterest} annually, ${monthlyInterest} monthly`
+    );
+
+    // Ensure monthly interest is a valid number
+    income += isFinite(monthlyInterest) ? monthlyInterest : 0;
+  }
+
   // Handle real estate rental income
   if (asset.type === "real_estate" && asset.rentalIncome && typeof asset.rentalIncome.amount === 'number') {
     const monthlyRental = asset.rentalIncome.amount;
@@ -86,6 +101,20 @@ export const calculateAssetIncomeForMonth = (
       `Dividend for ${asset.name} in month ${monthNumber}: ${dividendForMonth}`
     );
     income += isFinite(dividendForMonth) ? dividendForMonth : 0;
+  }
+
+  // Handle bond and cash interest income for specific month
+  if ((asset.type === "bond" || asset.type === "cash") && asset.interestRate !== undefined && asset.value) {
+    // Convert annual interest rate to monthly income
+    // interestRate is input as percentage value (e.g., 5.0 for 5%)
+    const annualInterest = asset.interestRate * asset.value / 100;
+    const monthlyInterest = annualInterest / 12;
+    
+    Logger.infoService(
+      `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)} interest for ${asset.name} in month ${monthNumber}: ${monthlyInterest}`
+    );
+    
+    income += isFinite(monthlyInterest) ? monthlyInterest : 0;
   }
 
   // Handle real estate rental income for specific month
@@ -190,7 +219,7 @@ export const calculateAssetMonthlyIncomeWithCache = (
     };
   }
   
-  Logger.cache(
+  Logger.infoService(
     `Cache miss for asset ${asset.name}, no cached dividend data available`
   );
 
@@ -216,6 +245,20 @@ export const calculateAssetMonthlyIncomeWithCache = (
         month
       );
       monthlyBreakdown[month] = isFinite(monthlyDividend) ? monthlyDividend : 0;
+    }
+  }
+  
+  // Calculate bond and cash interest income
+  else if ((asset.type === "bond" || asset.type === "cash") && asset.interestRate !== undefined && asset.value) {
+    // Convert annual interest rate to monthly income
+    // interestRate is input as percentage value (e.g., 5.0 for 5%)
+    const annualInterest = asset.interestRate * asset.value / 100;
+    monthlyAmount = annualInterest / 12;
+    annualAmount = annualInterest;
+    
+    // For interest income, it's the same every month
+    for (let month = 1; month <= 12; month++) {
+      monthlyBreakdown[month] = monthlyAmount;
     }
   }
   
@@ -253,8 +296,11 @@ export const updateAssetCacheData = (
     monthlyBreakdown: Record<number, number>;
   }
 ) => {
-  if (asset.type === "stock" && asset.dividendInfo) {
-    // Nur für Assets mit Dividenden-relevanten Daten
+  // Cache data for stocks with dividends, bonds with interest, and real estate with rental income
+  if ((asset.type === "stock" && asset.dividendInfo) || 
+      (asset.type === "bond" && asset.interestRate !== undefined) || 
+      (asset.type === "real_estate" && asset.rentalIncome)) {
+    
     return createCachedDividends(
       calculationResult.monthlyAmount,
       calculationResult.annualAmount,

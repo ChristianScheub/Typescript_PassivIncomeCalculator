@@ -72,10 +72,42 @@ const IncomeView: React.FC<IncomeViewProps> = ({
         </Button>
       </div>
 
-      <DataSummaryCard 
-        title={t('income.summary')} 
-        items={summaryItems} 
-      />
+      <Card className="bg-gradient-to-br from-emerald-600 to-emerald-400 dark:from-emerald-800 dark:to-emerald-600 rounded-[2rem] overflow-hidden">
+        <CardContent className="pt-6 pb-4">
+          <div className="flex justify-between items-start mb-8">
+            <div className="space-y-1">
+              <h2 className="text-lg font-medium text-white">
+                {t('income.summary')}
+              </h2>
+              <p className="text-sm font-medium text-emerald-100/80">
+                {t('common.across', { count: items.length })}
+              </p>
+            </div>
+            <div className="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
+              <CreditCard className="w-5 h-5 text-white" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-1">
+              <div className="text-3xl font-bold text-white">
+                {formatService.formatCurrency(totalMonthlyIncome)}
+              </div>
+              <p className="text-sm text-emerald-100/90">
+                {t('pages.totalMonthlyIncome')}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <div className="text-3xl font-bold text-white">
+                {formatService.formatCurrency(annualIncome)}
+              </div>
+              <p className="text-sm text-emerald-100/90">
+                {t('pages.yearly')}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {items.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

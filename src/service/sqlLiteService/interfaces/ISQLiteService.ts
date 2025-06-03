@@ -1,5 +1,6 @@
 import { DBSchema } from 'idb';
 import { Asset, Liability, Expense, Income } from '../../../types';
+import { ExchangeRate } from '../../exchangeService/interfaces/IExchangeService';
 
 export interface FinanceDB extends DBSchema {
   assets: {
@@ -20,9 +21,14 @@ export interface FinanceDB extends DBSchema {
     key: string;
     value: Income;
   };
+  exchangeRates: {
+    key: string;
+    value: ExchangeRate;
+    indexes: { 'by-date': string };
+  };
 }
 
-export type StoreNames = 'assets' | 'liabilities' | 'expenses' | 'income';
+export type StoreNames = 'assets' | 'liabilities' | 'expenses' | 'income' | 'exchangeRates';
 
 export interface ISQLiteService {
   getAll<K extends StoreNames>(storeName: K): Promise<FinanceDB[K]['value'][]>;

@@ -15,6 +15,7 @@ import ExpensesContainer from './container/ExpensesContainer';
 import IncomeContainer from './container/IncomeContainer';
 import ForecastContainer from './container/ForecastContainer';
 import SettingsContainer from './container/SettingsContainer';
+import AssetCalendarContainer from './container/AssetCalendarContainer';
 
 // Context
 import { AppProvider } from './context/AppContext';
@@ -37,6 +38,7 @@ function App() {
               <Route path="/income" element={<IncomeContainer />} />
               <Route path="/forecast" element={<ForecastContainer />} />
               <Route path="/settings" element={<SettingsContainer />} />
+              <Route path="/asset-calendar" element={<AssetCalendarContainer />} />
               <Route path="*" element={<Navigate to="/\" replace />} />
             </Routes>
           </Layout>

@@ -18,8 +18,16 @@ const initialState: IncomeState = {
 };
 
 // Async Thunks
-export const fetchIncome = createAsyncThunk('income/fetchIncome', async () => {
-  Logger.infoRedux('Fetching all income entries');
+export const fetchIncome = createAsyncThunk('income/fetchIncome', async (_, { getState }) => {
+  const state = getState() as { income: IncomeState };
+  
+  // If we already have items (from localStorage), don't fetch from SQLite
+  if (state.income.items.length > 0) {
+    Logger.infoRedux('Using income entries from localStorage');
+    return state.income.items;
+  }
+
+  Logger.infoRedux('Fetching all income entries from SQLite');
   return await sqliteService.getAll('income');
 });
 

@@ -58,17 +58,31 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
       </div>
 
       {/* Summary Card */}
-      <Card className="bg-white dark:bg-gray-800">
+      <Card className="bg-gradient-to-br from-red-600 to-red-400 dark:from-red-800 dark:to-red-600 rounded-[2rem] overflow-hidden">
         <CardHeader className="pb-2">
-          <CardTitle className="text-xl">{t('expenses.summary')}</CardTitle>
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <CardTitle className="text-lg font-medium text-white">
+                {t('expenses.summary')}
+              </CardTitle>
+              <p className="text-sm font-medium text-red-100/80">
+                {t('common.across', { count: expenses.length })}
+              </p>
+            </div>
+            <div className="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
+              <ReceiptText className="w-5 h-5 text-white" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-3xl font-bold text-red-500 dark:text-red-400">
-            {formatService.formatCurrency(totalMonthlyExpenses)}
+          <div className="space-y-1">
+            <div className="text-3xl font-bold text-white">
+              {formatService.formatCurrency(totalMonthlyExpenses)}
+            </div>
+            <p className="text-sm text-red-100/90">
+              Monthly expenses
+            </p>
           </div>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            {t('common.across', { count: expenses.length })}
-          </p>
         </CardContent>
       </Card>
 

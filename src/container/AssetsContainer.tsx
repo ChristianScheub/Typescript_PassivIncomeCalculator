@@ -9,6 +9,7 @@ import calculatorService from '../service/calculatorService';
 import { AssetsView } from '../view/AssetsView';
 import { createDividendCacheService } from '../service/dividendCacheService';
 import { createCachedDividends } from '../utils/dividendCacheUtils';
+import { sortAssets } from '../utils/sortingUtils';
 
 const AssetsContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -53,7 +54,10 @@ const AssetsContainer: React.FC = () => {
     return calculatorService.calculateAssetMonthlyIncome(asset);
   }, [dispatch]);
 
-
+  // Sort assets by value (highest to lowest)
+  const sortedAssets = useMemo(() => {
+    return sortAssets(assets);
+  }, [assets]);
 
   const { totalAssetValue, monthlyAssetIncome, annualAssetIncome } = useMemo(() => {
     const total = calculatorService.calculateTotalAssetValue(assets);
@@ -81,9 +85,12 @@ const AssetsContainer: React.FC = () => {
         const monthlyAmount = calculatorService.calculateAssetMonthlyIncome(newAsset);
         const annualAmount = monthlyAmount * 12;
         const monthlyBreakdown: Record<number, number> = {};
+        
+        // Für Bonds und andere Assets: Berechne die monatlichen Beträge korrekt
         for (let month = 1; month <= 12; month++) {
-          monthlyBreakdown[month] = monthlyAmount;
+          monthlyBreakdown[month] = calculatorService.calculateAssetIncomeForMonth(newAsset, month);
         }
+        
         const cachedDividends = createCachedDividends(
           monthlyAmount,
           annualAmount,
@@ -111,9 +118,12 @@ const AssetsContainer: React.FC = () => {
           const monthlyAmount = calculatorService.calculateAssetMonthlyIncome(updatedAsset);
           const annualAmount = monthlyAmount * 12;
           const monthlyBreakdown: Record<number, number> = {};
+          
+          // Für Bonds und andere Assets: Berechne die monatlichen Beträge korrekt
           for (let month = 1; month <= 12; month++) {
-            monthlyBreakdown[month] = monthlyAmount;
+            monthlyBreakdown[month] = calculatorService.calculateAssetIncomeForMonth(updatedAsset, month);
           }
+          
           const cachedDividends = createCachedDividends(
             monthlyAmount,
             annualAmount,
@@ -173,7 +183,7 @@ const AssetsContainer: React.FC = () => {
 
   return (
     <AssetsView
-      assets={assets}
+      assets={sortedAssets}
       status={status}
       totalAssetValue={totalAssetValue}
       monthlyAssetIncome={monthlyAssetIncome}

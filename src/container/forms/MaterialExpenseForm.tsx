@@ -31,9 +31,10 @@ type ExpenseFormData = z.infer<typeof expenseSchema>;
 interface ExpenseFormProps {
   initialData?: Expense;
   onSubmit: (data: ExpenseFormData) => void;
+  onCancel?: () => void;
 }
 
-export const MaterialExpenseForm = ({ initialData, onSubmit }: ExpenseFormProps) => {
+export const MaterialExpenseForm = ({ initialData, onSubmit, onCancel }: ExpenseFormProps) => {
   const { t } = useTranslation();
 
   const getDefaultValues = (): Partial<ExpenseFormData> => {
@@ -78,6 +79,7 @@ export const MaterialExpenseForm = ({ initialData, onSubmit }: ExpenseFormProps)
       watch={watch}
       setValue={setValue}
       onFormSubmit={onFormSubmit}
+      onCancel={onCancel}
       paymentFields={paymentFields}
       handleMonthChange={handleMonthChange}
       title={initialData ? t('expenses.editExpense') : t('expenses.addExpense')}

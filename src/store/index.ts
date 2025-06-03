@@ -6,12 +6,14 @@ import incomeReducer from './slices/incomeSlice';
 import dashboardReducer from './slices/dashboardSlice';
 import forecastReducer from './slices/forecastSlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
+import Logger from '../service/Logger/logger';
 
 type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
 
 // Versuche den gespeicherten State zu laden
 const loadState = () => {
   try {
+    Logger.infoRedux('Loading state from localStorage');
     const serializedState = localStorage.getItem('passiveIncomeCalculator');
     if (serializedState === null) {
       return undefined;
@@ -42,7 +44,7 @@ const loadState = () => {
       forecast: state.forecast || {}
     };
   } catch (err) {
-    console.error('Error loading state:', err);
+    Logger.error('Error loading state from localStorage:'+ JSON.stringify(err));
     return undefined;
   }
 };

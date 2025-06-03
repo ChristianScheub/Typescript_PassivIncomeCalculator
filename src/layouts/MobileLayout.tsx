@@ -11,15 +11,11 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({ children }) => {
   const { t } = useTranslation();
   
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-white dark:bg-gray-800 shadow-sm">
-        <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        </div>
-      </header>
-      
+    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+            <div style={{ height: "5vw" }}> </div>
+
       {/* Main content */}
-      <main className="flex-1 container mx-auto px-4 py-4 pb-20">
+      <main className="flex-1 container mx-auto px-4 py-4 pb-20 overflow-x-hidden max-w-full">
         {children}
       </main>
       

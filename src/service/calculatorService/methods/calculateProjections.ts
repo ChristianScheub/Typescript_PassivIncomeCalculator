@@ -114,10 +114,10 @@ export const calculateProjectionsWithCache = (
       passiveIncomeCoverage: totalMonthlyObligations > 0 ? totalPassiveIncome / totalMonthlyObligations : 0
     };
 
-    Logger.infoService(`Cached Month ${monthNumber} (${currentDate.toLocaleDateString()}): Asset income: ${monthlyAssetIncome} (cached), Total income: ${totalIncome}, Net cash flow: ${netCashFlow}`);
+    Logger.cache(`Cached Month ${monthNumber} (${currentDate.toLocaleDateString()}): Asset income: ${monthlyAssetIncome} (cached), Total income: ${totalIncome}, Net cash flow: ${netCashFlow}`);
     projections.push(projection);
   }
 
-  Logger.infoService(`Cached projections calculated - months: ${months}, final accumulated savings: ${accumulatedSavings}`);
+  Logger.cache(`Cached projections calculated - months: ${months}, final accumulated savings: ${accumulatedSavings}`);
   return projections;
 };

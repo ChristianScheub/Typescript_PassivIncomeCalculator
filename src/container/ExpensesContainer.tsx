@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchExpenses, addExpense, updateExpense, deleteExpense } from '../store/slices/expensesSlice';
 import { Expense } from '../types';
@@ -7,6 +7,7 @@ import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import ExpensesView from '../view/ExpensesView';
+import { sortExpenses, SortOrder } from '../utils/sortingUtils';
 
 const ExpensesContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -23,6 +24,11 @@ const ExpensesContainer: React.FC = () => {
   }, [dispatch, status]);
 
   const totalMonthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
+
+  // Sort expenses by monthly amount (highest to lowest)
+  const sortedExpenses = useMemo(() => {
+    return sortExpenses(expenses, SortOrder.DESC);
+  }, [expenses]);
 
   const handleAddExpense = async (data: any) => {
     try {
@@ -62,7 +68,7 @@ const ExpensesContainer: React.FC = () => {
 
   return (
     <ExpensesView
-      expenses={expenses}
+      expenses={sortedExpenses}
       status={status}
       totalMonthlyExpenses={totalMonthlyExpenses}
       isAddingExpense={isAddingExpense}

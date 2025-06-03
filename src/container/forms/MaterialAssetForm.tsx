@@ -12,6 +12,7 @@ interface AssetFormData {
   name: string;
   type: AssetType;
   value: number;
+  purchaseDate?: string;
   
   // Stock specific fields
   ticker?: string;
@@ -61,7 +62,8 @@ const getDefaultValues = (initialData?: Asset): Partial<AssetFormData> => {
   if (!initialData) {
     return {
       type: 'stock' as AssetType,
-      dividendFrequency: 'none' as DividendFrequency
+      dividendFrequency: 'none' as DividendFrequency,
+      purchaseDate: new Date().getFullYear() + '-01-01'
     };
   }
 
@@ -112,6 +114,7 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
           value: finalValue || 0,
           createdAt: initialData?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
+          purchaseDate: data.purchaseDate,
           // Add common optional fields
           country: data.country,
           continent: data.continent,
@@ -150,6 +153,10 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
             transformedData.interestRate = data.interestRate;
             transformedData.maturityDate = data.maturityDate;
             transformedData.nominalValue = data.nominalValue;
+            break;
+            
+          case 'cash':
+            transformedData.interestRate = data.interestRate;
             break;
 
           case 'crypto':

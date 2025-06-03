@@ -13,9 +13,9 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({ children }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
       {/* Sidebar */}
-      <aside className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm z-10">
+      <aside className="fixed inset-y-0 left-0 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm z-10 overflow-x-hidden">
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -93,8 +93,8 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({ children }) => {
       </aside>
       
       {/* Main content */}
-      <div className="flex-1 ml-64">
-        <main className="container mx-auto px-6 py-8">
+      <div className="flex-1 ml-64 overflow-x-hidden">
+        <main className="container mx-auto px-6 py-8 overflow-x-hidden max-w-full">
           {children}
         </main>
       </div>

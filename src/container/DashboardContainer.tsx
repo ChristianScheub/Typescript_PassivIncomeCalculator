@@ -6,10 +6,15 @@ import Logger from '../service/Logger/logger';
 import DashboardView from '../view/DashboardView';
 import { createDividendCacheService } from '../service/dividendCacheService';
 import { updateDashboardValues } from '../store/slices/dashboardSlice';
+import { createStockAPIService } from '../service/stockAPIService';
+import { isApiKeyConfigured } from '../service/stockAPIService/utils/fetch';
+import { StockInfo } from '../types/stock';
 
 const DashboardContainer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [stockInfo, setStockInfo] = React.useState<StockInfo | null>(null);
+  const [isLoadingStock, setIsLoadingStock] = React.useState(false);
   
   // Get the base data
   const assets = useAppSelector(state => state.assets.items);
@@ -58,6 +63,33 @@ const DashboardContainer: React.FC = () => {
     navigate('/settings');
   };
 
+  const handleFetchStock = async () => {
+    setIsLoadingStock(true);
+    try {
+      // Check if API key is configured
+      if (!isApiKeyConfigured()) {
+        setStockInfo({
+          error: 'API key not configured. Please set your Finnhub API key in Settings.',
+          needsApiKey: true
+        });
+        return;
+      }
+
+      const stockAPI = createStockAPIService();
+      const data = await stockAPI.getQuote('AAPL');
+      setStockInfo(data);
+      Logger.info('Successfully fetched AAPL stock information');
+    } catch (error) {
+      Logger.error(`Error fetching stock information: ${JSON.stringify(error)}`);
+      setStockInfo({
+        error: error instanceof Error ? error.message : 'Failed to fetch stock data',
+        needsApiKey: false
+      });
+    } finally {
+      setIsLoadingStock(false);
+    }
+  };
+
   // Track page view
   React.useEffect(() => {
     Logger.info('Dashboard mounted');
@@ -85,10 +117,9 @@ const DashboardContainer: React.FC = () => {
       passiveIncome={passiveIncome}
       monthlyCashFlow={monthlyCashFlow}
       passiveIncomeRatio={passiveIncomeRatio}
-      assets={assets}
-      liabilities={liabilities}
-      expenses={expenses}
-      income={income}
+      stockInfo={stockInfo}
+      isLoadingStock={isLoadingStock}
+      handleFetchStock={handleFetchStock}
       assetAllocation={assetAllocation}
       handleSettingsClick={handleSettingsClick}
     />
