@@ -3,7 +3,6 @@
 _Last updated: June 2025_<br>
 Language: TypeScript, React, Capacitor<br>
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
@@ -11,7 +10,6 @@ Language: TypeScript, React, Capacitor<br>
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=bugs)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=coverage)](https://sonarcloud.io/dashboard?id=ChristianScheub_Typescript_PassivIncomeCalculator)
 
 A comprehensive, cross-platform financial planning application for tracking passive income, assets, expenses, and more. Built with React, TypeScript, and Capacitor for iOS, Android, and Web.
 
