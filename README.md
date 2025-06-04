@@ -1,25 +1,41 @@
 # Passive Income Calculator
 
-A comprehensive financial planning application built with React, TypeScript, and Capacitor for cross-platform deployment (iOS, Android, and Web).
+_Last updated: June 2025_<br>
+Language: TypeScript, React, Capacitor<br>
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=bugs)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=ChristianScheub_Typescript_PassivIncomeCalculator)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=ChristianScheub_Typescript_PassivIncomeCalculator&metric=coverage)](https://sonarcloud.io/dashboard?id=ChristianScheub_Typescript_PassivIncomeCalculator)
+
+A comprehensive, cross-platform financial planning application for tracking passive income, assets, expenses, and more. Built with React, TypeScript, and Capacitor for iOS, Android, and Web.
+
+---
 
 ## 🌟 Features
-
-- 📊 Dashboard with financial overview
-- 💰 Income tracking and management
-- 💳 Expense monitoring
-- 📈 Asset portfolio management
-- 📉 Liabilities tracking
-- 🔮 Financial forecast visualization
-- 🌍 Multi-language support
-- 🎨 Light/Dark theme support
-- 📱 Cross-platform (iOS, Android, Web)
-- 🔄 Offline capability with SQLite
+- 📊 Dashboard with real-time financial overview
+- 💰 Income, expense, and asset management
 - 📈 Dividend tracking and caching
+- 💳 Liabilities and debt management
+- 🔮 Financial forecast and milestone visualization
+- 🌍 Multi-language support (i18next, JSON-based)
+- 🎨 Light/Dark theme (TailwindCSS)
+- 📱 Cross-platform: iOS, Android, Web
+- 🔄 Offline capability with SQLite
+- 🔐 Secure local data storage
+- 🧩 Modular, maintainable architecture
+- 🧪 Unit, integration, and E2E tests
+
+---
 
 ## 🏗 Architecture
 
 ### Application Layers
-
 ```mermaid
 graph TD
     UI[UI Layer] --> Container[Container Layer]
@@ -31,7 +47,6 @@ graph TD
 ```
 
 ### Class Architecture
-
 ```mermaid
 classDiagram
     class AppContext {
@@ -40,13 +55,11 @@ classDiagram
         +language: string
         +setLanguage(): void
     }
-    
     class CalculatorService {
         +calculateNetWorth(): number
         +calculatePassiveIncome(): number
         +forecastCalculations(): object
     }
-    
     class SQLiteService {
         +initDatabase(): void
         +executeQuery(): Promise
@@ -54,39 +67,31 @@ classDiagram
         +getIncome(): Promise
         +getLiabilities(): Promise
     }
-    
     class DividendCacheService {
         +cacheDividends(): void
         +getDividendData(): Promise
         +updateCache(): void
     }
-
     AppContext --> Container
     Container --> CalculatorService
     Container --> SQLiteService
     CalculatorService --> DividendCacheService
 ```
 
+---
+
 ## 🛠 Technology Stack
 
-### Core Technologies
-- **React** - UI framework
-- **TypeScript** - Programming language
-- **Capacitor** - Cross-platform deployment
-- **Vite** - Build tool and development server
-- **TailwindCSS** - Styling
-- **Redux Toolkit** - State management
+**Core:** React, TypeScript, Capacitor, Vite, TailwindCSS, Redux Toolkit
 
-### Key Libraries
-- **@capacitor/core** - Native platform integration
-- **@capacitor/ios** - iOS platform support
-- **@capacitor/android** - Android platform support
-- **@capacitor/sqlite** - Local database management
-- **recharts** - Chart visualization
-- **i18next** - Internationalization
-- **tailwindcss** - Utility-first CSS
-- **redux-toolkit** - State management
-- **react-router-dom** - Navigation
+**Key Libraries:**
+- @capacitor/core, @capacitor/ios, @capacitor/android, @capacitor/sqlite
+- recharts (charts)
+- i18next (internationalization)
+- redux-toolkit (state management)
+- react-router-dom (navigation)
+
+---
 
 ## 📁 Project Structure
 
@@ -95,66 +100,60 @@ src/
 ├── App.tsx                    # Application entry point
 ├── container/                 # Container components with business logic
 ├── context/                   # React context definitions
-├── hooks/                    # Custom React hooks
-├── i18n/                     # Internationalization setup
-├── layouts/                  # Layout components
-├── service/                  # Business logic and services
-│   ├── calculatorService/    # Financial calculations
-│   ├── formatService/        # Data formatting
-│   ├── sqlLiteService/      # Database operations
-│   └── Logger/              # Application logging
-├── store/                    # Redux store configuration
-├── types/                    # TypeScript type definitions
-├── ui/                      # Reusable UI components
-└── views/                   # Page components
+├── hooks/                     # Custom React hooks
+├── i18n/                      # Internationalization setup (JSON-based)
+├── layouts/                   # Layout components
+├── service/                   # Business logic and services
+│   ├── calculatorService/     # Financial calculations
+│   ├── dividendCacheService/  # Dividend caching
+│   ├── exchangeService/       # Currency exchange
+│   ├── formatService/         # Data formatting
+│   ├── sqlLiteService/        # Database operations
+│   ├── stockAPIService/       # Stock API integration
+│   └── Logger/                # Application logging
+├── store/                     # Redux store configuration
+├── types/                     # TypeScript type definitions
+├── ui/                        # Reusable UI components
+└── view/                      # Page components
 ```
+
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 - Node.js (v18 or higher)
 - npm or yarn
-- Xcode (for iOS development)
-- Android Studio (for Android development)
+- Xcode (for iOS)
+- Android Studio (for Android)
 
 ### Installation
-
 ```bash
 # Clone the repository
 git clone [repository-url]
-
 # Install dependencies
 npm install
-
 # Setup environment
 npm run setup
-
 # Start development server
 npm run dev
 ```
 
 ### Platform-specific Setup
-
 #### iOS
 ```bash
-# Install iOS dependencies
 npm run ios:setup
-
-# Open in Xcode
 npm run ios:open
 ```
-
 #### Android
 ```bash
-# Install Android dependencies
 npm run android:setup
-
-# Open in Android Studio
 npm run android:open
 ```
 
-## 📜 Available Scripts
+---
 
+## 📜 Available Scripts
 - `npm run dev` - Start development server
 - `npm run build` - Build production version
 - `npm run preview` - Preview production build
@@ -166,9 +165,10 @@ npm run android:open
 - `npm run deploy:ios` - Deploy iOS version
 - `npm run deploy:android` - Deploy Android version
 
-## 🔄 State Management
+---
 
-The application uses Redux Toolkit for state management with the following main slices:
+## 🔄 State Management
+Redux Toolkit is used for state management with the following main slices:
 - Assets
 - Income
 - Expenses
@@ -176,61 +176,58 @@ The application uses Redux Toolkit for state management with the following main 
 - Settings
 - UI State
 
-## 🌐 Internationalization
+---
 
-Supports multiple languages through i18next:
-- English (default)
-- German
-- More languages can be added in `src/i18n/locales`
+## 🌐 Internationalization
+- Multi-language support via i18next and JSON translation files
+- English (default), German, and easily extendable
+
+---
 
 ## 🎨 Theming
+- Light and dark themes via TailwindCSS
+- Custom configuration in `tailwind.config.js` and `src/hooks/useTheme.ts`
 
-Supports light and dark themes through TailwindCSS with custom configuration in:
-- `tailwind.config.js`
-- `src/hooks/useTheme.ts`
+---
 
 ## 🔒 Security
-
-- SQLite for secure local data storage
-- No sensitive data transmitted to external servers
+- Secure local data storage with SQLite
+- No sensitive data sent to external servers
 - Offline-first approach
-- Data backup functionality
+- Data backup and restore functionality
+
+---
 
 ## 📱 Mobile Features
-
-- Native performance through Capacitor
-- Touch-optimized UI
-- Responsive design
+- Native performance via Capacitor
+- Touch-optimized, responsive UI
 - Platform-specific UI adjustments
 
-## 🧪 Testing
-
-- Unit tests with Jest
-- Component tests with React Testing Library
-- E2E tests with Cypress
+---
 
 ## 📈 Performance Optimization
-
-- Code splitting
-- Lazy loading of components
+- Code splitting, lazy loading
 - Memoization of expensive calculations
 - Efficient SQLite queries
 - Dividend data caching
 
-## 🤝 Contributing
+---
 
+## 🤝 Contributing
 1. Fork the repository
 2. Create your feature branch
 3. Commit your changes
 4. Push to the branch
 5. Create a Pull Request
 
-## 📞 Support
+---
 
-For support, please open an issue in the repository or contact the maintainers.
+## 📞 Support
+For support, please open an issue or contact the maintainers.
+
+---
 
 ## 🙏 Acknowledgments
-
 - React community
 - Capacitor team
 - TailwindCSS team
@@ -238,4 +235,4 @@ For support, please open an issue in the repository or contact the maintainers.
 
 ---
 
-Made with ❤️ for financial independence
+_Made with ❤️ for financial independence_

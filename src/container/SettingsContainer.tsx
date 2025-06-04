@@ -221,14 +221,26 @@ const SettingsContainer: React.FC = () => {
     
     try {
       // Validierung hier einbauen wenn nötig
-      dispatch(setApiKey(newApiKey));
-      dispatch(setApiEnabled(true));
-      setApiKeyStatus('success');
-      setTimeout(() => setApiKeyStatus('idle'), 2000);
+      // Handle this exception or don't catch it at all (API key save)
+      const handleApiKeySave = (newApiKey: string) => {
+        try {
+          dispatch(setApiKey(newApiKey));
+          dispatch(setApiEnabled(true));
+          setApiKeyStatus('success');
+          setTimeout(() => setApiKeyStatus('idle'), 2000);
+        } catch (error) {
+          setApiKeyError('Failed to save API key');
+          setApiKeyStatus('error');
+          setTimeout(() => setApiKeyStatus('idle'), 2000);
+          Logger.error('Failed to save API key');
+          // Optionally: Logger.error(error instanceof Error ? error.message : String(error));
+        }
+      };
     } catch (error) {
       setApiKeyError('Failed to save API key');
       setApiKeyStatus('error');
       setTimeout(() => setApiKeyStatus('idle'), 2000);
+      Logger.error('Failed to save API key');
     }
   };
 
@@ -268,11 +280,10 @@ const SettingsContainer: React.FC = () => {
       setClearDataStatus('success');
       Logger.infoService('Financial data cleared successfully');
       analytics.trackEvent('settings_clear_partial_data');
-
-      // Reset status after a delay
       setTimeout(() => setClearDataStatus('idle'), 2000);
     } catch (error) {
       Logger.error('Failed to clear financial data');
+      // Optionally: Logger.error(error instanceof Error ? error.message : String(error));
       setClearDataStatus('idle');
     }
   };
@@ -304,14 +315,11 @@ const SettingsContainer: React.FC = () => {
       setClearDataStatus('success');
       Logger.infoService('All data cleared successfully');
       analytics.trackEvent('settings_clear_all_data');
-
-      // Reset status after a delay
       setTimeout(() => setClearDataStatus('idle'), 2000);
-
-      // Reload the page to reset all state
       window.location.reload();
     } catch (error) {
       Logger.error('Failed to clear all data');
+      // Optionally: Logger.error(error instanceof Error ? error.message : String(error));
       setClearDataStatus('idle');
     }
   };

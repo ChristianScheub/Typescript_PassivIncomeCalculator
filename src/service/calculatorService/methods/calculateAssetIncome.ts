@@ -338,8 +338,8 @@ export const calculateTotalMonthlyAssetIncomeFromCache = (assets: Asset[]): numb
 
   for (const asset of assets) {
     const cachedData = getCachedDividendData(asset);
-    if (cachedData) {
-      totalIncome += cachedData.monthlyAmount || 0;
+    if (cachedData?.monthlyAmount) {
+      totalIncome += cachedData.monthlyAmount;
       Logger.cache(`Asset ${asset.name}: using cached income ${cachedData.monthlyAmount}`);
     } else {
       allCached = false;
@@ -369,7 +369,7 @@ export const calculateTotalAssetIncomeForMonthFromCache = (
 
   for (const asset of assets) {
     const cachedData = getCachedDividendData(asset);
-    if (cachedData && cachedData.monthlyBreakdown) {
+    if (cachedData?.monthlyBreakdown) {
       const monthlyIncome = cachedData.monthlyBreakdown[monthNumber] || 0;
       totalIncome += monthlyIncome;
       Logger.cache(`Asset ${asset.name} month ${monthNumber}: using cached income ${monthlyIncome}`);

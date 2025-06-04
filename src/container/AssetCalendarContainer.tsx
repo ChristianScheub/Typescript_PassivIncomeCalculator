@@ -100,13 +100,11 @@ const AssetCalendarContainer: React.FC = () => {
 
   // Handle bar click for month selection with translated month names
   const handleBarClick = (data: any) => {
-    if (data && data.activePayload && data.activePayload[0]) {
-      const clickedMonthName = data.activePayload[0].payload.month;
-      
+    const clickedMonthName = data?.activePayload?.[0]?.payload?.month;
+    if (clickedMonthName) {
       // Get all short month names from translations
       const shortMonthsObj = t('dates.shortMonths', { returnObjects: true }) as Record<string, string>;
       const shortMonths = Object.values(shortMonthsObj);
-      
       // Find the clicked month index
       const monthIndex = shortMonths.findIndex(shortName => shortName === clickedMonthName);
       if (monthIndex !== -1) {
