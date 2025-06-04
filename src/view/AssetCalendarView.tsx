@@ -19,7 +19,6 @@ interface MonthData {
 interface ChartData {
   month: string;
   income: number;
-  isSelected: boolean;
 }
 
 interface AssetTypeOption {
@@ -56,8 +55,8 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
   const toggleFilter = () => setIsFilterExpanded(!isFilterExpanded);
   const toggleMonthDetails = () => setIsMonthDetailsExpanded(!isMonthDetailsExpanded);
 
-  const getBarColor = (isSelected: boolean) => {
-    return isSelected ? '#3B82F6' : '#E5E7EB'; // Blue for selected, gray for others
+  const getBarColorByMonth = (month: string) => {
+    return selectedMonthData && selectedMonthData.name === month ? '#3B82F6' : '#E5E7EB';
   };
 
   return (
@@ -162,7 +161,7 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
                       {chartData.map((entry) => (
                         <Cell 
                           key={`cell-${entry.month}`}
-                          fill={getBarColor(entry.isSelected)}
+                          fill={getBarColorByMonth(entry.month)}
                           style={{ cursor: 'pointer' }}
                         />
                       ))}

@@ -232,56 +232,8 @@ export const calculateAssetMonthlyIncomeWithCache = (
     `Cache miss for asset ${asset.name}, no cached dividend data available`
   );
 
-  // Perform calculation as fallback
-  let monthlyAmount = 0;
-  let annualAmount = 0;
-  let monthlyBreakdown: Record<number, number> = {};
-
-  // Calculate dividend income for stocks
-  if (asset.type === "stock" && asset.dividendInfo && asset.quantity) {
-    const dividendResult = calculateDividendSchedule(
-      asset.dividendInfo,
-      asset.quantity
-    );
-    monthlyAmount = isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
-    annualAmount = isFinite(dividendResult.annualAmount) ? dividendResult.annualAmount : 0;
-    
-    // Build monthlyBreakdown for each month 1-12
-    for (let month = 1; month <= 12; month++) {
-      const monthlyDividend = calculateDividendForMonth(
-        asset.dividendInfo,
-        asset.quantity,
-        month
-      );
-      monthlyBreakdown[month] = isFinite(monthlyDividend) ? monthlyDividend : 0;
-    }
-  }
-  
-  // Calculate bond and cash interest income
-  else if ((asset.type === "bond" || asset.type === "cash") && asset.interestRate !== undefined && asset.value) {
-    // Convert annual interest rate to monthly income
-    // interestRate is input as percentage value (e.g., 5.0 for 5%)
-    const annualInterest = asset.interestRate * asset.value / 100;
-    monthlyAmount = annualInterest / 12;
-    annualAmount = annualInterest;
-    
-    // For interest income, it's the same every month
-    for (let month = 1; month <= 12; month++) {
-      monthlyBreakdown[month] = monthlyAmount;
-    }
-  }
-  
-  // Calculate rental income for real estate
-  else if (asset.type === "real_estate" && asset.rentalIncome?.amount !== undefined) {
-    const rentalAmount = asset.rentalIncome?.amount;
-    monthlyAmount = isFinite(rentalAmount) ? rentalAmount : 0;
-    annualAmount = monthlyAmount * 12;
-    
-    // For rental income, it's the same every month
-    for (let month = 1; month <= 12; month++) {
-      monthlyBreakdown[month] = monthlyAmount;
-    }
-  }
+  // Use a helper to calculate all values and reduce complexity
+  const { monthlyAmount, annualAmount, monthlyBreakdown } = calculateAssetIncomeBreakdown(asset);
 
   return {
     monthlyAmount,
@@ -295,6 +247,55 @@ export const calculateAssetMonthlyIncomeWithCache = (
     },
   };
 };
+
+// Helper: Stock dividend calculation
+function getStockDividendBreakdown(asset: Asset) {
+  if (asset.type !== "stock" || !asset?.dividendInfo || !asset?.quantity) return null;
+  const dividendResult = calculateDividendSchedule(asset.dividendInfo, asset.quantity);
+  const monthlyAmount = isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
+  const annualAmount = isFinite(dividendResult.annualAmount) ? dividendResult.annualAmount : 0;
+  const monthlyBreakdown: Record<number, number> = {};
+  for (let month = 1; month <= 12; month++) {
+    const monthlyDividend = calculateDividendForMonth(asset.dividendInfo, asset.quantity, month);
+    monthlyBreakdown[month] = isFinite(monthlyDividend) ? monthlyDividend : 0;
+  }
+  return { monthlyAmount, annualAmount, monthlyBreakdown };
+}
+
+// Helper: Bond/cash interest calculation
+function getInterestBreakdown(asset: Asset) {
+  if ((asset.type !== "bond" && asset.type !== "cash") || asset.interestRate === undefined || !asset.value) return null;
+  const annualInterest = asset.interestRate * asset.value / 100;
+  const monthlyAmount = annualInterest / 12;
+  const annualAmount = annualInterest;
+  const monthlyBreakdown: Record<number, number> = {};
+  for (let month = 1; month <= 12; month++) {
+    monthlyBreakdown[month] = monthlyAmount;
+  }
+  return { monthlyAmount, annualAmount, monthlyBreakdown };
+}
+
+// Helper: Real estate rental calculation
+function getRealEstateBreakdown(asset: Asset) {
+  if (asset.type !== "real_estate" || asset?.rentalIncome?.amount === undefined) return null;
+  const monthlyAmount = isFinite(asset.rentalIncome.amount) ? asset.rentalIncome.amount : 0;
+  const annualAmount = monthlyAmount * 12;
+  const monthlyBreakdown: Record<number, number> = {};
+  for (let month = 1; month <= 12; month++) {
+    monthlyBreakdown[month] = monthlyAmount;
+  }
+  return { monthlyAmount, annualAmount, monthlyBreakdown };
+}
+
+// Refactored breakdown logic
+function calculateAssetIncomeBreakdown(asset: Asset) {
+  return (
+    getStockDividendBreakdown(asset) ||
+    getInterestBreakdown(asset) ||
+    getRealEstateBreakdown(asset) ||
+    { monthlyAmount: 0, annualAmount: 0, monthlyBreakdown: {} }
+  );
+}
 
 // Hilfsfunktion um Cache zu aktualisieren (sollte aus Redux Actions aufgerufen werden)
 export const updateAssetCacheData = (

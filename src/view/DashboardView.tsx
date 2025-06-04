@@ -1,7 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { CiSettings } from "react-icons/ci";
-import { AssetAllocation } from "../types";
 import { StockInfo } from "../types/stock";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -230,13 +229,23 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               <div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.change')}</div>
                 <div className={stockChangeClass}>
-                  {stockInfo.change ? `${stockInfo.change >= 0 ? '+' : ''}${stockInfo.change.toFixed(2)}` : '-'}
+                  {(() => {
+    if (typeof stockInfo.change === 'number') {
+      return `${stockInfo.change >= 0 ? '+' : ''}${stockInfo.change.toFixed(2)}`;
+    }
+    return '-';
+  })()}
                 </div>
               </div>
               <div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.changePercent')}</div>
                 <div className={stockChangePercentClass}>
-                  {stockInfo.changePercent ? `${stockInfo.changePercent >= 0 ? '+' : ''}${stockInfo.changePercent.toFixed(2)}%` : '-'}
+                  {(() => {
+    if (typeof stockInfo.changePercent === 'number') {
+      return `${stockInfo.changePercent >= 0 ? '+' : ''}${stockInfo.changePercent.toFixed(2)}%`;
+    }
+    return '-';
+  })()}
                 </div>
               </div>
             </div>

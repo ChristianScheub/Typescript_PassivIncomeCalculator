@@ -28,8 +28,8 @@ export function generateDividendCalculationHash(asset: Asset): string {
     interestRate: asset.interestRate,
     value: asset.value
   };
-  
-  const dataString = JSON.stringify(relevantData, Object.keys(relevantData).sort());
+
+  const dataString = JSON.stringify(relevantData, Object.keys(relevantData).sort(compareAlphabetically));
   return simpleHash(dataString);
 }
 
@@ -64,15 +64,6 @@ export function createCachedDividends(
 }
 
 /**
- * Invalidates cached dividends for all assets that might be affected by changes
- */
-export function shouldInvalidateCache(oldAsset: Asset, newAsset: Asset): boolean {
-  const oldHash = generateDividendCalculationHash(oldAsset);
-  const newHash = generateDividendCalculationHash(newAsset);
-  return oldHash !== newHash;
-}
-
-/**
  * Extracts cached dividend data if valid, otherwise returns null
  */
 export function getCachedDividendData(asset: Asset): CachedDividends | null {
@@ -80,4 +71,11 @@ export function getCachedDividendData(asset: Asset): CachedDividends | null {
     return asset.cachedDividends!;
   }
   return null;
+}
+
+/**
+ * Compare function for sorting strings alphabetically using localeCompare
+ */
+export function compareAlphabetically(a: string, b: string): number {
+  return a.localeCompare(b);
 }

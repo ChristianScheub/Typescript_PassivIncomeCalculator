@@ -71,9 +71,8 @@ export const CustomBarTooltip: React.FC<CustomBarTooltipProps> = ({
   payload,
   name 
 }) => {
-  if (active && payload && payload.length) {
-    const data = payload?.[0]?.payload;
-    
+  const data = payload?.[0]?.payload;
+  if (active && data) {
     return (
       <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
         <p className="text-sm font-medium">{name || data?.name}</p>
@@ -96,9 +95,8 @@ export const CustomStackedBarTooltip: React.FC<CustomStackedBarTooltipProps> = (
   firstBarColor 
 }) => {
   const { t } = useTranslation();
-  if (!active || !payload?.length) return null;
   const data = payload?.[0]?.payload;
-  if (!data) return null;
+  if (!active || !data) return null;
 
   const { amount, percentage, firstBar, secondBar } = data;
 

@@ -6,13 +6,6 @@ import { ExpenseBreakdown } from '../../types';
 import { COLORS } from '../../utils/constants';
 import formatService from '../../service/formatService';
 
-interface CombinedDataItem {
-  readonly category: string;
-  readonly amount: number;
-  readonly percentage: number;
-  readonly type: 'expense' | 'liability';
-  readonly id: string;
-}
 
 interface PieChartExpenseBreakdownProps {
   readonly expenseBreakdown: ReadonlyArray<ExpenseBreakdown>;

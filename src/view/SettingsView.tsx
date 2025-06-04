@@ -127,6 +127,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   className="absolute cursor-pointer bg-gray-200 peer-checked:bg-blue-500 rounded-full w-14 h-8 transition-colors duration-300"
                   htmlFor="api-toggle"
                 >
+                  <span className="sr-only">{t('settings.enableStockApi')}</span>
                   <span className="absolute bg-white w-6 h-6 left-1 top-1 rounded-full transition-transform duration-300 peer-checked:translate-x-6" />
                 </label>
               </div>
@@ -368,9 +369,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 variant="destructive"
                 className="flex items-center space-x-2"
               >
-                {clearDataStatus === 'clearing' ? t('settings.clearingData') :
-                 clearDataStatus === 'success' ? t('settings.dataCleared') :
-                 t('settings.clearPartialData')}
+                {(() => {
+                  if (clearDataStatus === 'clearing') return t('settings.clearingData');
+                  if (clearDataStatus === 'success') return t('settings.dataCleared');
+                  return t('settings.clearPartialData');
+                })()}
               </Button>
             </div>
 
@@ -393,9 +396,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 variant="destructive"
                 className="flex items-center space-x-2"
               >
-                {clearDataStatus === 'clearing' ? t('settings.clearingData') :
-                 clearDataStatus === 'success' ? t('settings.dataCleared') :
-                 t('settings.clearAllData')}
+                {(() => {
+                  if (clearDataStatus === 'clearing') return t('settings.clearingData');
+                  if (clearDataStatus === 'success') return t('settings.dataCleared');
+                  return t('settings.clearAllData');
+                })()}
               </Button>
             </div>
           </CardContent>
