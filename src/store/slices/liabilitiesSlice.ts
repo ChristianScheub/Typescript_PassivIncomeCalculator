@@ -69,7 +69,14 @@ export const deleteLiability = createAsyncThunk('liabilities/deleteLiability', a
 const liabilitiesSlice = createSlice({
   name: 'liabilities',
   initialState,
-  reducers: {},
+  reducers: {
+    // Clear all liabilities action
+    clearAllLiabilities: (state) => {
+      state.items = [];
+      state.status = 'idle';
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(hydrateStore, (state, action) => {
@@ -151,6 +158,8 @@ const liabilitiesSlice = createSlice({
       });
   }
 });
+
+export const { clearAllLiabilities } = liabilitiesSlice.actions;
 
 const liabilitiesReducer = liabilitiesSlice.reducer;
 export default liabilitiesReducer;

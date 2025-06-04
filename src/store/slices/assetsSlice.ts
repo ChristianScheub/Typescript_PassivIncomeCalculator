@@ -129,6 +129,13 @@ const assetsSlice = createSlice({
       state.items.forEach(asset => {
         asset.cachedDividends = undefined;
       });
+    },
+
+    // Clear all assets action
+    clearAllAssets: (state) => {
+      state.items = [];
+      state.status = 'idle';
+      state.error = null;
     }
   },
   extraReducers: (builder) => {
@@ -207,6 +214,6 @@ const assetsSlice = createSlice({
   }
 });
 
-export const { updateAssetDividendCache, invalidateAssetDividendCache, invalidateAllDividendCaches } = assetsSlice.actions;
+export const { updateAssetDividendCache, invalidateAssetDividendCache, invalidateAllDividendCaches, clearAllAssets } = assetsSlice.actions;
 
 export default assetsSlice.reducer;

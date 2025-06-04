@@ -76,7 +76,14 @@ export const deleteExpense = createAsyncThunk(
 const expensesSlice = createSlice({
   name: 'expenses',
   initialState,
-  reducers: {},
+  reducers: {
+    // Clear all expenses action
+    clearAllExpenses: (state) => {
+      state.items = [];
+      state.status = 'idle';
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       // Hydration
@@ -159,5 +166,7 @@ const expensesSlice = createSlice({
       });
   }
 });
+
+export const { clearAllExpenses } = expensesSlice.actions;
 
 export default expensesSlice.reducer;

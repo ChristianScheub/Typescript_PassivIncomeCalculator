@@ -69,7 +69,14 @@ export const deleteIncome = createAsyncThunk('income/deleteIncome', async (id: s
 const incomeSlice = createSlice({
   name: 'income',
   initialState,
-  reducers: {},
+  reducers: {
+    // Clear all income action
+    clearAllIncome: (state) => {
+      state.items = [];
+      state.status = 'idle';
+      state.error = null;
+    }
+  },
   extraReducers: (builder) => {
     builder
       .addCase(hydrateStore, (state, action) => {
@@ -151,6 +158,8 @@ const incomeSlice = createSlice({
       });
   }
 });
+
+export const { clearAllIncome } = incomeSlice.actions;
 
 const incomeReducer = incomeSlice.reducer;
 export default incomeReducer;

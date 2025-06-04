@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { setApiEnabled, setApiKey } from "../store/slices/apiConfigSlice";
+import { clearAllAssets } from "../store/slices/assetsSlice";
+import { clearAllLiabilities } from "../store/slices/liabilitiesSlice";
+import { clearAllExpenses } from "../store/slices/expensesSlice";
+import { clearAllIncome } from "../store/slices/incomeSlice";
 import sqliteService, { StoreNames } from "../service/sqlLiteService";
 import { analytics } from "../service/analytics";
 import Logger from "../service/Logger/logger";
@@ -259,7 +263,13 @@ const SettingsContainer: React.FC = () => {
       setClearDataStatus("clearing");
       Logger.infoService("Starting to clear financial data");
 
-      // Get all items from each store to delete them
+      // Clear Redux store first
+      dispatch(clearAllAssets());
+      dispatch(clearAllLiabilities());
+      dispatch(clearAllExpenses());
+      dispatch(clearAllIncome());
+
+      // Get all items from each store to delete them from SQLite
       const stores: StoreNames[] = [
         "assets",
         "liabilities",
@@ -275,13 +285,23 @@ const SettingsContainer: React.FC = () => {
         }
       }
 
+      // Clear specific localStorage entries related to financial data
+      const currentStorage = localStorage.getItem('passiveIncomeCalculator');
+      if (currentStorage) {
+        const parsed = JSON.parse(currentStorage);
+        parsed.assets = { items: [], status: 'idle', error: null };
+        parsed.liabilities = { items: [], status: 'idle', error: null };
+        parsed.expenses = { items: [], status: 'idle', error: null };
+        parsed.income = { items: [], status: 'idle', error: null };
+        localStorage.setItem('passiveIncomeCalculator', JSON.stringify(parsed));
+      }
+
       setClearDataStatus("success");
       Logger.infoService("Financial data cleared successfully");
       analytics.trackEvent("settings_clear_partial_data");
       setTimeout(() => setClearDataStatus("idle"), 2000);
     } catch (error) {
       Logger.error("Failed to clear financial data" + JSON.stringify(error));
-      // Optionally: Logger.error(error instanceof Error ? error.message : String(error));
       setClearDataStatus("idle");
     }
   };
@@ -292,7 +312,13 @@ const SettingsContainer: React.FC = () => {
       setClearDataStatus("clearing");
       Logger.infoService("Starting to clear all data");
 
-      // Clear all data from each store
+      // 1. Clear Redux store first
+      dispatch(clearAllAssets());
+      dispatch(clearAllLiabilities());
+      dispatch(clearAllExpenses());
+      dispatch(clearAllIncome());
+
+      // 2. Clear all data from SQLite
       const stores: StoreNames[] = [
         "assets",
         "liabilities",
@@ -301,29 +327,39 @@ const SettingsContainer: React.FC = () => {
         "exchangeRates",
       ];
       for (const store of stores) {
-        const items = await sqliteService.getAll(store);
-        for (const item of items) {
-          if (item.id) {
-            await sqliteService.remove(store, item.id.toString());
+        try {
+          const items = await sqliteService.getAll(store);
+          for (const item of items) {
+            if (item.id) {
+              await sqliteService.remove(store, item.id.toString());
+            }
           }
+          Logger.infoService(`Cleared ${items.length} items from ${store}`);
+        } catch (error) {
+          Logger.error(`Failed to clear ${store}: ${JSON.stringify(error)}`);
         }
       }
 
-      // Clear local storage
+      // 3. Clear ALL localStorage (not just our app data)
       localStorage.clear();
+      Logger.infoService("LocalStorage cleared completely");
 
-      // Reset API key state
+      // 4. Reset API key state
       dispatch(setApiKey(null));
       dispatch(setApiEnabled(false));
 
       setClearDataStatus("success");
       Logger.infoService("All data cleared successfully");
       analytics.trackEvent("settings_clear_all_data");
-      setTimeout(() => setClearDataStatus("idle"), 2000);
-      window.location.reload();
+      
+      // 5. Wait a bit and then reload the page to ensure clean state
+      setTimeout(() => {
+        Logger.infoService("Reloading page after data clear");
+        window.location.reload();
+      }, 1500);
+      
     } catch (error) {
       Logger.error("Failed to clear all data" + JSON.stringify(error));
-      // Optionally: Logger.error(error instanceof Error ? error.message : String(error));
       setClearDataStatus("idle");
     }
   };

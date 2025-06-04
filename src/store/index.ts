@@ -71,7 +71,12 @@ export const store = configureStore({
 });
 
 // Subscribe to store changes and save to localStorage
+let isClearing = false;
+
 store.subscribe(() => {
+  // Don't save to localStorage during clearing operations
+  if (isClearing) return;
+  
   const state = store.getState();
   try {
     const stateToSave = {
@@ -91,7 +96,21 @@ store.subscribe(() => {
       forecast: state.forecast,
       apiConfig: state.apiConfig
     };
-    localStorage.setItem('passiveIncomeCalculator', JSON.stringify(stateToSave));
+    
+    // Check if we're clearing data (all arrays are empty)
+    const isEmpty = state.assets.items.length === 0 && 
+                   state.liabilities.items.length === 0 && 
+                   state.expenses.items.length === 0 && 
+                   state.income.items.length === 0;
+    
+    if (isEmpty) {
+      isClearing = true;
+      // Clear localStorage when all data is empty
+      localStorage.removeItem('passiveIncomeCalculator');
+      setTimeout(() => { isClearing = false; }, 100);
+    } else {
+      localStorage.setItem('passiveIncomeCalculator', JSON.stringify(stateToSave));
+    }
   } catch (err) {
     console.error('Error saving state:', err);
   }
