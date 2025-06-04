@@ -72,8 +72,8 @@ const AssetCalendarContainer: React.FC = () => {
         }
       });
 
-      // Sort by income descending in a separate statement for clarity
-      const sortedMonthAssets = monthAssets.sort((a, b) => b.income - a.income);
+      // Sort by income descending using toSorted for immutability and clarity
+      const sortedMonthAssets = monthAssets.toSorted((a: { asset: Asset; income: number }, b: { asset: Asset; income: number }) => b.income - a.income);
 
       data.push({
         month,

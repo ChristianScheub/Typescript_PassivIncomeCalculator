@@ -19,6 +19,29 @@ interface PieChartExpenseBreakdownProps {
   readonly liabilities?: ReadonlyArray<{ readonly category: string; readonly amount: number }>;
 }
 
+interface PieChartExpenseBreakdownTooltipProps {
+  active?: boolean;
+  payload?: any[];
+  t: (key: string) => string;
+  formatService: typeof formatService;
+}
+
+const PieChartExpenseBreakdownTooltip: React.FC<PieChartExpenseBreakdownTooltipProps> = ({ active, payload, t, formatService }) => {
+  if (!active || !payload?.length) return null;
+  const data = payload[0]?.payload;
+  if (!data) return null;
+  const name = data.type === 'liability'
+    ? t(`liabilities.types.${data.category}`)
+    : t(`expenses.categories.${data.category}`);
+  return (
+    <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
+      <p className="text-sm font-medium">{name}</p>
+      <p className="text-sm">{formatService.formatCurrency(data.amount)}</p>
+      <p className="text-sm">({data.percentage.toFixed(1)}%)</p>
+    </div>
+  );
+};
+
 const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
   expenseBreakdown = [],
   liabilities = []
@@ -89,24 +112,9 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
                 ))}
               </Pie>
               <Tooltip 
-                content={({ active, payload }) => {
-                  if (!active || !payload?.length) return null;
-                  
-                  const data = payload[0]?.payload;
-                  if (!data) return null;
-                  
-                  const name = data.type === 'liability'
-                    ? t(`liabilities.types.${data.category}`)
-                    : t(`expenses.categories.${data.category}`);
-                      
-                  return (
-                    <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
-                      <p className="text-sm font-medium">{name}</p>
-                      <p className="text-sm">{formatService.formatCurrency(data.amount)}</p>
-                      <p className="text-sm">({data.percentage.toFixed(1)}%)</p>
-                    </div>
-                  );
-                }}
+                content={(props) => (
+                  <PieChartExpenseBreakdownTooltip {...props} t={t} formatService={formatService} />
+                )}
               />
             </PieChart>
           </ResponsiveContainer>

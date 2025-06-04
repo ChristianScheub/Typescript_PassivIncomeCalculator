@@ -357,6 +357,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   {t('settings.clearPartialDataDescription')}
                 </p>
               </div>
+              {/* For partial data clear button */}
               <Button
                 onClick={() => {
                   if (window.confirm(t('settings.confirmClearPartialData'))) {
@@ -381,6 +382,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   {t('settings.clearAllDataDescription')}
                 </p>
               </div>
+              {/* For all data clear button */}
               <Button
                 onClick={() => {
                   if (window.confirm(t('settings.confirmClearAllData'))) {

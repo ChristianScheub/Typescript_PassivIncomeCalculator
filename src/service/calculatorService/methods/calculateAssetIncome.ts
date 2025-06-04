@@ -9,6 +9,45 @@ import {
   createCachedDividends,
 } from "../../../utils/dividendCacheUtils";
 
+// Helper: Calculate stock dividend income
+const getStockDividendIncome = (asset: Asset): number => {
+  if (asset.type === "stock" && asset.dividendInfo?.frequency && asset.quantity) {
+    const dividendResult = calculateDividendSchedule(asset.dividendInfo, asset.quantity);
+    Logger.infoService(
+      `Individual dividend calculation result for ${asset.name}: ${JSON.stringify(dividendResult)}`
+    );
+    return isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
+  }
+  return 0;
+};
+
+// Helper: Calculate bond/cash interest income
+const getInterestIncome = (asset: Asset): number => {
+  if ((asset.type === "bond" || asset.type === "cash") && asset.interestRate !== undefined && asset.value) {
+    const annualInterest = asset.interestRate * asset.value / 100;
+    const monthlyInterest = annualInterest / 12;
+    Logger.infoService(
+      `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)} interest calculation for ${asset.name}: ${asset.interestRate}% of ${asset.value} = ${annualInterest} annually, ${monthlyInterest} monthly`
+    );
+    return isFinite(monthlyInterest) ? monthlyInterest : 0;
+  }
+  return 0;
+};
+
+// Helper: Calculate real estate rental income
+const getRentalIncome = (asset: Asset): number => {
+  if (asset.type === "real_estate" && asset.rentalIncome?.amount !== undefined) {
+    const monthlyRental = asset.rentalIncome?.amount;
+    Logger.infoService(
+      `Individual rental calculation result for ${asset.name}: ${monthlyRental}`
+    );
+    return isFinite(monthlyRental) ? monthlyRental : 0;
+  } else if (asset.type === "real_estate") {
+    Logger.infoService(`Real estate asset ${asset.name} has no rental income defined or amount is invalid`);
+  }
+  return 0;
+};
+
 export const calculateAssetMonthlyIncome = (asset: Asset): number => {
   // Zuerst prüfen, ob gecachte Daten vorhanden sind
   const cachedData = getCachedDividendData(asset);
@@ -18,79 +57,22 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
   }
 
   Logger.cache(`Cache miss for asset ${asset.name}, calculating monthly income`);
-  let income = 0;
-
   Logger.infoService(
     `Calculating income for individual asset: ${asset.name} - Type: ${asset.type}`
   );
 
-  // Handle stock dividend income
-  if (asset.type === "stock" && asset.dividendInfo?.frequency && asset.quantity) {
-    const dividendResult = calculateDividendSchedule(
-      asset.dividendInfo,
-      asset.quantity
-    );
-    Logger.infoService(
-      `Individual dividend calculation result for ${asset.name}: ${JSON.stringify(dividendResult)}`
-    );
-
-    // Ensure monthly amount is a valid number
-    income += isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
-  }
-
-  // Handle bond and cash interest income
-  if ((asset.type === "bond" || asset.type === "cash") && asset.interestRate !== undefined && asset.value) {
-    // Convert annual interest rate to monthly income
-    // interestRate is input as percentage value (e.g., 5.0 for 5%)
-    const annualInterest = asset.interestRate * asset.value / 100;
-    const monthlyInterest = annualInterest / 12;
-    
-    Logger.infoService(
-      `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)} interest calculation for ${asset.name}: ${asset.interestRate}% of ${asset.value} = ${annualInterest} annually, ${monthlyInterest} monthly`
-    );
-
-    // Ensure monthly interest is a valid number
-    income += isFinite(monthlyInterest) ? monthlyInterest : 0;
-  }
-
-  // Handle real estate rental income
-  if (asset.type === "real_estate" && asset.rentalIncome?.amount !== undefined) {
-    const monthlyRental = asset.rentalIncome.amount;
-    Logger.infoService(
-      `Individual rental calculation result for ${asset.name}: ${monthlyRental}`
-    );
-
-    // Ensure rental amount is a valid number
-    income += isFinite(monthlyRental) ? monthlyRental : 0;
-  } else if (asset.type === "real_estate") {
-    Logger.infoService(`Real estate asset ${asset.name} has no rental income defined or amount is invalid`);
-  }
+  // Use helpers for each asset type
+  const income =
+    getStockDividendIncome(asset) +
+    getInterestIncome(asset) +
+    getRentalIncome(asset);
 
   Logger.infoService(`Final individual income for asset ${asset.name}: ${income}`);
   return income;
 };
 
-// Neue Funktion: Berechnet das Asset-Einkommen für einen spezifischen Monat
-export const calculateAssetIncomeForMonth = (
-  asset: Asset,
-  monthNumber: number
-): number => {
-  // Zuerst prüfen, ob gecachte Daten vorhanden sind
-  const cachedData = getCachedDividendData(asset);
-  if (cachedData && cachedData.monthlyBreakdown) {
-    const cachedMonthlyIncome = cachedData.monthlyBreakdown[monthNumber] || 0;
-    Logger.cache(`Cache hit for asset ${asset.name} month ${monthNumber}, returning cached income: ${cachedMonthlyIncome}`);
-    return cachedMonthlyIncome;
-  }
-
-  Logger.cache(`Cache miss for asset ${asset.name} month ${monthNumber}, calculating income`);
-  let income = 0;
-
-  Logger.infoService(
-    `Calculating income for asset ${asset.name} in month ${monthNumber}`
-  );
-
-  // Handle stock dividend income for specific month
+// Helper: Calculate stock dividend for a specific month
+const getStockDividendForMonth = (asset: Asset, monthNumber: number): number => {
   if (asset.type === "stock" && asset.dividendInfo && asset.quantity) {
     const dividendForMonth = calculateDividendForMonth(
       asset.dividendInfo,
@@ -100,31 +82,58 @@ export const calculateAssetIncomeForMonth = (
     Logger.infoService(
       `Dividend for ${asset.name} in month ${monthNumber}: ${dividendForMonth}`
     );
-    income += isFinite(dividendForMonth) ? dividendForMonth : 0;
+    return isFinite(dividendForMonth) ? dividendForMonth : 0;
   }
+  return 0;
+};
 
-  // Handle bond and cash interest income for specific month
+// Helper: Calculate interest for a specific month
+const getInterestForMonth = (asset: Asset, monthNumber: number): number => {
   if ((asset.type === "bond" || asset.type === "cash") && asset.interestRate !== undefined && asset.value) {
-    // Convert annual interest rate to monthly income
-    // interestRate is input as percentage value (e.g., 5.0 for 5%)
     const annualInterest = asset.interestRate * asset.value / 100;
     const monthlyInterest = annualInterest / 12;
-    
     Logger.infoService(
       `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)} interest for ${asset.name} in month ${monthNumber}: ${monthlyInterest}`
     );
-    
-    income += isFinite(monthlyInterest) ? monthlyInterest : 0;
+    return isFinite(monthlyInterest) ? monthlyInterest : 0;
   }
+  return 0;
+};
 
-  // Handle real estate rental income for specific month
+// Helper: Calculate rental for a specific month
+const getRentalForMonth = (asset: Asset, monthNumber: number): number => {
   if (asset.type === "real_estate" && asset.rentalIncome?.amount !== undefined) {
-    const monthlyRental = asset.rentalIncome.amount;
+    const monthlyRental = asset.rentalIncome?.amount;
     Logger.infoService(
       `Rental income for ${asset.name} in month ${monthNumber}: ${monthlyRental}`
     );
-    income += isFinite(monthlyRental) ? monthlyRental : 0;
+    return isFinite(monthlyRental) ? monthlyRental : 0;
   }
+  return 0;
+};
+
+export const calculateAssetIncomeForMonth = (
+  asset: Asset,
+  monthNumber: number
+): number => {
+  // Zuerst prüfen, ob gecachte Daten vorhanden sind
+  const cachedData = getCachedDividendData(asset);
+  if (cachedData?.monthlyBreakdown) {
+    const cachedMonthlyIncome = cachedData.monthlyBreakdown[monthNumber] || 0;
+    Logger.cache(`Cache hit for asset ${asset.name} month ${monthNumber}, returning cached income: ${cachedMonthlyIncome}`);
+    return cachedMonthlyIncome;
+  }
+
+  Logger.cache(`Cache miss for asset ${asset.name} month ${monthNumber}, calculating income`);
+  Logger.infoService(
+    `Calculating income for asset ${asset.name} in month ${monthNumber}`
+  );
+
+  // Use helpers for each asset type
+  const income =
+    getStockDividendForMonth(asset, monthNumber) +
+    getInterestForMonth(asset, monthNumber) +
+    getRentalForMonth(asset, monthNumber);
 
   Logger.infoService(
     `Total income for asset ${asset.name} in month ${monthNumber}: ${income}`
@@ -264,7 +273,7 @@ export const calculateAssetMonthlyIncomeWithCache = (
   
   // Calculate rental income for real estate
   else if (asset.type === "real_estate" && asset.rentalIncome?.amount !== undefined) {
-    const rentalAmount = asset.rentalIncome.amount;
+    const rentalAmount = asset.rentalIncome?.amount;
     monthlyAmount = isFinite(rentalAmount) ? rentalAmount : 0;
     annualAmount = monthlyAmount * 12;
     

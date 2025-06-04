@@ -159,9 +159,9 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
                       tickFormatter={(value) => formatService.formatCurrency(value)}
                     />
                     <Bar dataKey="income" radius={[4, 4, 0, 0]}>
-                      {chartData.map((entry, index) => (
+                      {chartData.map((entry) => (
                         <Cell 
-                          key={`cell-${index}`} 
+                          key={`cell-${entry.month}`}
                           fill={getBarColor(entry.isSelected)}
                           style={{ cursor: 'pointer' }}
                         />

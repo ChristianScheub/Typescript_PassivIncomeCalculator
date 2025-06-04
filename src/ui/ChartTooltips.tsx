@@ -72,12 +72,12 @@ export const CustomBarTooltip: React.FC<CustomBarTooltipProps> = ({
   name 
 }) => {
   if (active && payload && payload.length) {
-    const data = payload[0].payload;
+    const data = payload?.[0]?.payload;
     
     return (
       <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
-        <p className="text-sm font-medium">{name || data.name}</p>
-        <p className="text-sm">{formatService.formatCurrency(data.value || data.amount)}</p>
+        <p className="text-sm font-medium">{name || data?.name}</p>
+        <p className="text-sm">{formatService.formatCurrency(data?.value || data?.amount)}</p>
       </div>
     );
   }

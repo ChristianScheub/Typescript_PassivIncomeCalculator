@@ -28,8 +28,8 @@ export const DataSummaryCard: React.FC<DataSummaryCardProps> = ({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {items.map((row, rowIndex) => (
-            <div key={`row-${rowIndex}`} className="space-y-4">
+          {items.map((row) => (
+            <div key={row.map(item => item.id).join('-')} className="space-y-4">
               {row.map((item) => (
                 <div key={item.id} className="space-y-2">
                   <p className="text-sm text-gray-500 dark:text-gray-400">

@@ -26,12 +26,10 @@ interface DashboardViewProps {
   monthlyAssetIncome: number;
   passiveIncome: number;
   monthlyCashFlow: number;
-  passiveIncomeRatio: number;
   stockInfo: StockInfo | null;
   isLoadingStock: boolean;
   handleSettingsClick: () => void;
   handleFetchStock: () => void;
-  assetAllocation: AssetAllocation[];
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({
@@ -51,6 +49,22 @@ const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  // Refactor nested ternary at line 219
+  let stockChangeClass = 'font-semibold';
+  if ((stockInfo?.change || 0) >= 0) {
+    stockChangeClass += ' text-green-600';
+  } else {
+    stockChangeClass += ' text-red-600';
+  }
+
+  // Refactor nested ternary at line 225
+  let stockChangePercentClass = 'font-semibold';
+  if ((stockInfo?.changePercent || 0) >= 0) {
+    stockChangePercentClass += ' text-green-600';
+  } else {
+    stockChangePercentClass += ' text-red-600';
+  }
 
   return (
     <div className="space-y-6 pb-8 overflow-x-hidden">
@@ -215,13 +229,13 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               </div>
               <div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.change')}</div>
-                <div className={`font-semibold ${(stockInfo.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <div className={stockChangeClass}>
                   {stockInfo.change ? `${stockInfo.change >= 0 ? '+' : ''}${stockInfo.change.toFixed(2)}` : '-'}
                 </div>
               </div>
               <div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.changePercent')}</div>
-                <div className={`font-semibold ${(stockInfo.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                <div className={stockChangePercentClass}>
                   {stockInfo.changePercent ? `${stockInfo.changePercent >= 0 ? '+' : ''}${stockInfo.changePercent.toFixed(2)}%` : '-'}
                 </div>
               </div>

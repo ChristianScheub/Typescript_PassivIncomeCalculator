@@ -129,49 +129,50 @@ const AssetsContainer: React.FC = () => {
     }
   };
 
-  const handleUpdateAsset = async (data: any) => {
-    if (editingAsset) {
-      try {
-        Logger.info('Updating asset' + " - " + JSON.stringify({ id: editingAsset.id, data }));
-        analytics.trackEvent('asset_update', { id: editingAsset.id, type: data.type });
-        
-        // Calculate value and percentage difference for stock assets
-        if (data.type === 'stock' && data.quantity && data.currentPrice && data.purchasePrice) {
-          const currentValue = data.quantity * data.currentPrice;
-          const purchaseValue = data.quantity * data.purchasePrice;
-          const difference = currentValue - purchaseValue;
-          const percentageDiff = purchaseValue > 0 ? ((currentValue - purchaseValue) / purchaseValue) * 100 : 0;
-          data.valueDifference = difference !== 0 ? difference : undefined;
-          data.percentageDifference = difference !== 0 ? percentageDiff : undefined;
-          data.value = currentValue; // Ensure value is set based on quantity * currentPrice
-        }
-        
-        await dispatch(updateAsset({ ...data, id: editingAsset.id }));
-        setEditingAsset(null);
-        
-        // Nach dem Aktualisieren: Asset aus dem Store holen (per ID)
-        const updatedAsset = assets.find(a => a.id === editingAsset.id);
-        if (updatedAsset) {
-          const monthlyAmount = calculatorService.calculateAssetMonthlyIncome(updatedAsset);
-          const annualAmount = monthlyAmount * 12;
-          const monthlyBreakdown: Record<number, number> = {};
-          
-          // Für Bonds und andere Assets: Berechne die monatlichen Beträge korrekt
-          for (let month = 1; month <= 12; month++) {
-            monthlyBreakdown[month] = calculatorService.calculateAssetIncomeForMonth(updatedAsset, month);
-          }
-          
-          const cachedDividends = createCachedDividends(
-            monthlyAmount,
-            annualAmount,
-            monthlyBreakdown,
-            updatedAsset
-          );
-          dispatch(updateAssetDividendCache({ assetId: updatedAsset.id, cachedDividends }));
-        }
-      } catch (error) {
-        Logger.error('Failed to update asset' + " - " + JSON.stringify(error as Error));
+  // Helper: Calculate stock value and differences
+  function updateStockValueFields(data: any) {
+    if (data.type === 'stock' && data.quantity && data.currentPrice && data.purchasePrice) {
+      const currentValue = data.quantity * data.currentPrice;
+      const purchaseValue = data.quantity * data.purchasePrice;
+      const difference = currentValue - purchaseValue;
+      const percentageDiff = purchaseValue > 0 ? ((currentValue - purchaseValue) / purchaseValue) * 100 : 0;
+      data.valueDifference = difference !== 0 ? difference : undefined;
+      data.percentageDifference = difference !== 0 ? percentageDiff : undefined;
+      data.value = currentValue;
+    }
+  }
+
+  // Helper: Update asset cache in Redux
+  async function updateAssetCacheAfterEdit(editingAsset: Asset, assets: Asset[], dispatch: any) {
+    const updatedAsset = assets.find(a => a.id === editingAsset.id);
+    if (updatedAsset) {
+      const monthlyAmount = calculatorService.calculateAssetMonthlyIncome(updatedAsset);
+      const annualAmount = monthlyAmount * 12;
+      const monthlyBreakdown: Record<number, number> = {};
+      for (let month = 1; month <= 12; month++) {
+        monthlyBreakdown[month] = calculatorService.calculateAssetIncomeForMonth(updatedAsset, month);
       }
+      const cachedDividends = createCachedDividends(
+        monthlyAmount,
+        annualAmount,
+        monthlyBreakdown,
+        updatedAsset
+      );
+      dispatch(updateAssetDividendCache({ assetId: updatedAsset.id, cachedDividends }));
+    }
+  }
+
+  const handleUpdateAsset = async (data: any) => {
+    if (!editingAsset) return;
+    try {
+      Logger.info('Updating asset' + " - " + JSON.stringify({ id: editingAsset.id, data }));
+      analytics.trackEvent('asset_update', { id: editingAsset.id, type: data.type });
+      updateStockValueFields(data);
+      await dispatch(updateAsset({ ...data, id: editingAsset.id }));
+      setEditingAsset(null);
+      await updateAssetCacheAfterEdit(editingAsset, assets, dispatch);
+    } catch (error) {
+      Logger.error('Failed to update asset' + " - " + JSON.stringify(error as Error));
     }
   };
 

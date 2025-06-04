@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Wallet, Landmark, ReceiptText, CreditCard, Settings } from 'lucide-react';
+import { Home, Wallet, Landmark, ReceiptText, CreditCard } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 

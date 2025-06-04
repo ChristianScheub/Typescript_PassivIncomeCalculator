@@ -1,11 +1,7 @@
-import { Middleware, MiddlewareAPI, AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { Middleware, MiddlewareAPI } from '@reduxjs/toolkit';
 import { updateForecastValues, updateMonthlyAssetIncomeCache } from '../slices/forecastSlice';
 import { updateDashboardValues } from '../slices/dashboardSlice';
 import Logger from '../../service/Logger/logger';
-
-// Define RootState type locally to avoid circular dependency
-type LocalRootState = any;
-type AppDispatch = ThunkDispatch<LocalRootState, undefined, AnyAction>;
 
 // Type guard to check if action has a type property
 function isActionWithType(action: unknown): action is { type: string } {
@@ -13,7 +9,7 @@ function isActionWithType(action: unknown): action is { type: string } {
 }
 
 // Middleware um automatisch Forecast und Dashboard zu aktualisieren wenn sich relevante Daten ändern
-export const dataChangeMiddleware: Middleware<{}, LocalRootState> = (store: MiddlewareAPI<AppDispatch, LocalRootState>) => (next) => (action) => {
+export const dataChangeMiddleware: Middleware<{}, any> = (store: MiddlewareAPI<any, any>) => (next) => (action) => {
   const result = next(action);
   
   // Listen for successful data changes (but not fetch operations)

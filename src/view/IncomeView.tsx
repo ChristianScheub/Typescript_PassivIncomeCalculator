@@ -4,7 +4,6 @@ import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Plus, CreditCard, Edit, Trash2 } from 'lucide-react';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
-import { DataSummaryCard } from '../ui/DataSummaryCard';
 import { Modal } from '../ui/Modal';
 import { EmptyState } from '../ui/EmptyState';
 import { Income } from '../types';
@@ -49,18 +48,6 @@ const IncomeView: React.FC<IncomeViewProps> = ({
   if (status === 'loading') {
     return <LoadingSpinner />;
   }
-
-  const summaryItems = [
-    [
-      {
-        id: 'monthly-income',
-        label: t('pages.totalMonthlyIncome'),
-        value: formatService.formatCurrency(totalMonthlyIncome),
-        subValue: `${formatService.formatCurrency(annualIncome)} ${t('pages.yearly')}`,
-        valueClassName: 'text-emerald-500 dark:text-emerald-400'
-      }
-    ]
-  ];
 
   return (
     <div className="space-y-6">

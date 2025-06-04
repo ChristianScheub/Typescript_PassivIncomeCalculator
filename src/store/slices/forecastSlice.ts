@@ -38,10 +38,10 @@ export const updateForecastValues = createAsyncThunk(
     const { assets, income, expenses, liabilities, dashboard } = state;
 
     // Verwende bereits berechnete Dashboard-Werte wenn verfügbar, sonst berechne neu
-    let baseValues = {
-      totalMonthlyIncome: dashboard.totalMonthlyIncome,
-      totalMonthlyExpenses: dashboard.totalMonthlyExpenses,
-      totalLiabilityPayments: dashboard.totalLiabilityPayments,
+    const baseValues = {
+      totalMonthlyIncome: dashboard.monthlyIncome,
+      totalMonthlyExpenses: dashboard.monthlyExpenses,
+      totalLiabilityPayments: dashboard.monthlyLiabilityPayments,
       passiveIncome: dashboard.passiveIncome,
     };
 
