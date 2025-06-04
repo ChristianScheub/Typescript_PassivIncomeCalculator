@@ -123,7 +123,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">Vermögen</p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{t('dashboard.assets')}</p>
               <p className="text-sm sm:text-lg md:text-xl font-semibold text-blue-600 dark:text-blue-400 truncate">
                 {formatService.formatCurrency(monthlyAssetIncome)}
               </p>
@@ -156,7 +156,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
               <CreditCard className="w-4 sm:w-5 h-4 sm:h-5 text-purple-600 dark:text-purple-400" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">Verbindlichkeiten</p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{t('dashboard.liabilities')}</p>
               <p className="text-sm sm:text-lg md:text-xl font-semibold text-purple-600 dark:text-purple-400 truncate">
                 {formatService.formatCurrency(monthlyLiabilityPayments)}
               </p>
@@ -189,7 +189,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           className="w-full flex items-center justify-center space-x-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white p-4 rounded-xl transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98] max-w-full overflow-hidden"
         >
           <BarChart3 className="w-5 h-5 flex-shrink-0" />
-          <span className="font-semibold truncate">Assetkalender</span>
+          <span className="font-semibold truncate">{t('dashboard.assetCalendar')}</span>
         </button>
       </div>
               {/* Stock Info Section */}
@@ -206,21 +206,21 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           {stockInfo && !stockInfo.error && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
               <div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Symbol</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.symbol')}</div>
                 <div className="font-semibold">{stockInfo.symbol}</div>
               </div>
               <div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Current Price</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.currentPrice')}</div>
                 <div className="font-semibold">{formatService.formatCurrency(stockInfo.price || 0)}</div>
               </div>
               <div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Change</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.change')}</div>
                 <div className={`font-semibold ${(stockInfo.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {stockInfo.change ? `${stockInfo.change >= 0 ? '+' : ''}${stockInfo.change.toFixed(2)}` : '-'}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Change %</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{t('dashboard.changePercent')}</div>
                 <div className={`font-semibold ${(stockInfo.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   {stockInfo.changePercent ? `${stockInfo.changePercent >= 0 ? '+' : ''}${stockInfo.changePercent.toFixed(2)}%` : '-'}
                 </div>
@@ -240,7 +240,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
                   onClick={handleSettingsClick}
                   className="mt-2 text-sm text-red-600 dark:text-red-400 underline hover:text-red-700 dark:hover:text-red-300"
                 >
-                  Go to Settings to configure API key
+                  {t('dashboard.goToSettingsToConfigureApiKey')}
                 </button>
               )}
             </div>

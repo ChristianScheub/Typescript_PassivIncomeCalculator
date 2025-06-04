@@ -23,6 +23,9 @@ export const calculateMonthlyAmountFromFrequency = (
   }
 };
 
+// Move outside to avoid lexical declaration in case block
+const defaultQuarterlyMonths = [3, 6, 9, 12];
+
 export const isPaymentMonthForFrequency = (
   monthNumber: number,
   frequency: string,
@@ -32,7 +35,6 @@ export const isPaymentMonthForFrequency = (
     case 'monthly':
       return true;
     case 'quarterly':
-      const defaultQuarterlyMonths = [3, 6, 9, 12];
       return specifiedMonths?.includes(monthNumber) ?? defaultQuarterlyMonths.includes(monthNumber);
     case 'annually':
       return specifiedMonths?.includes(monthNumber) ?? monthNumber === 12;
@@ -63,8 +65,16 @@ export const calculateAmountForPaymentMonth = (
     return schedule.customAmounts[monthNumber] * quantity;
   }
 
+  // Use correct months property depending on schedule type
+  let months: number[] | undefined;
+  if ('paymentMonths' in schedule && schedule.paymentMonths) {
+    months = schedule.paymentMonths;
+  } else if ('months' in schedule && schedule.months) {
+    months = schedule.months;
+  }
+
   // Check if this is a payment month for the given frequency
-  return isPaymentMonthForFrequency(monthNumber, schedule.frequency, schedule.paymentMonths)
+  return isPaymentMonthForFrequency(monthNumber, schedule.frequency, months)
     ? baseAmount
     : 0;
 };

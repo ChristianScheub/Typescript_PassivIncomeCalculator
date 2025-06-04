@@ -11,9 +11,9 @@ export const getAllExchangeRatesMethod = async (): Promise<ExchangeRate[]> => {
     Logger.infoService('Getting all exchange rates from database');
 
     const exchangeRates = await sqliteService.getAll('exchangeRates');
-    
-    // Sort by date descending (newest first)
-    const sortedRates = exchangeRates.sort((a, b) => b.date.localeCompare(a.date));
+    // Move sort to a separate statement for clarity
+    let sortedRates = exchangeRates;
+    sortedRates = sortedRates.sort((a, b) => b.date.localeCompare(a.date));
 
     Logger.infoService(`Retrieved ${sortedRates.length} exchange rates`);
     return sortedRates;

@@ -1,15 +1,12 @@
-
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { Download, Upload, Moon, Sun, Eye, EyeOff, Key, ChevronRight, ChevronDown, Trash } from 'lucide-react';
-import LanguageSelector from '../ui/LanguageSelector';
+import { Download, Upload, Eye, EyeOff, Key, ChevronRight, ChevronDown, Trash } from 'lucide-react';
 import DebugSettings from '../ui/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../config/featureFlags';
 
 interface SettingsViewProps {
-  theme: string;
   exportStatus: 'idle' | 'loading' | 'success' | 'error';
   importStatus: 'idle' | 'loading' | 'success' | 'error';
   importError: string | null;
@@ -33,7 +30,6 @@ interface SettingsViewProps {
   onApiExpandedChange: () => void;
   onDataManagementExpandedChange: () => void;
   onClearDataExpandedChange: () => void;
-  onThemeChange: () => void;
   onExportData: () => void;
   onImportData: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onToggleLogs: () => void;
@@ -52,7 +48,6 @@ interface SettingsViewProps {
 }
 
 const SettingsView: React.FC<SettingsViewProps> = ({
-  theme,
   exportStatus,
   importStatus,
   importError,
@@ -73,7 +68,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onApiExpandedChange,
   onDataManagementExpandedChange,
   onClearDataExpandedChange,
-  onThemeChange,
   onExportData,
   onImportData,
   onToggleLogs,
@@ -107,7 +101,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Key size={20} />
-              <span>Stock API Configuration</span>
+              <span>{t('settings.stockApiConfig')}</span>
             </div>
             {isApiExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
           </CardTitle>
@@ -116,9 +110,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium">Enable Stock API</h3>
+                <h3 className="font-medium">{t('settings.enableStockApi')}</h3>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Enable or disable the stock API integration
+                  {t('settings.enableStockApiDescription')}
                 </p>
               </div>
               <div className="relative inline-block w-14 h-8 flex-shrink-0">
@@ -139,9 +133,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
 
             <div>
-              <h3 className="font-medium">Finnhub API Key</h3>
+              <h3 className="font-medium">{t('settings.finnhubApiKey')}</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                Get your free API key from{' '}
+                {t('settings.getFinnhubKey')}{' '}
                 <a 
                   href="https://finnhub.io" 
                   target="_blank" 
@@ -150,7 +144,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 >
                   finnhub.io
                 </a>
-                {' '}to enable stock data features.
+                {' '}{t('settings.toEnableStockData')}
               </p>
               
               <div className="space-y-3">
@@ -159,7 +153,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                     type={showApiKey ? 'text' : 'password'}
                     value={tempApiKey}
                     onChange={(e) => setTempApiKey(e.target.value)}
-                    placeholder="Enter your Finnhub API key"
+                    placeholder={t('settings.enterFinnhubApiKey')}
                     className={`w-full px-3 py-2 pr-10 border rounded-md ${
                       isApiEnabled 
                         ? 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100' 
@@ -193,9 +187,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   >
                     <span>
                       {(() => {
-                        if (apiKeyStatus === 'saving') return 'Saving...';
-                        if (apiKeyStatus === 'success') return 'Saved!';
-                        return 'Save API Key';
+                        if (apiKeyStatus === 'saving') return t('settings.saving');
+                        if (apiKeyStatus === 'success') return t('settings.saved');
+                        return t('settings.saveApiKey');
                       })()}
                     </span>
                   </Button>
@@ -210,23 +204,23 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                       disabled={!isApiEnabled}
                       className="text-red-600 hover:text-red-700"
                     >
-                      Remove
+                      {t('common.remove')}
                     </Button>
                   )}
                 </div>
                 
                 {apiKey && (
                   <p className="text-sm text-green-600 dark:text-green-400">
-                    ✓ API key configured
+                    {t('settings.apiKeyConfigured')}
                   </p>
                 )}
               </div>
             </div>
             
             <div>
-              <h3 className="font-medium">Stock Market Currency</h3>
+              <h3 className="font-medium">{t('settings.stockMarketCurrency')}</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                Select the currency for displaying stock prices. USD shows original prices, EUR converts USD prices to Euro using live exchange rates.
+                {t('settings.stockMarketCurrencyDescription')}
               </p>
               
               <div className="flex space-x-3">
@@ -238,7 +232,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
-                  EUR (Auto-converted)
+                  {t('settings.eurAutoConverted')}
                 </button>
                 <button
                   onClick={() => onCurrencyChange('USD')}
@@ -248,52 +242,18 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                       : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
-                  USD (Original)
+                  {t('settings.usdOriginal')}
                 </button>
               </div>
               
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-                Current: {currency === 'EUR' ? 'Euro - USD prices converted to EUR using live exchange rates' : 'US Dollar - Original USD prices from US exchanges'}
+                {t('settings.currentCurrency', {
+                  currency,
+                })}
               </p>
             </div>
           </CardContent>
         )}
-      </Card>
-      
-      {/* Appearance */}
-      <Card className="bg-white dark:bg-gray-800">
-        <CardHeader>
-          <CardTitle>{t('settings.appearance')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{t('settings.theme')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('settings.themeDescription')}
-              </p>
-            </div>
-            <Button
-              variant="outline"
-              onClick={onThemeChange}
-              className="flex items-center space-x-2"
-            >
-              {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
-              <span>{theme === 'light' ? t('settings.darkMode') : t('settings.lightMode')}</span>
-            </Button>
-          </div>
-
-          {/* Language Selector */}
-          <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
-            <div>
-              <h3 className="font-medium">{t('settings.language')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('settings.languageDescription')}
-              </p>
-            </div>
-            <LanguageSelector />
-          </div>
-        </CardContent>
       </Card>
 
       {/* Data Management */}
@@ -466,22 +426,22 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         <CardContent>
           <div className="space-y-2">
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              <strong>Passive Income Calculator</strong>
+              <strong>{t('settings.appName')}</strong>
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Version 1.0.0
+              {t('settings.version', { version: '1.0.0' })}
             </p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Track your assets, liabilities, income, and expenses to achieve financial independence.
+              {t('settings.appDescription')}
             </p>
             
             {featureFlag_Debug_Settings_View && (
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-yellow-600 dark:text-yellow-400 font-mono">
-                  🚧 Debug Mode Active
+                  🚧 {t('settings.debugModeActive')}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Additional debugging features are enabled. Disable in production.
+                  {t('settings.debugModeDescription')}
                 </p>
               </div>
             )}

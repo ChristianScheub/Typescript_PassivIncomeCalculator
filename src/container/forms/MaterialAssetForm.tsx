@@ -84,6 +84,69 @@ const getDefaultValues = (initialData?: Asset): Partial<AssetFormData> => {
   };
 };
 
+// Helper to calculate stock value, difference, and percentage
+function calculateStockValues(data: AssetFormData) {
+  let finalValue = data.value;
+  let valueDifference;
+  let percentageDifference;
+
+  if (data.type === 'stock' && data.quantity && data.currentPrice) {
+    finalValue = data.quantity * data.currentPrice;
+    if (data.purchasePrice) {
+      const purchaseValue = data.quantity * data.purchasePrice;
+      valueDifference = finalValue - purchaseValue;
+      if (valueDifference !== 0) {
+        percentageDifference = purchaseValue > 0 ? ((finalValue - purchaseValue) / purchaseValue) * 100 : 0;
+      }
+    }
+    Logger.info(`Stock value calculated: ${data.quantity} × ${data.currentPrice} = ${finalValue}`);
+    Logger.info(`Value difference: ${valueDifference}`);
+    Logger.info(`Percentage difference: ${percentageDifference}%`);
+  }
+  return { finalValue, valueDifference, percentageDifference };
+}
+
+// Helper to assign type-specific fields
+function assignTypeSpecificFields(transformedData: Asset, data: AssetFormData) {
+  switch (data.type) {
+    case 'stock':
+      transformedData.ticker = data.ticker;
+      transformedData.quantity = data.quantity;
+      transformedData.purchasePrice = data.purchasePrice;
+      transformedData.currentPrice = data.currentPrice;
+      if (data.dividendFrequency && data.dividendFrequency !== 'none') {
+        transformedData.dividendInfo = {
+          frequency: data.dividendFrequency,
+          amount: data.dividendAmount || 0,
+          months: data.dividendMonths,
+          paymentMonths: data.dividendPaymentMonths,
+          customAmounts: data.customDividendAmounts,
+        };
+      }
+      break;
+    case 'real_estate':
+      transformedData.propertyValue = data.propertyValue;
+      if (data.rentalAmount) {
+        transformedData.rentalIncome = {
+          amount: data.rentalAmount,
+          frequency: 'monthly',
+        };
+      }
+      break;
+    case 'bond':
+      transformedData.interestRate = data.interestRate;
+      transformedData.maturityDate = data.maturityDate;
+      transformedData.nominalValue = data.nominalValue;
+      break;
+    case 'crypto':
+      transformedData.symbol = data.symbol;
+      transformedData.acquisitionCost = data.acquisitionCost;
+      break;
+    default:
+      break;
+  }
+}
+
 export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSubmit }) => {
   const { t } = useTranslation();
   
@@ -98,26 +161,8 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
     onSubmit: async (data: AssetFormData) => {
       try {
         Logger.info('Form submission started with data: ' + JSON.stringify(data));
-        
-        // For stocks, ensure value is calculated from quantity * currentPrice
-        let finalValue = data.value;
-        let valueDifference;
-        let percentageDifference;
-
-        if (data.type === 'stock' && data.quantity && data.currentPrice) {
-          finalValue = data.quantity * data.currentPrice;
-          if (data.purchasePrice) {
-            const purchaseValue = data.quantity * data.purchasePrice;
-            valueDifference = finalValue - purchaseValue;
-            if (valueDifference !== 0) {
-              percentageDifference = purchaseValue > 0 ? ((finalValue - purchaseValue) / purchaseValue) * 100 : 0;
-            }
-          }
-          Logger.info(`Stock value calculated: ${data.quantity} × ${data.currentPrice} = ${finalValue}`);
-          Logger.info(`Value difference: ${valueDifference}`);
-          Logger.info(`Percentage difference: ${percentageDifference}%`);
-        }
-        
+        // Use helper for stock calculations
+        const { finalValue, valueDifference, percentageDifference } = calculateStockValues(data);
         // Create the base transformed data
         const transformedData: Asset = {
           id: initialData?.id || Date.now().toString(),
@@ -134,47 +179,8 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
           sector: data.sector,
           notes: data.notes
         };
-
-        // Add type-specific fields based on asset type
-        switch (data.type) {
-          case 'stock':
-            transformedData.ticker = data.ticker;
-            transformedData.quantity = data.quantity;
-            transformedData.purchasePrice = data.purchasePrice;
-            transformedData.currentPrice = data.currentPrice;
-            if (data.dividendFrequency && data.dividendFrequency !== 'none') {
-              transformedData.dividendInfo = {
-                frequency: data.dividendFrequency,
-                amount: data.dividendAmount || 0,
-                months: data.dividendMonths,
-                paymentMonths: data.dividendPaymentMonths,
-                customAmounts: data.customDividendAmounts,
-              };
-            }
-            break;
-
-          case 'real_estate':
-            transformedData.propertyValue = data.propertyValue;
-            if (data.rentalAmount) {
-              transformedData.rentalIncome = {
-                amount: data.rentalAmount,
-                frequency: 'monthly',
-              };
-            }
-            break;
-
-          case 'bond':
-            transformedData.interestRate = data.interestRate;
-            transformedData.maturityDate = data.maturityDate;
-            transformedData.nominalValue = data.nominalValue;
-            break;
-
-          case 'crypto':
-            transformedData.symbol = data.symbol;
-            transformedData.acquisitionCost = data.acquisitionCost;
-            break;
-        }
-
+        // Use helper for type-specific fields
+        assignTypeSpecificFields(transformedData, data);
         Logger.info('Transformed data: ' + JSON.stringify(transformedData));
         await onSubmit(transformedData);
         Logger.info('Form submission completed successfully');

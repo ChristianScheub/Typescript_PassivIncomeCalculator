@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useTheme } from "../hooks/useTheme";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
 import { setApiEnabled, setApiKey } from "../store/slices/apiConfigSlice";
 import sqliteService, { StoreNames } from "../service/sqlLiteService";
@@ -10,7 +9,6 @@ import { handleFileDownload } from "../service/helper/downloadFile";
 import { setCurrency, getCurrency } from "../service/stockAPIService/utils/fetch";
 
 const SettingsContainer: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
   const dispatch = useAppDispatch();
   const apiConfig = useAppSelector(state => state.apiConfig);
   
@@ -170,13 +168,6 @@ const SettingsContainer: React.FC = () => {
     }
   };
 
-  const handleThemeChange = () => {
-    toggleTheme();
-    analytics.trackEvent("settings_theme_change", {
-      theme: theme === "light" ? "dark" : "light",
-    });
-  };
-
   const handleClearLogs = () => {
     if (window.confirm("Are you sure you want to clear all debug logs?")) {
       Logger.deleteLogs();
@@ -327,7 +318,6 @@ const SettingsContainer: React.FC = () => {
 
   return (
     <SettingsView
-      theme={theme}
       exportStatus={exportStatus}
       importStatus={importStatus}
       importError={importError}
@@ -348,7 +338,6 @@ const SettingsContainer: React.FC = () => {
       onApiExpandedChange={() => setIsApiExpanded(!isApiExpanded)}
       onDataManagementExpandedChange={() => setIsDataManagementExpanded(!isDataManagementExpanded)}
       onClearDataExpandedChange={() => setIsClearDataExpanded(!isClearDataExpanded)}
-      onThemeChange={toggleTheme}
       onExportData={handleExportData}
       onImportData={handleImportData}
       onToggleLogs={() => setShowLogs(!showLogs)}

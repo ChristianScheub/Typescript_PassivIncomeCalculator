@@ -103,6 +103,24 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
 
+  // Options arrays (localized)
+  const assetTypeOptions = [
+    { value: 'stock', label: t('assets.types.stock') },
+    { value: 'bond', label: t('assets.types.bond') },
+    { value: 'real_estate', label: t('assets.types.real_estate') },
+    { value: 'crypto', label: t('assets.types.crypto') },
+    { value: 'cash', label: t('assets.types.cash') },
+    { value: 'other', label: t('assets.types.other') }
+  ];
+
+  const dividendFrequencyOptions = [
+    { value: 'monthly', label: t('frequency.monthly') },
+    { value: 'quarterly', label: t('frequency.quarterly') },
+    { value: 'annually', label: t('frequency.annually') },
+    { value: 'custom', label: t('frequency.custom') },
+    { value: 'none', label: t('frequency.none') }
+  ];
+
   return (
     <Box sx={{ pb: 10 }}>
       <MaterialForm 
@@ -146,7 +164,7 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
                   error={errors.value?.message}
                   value={watch('value')}
                   onChange={(value) => setValue('value', value)}
-                  placeholder="0.00"
+                  placeholder={t('common.zeroAmountPlaceholder')}
                   step={0.01}
                   min={0}
                 />
@@ -176,7 +194,7 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
                   type="number"
                   value={watch('quantity')}
                   onChange={(value) => setValue('quantity', value)}
-                  placeholder="0"
+                  placeholder={t('common.zeroPlaceholder')}
                   step={1}
                   min={0}
                 />
@@ -188,7 +206,7 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
                   type="number"
                   value={watch('purchasePrice')}
                   onChange={(value) => setValue('purchasePrice', value)}
-                  placeholder="0.00"
+                  placeholder={t('common.zeroAmountPlaceholder')}
                   step={0.01}
                   min={0}
                 />
@@ -200,7 +218,7 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
                   type="number"
                   value={watch('currentPrice')}
                   onChange={(value) => setValue('currentPrice', value)}
-                  placeholder="0.00"
+                  placeholder={t('common.zeroAmountPlaceholder')}
                   step={0.01}
                   min={0}
                 />
@@ -213,11 +231,11 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
                     type="number"
                     value={quantity * currentPrice}
                     onChange={() => {}} // Read-only
-                    placeholder="0.00"
+                    placeholder={t('common.zeroAmountPlaceholder')}
                     step={0.01}
                     min={0}
                     disabled={true}
-                    helperText="Automatically calculated from quantity × current price"
+                    helperText={t('assets.form.calculatedValueHelper')}
                   />
                 </Grid>
               )}
@@ -299,7 +317,7 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
                   type="number"
                   value={watch('propertyValue')}
                   onChange={(value) => setValue('propertyValue', value)}
-                  placeholder="0.00"
+                  placeholder={t('common.zeroAmountPlaceholder')}
                   step={0.01}
                   min={0}
                 />
@@ -311,7 +329,7 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
                   type="number"
                   value={watch('rentalAmount')}
                   onChange={(value) => setValue('rentalAmount', value)}
-                  placeholder="0.00"
+                  placeholder={t('common.zeroAmountPlaceholder')}
                   step={0.01}
                   min={0}
                 />
@@ -351,6 +369,7 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
                   type="number"
                   value={watch('nominalValue')}
                   onChange={(value) => setValue('nominalValue', value)}
+                  placeholder={t('common.zeroAmountPlaceholder')}
                   step={0.01}
                   min={0}
                 />

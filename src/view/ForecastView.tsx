@@ -10,15 +10,17 @@ import BarChartNetCashFlow from '../ui/barCharts/BarChartNetCashFlow';
 import BarChartExpenseCoverage from '../ui/barCharts/BarChartExpenseCoverage';
 import MilestonesContainer from '../container/MilestonesContainer';
 
+type ForecastTab = 'projections' | 'allocations' | 'fire';
+
 interface ForecastViewProps {
-  selectedTab: 'projections' | 'allocations' | 'fire';
+  selectedTab: ForecastTab;
   isLoading: boolean;
   projections: MonthlyProjection[];
   assetAllocation: AssetAllocation[];
   expenseBreakdown: ExpenseBreakdown[];
   incomeAllocation: IncomeAllocation[];
   liabilities: { category: string; amount: number }[];
-  onTabChange: (tab: 'projections' | 'allocations' | 'fire') => void;
+  onTabChange: (tab: ForecastTab) => void;
 }
 
 const ForecastView: React.FC<ForecastViewProps> = ({
@@ -79,7 +81,7 @@ const ForecastView: React.FC<ForecastViewProps> = ({
       <TabSelector
         tabs={tabs}
         selectedTab={selectedTab}
-        onTabChange={(id) => onTabChange(id as 'projections' | 'allocations' | 'fire')}
+        onTabChange={(id) => onTabChange(id as ForecastTab)}
       />
       {renderContent()}
     </div>

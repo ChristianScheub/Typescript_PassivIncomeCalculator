@@ -34,7 +34,8 @@ export const getExchangeRateMethod = async (): Promise<number> => {
     }
 
     // If still not found, try to get the most recent rate as fallback
-    const sortedRates = refreshedRates.sort((a, b) => b.date.localeCompare(a.date));
+    let sortedRates = refreshedRates;
+    sortedRates = sortedRates.sort((a, b) => b.date.localeCompare(a.date));
     if (sortedRates.length > 0) {
       const fallbackRate = sortedRates[0];
       Logger.warn(`Using fallback exchange rate from ${fallbackRate.date}: ${fallbackRate.usdToEur}`);

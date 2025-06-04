@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { EmptyState } from '../ui/EmptyState';
 import { Modal } from '../ui/Modal';
-import { DataSummaryCard } from '../ui/DataSummaryCard';
 import formatService from '../service/formatService';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
 
@@ -42,25 +41,10 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
 
+
   if (status === 'loading') {
     return <LoadingSpinner />;
   }
-
-  const summaryItems = [
-    [{
-      id: 'total-debt',
-      label: t('liabilities.totalDebt'),
-      value: formatService.formatCurrency(totalDebt),
-      valueClassName: 'text-red-500 dark:text-red-400'
-    }],
-    [{
-      id: 'monthly-payments',
-      label: t('liabilities.monthlyPayments'),
-      value: formatService.formatCurrency(totalMonthlyPayment),
-      valueClassName: 'text-red-500 dark:text-red-400',
-      subValue: t('common.across', { count: liabilities.length })
-    }]
-  ];
 
   return (
     <div className="space-y-6">
