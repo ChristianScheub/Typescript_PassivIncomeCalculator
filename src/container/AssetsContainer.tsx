@@ -16,6 +16,7 @@ const AssetsContainer: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { items: assets, status } = useAppSelector(state => state.assets);
+  const { isEnabled: isApiEnabled } = useAppSelector(state => state.apiConfig);
   const [isAddingAsset, setIsAddingAsset] = useState(false);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [isUpdatingPrices, setIsUpdatingPrices] = useState(false);
@@ -263,6 +264,7 @@ const AssetsContainer: React.FC = () => {
       isAddingAsset={isAddingAsset}
       editingAsset={editingAsset}
       isUpdatingPrices={isUpdatingPrices}
+      isApiEnabled={isApiEnabled}
       calculateAssetMonthlyIncome={calculateAssetMonthlyIncome}
       getAssetTypeLabel={getAssetTypeLabel}
       onAddAsset={handleAddAsset}

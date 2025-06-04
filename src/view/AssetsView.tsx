@@ -23,6 +23,7 @@ interface AssetsViewProps {
   isAddingAsset: boolean;
   editingAsset: Asset | null;
   isUpdatingPrices: boolean;
+  isApiEnabled: boolean;
   calculateAssetMonthlyIncome: (asset: Asset) => number;
   getAssetTypeLabel: (type: AssetType) => string;
   onAddAsset: (data: any) => void;
@@ -44,6 +45,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
   isAddingAsset,
   editingAsset,
   isUpdatingPrices,
+  isApiEnabled,
   calculateAssetMonthlyIncome,
   getAssetTypeLabel,
   onAddAsset,
@@ -68,7 +70,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">{t('assets.title')}</h1>
         <div className="flex gap-2">
-          {stocksCount > 0 && (
+          {stocksCount > 0 && isApiEnabled && (
             <Button 
               variant="outline"
               onClick={onUpdateStockPrices}

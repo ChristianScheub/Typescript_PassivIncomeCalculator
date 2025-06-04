@@ -1,31 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "../hooks/useTheme";
+import { useAppDispatch, useAppSelector } from "../hooks/redux";
+import { setApiEnabled, setApiKey } from "../store/slices/apiConfigSlice";
 import sqliteService, { StoreNames } from "../service/sqlLiteService";
 import { analytics } from "../service/analytics";
 import Logger from "../service/Logger/logger";
 import SettingsView from "../view/SettingsView";
 import { handleFileDownload } from "../service/helper/downloadFile";
-import { setApiKey, removeApiKey, getCurrency, setCurrency } from "../service/stockAPIService/utils/fetch";
+import { setCurrency, getCurrency } from "../service/stockAPIService/utils/fetch";
 
 const SettingsContainer: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
+  const dispatch = useAppDispatch();
+  const apiConfig = useAppSelector(state => state.apiConfig);
+  
   const [exportStatus, setExportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [importStatus, setImportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [importError, setImportError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const [apiKey, setApiKeyState] = useState<string>("");
   const [apiKeyStatus, setApiKeyStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const [currency, setCurrencyState] = useState<'EUR' | 'USD'>('EUR');
   const [clearDataStatus, setClearDataStatus] = useState<'idle' | 'clearing' | 'success'>('idle');
+  const [isApiExpanded, setIsApiExpanded] = useState(false);
+  const [isDataManagementExpanded, setIsDataManagementExpanded] = useState(false);
+  const [isClearDataExpanded, setIsClearDataExpanded] = useState(false);
 
   // Load API key and currency on mount
   useEffect(() => {
     const storedApiKey = localStorage.getItem('finnhub_api_key');
     if (storedApiKey) {
-      setApiKeyState(storedApiKey);
+      dispatch(setApiKey(storedApiKey));
     }
     
     const storedCurrency = getCurrency();
@@ -218,37 +225,29 @@ const SettingsContainer: React.FC = () => {
   };
 
   const handleApiKeyChange = async (newApiKey: string) => {
-    if (!newApiKey.trim()) {
-      setApiKeyError("API key cannot be empty");
-      return;
-    }
-
-    setApiKeyStatus("saving");
+    setApiKeyStatus('saving');
     setApiKeyError(null);
-
+    
     try {
-      setApiKey(newApiKey.trim());
-      setApiKeyState(newApiKey.trim());
-      setApiKeyStatus("success");
-      Logger.info("Finnhub API key saved successfully");
-      analytics.trackEvent("settings_api_key_saved");
-      setTimeout(() => setApiKeyStatus("idle"), 2000);
+      // Validierung hier einbauen wenn nötig
+      dispatch(setApiKey(newApiKey));
+      dispatch(setApiEnabled(true));
+      setApiKeyStatus('success');
+      setTimeout(() => setApiKeyStatus('idle'), 2000);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to save API key";
-      setApiKeyError(errorMessage);
-      setApiKeyStatus("error");
-      Logger.error(`Failed to save API key: ${errorMessage}`);
-      setTimeout(() => setApiKeyStatus("idle"), 3000);
+      setApiKeyError('Failed to save API key');
+      setApiKeyStatus('error');
+      setTimeout(() => setApiKeyStatus('idle'), 2000);
     }
   };
 
   const handleApiKeyRemove = () => {
-    if (window.confirm("Are you sure you want to remove your API key? This will disable stock data features.")) {
-      removeApiKey();
-      setApiKeyState("");
-      Logger.info("Finnhub API key removed");
-      analytics.trackEvent("settings_api_key_removed");
-    }
+    dispatch(setApiKey(null));
+    dispatch(setApiEnabled(false));
+  };
+
+  const handleApiToggle = (enabled: boolean) => {
+    dispatch(setApiEnabled(enabled));
   };
 
   const handleCurrencyChange = (newCurrency: 'EUR' | 'USD') => {
@@ -308,8 +307,8 @@ const SettingsContainer: React.FC = () => {
       localStorage.clear();
       
       // Reset API key state
-      setApiKeyState('');
-      setApiKey('');
+      dispatch(setApiKey(null));
+      dispatch(setApiEnabled(false));
 
       setClearDataStatus('success');
       Logger.infoService('All data cleared successfully');
@@ -336,19 +335,27 @@ const SettingsContainer: React.FC = () => {
       showLogs={showLogs}
       autoRefresh={autoRefresh}
       analytics={analytics}
-      apiKey={apiKey}
+      apiKey={apiConfig.apiKey || ""}
       apiKeyStatus={apiKeyStatus}
       apiKeyError={apiKeyError}
       currency={currency}
       clearDataStatus={clearDataStatus}
-      onThemeChange={handleThemeChange}
+      isApiEnabled={apiConfig.isEnabled}
+      isApiExpanded={isApiExpanded}
+      isDataManagementExpanded={isDataManagementExpanded}
+      isClearDataExpanded={isClearDataExpanded}
+      onApiToggle={handleApiToggle}
+      onApiExpandedChange={() => setIsApiExpanded(!isApiExpanded)}
+      onDataManagementExpandedChange={() => setIsDataManagementExpanded(!isDataManagementExpanded)}
+      onClearDataExpandedChange={() => setIsClearDataExpanded(!isClearDataExpanded)}
+      onThemeChange={toggleTheme}
       onExportData={handleExportData}
       onImportData={handleImportData}
       onToggleLogs={() => setShowLogs(!showLogs)}
       onRefreshLogs={handleRefreshLogs}
       onExportLogs={handleExportLogs}
       onClearLogs={handleClearLogs}
-      onAutoRefreshChange={(enabled) => setAutoRefresh(enabled)}
+      onAutoRefreshChange={setAutoRefresh}
       onApiKeyChange={handleApiKeyChange}
       onApiKeyRemove={handleApiKeyRemove}
       onCurrencyChange={handleCurrencyChange}
