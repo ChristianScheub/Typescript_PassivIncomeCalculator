@@ -5,7 +5,6 @@ import { RootState } from '../store';
 import { calculateAssetIncomeForMonth } from '../service/calculatorService/methods/calculateAssetIncome';
 import { Asset, AssetType } from '../types';
 import AssetCalendarView from '../view/AssetCalendarView';
-import { useAppDispatch } from '../hooks/redux';
 import calculatorService from '../service/calculatorService';
 import Logger from '../service/Logger/logger';
 
@@ -19,10 +18,16 @@ interface MonthData {
   }>;
 }
 
+interface ChartData {
+  month: string;
+  income: number;
+  isSelected: boolean;
+  monthNumber: number;
+}
+
 const AssetCalendarContainer: React.FC = () => {
   const assets = useSelector((state: RootState) => state.assets.items);
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Current month (1-12)
   const [selectedAssetType, setSelectedAssetType] = useState<AssetType | 'all'>('all');
@@ -192,7 +197,7 @@ const AssetCalendarContainer: React.FC = () => {
   }, [monthsData, selectedMonth]);
 
   // Memoize chart data with proper dependencies
-  const chartData = useMemo(() => {
+  const chartData = useMemo((): ChartData[] => {
     const shortMonthsObj = t('dates.shortMonths', { returnObjects: true }) as Record<string, string>;
     const shortMonthsKeys = Object.keys(shortMonthsObj);
     

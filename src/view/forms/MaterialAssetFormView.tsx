@@ -14,6 +14,7 @@ import {
 import { MonthSelector } from '../../ui/MonthSelector';
 import { useTranslation } from 'react-i18next';
 import { SharedFormField } from '../../components/SharedFormField';
+import formatService from '../../service/formatService';
 
 // Define the AssetFormData interface for the form
 interface AssetFormData {
@@ -68,24 +69,6 @@ interface MaterialAssetFormViewProps {
   // Title
   title: string;
 }
-
-// Options arrays
-const assetTypeOptions = [
-  { value: 'stock', label: 'Stock' },
-  { value: 'bond', label: 'Bond' },
-  { value: 'real_estate', label: 'Real Estate' },
-  { value: 'crypto', label: 'Crypto' },
-  { value: 'cash', label: 'Cash' },
-  { value: 'other', label: 'Other' }
-];
-
-const dividendFrequencyOptions = [
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'quarterly', label: 'Quarterly' },
-  { value: 'annually', label: 'Annually' },
-  { value: 'custom', label: 'Custom' },
-  { value: 'none', label: 'None' }
-];
 
 export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
   assetType,

@@ -43,7 +43,6 @@ interface SettingsViewProps {
   onClearPartialData: () => void;
   onClearAllData: () => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
-  getLogLevel: (message: string) => string;
   getLogLevelColor: (level: string) => string;
 }
 
@@ -81,7 +80,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onClearPartialData,
   onClearAllData,
   formatLogEntry,
-  getLogLevel,
   getLogLevelColor
 }) => {
   const { t } = useTranslation();
@@ -420,7 +418,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           onClearLogs={onClearLogs}
           onAutoRefreshChange={onAutoRefreshChange}
           formatLogEntry={formatLogEntry}
-          getLogLevel={getLogLevel}
           getLogLevelColor={getLogLevelColor}
         />
       )}

@@ -19,6 +19,8 @@ interface MonthData {
 interface ChartData {
   month: string;
   income: number;
+  isSelected: boolean;
+  monthNumber?: number;
 }
 
 interface AssetTypeOption {

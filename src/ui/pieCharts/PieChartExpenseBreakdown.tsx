@@ -15,17 +15,20 @@ interface PieChartExpenseBreakdownProps {
 interface PieChartExpenseBreakdownTooltipProps {
   active?: boolean;
   payload?: any[];
-  t: (key: string) => string;
-  formatService: typeof formatService;
 }
 
-const PieChartExpenseBreakdownTooltip: React.FC<PieChartExpenseBreakdownTooltipProps> = ({ active, payload, t, formatService }) => {
+// Move tooltip component outside to avoid recreation on every render
+const PieChartExpenseBreakdownTooltip: React.FC<PieChartExpenseBreakdownTooltipProps> = ({ active, payload }) => {
+  const { t } = useTranslation();
+  
   if (!active || !payload?.length) return null;
   const data = payload[0]?.payload;
   if (!data) return null;
+  
   const name = data.type === 'liability'
     ? t(`liabilities.types.${data.category}`)
     : t(`expenses.categories.${data.category}`);
+    
   return (
     <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
       <p className="text-sm font-medium">{name}</p>
@@ -104,11 +107,7 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
                   />
                 ))}
               </Pie>
-              <Tooltip 
-                content={(props) => (
-                  <PieChartExpenseBreakdownTooltip {...props} t={t} formatService={formatService} />
-                )}
-              />
+              <Tooltip content={<PieChartExpenseBreakdownTooltip />} />
             </PieChart>
           </ResponsiveContainer>
         ) : (

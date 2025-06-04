@@ -17,7 +17,6 @@ interface DebugSettingsProps {
   onClearLogs: () => void;
   onAutoRefreshChange: (enabled: boolean) => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
-  getLogLevel: (message: string) => string;
   getLogLevelColor: (level: string) => string;
 }
 
@@ -32,7 +31,6 @@ const DebugSettings: React.FC<DebugSettingsProps> = ({
   onClearLogs,
   onAutoRefreshChange,
   formatLogEntry,
-  getLogLevel,
   getLogLevelColor
 }) => {
   return (
@@ -113,9 +111,8 @@ const DebugSettings: React.FC<DebugSettingsProps> = ({
               ) : (
                 logs.slice(-50).reverse().map((logEntry) => {
                   const { timestamp, message } = formatLogEntry(logEntry);
-                  const level = getLogLevel(message);
-                  const colorClass = getLogLevelColor(level);
-                  
+                  const colorClass = getLogLevelColor(message);
+
                   return (
                     <div key={`${timestamp}-${message.substring(0, 20)}`} className="text-xs font-mono border-b border-gray-200 dark:border-gray-700 pb-1 mb-1">
                       <div className="flex items-start space-x-2">

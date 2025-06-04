@@ -6,33 +6,45 @@ import { analytics } from "../service/analytics";
 import Logger from "../service/Logger/logger";
 import SettingsView from "../view/SettingsView";
 import { handleFileDownload } from "../service/helper/downloadFile";
-import { setCurrency, getCurrency } from "../service/stockAPIService/utils/fetch";
+import {
+  setCurrency,
+  getCurrency,
+} from "../service/stockAPIService/utils/fetch";
 
 const SettingsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
-  const apiConfig = useAppSelector(state => state.apiConfig);
-  
-  const [exportStatus, setExportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [importStatus, setImportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const apiConfig = useAppSelector((state) => state.apiConfig);
+
+  const [exportStatus, setExportStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
+  const [importStatus, setImportStatus] = useState<
+    "idle" | "loading" | "success" | "error"
+  >("idle");
   const [importError, setImportError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const [apiKeyStatus, setApiKeyStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
+  const [apiKeyStatus, setApiKeyStatus] = useState<
+    "idle" | "saving" | "success" | "error"
+  >("idle");
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
-  const [currency, setCurrencyState] = useState<'EUR' | 'USD'>('EUR');
-  const [clearDataStatus, setClearDataStatus] = useState<'idle' | 'clearing' | 'success'>('idle');
+  const [currency, setCurrencyState] = useState<"EUR" | "USD">("EUR");
+  const [clearDataStatus, setClearDataStatus] = useState<
+    "idle" | "clearing" | "success"
+  >("idle");
   const [isApiExpanded, setIsApiExpanded] = useState(false);
-  const [isDataManagementExpanded, setIsDataManagementExpanded] = useState(false);
+  const [isDataManagementExpanded, setIsDataManagementExpanded] =
+    useState(false);
   const [isClearDataExpanded, setIsClearDataExpanded] = useState(false);
 
   // Load API key and currency on mount
   useEffect(() => {
-    const storedApiKey = localStorage.getItem('finnhub_api_key');
+    const storedApiKey = localStorage.getItem("finnhub_api_key");
     if (storedApiKey) {
       dispatch(setApiKey(storedApiKey));
     }
-    
+
     const storedCurrency = getCurrency();
     setCurrencyState(storedCurrency);
   }, []);
@@ -189,15 +201,6 @@ const SettingsContainer: React.FC = () => {
     return { timestamp: "", message: logEntry };
   };
 
-  const getLogLevel = (message: string) => {
-    if (message.includes("‼️🆘 ERROR:")) return "error";
-    if (message.includes("⚠️ WARN:")) return "warning";
-    if (message.includes("ℹ️ INFO:")) return "info";
-    if (message.includes("⚙️ Service Call Info:")) return "service";
-    if (message.includes("👁️‍🗨️ Redux Log:")) return "redux";
-    return "debug";
-  };
-
   const getLogLevelColor = (level: string) => {
     switch (level) {
       case "error":
@@ -216,31 +219,19 @@ const SettingsContainer: React.FC = () => {
   };
 
   const handleApiKeyChange = async (newApiKey: string) => {
-    setApiKeyStatus('saving');
+    setApiKeyStatus("saving");
     setApiKeyError(null);
-    
+
     try {
-      // Validierung hier einbauen wenn nötig
-      // Handle this exception or don't catch it at all (API key save)
-      const handleApiKeySave = (newApiKey: string) => {
-        try {
-          dispatch(setApiKey(newApiKey));
-          dispatch(setApiEnabled(true));
-          setApiKeyStatus('success');
-          setTimeout(() => setApiKeyStatus('idle'), 2000);
-        } catch (error) {
-          setApiKeyError('Failed to save API key');
-          setApiKeyStatus('error');
-          setTimeout(() => setApiKeyStatus('idle'), 2000);
-          Logger.error('Failed to save API key');
-          // Optionally: Logger.error(error instanceof Error ? error.message : String(error));
-        }
-      };
+      dispatch(setApiKey(newApiKey));
+      dispatch(setApiEnabled(true));
+      setApiKeyStatus("success");
+      setTimeout(() => setApiKeyStatus("idle"), 2000);
     } catch (error) {
-      setApiKeyError('Failed to save API key');
-      setApiKeyStatus('error');
-      setTimeout(() => setApiKeyStatus('idle'), 2000);
-      Logger.error('Failed to save API key');
+      setApiKeyError("Failed to save API key");
+      setApiKeyStatus("error");
+      setTimeout(() => setApiKeyStatus("idle"), 2000);
+      Logger.error("Failed to save API key" + JSON.stringify(error));
     }
   };
 
@@ -253,21 +244,28 @@ const SettingsContainer: React.FC = () => {
     dispatch(setApiEnabled(enabled));
   };
 
-  const handleCurrencyChange = (newCurrency: 'EUR' | 'USD') => {
+  const handleCurrencyChange = (newCurrency: "EUR" | "USD") => {
     setCurrency(newCurrency);
     setCurrencyState(newCurrency);
     Logger.info(`Currency changed to ${newCurrency}`);
-    analytics.trackEvent("settings_currency_changed", { currency: newCurrency });
+    analytics.trackEvent("settings_currency_changed", {
+      currency: newCurrency,
+    });
   };
 
   // Handle clearing only financial data
   const handleClearPartialData = async () => {
     try {
-      setClearDataStatus('clearing');
-      Logger.infoService('Starting to clear financial data');
-      
+      setClearDataStatus("clearing");
+      Logger.infoService("Starting to clear financial data");
+
       // Get all items from each store to delete them
-      const stores: StoreNames[] = ['assets', 'liabilities', 'expenses', 'income'];
+      const stores: StoreNames[] = [
+        "assets",
+        "liabilities",
+        "expenses",
+        "income",
+      ];
       for (const store of stores) {
         const items = await sqliteService.getAll(store);
         for (const item of items) {
@@ -277,25 +275,31 @@ const SettingsContainer: React.FC = () => {
         }
       }
 
-      setClearDataStatus('success');
-      Logger.infoService('Financial data cleared successfully');
-      analytics.trackEvent('settings_clear_partial_data');
-      setTimeout(() => setClearDataStatus('idle'), 2000);
+      setClearDataStatus("success");
+      Logger.infoService("Financial data cleared successfully");
+      analytics.trackEvent("settings_clear_partial_data");
+      setTimeout(() => setClearDataStatus("idle"), 2000);
     } catch (error) {
-      Logger.error('Failed to clear financial data');
+      Logger.error("Failed to clear financial data" + JSON.stringify(error));
       // Optionally: Logger.error(error instanceof Error ? error.message : String(error));
-      setClearDataStatus('idle');
+      setClearDataStatus("idle");
     }
   };
 
   // Handle clearing all data
   const handleClearAllData = async () => {
     try {
-      setClearDataStatus('clearing');
-      Logger.infoService('Starting to clear all data');
-      
+      setClearDataStatus("clearing");
+      Logger.infoService("Starting to clear all data");
+
       // Clear all data from each store
-      const stores: StoreNames[] = ['assets', 'liabilities', 'expenses', 'income', 'exchangeRates'];
+      const stores: StoreNames[] = [
+        "assets",
+        "liabilities",
+        "expenses",
+        "income",
+        "exchangeRates",
+      ];
       for (const store of stores) {
         const items = await sqliteService.getAll(store);
         for (const item of items) {
@@ -307,20 +311,20 @@ const SettingsContainer: React.FC = () => {
 
       // Clear local storage
       localStorage.clear();
-      
+
       // Reset API key state
       dispatch(setApiKey(null));
       dispatch(setApiEnabled(false));
 
-      setClearDataStatus('success');
-      Logger.infoService('All data cleared successfully');
-      analytics.trackEvent('settings_clear_all_data');
-      setTimeout(() => setClearDataStatus('idle'), 2000);
+      setClearDataStatus("success");
+      Logger.infoService("All data cleared successfully");
+      analytics.trackEvent("settings_clear_all_data");
+      setTimeout(() => setClearDataStatus("idle"), 2000);
       window.location.reload();
     } catch (error) {
-      Logger.error('Failed to clear all data');
+      Logger.error("Failed to clear all data" + JSON.stringify(error));
       // Optionally: Logger.error(error instanceof Error ? error.message : String(error));
-      setClearDataStatus('idle');
+      setClearDataStatus("idle");
     }
   };
 
@@ -344,8 +348,12 @@ const SettingsContainer: React.FC = () => {
       isClearDataExpanded={isClearDataExpanded}
       onApiToggle={handleApiToggle}
       onApiExpandedChange={() => setIsApiExpanded(!isApiExpanded)}
-      onDataManagementExpandedChange={() => setIsDataManagementExpanded(!isDataManagementExpanded)}
-      onClearDataExpandedChange={() => setIsClearDataExpanded(!isClearDataExpanded)}
+      onDataManagementExpandedChange={() =>
+        setIsDataManagementExpanded(!isDataManagementExpanded)
+      }
+      onClearDataExpandedChange={() =>
+        setIsClearDataExpanded(!isClearDataExpanded)
+      }
       onExportData={handleExportData}
       onImportData={handleImportData}
       onToggleLogs={() => setShowLogs(!showLogs)}
@@ -359,7 +367,6 @@ const SettingsContainer: React.FC = () => {
       onClearPartialData={handleClearPartialData}
       onClearAllData={handleClearAllData}
       formatLogEntry={formatLogEntry}
-      getLogLevel={getLogLevel}
       getLogLevelColor={getLogLevelColor}
     />
   );
