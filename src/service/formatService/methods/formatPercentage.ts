@@ -5,8 +5,10 @@ export const formatPercentage = (value: number, options?: {
   maximumFractionDigits?: number;
 }): string => {
   Logger.infoService(`Formatting percentage: ${value}`);
-  return new Intl.NumberFormat('en-US', {
+  // Already in percentage form, no need to divide by 100
+  return new Intl.NumberFormat('de-DE', {
     style: 'percent',
-    minimumFractionDigits: options?.minimumFractionDigits ?? 0,
-    maximumFractionDigits: options?.maximumFractionDigits ?? 0,
-  }).format(value)};
+    minimumFractionDigits: options?.minimumFractionDigits ?? 2,
+    maximumFractionDigits: options?.maximumFractionDigits ?? 2,
+  }).format(value / 100)
+};

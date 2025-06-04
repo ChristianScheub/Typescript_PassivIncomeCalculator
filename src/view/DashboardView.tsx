@@ -95,61 +95,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({
       {/* Monatliche Übersicht */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700 overflow-x-hidden">
         <h3 className="text-lg font-semibold mb-4">{t('dashboard.monthlyOverview')}</h3>
-        
-        {/* Stock Info Section */}
-        <div className="mb-6">
-          <button
-            onClick={handleFetchStock}
-            className="mb-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            disabled={isLoadingStock}
-          >
-            <LineChart className="w-4 h-4 mr-2" />
-            {isLoadingStock ? t('common.loading') : t('dashboard.fetchAAPL')}
-          </button>
-          
-          {stockInfo && !stockInfo.error && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-              <div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Symbol</div>
-                <div className="font-semibold">{stockInfo.symbol}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Current Price</div>
-                <div className="font-semibold">{formatService.formatCurrency(stockInfo.price || 0)}</div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Change</div>
-                <div className={`font-semibold ${(stockInfo.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {stockInfo.change ? `${stockInfo.change >= 0 ? '+' : ''}${stockInfo.change.toFixed(2)}` : '-'}
-                </div>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500 dark:text-gray-400">Change %</div>
-                <div className={`font-semibold ${(stockInfo.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {stockInfo.changePercent ? `${stockInfo.changePercent >= 0 ? '+' : ''}${stockInfo.changePercent.toFixed(2)}%` : '-'}
-                </div>
-              </div>
-            </div>
-          )}
-          
-          {stockInfo?.error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-800">
-              <div className="flex items-center space-x-2">
-                <div className="text-red-600 dark:text-red-400">
-                  ⚠️ {stockInfo.error}
-                </div>
-              </div>
-              {stockInfo.needsApiKey && (
-                <button
-                  onClick={handleSettingsClick}
-                  className="mt-2 text-sm text-red-600 dark:text-red-400 underline hover:text-red-700 dark:hover:text-red-300"
-                >
-                  Go to Settings to configure API key
-                </button>
-              )}
-            </div>
-          )}
-        </div>
 
         <div className="grid grid-cols-2 gap-4 overflow-x-hidden">
           {/* Einkommen */}
@@ -247,6 +192,60 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           <span className="font-semibold truncate">Assetkalender</span>
         </button>
       </div>
+              {/* Stock Info Section */}
+        <div className="mb-6">
+          <button
+            onClick={handleFetchStock}
+            className="mb-4 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            disabled={isLoadingStock}
+          >
+            <LineChart className="w-4 h-4 mr-2" />
+            {isLoadingStock ? t('common.loading') : t('dashboard.fetchAAPL')}
+          </button>
+          
+          {stockInfo && !stockInfo.error && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+              <div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Symbol</div>
+                <div className="font-semibold">{stockInfo.symbol}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Current Price</div>
+                <div className="font-semibold">{formatService.formatCurrency(stockInfo.price || 0)}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Change</div>
+                <div className={`font-semibold ${(stockInfo.change || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {stockInfo.change ? `${stockInfo.change >= 0 ? '+' : ''}${stockInfo.change.toFixed(2)}` : '-'}
+                </div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Change %</div>
+                <div className={`font-semibold ${(stockInfo.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {stockInfo.changePercent ? `${stockInfo.changePercent >= 0 ? '+' : ''}${stockInfo.changePercent.toFixed(2)}%` : '-'}
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {stockInfo?.error && (
+            <div className="p-4 bg-red-50 dark:bg-red-900/30 rounded-lg border border-red-200 dark:border-red-800">
+              <div className="flex items-center space-x-2">
+                <div className="text-red-600 dark:text-red-400">
+                  ⚠️ {stockInfo.error}
+                </div>
+              </div>
+              {stockInfo.needsApiKey && (
+                <button
+                  onClick={handleSettingsClick}
+                  className="mt-2 text-sm text-red-600 dark:text-red-400 underline hover:text-red-700 dark:hover:text-red-300"
+                >
+                  Go to Settings to configure API key
+                </button>
+              )}
+            </div>
+          )}
+        </div>
     </div>
   );
 };

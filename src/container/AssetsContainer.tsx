@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { fetchAssets, addAsset, updateAsset, deleteAsset, updateAssetDividendCache } from '../store/slices/assetsSlice';
+import { fetchAssets, addAsset, updateAsset, deleteAsset, updateAssetDividendCache, updateStockPrices } from '../store/slices/assetsSlice';
 import { Asset, AssetType } from '../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../service/Logger/logger';
@@ -10,6 +10,7 @@ import { AssetsView } from '../view/AssetsView';
 import { createDividendCacheService } from '../service/dividendCacheService';
 import { createCachedDividends } from '../utils/dividendCacheUtils';
 import { sortAssets } from '../utils/sortingUtils';
+import { StockPriceUpdater } from '../service/helper/stockPriceUpdater';
 
 const AssetsContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ const AssetsContainer: React.FC = () => {
   const { items: assets, status } = useAppSelector(state => state.assets);
   const [isAddingAsset, setIsAddingAsset] = useState(false);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
+  const [isUpdatingPrices, setIsUpdatingPrices] = useState(false);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -72,6 +74,28 @@ const AssetsContainer: React.FC = () => {
     };
   }, [assets, calculateAssetMonthlyIncome]);
 
+  const totalInitialValue = useMemo(() => {
+    return assets.reduce((sum, asset) => {
+      if (asset.type === 'stock') {
+        // Use 0 as fallback if either purchasePrice or quantity is undefined
+        const price = asset.purchasePrice || 0;
+        const quantity = asset.quantity || 0;
+        return sum + (price * quantity);
+      } else {
+        // For non-stock assets, use 0 as fallback if purchasePrice is undefined
+        return sum + (asset.purchasePrice || 0);
+      }
+    }, 0);
+  }, [assets]);
+
+  const totalValueDifference = useMemo(() => {
+    return totalAssetValue - totalInitialValue;
+  }, [totalAssetValue, totalInitialValue]);
+
+  const totalPercentageDifference = useMemo(() => {
+    return totalInitialValue > 0 ? (totalValueDifference / totalInitialValue) * 100 : 0;
+  }, [totalValueDifference, totalInitialValue]);
+
   const handleAddAsset = async (data: any) => {
     try {
       Logger.info('Adding new asset' + " - " + JSON.stringify(data));
@@ -109,6 +133,18 @@ const AssetsContainer: React.FC = () => {
       try {
         Logger.info('Updating asset' + " - " + JSON.stringify({ id: editingAsset.id, data }));
         analytics.trackEvent('asset_update', { id: editingAsset.id, type: data.type });
+        
+        // Calculate value and percentage difference for stock assets
+        if (data.type === 'stock' && data.quantity && data.currentPrice && data.purchasePrice) {
+          const currentValue = data.quantity * data.currentPrice;
+          const purchaseValue = data.quantity * data.purchasePrice;
+          const difference = currentValue - purchaseValue;
+          const percentageDiff = purchaseValue > 0 ? ((currentValue - purchaseValue) / purchaseValue) * 100 : 0;
+          data.valueDifference = difference !== 0 ? difference : undefined;
+          data.percentageDifference = difference !== 0 ? percentageDiff : undefined;
+          data.value = currentValue; // Ensure value is set based on quantity * currentPrice
+        }
+        
         await dispatch(updateAsset({ ...data, id: editingAsset.id }));
         setEditingAsset(null);
         
@@ -181,15 +217,52 @@ const AssetsContainer: React.FC = () => {
     });
   }, [assets, dispatch]);
 
+  const handleUpdateStockPrices = async () => {
+    setIsUpdatingPrices(true);
+    try {
+      Logger.info('Starting stock price update');
+      const updatedStocks = await StockPriceUpdater.updateStockPrices(assets);
+      if (updatedStocks.length > 0) {
+        Logger.info(`Dispatching price updates for ${updatedStocks.length} stocks`);
+        await dispatch(updateStockPrices(updatedStocks));
+        
+        // Re-calculate cache for updated stocks since their values have changed
+        updatedStocks.forEach(asset => {
+          const result = calculatorService.calculateAssetMonthlyIncomeWithCache?.(asset);
+          if (result?.cacheDataToUpdate) {
+            const cachedDividends = createCachedDividends(
+              result.cacheDataToUpdate.monthlyAmount,
+              result.cacheDataToUpdate.annualAmount,
+              result.cacheDataToUpdate.monthlyBreakdown,
+              asset
+            );
+            dispatch(updateAssetDividendCache({ assetId: asset.id, cachedDividends }));
+          }
+        });
+
+        Logger.info('Successfully updated stock prices and recalculated caches');
+      } else {
+        Logger.info('No stocks were updated');
+      }
+    } catch (error) {
+      Logger.error('Failed to update stock prices' + ' - ' + JSON.stringify(error as Error));
+    } finally {
+      setIsUpdatingPrices(false);
+    }
+  };
+
   return (
     <AssetsView
       assets={sortedAssets}
       status={status}
       totalAssetValue={totalAssetValue}
+      totalValueDifference={totalValueDifference}
+      totalPercentageDifference={totalPercentageDifference}
       monthlyAssetIncome={monthlyAssetIncome}
       annualAssetIncome={annualAssetIncome}
       isAddingAsset={isAddingAsset}
       editingAsset={editingAsset}
+      isUpdatingPrices={isUpdatingPrices}
       calculateAssetMonthlyIncome={calculateAssetMonthlyIncome}
       getAssetTypeLabel={getAssetTypeLabel}
       onAddAsset={handleAddAsset}
@@ -197,6 +270,7 @@ const AssetsContainer: React.FC = () => {
       onDeleteAsset={handleDeleteAsset}
       onSetIsAddingAsset={setIsAddingAsset}
       onSetEditingAsset={setEditingAsset}
+      onUpdateStockPrices={handleUpdateStockPrices}
     />
   );
 };

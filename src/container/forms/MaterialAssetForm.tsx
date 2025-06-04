@@ -101,9 +101,21 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
         
         // For stocks, ensure value is calculated from quantity * currentPrice
         let finalValue = data.value;
+        let valueDifference;
+        let percentageDifference;
+
         if (data.type === 'stock' && data.quantity && data.currentPrice) {
           finalValue = data.quantity * data.currentPrice;
+          if (data.purchasePrice) {
+            const purchaseValue = data.quantity * data.purchasePrice;
+            valueDifference = finalValue - purchaseValue;
+            if (valueDifference !== 0) {
+              percentageDifference = purchaseValue > 0 ? ((finalValue - purchaseValue) / purchaseValue) * 100 : 0;
+            }
+          }
           Logger.info(`Stock value calculated: ${data.quantity} × ${data.currentPrice} = ${finalValue}`);
+          Logger.info(`Value difference: ${valueDifference}`);
+          Logger.info(`Percentage difference: ${percentageDifference}%`);
         }
         
         // Create the base transformed data
@@ -111,11 +123,12 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
           id: initialData?.id || Date.now().toString(),
           name: data.name,
           type: data.type,
-          value: finalValue || 0,
+          value: finalValue || data.value || 0,
           createdAt: initialData?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
           purchaseDate: data.purchaseDate,
-          // Add common optional fields
+          valueDifference,
+          percentageDifference,
           country: data.country,
           continent: data.continent,
           sector: data.sector,
@@ -125,17 +138,17 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
         // Add type-specific fields based on asset type
         switch (data.type) {
           case 'stock':
+            transformedData.ticker = data.ticker;
             transformedData.quantity = data.quantity;
             transformedData.purchasePrice = data.purchasePrice;
             transformedData.currentPrice = data.currentPrice;
-            transformedData.ticker = data.ticker;
             if (data.dividendFrequency && data.dividendFrequency !== 'none') {
               transformedData.dividendInfo = {
                 frequency: data.dividendFrequency,
                 amount: data.dividendAmount || 0,
-                months: data.dividendMonths || [],
-                paymentMonths: data.dividendPaymentMonths || [],
-                customAmounts: data.customDividendAmounts || {}
+                months: data.dividendMonths,
+                paymentMonths: data.dividendPaymentMonths,
+                customAmounts: data.customDividendAmounts,
               };
             }
             break;
@@ -144,7 +157,8 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
             transformedData.propertyValue = data.propertyValue;
             if (data.rentalAmount) {
               transformedData.rentalIncome = {
-                amount: data.rentalAmount
+                amount: data.rentalAmount,
+                frequency: 'monthly',
               };
             }
             break;
@@ -153,10 +167,6 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
             transformedData.interestRate = data.interestRate;
             transformedData.maturityDate = data.maturityDate;
             transformedData.nominalValue = data.nominalValue;
-            break;
-            
-          case 'cash':
-            transformedData.interestRate = data.interestRate;
             break;
 
           case 'crypto':
@@ -170,6 +180,7 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
         Logger.info('Form submission completed successfully');
       } catch (error) {
         Logger.error('Form submission error: ' + JSON.stringify(error));
+        throw error;
       }
     }
   });
@@ -186,8 +197,6 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
   // Watch fields that affect validation
   const assetType = watch('type');
   const dividendFrequency = watch('dividendFrequency');
-  
-  // Calculate value for stocks based on quantity and currentPrice
   const quantity = watch('quantity');
   const currentPrice = watch('currentPrice');
   

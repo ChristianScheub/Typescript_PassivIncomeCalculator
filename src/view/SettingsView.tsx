@@ -23,6 +23,7 @@ interface SettingsViewProps {
   apiKeyStatus: 'idle' | 'saving' | 'success' | 'error';
   apiKeyError: string | null;
   currency: 'EUR' | 'USD';
+  clearDataStatus?: 'idle' | 'clearing' | 'success';
   onThemeChange: () => void;
   onExportData: () => void;
   onImportData: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -34,6 +35,8 @@ interface SettingsViewProps {
   onApiKeyChange: (apiKey: string) => void;
   onApiKeyRemove: () => void;
   onCurrencyChange: (currency: 'EUR' | 'USD') => void;
+  onClearPartialData: () => void;
+  onClearAllData: () => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
   getLogLevel: (message: string) => string;
   getLogLevelColor: (level: string) => string;
@@ -52,6 +55,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   apiKeyStatus,
   apiKeyError,
   currency,
+  clearDataStatus = 'idle',
   onThemeChange,
   onExportData,
   onImportData,
@@ -63,6 +67,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onApiKeyChange,
   onApiKeyRemove,
   onCurrencyChange,
+  onClearPartialData,
+  onClearAllData,
   formatLogEntry,
   getLogLevel,
   getLogLevelColor
@@ -292,6 +298,64 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 </span>
               </Button>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Clear Data Section */}
+      <Card className="bg-white dark:bg-gray-800 border-red-200 dark:border-red-800">
+        <CardHeader>
+          <CardTitle className="text-red-600 dark:text-red-400">
+            {t('settings.clearData')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Clear Financial Data */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">{t('settings.clearPartialData')}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('settings.clearPartialDataDescription')}
+              </p>
+            </div>
+            <Button
+              onClick={() => {
+                if (window.confirm(t('settings.confirmClearPartialData'))) {
+                  onClearPartialData();
+                }
+              }}
+              disabled={clearDataStatus === 'clearing'}
+              variant="destructive"
+              className="flex items-center space-x-2"
+            >
+              {clearDataStatus === 'clearing' ? t('settings.clearingData') :
+               clearDataStatus === 'success' ? t('settings.dataCleared') :
+               t('settings.clearPartialData')}
+            </Button>
+          </div>
+
+          {/* Clear All Data */}
+          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div>
+              <h3 className="font-medium">{t('settings.clearAllData')}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('settings.clearAllDataDescription')}
+              </p>
+            </div>
+            <Button
+              onClick={() => {
+                if (window.confirm(t('settings.confirmClearAllData'))) {
+                  onClearAllData();
+                }
+              }}
+              disabled={clearDataStatus === 'clearing'}
+              variant="destructive"
+              className="flex items-center space-x-2"
+            >
+              {clearDataStatus === 'clearing' ? t('settings.clearingData') :
+               clearDataStatus === 'success' ? t('settings.dataCleared') :
+               t('settings.clearAllData')}
+            </Button>
           </div>
         </CardContent>
       </Card>

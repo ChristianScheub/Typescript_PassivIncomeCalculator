@@ -60,6 +60,9 @@ export interface Asset extends BaseEntity {
   quantity?: number;
   purchasePrice?: number;
   currentPrice?: number;
+  lastPriceUpdate?: string;  // New field for price update timestamp
+  valueDifference?: number; // New field for storing value difference
+  percentageDifference?: number; // New field for storing percentage difference
   ticker?: string;
   interestRate?: number;
   maturityDate?: string;
@@ -78,6 +81,7 @@ export interface Asset extends BaseEntity {
   };
   rentalIncome?: {
     amount: number;
+    frequency: PaymentFrequency;
   };
   notes?: string;
   cachedDividends?: CachedDividends;

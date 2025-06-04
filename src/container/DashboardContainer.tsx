@@ -24,13 +24,13 @@ const DashboardContainer: React.FC = () => {
 
   // Get the calculated values from the dashboard store
   const {
-    totalMonthlyIncome,
-    totalMonthlyExpenses,
-    totalLiabilityPayments,
+    monthlyIncome,
+    monthlyExpenses,
+    monthlyLiabilityPayments,
     monthlyAssetIncome,
     passiveIncome,
-    totalAssetValue,
-    totalLiabilityValue,
+    totalAssets,
+    totalLiabilities,
     netWorth,
     monthlyCashFlow,
     passiveIncomeRatio,
@@ -52,10 +52,10 @@ const DashboardContainer: React.FC = () => {
     analytics.trackEvent('settings_click', { 
       page: 'dashboard',
       netWorth,
-      totalAssets: totalAssetValue,
-      totalLiabilities: totalLiabilityValue,
-      monthlyIncome: totalMonthlyIncome,
-      monthlyExpenses: totalMonthlyExpenses,
+      totalAssets,
+      totalLiabilities,
+      monthlyIncome,
+      monthlyExpenses,
       monthlyCashFlow,
       passiveIncomeRatio
     });
@@ -96,10 +96,10 @@ const DashboardContainer: React.FC = () => {
     analytics.trackEvent('page_view', { 
       page: 'dashboard',
       netWorth,
-      totalAssets: totalAssetValue,
-      totalLiabilities: totalLiabilityValue,
-      monthlyIncome: totalMonthlyIncome,
-      monthlyExpenses: totalMonthlyExpenses,
+      totalAssets,
+      totalLiabilities,
+      monthlyIncome,
+      monthlyExpenses,
       monthlyCashFlow,
       passiveIncomeRatio
     });
@@ -108,11 +108,11 @@ const DashboardContainer: React.FC = () => {
   return (
     <DashboardView
       netWorth={netWorth}
-      totalAssets={totalAssetValue}
-      totalLiabilities={totalLiabilityValue}
-      monthlyIncome={totalMonthlyIncome}
-      monthlyExpenses={totalMonthlyExpenses}
-      monthlyLiabilityPayments={totalLiabilityPayments}
+      totalAssets={totalAssets}
+      totalLiabilities={totalLiabilities}
+      monthlyIncome={monthlyIncome}
+      monthlyExpenses={monthlyExpenses}
+      monthlyLiabilityPayments={monthlyLiabilityPayments}
       monthlyAssetIncome={monthlyAssetIncome}
       passiveIncome={passiveIncome}
       monthlyCashFlow={monthlyCashFlow}

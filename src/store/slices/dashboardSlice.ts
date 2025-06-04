@@ -1,36 +1,42 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { AssetAllocation } from '../../types';
-import calculatorService from '../../service/calculatorService';
 import { RootState } from '..';
+import calculatorService from '../../service/calculatorService';
 import Logger from '../../service/Logger/logger';
-import { hydrateStore } from '../actions/hydrateAction';
 
 interface DashboardState {
-  totalMonthlyIncome: number;
-  totalMonthlyExpenses: number;
-  totalLiabilityPayments: number;
+  netWorth: number;
+  totalAssets: number;
+  totalLiabilities: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  monthlyLiabilityPayments: number;
   monthlyAssetIncome: number;
   passiveIncome: number;
-  totalAssetValue: number;
-  totalLiabilityValue: number;
-  netWorth: number;
   monthlyCashFlow: number;
   passiveIncomeRatio: number;
-  assetAllocation: AssetAllocation[];
+  assetAllocation: Array<{ name: string; type: string; value: number; percentage: number }>;
+  totalAssetGain: number;
+  totalAssetGainPercentage: number;
+  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  error: string | null;
 }
 
 const initialState: DashboardState = {
-  totalMonthlyIncome: 0,
-  totalMonthlyExpenses: 0,
-  totalLiabilityPayments: 0,
+  netWorth: 0,
+  totalAssets: 0,
+  totalLiabilities: 0,
+  monthlyIncome: 0,
+  monthlyExpenses: 0,
+  monthlyLiabilityPayments: 0,
   monthlyAssetIncome: 0,
   passiveIncome: 0,
-  totalAssetValue: 0,
-  totalLiabilityValue: 0,
-  netWorth: 0,
   monthlyCashFlow: 0,
   passiveIncomeRatio: 0,
   assetAllocation: [],
+  totalAssetGain: 0,
+  totalAssetGainPercentage: 0,
+  status: 'idle',
+  error: null
 };
 
 // Thunk to recalculate all dashboard values
@@ -42,9 +48,9 @@ export const updateDashboardValues = createAsyncThunk(
     const { assets, income, expenses, liabilities } = state;
 
     // Calculate all values
-    const totalMonthlyIncome = calculatorService.calculateTotalMonthlyIncome(income.items);
-    const totalMonthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses.items);
-    const totalLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities.items);
+    const monthlyIncome = calculatorService.calculateTotalMonthlyIncome(income.items);
+    const monthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses.items);
+    const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities.items);
 
     // Use cached calculation for monthly asset income
     const monthlyAssetIncome = calculatorService.calculateTotalMonthlyAssetIncomeWithCache
@@ -55,40 +61,56 @@ export const updateDashboardValues = createAsyncThunk(
     const passiveIncome = calculatorService.calculatePassiveIncome(income.items);
 
     // Calculate derived values
-    const totalAssetValue = calculatorService.calculateTotalAssetValue(assets.items);
-    const totalLiabilityValue = calculatorService.calculateTotalDebt(liabilities.items);
-    const netWorth = calculatorService.calculateNetWorth(totalAssetValue, totalLiabilityValue);
+    const totalAssets = calculatorService.calculateTotalAssetValue(assets.items);
+    const totalLiabilities = calculatorService.calculateTotalDebt(liabilities.items);
+    const netWorth = calculatorService.calculateNetWorth(totalAssets, totalLiabilities);
 
     const monthlyCashFlow = calculatorService.calculateMonthlyCashFlow(
-      totalMonthlyIncome + monthlyAssetIncome,
-      totalMonthlyExpenses,
-      totalLiabilityPayments
+      monthlyIncome + monthlyAssetIncome,
+      monthlyExpenses,
+      monthlyLiabilityPayments
     );
-    const passiveIncomeRatio = calculatorService.calculatePassiveIncomeRatio(totalMonthlyIncome, passiveIncome);
+    
+    const passiveIncomeRatio = calculatorService.calculatePassiveIncomeRatio(monthlyIncome, passiveIncome);
     const assetAllocation = calculatorService.calculateAssetAllocation(assets.items);
 
-    const values = {
-      totalMonthlyIncome,
-      totalMonthlyExpenses,
-      totalLiabilityPayments,
-      monthlyAssetIncome,
-      passiveIncome,
-      totalAssetValue,
-      totalLiabilityValue,
-      netWorth,
-      monthlyCashFlow,
-      passiveIncomeRatio,
-      assetAllocation,
-    };
+    // Calculate total asset gain and percentage directly in the thunk
+    const totalInitialInvestment = assets.items.reduce((sum, asset) => {
+      if (asset.type === 'stock') {
+        return sum + (asset.purchasePrice || 0) * (asset.quantity || 0);
+      }
+      return sum + (asset.purchasePrice || 0);
+    }, 0);
+
+    const totalAssetGain = totalAssets - totalInitialInvestment;
+    const totalAssetGainPercentage = totalInitialInvestment > 0 
+      ? (totalAssetGain / totalInitialInvestment) * 100 
+      : 0;
 
     Logger.infoRedux(`Dashboard values updated: ${JSON.stringify({
-      monthlyIncome: totalMonthlyIncome,
-      monthlyExpenses: totalMonthlyExpenses,
+      monthlyIncome,
+      monthlyExpenses,
       netWorth,
       passiveIncomeRatio: Math.round(passiveIncomeRatio * 100) / 100
     })}`);
 
-    return values;
+    return {
+      netWorth,
+      totalAssets,
+      totalLiabilities,
+      monthlyIncome,
+      monthlyExpenses,
+      monthlyLiabilityPayments,
+      monthlyAssetIncome,
+      passiveIncome,
+      monthlyCashFlow,
+      passiveIncomeRatio,
+      assetAllocation,
+      totalAssetGain,
+      totalAssetGainPercentage,
+      status: 'succeeded' as const,
+      error: null
+    } as DashboardState;
   }
 );
 
@@ -99,6 +121,7 @@ const dashboardSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(updateDashboardValues.pending, (state) => {
+        state.status = 'loading';
         Logger.infoRedux('Updating dashboard values...');
       })
       .addCase(updateDashboardValues.fulfilled, (state, action) => {
@@ -106,20 +129,13 @@ const dashboardSlice = createSlice({
         return {
           ...state,
           ...action.payload,
+          status: 'succeeded'
         };
       })
       .addCase(updateDashboardValues.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'An error occurred';
         Logger.infoRedux(`Failed to update dashboard values: ${action.error.message}`);
-      })
-      .addCase(hydrateStore, (state, action) => {
-        if (action.payload.dashboard) {
-          Logger.infoRedux('Hydrating dashboard state');
-          return {
-            ...state,
-            ...action.payload.dashboard
-          };
-        }
-        return state;
       });
   },
 });

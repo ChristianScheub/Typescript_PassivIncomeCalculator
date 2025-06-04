@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTheme } from "../hooks/useTheme";
-import sqliteService from "../service/sqlLiteService";
+import sqliteService, { StoreNames } from "../service/sqlLiteService";
 import { analytics } from "../service/analytics";
 import Logger from "../service/Logger/logger";
 import SettingsView from "../view/SettingsView";
@@ -9,22 +9,17 @@ import { setApiKey, removeApiKey, getCurrency, setCurrency } from "../service/st
 
 const SettingsContainer: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
-  const [exportStatus, setExportStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-  const [importStatus, setImportStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [exportStatus, setExportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [importStatus, setImportStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [importError, setImportError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [apiKey, setApiKeyState] = useState<string>("");
-  const [apiKeyStatus, setApiKeyStatus] = useState<
-    "idle" | "saving" | "success" | "error"
-  >("idle");
+  const [apiKeyStatus, setApiKeyStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const [currency, setCurrencyState] = useState<'EUR' | 'USD'>('EUR');
+  const [clearDataStatus, setClearDataStatus] = useState<'idle' | 'clearing' | 'success'>('idle');
 
   // Load API key and currency on mount
   useEffect(() => {
@@ -263,6 +258,74 @@ const SettingsContainer: React.FC = () => {
     analytics.trackEvent("settings_currency_changed", { currency: newCurrency });
   };
 
+  // Handle clearing only financial data
+  const handleClearPartialData = async () => {
+    try {
+      setClearDataStatus('clearing');
+      Logger.infoService('Starting to clear financial data');
+      
+      // Get all items from each store to delete them
+      const stores: StoreNames[] = ['assets', 'liabilities', 'expenses', 'income'];
+      for (const store of stores) {
+        const items = await sqliteService.getAll(store);
+        for (const item of items) {
+          if (item.id) {
+            await sqliteService.remove(store, item.id.toString());
+          }
+        }
+      }
+
+      setClearDataStatus('success');
+      Logger.infoService('Financial data cleared successfully');
+      analytics.trackEvent('settings_clear_partial_data');
+
+      // Reset status after a delay
+      setTimeout(() => setClearDataStatus('idle'), 2000);
+    } catch (error) {
+      Logger.error('Failed to clear financial data');
+      setClearDataStatus('idle');
+    }
+  };
+
+  // Handle clearing all data
+  const handleClearAllData = async () => {
+    try {
+      setClearDataStatus('clearing');
+      Logger.infoService('Starting to clear all data');
+      
+      // Clear all data from each store
+      const stores: StoreNames[] = ['assets', 'liabilities', 'expenses', 'income', 'exchangeRates'];
+      for (const store of stores) {
+        const items = await sqliteService.getAll(store);
+        for (const item of items) {
+          if (item.id) {
+            await sqliteService.remove(store, item.id.toString());
+          }
+        }
+      }
+
+      // Clear local storage
+      localStorage.clear();
+      
+      // Reset API key state
+      setApiKeyState('');
+      setApiKey('');
+
+      setClearDataStatus('success');
+      Logger.infoService('All data cleared successfully');
+      analytics.trackEvent('settings_clear_all_data');
+
+      // Reset status after a delay
+      setTimeout(() => setClearDataStatus('idle'), 2000);
+
+      // Reload the page to reset all state
+      window.location.reload();
+    } catch (error) {
+      Logger.error('Failed to clear all data');
+      setClearDataStatus('idle');
+    }
+  };
+
   return (
     <SettingsView
       theme={theme}
@@ -277,6 +340,7 @@ const SettingsContainer: React.FC = () => {
       apiKeyStatus={apiKeyStatus}
       apiKeyError={apiKeyError}
       currency={currency}
+      clearDataStatus={clearDataStatus}
       onThemeChange={handleThemeChange}
       onExportData={handleExportData}
       onImportData={handleImportData}
@@ -288,6 +352,8 @@ const SettingsContainer: React.FC = () => {
       onApiKeyChange={handleApiKeyChange}
       onApiKeyRemove={handleApiKeyRemove}
       onCurrencyChange={handleCurrencyChange}
+      onClearPartialData={handleClearPartialData}
+      onClearAllData={handleClearAllData}
       formatLogEntry={formatLogEntry}
       getLogLevel={getLogLevel}
       getLogLevelColor={getLogLevelColor}

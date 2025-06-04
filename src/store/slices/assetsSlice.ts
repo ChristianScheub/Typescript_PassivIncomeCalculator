@@ -86,6 +86,25 @@ export const deleteAsset = createAsyncThunk('assets/deleteAsset', async (id: str
   return id;
 });
 
+// New action to update stock prices
+export const updateStockPrices = createAsyncThunk('assets/updateStockPrices', 
+  async (updatedStocks: Asset[]) => {
+    try {
+      Logger.infoRedux(`Updating prices for ${updatedStocks.length} stocks`);
+      
+      // Update each stock in SQLite
+      for (const stock of updatedStocks) {
+        await sqliteService.update('assets', stock);
+      }
+      
+      return updatedStocks;
+    } catch (error) {
+      Logger.infoRedux(`Failed to update stock prices: ${JSON.stringify(error)}`);
+      throw error;
+    }
+  }
+);
+
 // Slice
 const assetsSlice = createSlice({
   name: 'assets',
@@ -165,6 +184,25 @@ const assetsSlice = createSlice({
       // Delete asset
       .addCase(deleteAsset.fulfilled, (state, action) => {
         state.items = state.items.filter(asset => asset.id !== action.payload);
+      })
+      
+      // Update stock prices
+      .addCase(updateStockPrices.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(updateStockPrices.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        // Update the prices in state
+        action.payload.forEach(updatedStock => {
+          const index = state.items.findIndex(item => item.id === updatedStock.id);
+          if (index !== -1) {
+            state.items[index] = updatedStock;
+          }
+        });
+      })
+      .addCase(updateStockPrices.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message || 'Failed to update stock prices';
       });
   }
 });
