@@ -237,6 +237,9 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
                     disabled={true}
                     helperText={t('assets.form.calculatedValueHelper')}
                   />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {t('assets.calculatedValue')}: {formatService.formatCurrency(quantity * currentPrice)}
+                  </p>
                 </Grid>
               )}
               <Grid sx={{ gridColumn: { xs: 'span 12', md: 'span 6' } }} component="div">

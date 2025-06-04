@@ -56,7 +56,9 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
   const toggleMonthDetails = () => setIsMonthDetailsExpanded(!isMonthDetailsExpanded);
 
   const getBarColorByMonth = (month: string) => {
-    return selectedMonthData && selectedMonthData.name === month ? '#3B82F6' : '#E5E7EB';
+    // Find the corresponding chart data entry
+    const chartEntry = chartData.find(entry => entry.month === month);
+    return chartEntry?.isSelected ? '#3B82F6' : '#E5E7EB';
   };
 
   return (

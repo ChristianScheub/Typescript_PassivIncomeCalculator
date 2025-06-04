@@ -74,6 +74,23 @@ export function getCachedDividendData(asset: Asset): CachedDividends | null {
 }
 
 /**
+ * Determines if the dividend cache should be invalidated by comparing two assets
+ */
+export function shouldInvalidateCache(oldAsset: Asset, newAsset: Asset): boolean {
+  // If there's no cache in the old asset, no need to invalidate
+  if (!oldAsset.cachedDividends) {
+    return false;
+  }
+  
+  // Generate hashes for both assets and compare
+  const oldHash = generateDividendCalculationHash(oldAsset);
+  const newHash = generateDividendCalculationHash(newAsset);
+  
+  // If hashes are different, cache should be invalidated
+  return oldHash !== newHash;
+}
+
+/**
  * Compare function for sorting strings alphabetically using localeCompare
  */
 export function compareAlphabetically(a: string, b: string): number {
