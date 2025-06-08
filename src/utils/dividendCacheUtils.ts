@@ -20,13 +20,22 @@ function simpleHash(str: string): string {
  * Generates a hash for dividend calculation parameters to detect changes
  */
 export function generateDividendCalculationHash(asset: Asset): string {
+  // Use assetDefinition data only (legacy fields have been removed from Asset interface)
+  const dividendInfo = asset.assetDefinition?.dividendInfo;
+  const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
+  const rentalInfo = asset.assetDefinition?.rentalInfo;
+  
   const relevantData = {
-    dividendInfo: asset.dividendInfo,
-    quantity: asset.quantity,
+    dividendInfo: dividendInfo,
+    currentQuantity: asset.currentQuantity,
+    purchaseQuantity: asset.purchaseQuantity,
     currentPrice: asset.currentPrice,
     type: asset.type,
-    interestRate: asset.interestRate,
-    value: asset.value
+    interestRate: interestRate,
+    value: asset.value,
+    rentalInfo: rentalInfo,
+    // Include assetDefinitionId to detect when definition changes
+    assetDefinitionId: asset.assetDefinitionId
   };
 
   const dataString = JSON.stringify(relevantData, Object.keys(relevantData).sort(compareAlphabetically));

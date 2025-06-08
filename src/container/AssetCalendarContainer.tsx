@@ -122,7 +122,8 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
       const basicMonthly = calculatorService.calculateAssetMonthlyIncome(asset);
       Logger.cache(`Basic monthly calculation for ${asset.name}: ${basicMonthly}`);
       
-      const isMonthlyDividendStock = asset.type === 'stock' && asset.dividendInfo?.frequency === 'monthly';
+      const dividendInfo = asset.assetDefinition?.dividendInfo;
+      const isMonthlyDividendStock = asset.type === 'stock' && dividendInfo?.frequency === 'monthly';
       if (isMonthlyDividendStock && calculatedIncome === 0 && basicMonthly > 0) {
         Logger.cache(`Using basic monthly calculation as fallback for ${asset.name}: ${basicMonthly}`);
         return basicMonthly;
@@ -141,7 +142,8 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
     Logger.cache(`Asset details - Type: ${asset.type}, Value: ${asset.value}`);
     if (asset.type === 'stock') {
       const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
-      Logger.cache(`Stock details - Quantity: ${quantity}, DividendInfo: ${JSON.stringify(asset.dividendInfo)}`);
+      const dividendInfo = asset.assetDefinition?.dividendInfo;
+      Logger.cache(`Stock details - Quantity: ${quantity}, DividendInfo: ${JSON.stringify(dividendInfo)}`);
     }
     
     // Try cached calculation first
@@ -166,14 +168,24 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
     // Log asset details for debugging
     filteredAssets.forEach(asset => {
       Logger.info(`Asset: ${asset.name} (${asset.type}) - Value: ${asset.value}`);
-      if (asset.type === 'stock' && asset.dividendInfo) {
-        Logger.info(`  Dividend Info: frequency=${asset.dividendInfo.frequency}, amount=${asset.dividendInfo.amount}`);
+      
+      // Check dividend info from AssetDefinition or legacy Asset fields
+      const dividendInfo = asset.assetDefinition?.dividendInfo;
+      if (asset.type === 'stock' && dividendInfo) {
+        Logger.info(`  Dividend Info: frequency=${dividendInfo.frequency}, amount=${dividendInfo.amount} (source: definition)`);
       }
-      if (asset.type === 'bond' && asset.interestRate) {
-        Logger.info(`  Interest Rate: ${asset.interestRate}%`);
+      
+      // Check interest rate from AssetDefinition or legacy Asset fields
+      const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
+      if (asset.type === 'bond' && interestRate) {
+        Logger.info(`  Interest Rate: ${interestRate}% (source: definition)`);
       }
-      if (asset.type === 'real_estate' && asset.rentalIncome) {
-        Logger.info(`  Rental Income: ${asset.rentalIncome.amount}`);
+      
+      // Check rental info from AssetDefinition or legacy Asset fields
+      const rentalInfo = asset.assetDefinition?.rentalInfo;
+      if (asset.type === 'real_estate' && rentalInfo) {
+        const amount = rentalInfo.baseRent;
+        Logger.info(`  Rental Income: ${amount} (source: definition)`);
       }
     });
     

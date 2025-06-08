@@ -1,5 +1,5 @@
 import React from 'react';
-import { AssetType, DividendFrequency } from '../../types';
+import { AssetType } from '../../types';
 import { UseFormSetValue } from 'react-hook-form';
 import { OptionalSection } from '../forms/StandardFormWrapper';
 import { useTranslation } from 'react-i18next';
@@ -7,24 +7,18 @@ import { BaseAssetFields } from './BaseAssetFields';
 
 interface AssetSpecificFieldsProps {
   assetType: AssetType;
-  dividendFrequency?: DividendFrequency;
   quantity?: number;
   currentPrice?: number;
   watch: (field: string) => any;
   setValue: UseFormSetValue<any>;
-  paymentFields: { months?: number[] };
-  handleMonthChange: (month: number, checked: boolean) => void;
 }
 
 export const AssetSpecificFields: React.FC<AssetSpecificFieldsProps> = ({
   assetType,
-  dividendFrequency,
   quantity,
   currentPrice,
   watch,
-  setValue,
-  paymentFields,
-  handleMonthChange
+  setValue
 }) => {
   const { t } = useTranslation();
 
@@ -51,13 +45,10 @@ export const AssetSpecificFields: React.FC<AssetSpecificFieldsProps> = ({
     <OptionalSection title={getTitleByAssetType()}>
       <BaseAssetFields
         assetType={assetType}
-        dividendFrequency={dividendFrequency}
         quantity={quantity}
         currentPrice={currentPrice}
         watch={watch}
         setValue={setValue}
-        paymentFields={paymentFields}
-        handleMonthChange={handleMonthChange}
         showCalculatedValue={false} // Different styling in OptionalSection
       />
     </OptionalSection>

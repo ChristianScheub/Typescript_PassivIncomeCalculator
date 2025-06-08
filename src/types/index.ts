@@ -126,29 +126,6 @@ export interface Asset extends BaseEntity {
   totalReturn?: number;
   totalReturnPercentage?: number;
   
-  // Legacy fields for backward compatibility
-  ticker?: string;
-  symbol?: string;
-  country?: string;
-  continent?: string;
-  sector?: string;
-  acquisitionCost?: number;
-  dividendInfo?: DividendSchedule;
-  rentalIncome?: {
-    amount: number;
-    frequency: PaymentFrequency;
-  };
-  interestRate?: number;
-  
-  // Override fields (if user wants to override definition data)
-  overrideDividendInfo?: {
-    frequency: DividendFrequency;
-    amount: number;
-    months?: number[];
-    paymentMonths?: number[];
-    customAmounts?: Record<number, number>;
-  };
-  
   notes?: string;
   cachedDividends?: CachedDividends;
 }

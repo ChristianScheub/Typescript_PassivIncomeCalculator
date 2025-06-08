@@ -11,47 +11,69 @@ import {
 
 // Helper: Calculate stock dividend income
 const getStockDividendIncome = (asset: Asset): number => {
-  if (asset.type === "stock" && asset.dividendInfo?.frequency) {
-    // Use currentQuantity or purchaseQuantity 
-    const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+  if (asset.type === "stock") {
+    // Use assetDefinition.dividendInfo (legacy fields have been removed from Asset interface)
+    const dividendInfo = asset.assetDefinition?.dividendInfo;
     
-    if (quantity <= 0) {
-      Logger.infoService(`Stock ${asset.name} has no valid quantity (${quantity}), skipping dividend calculation`);
-      return 0;
+    if (dividendInfo?.frequency) {
+      // Use currentQuantity or purchaseQuantity 
+      const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+      
+      if (quantity <= 0) {
+        Logger.infoService(`Stock ${asset.name} has no valid quantity (${quantity}), skipping dividend calculation`);
+        return 0;
+      }
+      
+      const dividendResult = calculateDividendSchedule(dividendInfo, quantity);
+      Logger.infoService(
+        `Individual dividend calculation result for ${asset.name}: quantity=${quantity}, dividendSource=definition, result=${JSON.stringify(dividendResult)}`
+      );
+      return isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
     }
-    
-    const dividendResult = calculateDividendSchedule(asset.dividendInfo, quantity);
-    Logger.infoService(
-      `Individual dividend calculation result for ${asset.name}: quantity=${quantity}, result=${JSON.stringify(dividendResult)}`
-    );
-    return isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
   }
   return 0;
 };
 
 // Helper: Calculate bond/cash interest income
 const getInterestIncome = (asset: Asset): number => {
-  if ((asset.type === "bond" || asset.type === "cash") && asset.interestRate !== undefined && asset.value) {
-    const annualInterest = asset.interestRate * asset.value / 100;
-    const monthlyInterest = annualInterest / 12;
-    Logger.infoService(
-      `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)} interest calculation for ${asset.name}: ${asset.interestRate}% of ${asset.value} = ${annualInterest} annually, ${monthlyInterest} monthly`
-    );
-    return isFinite(monthlyInterest) ? monthlyInterest : 0;
+  if ((asset.type === "bond" || asset.type === "cash")) {
+    // Use assetDefinition.bondInfo (legacy fields have been removed from Asset interface)
+    const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
+    
+    if (interestRate !== undefined && asset.value) {
+      const annualInterest = interestRate * asset.value / 100;
+      const monthlyInterest = annualInterest / 12;
+      Logger.infoService(
+        `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)} interest calculation for ${asset.name}: ${interestRate}% of ${asset.value} = ${annualInterest} annually, ${monthlyInterest} monthly, source=definition`
+      );
+      return isFinite(monthlyInterest) ? monthlyInterest : 0;
+    }
   }
   return 0;
 };
 
 // Helper: Calculate real estate rental income
 const getRentalIncome = (asset: Asset): number => {
-  if (asset.type === "real_estate" && asset.rentalIncome?.amount !== undefined) {
-    const monthlyRental = asset.rentalIncome?.amount;
-    Logger.infoService(
-      `Individual rental calculation result for ${asset.name}: ${monthlyRental}`
-    );
-    return isFinite(monthlyRental) ? monthlyRental : 0;
-  } else if (asset.type === "real_estate") {
-    Logger.infoService(`Real estate asset ${asset.name} has no rental income defined or amount is invalid`);
+  if (asset.type === "real_estate") {
+    // Use assetDefinition.rentalInfo (legacy fields have been removed from Asset interface)
+    const definitionRentalInfo = asset.assetDefinition?.rentalInfo;
+    
+    let monthlyRental: number | undefined;
+    let source = 'none';
+    
+    if (definitionRentalInfo?.baseRent !== undefined) {
+      monthlyRental = definitionRentalInfo.baseRent;
+      source = 'definition';
+    }
+    
+    if (monthlyRental !== undefined) {
+      Logger.infoService(
+        `Individual rental calculation result for ${asset.name}: ${monthlyRental}, source=${source}`
+      );
+      return isFinite(monthlyRental) ? monthlyRental : 0;
+    } else {
+      Logger.infoService(`Real estate asset ${asset.name} has no rental income defined or amount is invalid`);
+    }
   }
   return 0;
 };
@@ -65,9 +87,12 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
     `Asset type: ${asset.type}, Current quantity: ${asset.currentQuantity}, Purchase quantity: ${asset.purchaseQuantity}`
   );
   
-  if (asset.dividendInfo) {
+  // Check for dividend info from AssetDefinition only
+  const definitionDividendInfo = asset.assetDefinition?.dividendInfo;
+  
+  if (definitionDividendInfo) {
     Logger.infoService(
-      `Dividend info found - Frequency: ${asset.dividendInfo.frequency}, Amount: ${asset.dividendInfo.amount}`
+      `Definition dividend info found - Frequency: ${definitionDividendInfo.frequency}, Amount: ${definitionDividendInfo.amount}`
     );
   } else {
     Logger.infoService(`No dividend info found for asset ${asset.name}`);
@@ -97,49 +122,71 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
 
 // Helper: Calculate stock dividend for a specific month
 const getStockDividendForMonth = (asset: Asset, monthNumber: number): number => {
-  if (asset.type === "stock" && asset.dividendInfo) {
-    // Use currentQuantity or purchaseQuantity
-    const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+  if (asset.type === "stock") {
+    // Use assetDefinition.dividendInfo (legacy fields have been removed from Asset interface)
+    const dividendInfo = asset.assetDefinition?.dividendInfo;
     
-    if (quantity <= 0) {
-      Logger.infoService(`Stock ${asset.name} has no valid quantity (${quantity}) for month ${monthNumber}, skipping dividend calculation`);
-      return 0;
+    if (dividendInfo) {
+      // Use currentQuantity or purchaseQuantity
+      const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+      
+      if (quantity <= 0) {
+        Logger.infoService(`Stock ${asset.name} has no valid quantity (${quantity}) for month ${monthNumber}, skipping dividend calculation`);
+        return 0;
+      }
+      
+      const dividendForMonth = calculateDividendForMonth(
+        dividendInfo,
+        quantity,
+        monthNumber
+      );
+      Logger.infoService(
+        `Dividend for ${asset.name} in month ${monthNumber}: quantity=${quantity}, dividend=${dividendForMonth}, source=definition`
+      );
+      return isFinite(dividendForMonth) ? dividendForMonth : 0;
     }
-    
-    const dividendForMonth = calculateDividendForMonth(
-      asset.dividendInfo,
-      quantity,
-      monthNumber
-    );
-    Logger.infoService(
-      `Dividend for ${asset.name} in month ${monthNumber}: quantity=${quantity}, dividend=${dividendForMonth}`
-    );
-    return isFinite(dividendForMonth) ? dividendForMonth : 0;
   }
   return 0;
 };
 
 // Helper: Calculate interest for a specific month
 const getInterestForMonth = (asset: Asset, monthNumber: number): number => {
-  if ((asset.type === "bond" || asset.type === "cash") && asset.interestRate !== undefined && asset.value) {
-    const annualInterest = asset.interestRate * asset.value / 100;
-    const monthlyInterest = annualInterest / 12;
-    Logger.infoService(
-      `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)} interest for ${asset.name} in month ${monthNumber}: ${monthlyInterest}`
-    );
-    return isFinite(monthlyInterest) ? monthlyInterest : 0;
+  if ((asset.type === "bond" || asset.type === "cash")) {
+    // Use assetDefinition.bondInfo (legacy fields have been removed from Asset interface)
+    const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
+    
+    if (interestRate !== undefined && asset.value) {
+      const annualInterest = interestRate * asset.value / 100;
+      const monthlyInterest = annualInterest / 12;
+      Logger.infoService(
+        `${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)} interest for ${asset.name} in month ${monthNumber}: ${monthlyInterest}, source=definition`
+      );
+      return isFinite(monthlyInterest) ? monthlyInterest : 0;
+    }
   }
   return 0;
 };
 
 // Helper: Calculate rental for a specific month
 const getRentalForMonth = (asset: Asset, monthNumber: number): number => {
-  if (asset.type === "real_estate" && asset.rentalIncome?.amount !== undefined) {
-    const monthlyRental = asset.rentalIncome?.amount;
-    Logger.infoService(
-      `Rental income for ${asset.name} in month ${monthNumber}: ${monthlyRental}`
-    );
-    return isFinite(monthlyRental) ? monthlyRental : 0;
+  if (asset.type === "real_estate") {
+    // Use assetDefinition.rentalInfo (legacy fields have been removed from Asset interface)
+    const definitionRentalInfo = asset.assetDefinition?.rentalInfo;
+    
+    let monthlyRental: number | undefined;
+    let source = 'none';
+    
+    if (definitionRentalInfo?.baseRent !== undefined) {
+      monthlyRental = definitionRentalInfo.baseRent;
+      source = 'definition';
+    }
+    
+    if (monthlyRental !== undefined) {
+      Logger.infoService(
+        `Rental income for ${asset.name} in month ${monthNumber}: ${monthlyRental}, source=${source}`
+      );
+      return isFinite(monthlyRental) ? monthlyRental : 0;
+    }
   }
   return 0;
 };
@@ -282,18 +329,23 @@ export const calculateAssetMonthlyIncomeWithCache = (
 
 // Helper: Stock dividend calculation
 function getStockDividendBreakdown(asset: Asset) {
-  if (asset.type !== "stock" || !asset?.dividendInfo) return null;
+  if (asset.type !== "stock") return null;
+  
+  // Use assetDefinition.dividendInfo (legacy fields have been removed from Asset interface)
+  const dividendInfo = asset.assetDefinition?.dividendInfo;
+  
+  if (!dividendInfo) return null;
   
   // Use currentQuantity or purchaseQuantity
   const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
   if (quantity <= 0) return null;
   
-  const dividendResult = calculateDividendSchedule(asset.dividendInfo, quantity);
+  const dividendResult = calculateDividendSchedule(dividendInfo, quantity);
   const monthlyAmount = isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
   const annualAmount = isFinite(dividendResult.annualAmount) ? dividendResult.annualAmount : 0;
   const monthlyBreakdown: Record<number, number> = {};
   for (let month = 1; month <= 12; month++) {
-    const monthlyDividend = calculateDividendForMonth(asset.dividendInfo, quantity, month);
+    const monthlyDividend = calculateDividendForMonth(dividendInfo, quantity, month);
     monthlyBreakdown[month] = isFinite(monthlyDividend) ? monthlyDividend : 0;
   }
   return { monthlyAmount, annualAmount, monthlyBreakdown };
@@ -301,8 +353,14 @@ function getStockDividendBreakdown(asset: Asset) {
 
 // Helper: Bond/cash interest calculation
 function getInterestBreakdown(asset: Asset) {
-  if ((asset.type !== "bond" && asset.type !== "cash") || asset.interestRate === undefined || !asset.value) return null;
-  const annualInterest = asset.interestRate * asset.value / 100;
+  if ((asset.type !== "bond" && asset.type !== "cash")) return null;
+  
+  // Use assetDefinition.bondInfo (legacy fields have been removed from Asset interface)
+  const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
+  
+  if (interestRate === undefined || !asset.value) return null;
+  
+  const annualInterest = interestRate * asset.value / 100;
   const monthlyAmount = annualInterest / 12;
   const annualAmount = annualInterest;
   const monthlyBreakdown: Record<number, number> = {};
@@ -314,14 +372,26 @@ function getInterestBreakdown(asset: Asset) {
 
 // Helper: Real estate rental calculation
 function getRealEstateBreakdown(asset: Asset) {
-  if (asset.type !== "real_estate" || asset?.rentalIncome?.amount === undefined) return null;
-  const monthlyAmount = isFinite(asset.rentalIncome.amount) ? asset.rentalIncome.amount : 0;
-  const annualAmount = monthlyAmount * 12;
+  if (asset.type !== "real_estate") return null;
+  
+  // Use assetDefinition.rentalInfo (legacy fields have been removed from Asset interface)
+  const definitionRentalInfo = asset.assetDefinition?.rentalInfo;
+  
+  let monthlyAmount: number | undefined;
+  
+  if (definitionRentalInfo?.baseRent !== undefined) {
+    monthlyAmount = definitionRentalInfo.baseRent;
+  }
+  
+  if (monthlyAmount === undefined) return null;
+  
+  const finalMonthlyAmount = isFinite(monthlyAmount) ? monthlyAmount : 0;
+  const annualAmount = finalMonthlyAmount * 12;
   const monthlyBreakdown: Record<number, number> = {};
   for (let month = 1; month <= 12; month++) {
-    monthlyBreakdown[month] = monthlyAmount;
+    monthlyBreakdown[month] = finalMonthlyAmount;
   }
-  return { monthlyAmount, annualAmount, monthlyBreakdown };
+  return { monthlyAmount: finalMonthlyAmount, annualAmount, monthlyBreakdown };
 }
 
 // Refactored breakdown logic
@@ -343,10 +413,14 @@ export const updateAssetCacheData = (
     monthlyBreakdown: Record<number, number>;
   }
 ) => {
-  // Cache data for stocks with dividends, bonds with interest, and real estate with rental income
-  if ((asset.type === "stock" && asset.dividendInfo) || 
-      (asset.type === "bond" && asset.interestRate !== undefined) || 
-      (asset.type === "real_estate" && asset.rentalIncome)) {
+  // Cache data for assets with income potential (using assetDefinition data only)
+  const hasDividendInfo = asset.assetDefinition?.dividendInfo;
+  const hasInterestInfo = asset.assetDefinition?.bondInfo?.interestRate !== undefined;
+  const hasRentalInfo = asset.assetDefinition?.rentalInfo;
+  
+  if ((asset.type === "stock" && hasDividendInfo) || 
+      ((asset.type === "bond" || asset.type === "cash") && hasInterestInfo) || 
+      (asset.type === "real_estate" && hasRentalInfo)) {
     
     return createCachedDividends(
       calculationResult.monthlyAmount,

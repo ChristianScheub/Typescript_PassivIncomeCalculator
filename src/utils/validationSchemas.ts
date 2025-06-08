@@ -29,20 +29,13 @@ export const stockFields = {
   quantity: amountSchema,  // Required for stocks
   purchasePrice: amountSchema,  // Required for stocks
   currentPrice: amountSchema,  // Required for stocks
-  dividendFrequency: z.enum(['monthly', 'quarterly', 'annually', 'custom', 'none'] as const).optional(),
-  dividendAmount: amountSchema.optional(),
-  dividendMonths: z.array(z.number()).optional(),
-  dividendPaymentMonths: z.array(z.number()).optional(),
-  customDividendAmounts: z.record(z.number()).optional(),
 };
 
 export const realEstateFields = {
   propertyValue: amountSchema.optional(),
-  rentalAmount: amountSchema.optional(),
 };
 
 export const bondFields = {
-  interestRate: amountSchema.optional(),
   maturityDate: z.string().optional(),
   nominalValue: amountSchema.optional(),
 };
@@ -52,8 +45,7 @@ export const cryptoFields = {
   acquisitionCost: amountSchema.optional(),
 };
 
-// Asset Schema
-// Asset Schema - separate from baseEntitySchema since assets don't have start/end dates
+// Asset Schema - Transaction-focused, references AssetDefinition for master data
 export const createAssetSchema = () => {
   const assetSchema = z.object({
     name: z.string({
@@ -68,38 +60,46 @@ export const createAssetSchema = () => {
       required_error: "Asset value is required",
       invalid_type_error: "Asset value must be a number"
     }).min(0, "Asset value must be positive").optional(),  // Optional for stocks as it's calculated
-    // Optional fields
-    notes: z.string().optional(),
-    country: z.string().optional(),
-    continent: z.string().optional(),
-    sector: z.string().optional(),
-    // Stock specific fields
+    
+    // Asset Definition reference
+    assetDefinitionId: z.string().optional(),
+    
+    // Transaction specific data
+    purchaseDate: z.string().optional(),
+    purchasePrice: z.number({
+      invalid_type_error: "Purchase price must be a number"
+    }).min(0, "Purchase price must be positive").optional(),
+    purchaseQuantity: z.number({
+      invalid_type_error: "Purchase quantity must be a number"
+    }).min(0, "Purchase quantity must be positive").optional(),
+    transactionCosts: z.number().min(0).optional(),
+    
+    // Current values (calculated or updated)
+    currentPrice: z.number({
+      invalid_type_error: "Current price must be a number"
+    }).min(0, "Current price must be positive").optional(),
+    currentQuantity: z.number().min(0).optional(),
+    currentValue: z.number().min(0).optional(),
+    
+    // Stock specific fields (for backwards compatibility)
     ticker: z.string().optional(),
     quantity: z.number({
       invalid_type_error: "Quantity must be a number"
     }).min(0, "Quantity must be positive").optional(),
-    purchasePrice: z.number({
-      invalid_type_error: "Purchase price must be a number"
-    }).min(0, "Purchase price must be positive").optional(),
-    currentPrice: z.number({
-      invalid_type_error: "Current price must be a number"
-    }).min(0, "Current price must be positive").optional(),
-    // Real estate specific fields
+    
+    // Real estate specific fields (for backwards compatibility)
     propertyValue: z.number().min(0).optional(),
-    rentalAmount: z.number().min(0).optional(),
-    // Bond specific fields
-    interestRate: z.number().min(0).optional(),
+    
+    // Bond specific fields (for backwards compatibility)
     maturityDate: z.string().optional(),
     nominalValue: z.number().min(0).optional(),
-    // Crypto specific fields
+    
+    // Crypto specific fields (for backwards compatibility)
     symbol: z.string().optional(),
     acquisitionCost: z.number().min(0).optional(),
-    // Dividend related fields
-    dividendFrequency: z.enum(['monthly', 'quarterly', 'annually', 'custom', 'none'] as const).optional(),
-    dividendAmount: z.number().min(0).optional(),
-    dividendMonths: z.array(z.number().min(1).max(12)).optional(),
-    dividendPaymentMonths: z.array(z.number().min(1).max(12)).optional(),
-    customDividendAmounts: z.record(z.number()).optional(),
+    
+    // Optional fields
+    notes: z.string().optional(),
   });
 
   return assetSchema.superRefine((data, ctx) => {

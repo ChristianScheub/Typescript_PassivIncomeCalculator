@@ -1,6 +1,20 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { fetchAssets, addAsset, updateAsset, deleteAsset, updateAssetDividendCache, updateStockPrices } from '../store/slices/assetsSlice';
+import { 
+  fetchAssets, 
+  addAsset, 
+  updateAsset, 
+  deleteAsset, 
+  updateAssetDividendCache, 
+  updateStockPrices,
+  calculatePortfolioData,
+  selectAssets,
+  selectAssetsStatus,
+  selectPortfolioCache,
+  selectPortfolioCacheValid,
+  selectPortfolioTotals,
+  selectSortedAssets
+} from '../store/slices/assetsSlice';
 import { fetchAssetDefinitions } from '../store/slices/assetDefinitionsSlice';
 import { AssetsView } from '../view/AssetsView';
 import { Asset } from '../types';
@@ -8,10 +22,8 @@ import { useTranslation } from 'react-i18next';
 import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
-import portfolioService from '../service/portfolioService';
 import { createDividendCacheService } from '../service/dividendCacheService';
 import { createCachedDividends } from '../utils/dividendCacheUtils';
-import { sortAssets } from '../utils/sortingUtils';
 import { StockPriceUpdater } from '../service/helper/stockPriceUpdater';
 import AssetDefinitionsContainer from './AssetDefinitionsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
@@ -19,9 +31,18 @@ import AssetCalendarContainer from './AssetCalendarContainer';
 const AssetsContainer: React.FC = () => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
-  const { items: assets, status } = useAppSelector(state => state.assets);
+  
+  // Use new selectors for better performance
+  const assets = useAppSelector(selectAssets);
+  const status = useAppSelector(selectAssetsStatus);
+  const portfolioCache = useAppSelector(selectPortfolioCache);
+  const portfolioCacheValid = useAppSelector(selectPortfolioCacheValid);
+  const portfolioTotals = useAppSelector(selectPortfolioTotals);
+  const sortedAssets = useAppSelector(selectSortedAssets);
+  
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions || { items: [] });
   const { isEnabled: isApiEnabled } = useAppSelector(state => state.apiConfig);
+  
   const [isAddingAsset, setIsAddingAsset] = useState(false);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [isUpdatingPrices, setIsUpdatingPrices] = useState(false);
@@ -41,23 +62,36 @@ const AssetsContainer: React.FC = () => {
     createDividendCacheService(dispatch);
   }, [dispatch, status]);
 
-  // Sort assets by value (highest to lowest)
-  const sortedAssets = useMemo(() => {
-    return sortAssets(assets);
-  }, [assets]);
+  // Calculate portfolio data when needed (with caching)
+  useEffect(() => {
+    if (assets.length > 0 && assetDefinitions.length > 0 && !portfolioCacheValid) {
+      Logger.info('Calculating portfolio data');
+      dispatch(calculatePortfolioData(assetDefinitions));
+    }
+  }, [assets.length, assetDefinitions.length, portfolioCacheValid, dispatch]);
 
-  // Calculate portfolio data using the new portfolio service
-  const portfolioData = useMemo(() => {
-    return portfolioService.calculatePortfolio(assets, assetDefinitions);
-  }, [assets, assetDefinitions]);
-
+  // Extract values from cached totals
   const { totalAssetValue, monthlyAssetIncome, annualAssetIncome } = useMemo(() => {
     return {
-      totalAssetValue: portfolioData.totals.totalValue,
-      monthlyAssetIncome: portfolioData.totals.monthlyIncome,
-      annualAssetIncome: portfolioData.totals.annualIncome
+      totalAssetValue: portfolioTotals.totalValue,
+      monthlyAssetIncome: portfolioTotals.monthlyIncome,
+      annualAssetIncome: portfolioTotals.annualIncome
     };
-  }, [portfolioData]);
+  }, [portfolioTotals]);
+
+  // Portfolio data for the view (using cached data or fallback)
+  const portfolioData = useMemo(() => {
+    return portfolioCache || {
+      positions: [],
+      totals: portfolioTotals,
+      metadata: {
+        lastCalculated: new Date().toISOString(),
+        assetCount: assets.length,
+        definitionCount: assetDefinitions.length,
+        positionCount: 0
+      }
+    };
+  }, [portfolioCache, portfolioTotals, assets.length, assetDefinitions.length]);
 
   const handleAddAsset = async (data: any) => {
     try {

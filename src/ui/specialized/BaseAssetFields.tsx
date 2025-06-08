@@ -1,22 +1,16 @@
 import React from 'react';
-import { AssetType, DividendFrequency } from '../../types';
+import { AssetType } from '../../types';
 import { UseFormSetValue } from 'react-hook-form';
 import { FormGrid, StandardFormField } from '../forms/FormGrid';
-import { MonthSelector } from '../forms/MonthSelector';
-import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import formatService from '../../service/formatService';
-import { getDividendFrequencyOptions } from '../../constants';
 
 interface BaseAssetFieldsProps {
   assetType: AssetType;
-  dividendFrequency?: DividendFrequency;
   quantity?: number;
   currentPrice?: number;
   watch: (field: string) => any;
   setValue: UseFormSetValue<any>;
-  paymentFields: { months?: number[] };
-  handleMonthChange: (month: number, checked: boolean) => void;
   showCalculatedValue?: boolean;
 }
 
@@ -26,17 +20,13 @@ interface BaseAssetFieldsProps {
  */
 export const BaseAssetFields: React.FC<BaseAssetFieldsProps> = ({
   assetType,
-  dividendFrequency,
   quantity,
   currentPrice,
   watch,
   setValue,
-  paymentFields,
-  handleMonthChange,
   showCalculatedValue = true
 }) => {
   const { t } = useTranslation();
-  const dividendFrequencyOptions = getDividendFrequencyOptions(t);
 
   const renderStockFields = () => (
     <>
@@ -101,27 +91,6 @@ export const BaseAssetFields: React.FC<BaseAssetFieldsProps> = ({
           }}
         />
       )}
-      
-      <StandardFormField
-        label={t('assets.form.dividendFrequency')}
-        name="dividendFrequency"
-        type="select"
-        options={dividendFrequencyOptions}
-        value={watch('dividendFrequency')}
-        onChange={(value) => setValue('dividendFrequency', value as DividendFrequency)}
-      />
-      
-      {dividendFrequency && dividendFrequency !== 'none' && (
-        <StandardFormField
-          label={t('assets.form.dividendAmountPerShare')}
-          name="dividendAmount"
-          type="number"
-          value={watch('dividendAmount')}
-          onChange={(value) => setValue('dividendAmount', value)}
-          step={0.01}
-          min={0}
-        />
-      )}
     </>
   );
 
@@ -137,32 +106,11 @@ export const BaseAssetFields: React.FC<BaseAssetFieldsProps> = ({
         step={0.01}
         min={0}
       />
-      
-      <StandardFormField
-        label={t('assets.form.monthlyRentalIncome')}
-        name="rentalAmount"
-        type="number"
-        value={watch('rentalAmount')}
-        onChange={(value) => setValue('rentalAmount', value)}
-        placeholder={t('common.zeroAmountPlaceholder')}
-        step={0.01}
-        min={0}
-      />
     </>
   );
 
   const renderBondFields = () => (
     <>
-      <StandardFormField
-        label={t('assets.form.interestRatePercent')}
-        name="interestRate"
-        type="number"
-        value={watch('interestRate')}
-        onChange={(value) => setValue('interestRate', value)}
-        step={0.01}
-        min={0}
-      />
-      
       <StandardFormField
         label={t('assets.form.maturityDate')}
         name="maturityDate"
@@ -218,44 +166,6 @@ export const BaseAssetFields: React.FC<BaseAssetFieldsProps> = ({
     </>
   );
 
-  const renderMonthSelector = () => {
-    if (!['quarterly', 'annually', 'custom'].includes(dividendFrequency || '')) {
-      return null;
-    }
-
-    let monthSelectorLabel: string;
-    
-    if (dividendFrequency === 'quarterly') {
-      monthSelectorLabel = t('assets.form.quarterlyPaymentMonths');
-    } else if (dividendFrequency === 'annually') {
-      monthSelectorLabel = t('assets.form.annualPaymentMonth');
-    } else {
-      monthSelectorLabel = t('assets.form.customDividendMonths');
-    }
-
-    return (
-      <Box sx={{ mt: 2 }}>
-        <MonthSelector
-          selectedMonths={paymentFields.months || []}
-          onChange={(month: number, checked: boolean) => {
-            handleMonthChange(month, checked);
-            const currentMonths = paymentFields.months || [];
-            const newMonths = checked 
-              ? [...currentMonths, month].sort((a, b) => a - b)
-              : currentMonths.filter(m => m !== month);
-            
-            if (dividendFrequency === 'custom') {
-              setValue('dividendMonths', newMonths);
-            } else {
-              setValue('dividendPaymentMonths', newMonths);
-            }
-          }}
-          label={monthSelectorLabel}
-        />
-      </Box>
-    );
-  };
-
   const getFieldsByAssetType = () => {
     switch (assetType) {
       case 'stock':
@@ -272,12 +182,9 @@ export const BaseAssetFields: React.FC<BaseAssetFieldsProps> = ({
   };
 
   return (
-    <>
-      <FormGrid>
-        {getFieldsByAssetType()}
-      </FormGrid>
-      {assetType === 'stock' && renderMonthSelector()}
-    </>
+    <FormGrid>
+      {getFieldsByAssetType()}
+    </FormGrid>
   );
 };
 

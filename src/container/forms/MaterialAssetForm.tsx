@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { Asset, AssetType, DividendFrequency, PaymentFrequency } from '../../types';
-import { usePaymentSchedule } from '../../hooks/usePaymentSchedule';
+import { Asset, AssetType } from '../../types';
 import { useSharedForm } from '../../hooks/useSharedForm';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
@@ -19,29 +18,15 @@ interface AssetFormData {
   quantity?: number;
   purchasePrice?: number;
   currentPrice?: number;
-  dividendFrequency?: DividendFrequency;
-  dividendAmount?: number;
-  dividendMonths?: number[];
-  dividendPaymentMonths?: number[];
-  customDividendAmounts?: { [key: string]: number };
 
   // Real estate specific fields
   propertyValue?: number;
-  rentalAmount?: number;
-
-  // Bond specific fields
-  interestRate?: number;
-  maturityDate?: string;
-  nominalValue?: number;
 
   // Crypto specific fields
   symbol?: string;
   acquisitionCost?: number;
 
-  // Optional fields
-  country?: string;
-  continent?: string;
-  sector?: string;
+  // Transaction notes
   notes?: string;
 
   // System fields
@@ -62,7 +47,6 @@ const getDefaultValues = (initialData?: Asset): Partial<AssetFormData> => {
   if (!initialData) {
     return {
       type: 'stock' as AssetType,
-      dividendFrequency: 'none' as DividendFrequency,
       purchaseDate: new Date().getFullYear() + '-01-01'
     };
   }
@@ -70,18 +54,11 @@ const getDefaultValues = (initialData?: Asset): Partial<AssetFormData> => {
   return {
     ...initialData,
     quantity: initialData.currentQuantity || initialData.purchaseQuantity,
-    dividendFrequency: initialData.dividendInfo?.frequency || initialData.overrideDividendInfo?.frequency || 'none',
-    dividendAmount: initialData.dividendInfo?.amount || initialData.overrideDividendInfo?.amount,
-    dividendMonths: initialData.dividendInfo?.months || initialData.overrideDividendInfo?.months,
-    dividendPaymentMonths: initialData.dividendInfo?.paymentMonths || initialData.overrideDividendInfo?.paymentMonths,
-    customDividendAmounts: initialData.dividendInfo?.customAmounts || initialData.overrideDividendInfo?.customAmounts,
-    propertyValue: initialData.value, // Use value for property value
-    rentalAmount: initialData.rentalIncome?.amount,
-    interestRate: initialData.interestRate,
-    maturityDate: initialData.assetDefinition?.bondInfo?.maturityDate,
-    nominalValue: initialData.assetDefinition?.bondInfo?.nominalValue,
-    symbol: initialData.symbol,
-    acquisitionCost: initialData.acquisitionCost
+    propertyValue: initialData.value,
+    // Get ticker and symbol from AssetDefinition
+    ticker: initialData.assetDefinition?.ticker,
+    symbol: initialData.assetDefinition?.ticker, // Use ticker for crypto symbol as well
+    acquisitionCost: initialData.purchasePrice // Use purchasePrice as acquisitionCost for crypto
   };
 };
 
@@ -111,7 +88,7 @@ function calculateStockValues(data: AssetFormData) {
 function assignTypeSpecificFields(transformedData: Asset, data: AssetFormData) {
   switch (data.type) {
     case 'stock':
-      transformedData.ticker = data.ticker;
+      // Note: ticker is now stored in AssetDefinition, not directly on Asset
       transformedData.currentQuantity = data.quantity;
       transformedData.purchaseQuantity = data.quantity;
       if (data.purchasePrice !== undefined) {
@@ -120,52 +97,18 @@ function assignTypeSpecificFields(transformedData: Asset, data: AssetFormData) {
       if (data.currentPrice !== undefined) {
         transformedData.currentPrice = data.currentPrice;
       }
-      if (data.dividendFrequency && data.dividendFrequency !== 'none') {
-        transformedData.dividendInfo = {
-          frequency: data.dividendFrequency,
-          amount: data.dividendAmount || 0,
-          months: data.dividendMonths,
-          paymentMonths: data.dividendPaymentMonths,
-          customAmounts: data.customDividendAmounts,
-        };
-      }
       break;
     case 'real_estate':
-      // For real estate, store property value in main value field
       if (data.propertyValue !== undefined) {
         transformedData.value = data.propertyValue;
       }
-      if (data.rentalAmount) {
-        transformedData.rentalIncome = {
-          amount: data.rentalAmount,
-          frequency: 'monthly',
-        };
-      }
-      break;
-    case 'bond':
-      transformedData.interestRate = data.interestRate;
-      // Store bond-specific info in AssetDefinition reference if available
-      if (data.maturityDate || data.nominalValue) {
-        if (!transformedData.assetDefinition) {
-          transformedData.assetDefinition = {
-            id: `def-${transformedData.id}`,
-            name: data.name,
-            fullName: data.name,
-            type: data.type,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-        }
-        transformedData.assetDefinition.bondInfo = {
-          interestRate: data.interestRate || 0,
-          maturityDate: data.maturityDate,
-          nominalValue: data.nominalValue,
-        };
-      }
       break;
     case 'crypto':
-      transformedData.symbol = data.symbol;
-      transformedData.acquisitionCost = data.acquisitionCost;
+      // Note: symbol is now stored in AssetDefinition as ticker
+      // acquisitionCost is now stored as purchasePrice
+      if (data.acquisitionCost !== undefined) {
+        transformedData.purchasePrice = data.acquisitionCost;
+      }
       break;
     default:
       break;
@@ -199,9 +142,6 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
           updatedAt: new Date().toISOString(),
           purchaseDate: data.purchaseDate || new Date().getFullYear() + '-01-01',
           purchasePrice: data.purchasePrice || 0,
-          country: data.country,
-          continent: data.continent,
-          sector: data.sector,
           notes: data.notes
         };
         // Use helper for type-specific fields
@@ -216,23 +156,8 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
     }
   });
 
-  const { fields: paymentFields, handleMonthChange } = usePaymentSchedule(
-    initialData?.dividendInfo ? {
-      frequency: initialData.dividendInfo.frequency as PaymentFrequency,
-      amount: initialData.dividendInfo.amount,
-      months: initialData.dividendInfo.paymentMonths || initialData.dividendInfo.months,
-      customAmounts: initialData.dividendInfo.customAmounts,
-    } : initialData?.overrideDividendInfo ? {
-      frequency: initialData.overrideDividendInfo.frequency as PaymentFrequency,
-      amount: initialData.overrideDividendInfo.amount,
-      months: initialData.overrideDividendInfo.paymentMonths || initialData.overrideDividendInfo.months,
-      customAmounts: initialData.overrideDividendInfo.customAmounts,
-    } : undefined
-  );
-
   // Watch fields that affect validation
   const assetType = watch('type');
-  const dividendFrequency = watch('dividendFrequency');
   const quantity = watch('quantity');
   const currentPrice = watch('currentPrice');
   
@@ -242,50 +167,26 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
       Logger.info('Pre-populating form fields with initial data: ' + JSON.stringify(initialData));
       
       const formData: Partial<AssetFormData> = {
-        // Basic fields
         name: initialData.name || '',
         type: initialData.type,
         value: initialData.value || 0,
         purchaseDate: initialData.purchaseDate || new Date().getFullYear() + '-01-01',
-        
-        // Optional general fields
-        country: initialData.country || '',
-        continent: initialData.continent || '',
-        sector: initialData.sector || '',
         notes: initialData.notes || '',
       };
 
       // Type-specific fields
       if (initialData.type === 'stock') {
-        formData.ticker = initialData.ticker || '';
+        formData.ticker = initialData.assetDefinition?.ticker || '';
         formData.quantity = initialData.currentQuantity || initialData.purchaseQuantity || 1;
         formData.purchasePrice = initialData.purchasePrice || 0;
         formData.currentPrice = initialData.currentPrice || 0;
-        
-        // Dividend fields - check both dividendInfo and overrideDividendInfo
-        const dividendSource = initialData.dividendInfo || initialData.overrideDividendInfo;
-        if (dividendSource) {
-          formData.dividendFrequency = dividendSource.frequency || 'none';
-          formData.dividendAmount = dividendSource.amount || 0;
-          formData.dividendMonths = dividendSource.months || [];
-          formData.dividendPaymentMonths = dividendSource.paymentMonths || [];
-          formData.customDividendAmounts = dividendSource.customAmounts || {};
-        } else {
-          formData.dividendFrequency = 'none';
-        }
       } else if (initialData.type === 'real_estate') {
         formData.propertyValue = initialData.value || 0;
-        formData.rentalAmount = initialData.rentalIncome?.amount || 0;
-      } else if (initialData.type === 'bond') {
-        formData.interestRate = initialData.interestRate || 0;
-        formData.maturityDate = initialData.assetDefinition?.bondInfo?.maturityDate || '';
-        formData.nominalValue = initialData.assetDefinition?.bondInfo?.nominalValue || 0;
       } else if (initialData.type === 'crypto') {
-        formData.symbol = initialData.symbol || '';
-        formData.acquisitionCost = initialData.acquisitionCost || 0;
+        formData.symbol = initialData.assetDefinition?.ticker || '';
+        formData.acquisitionCost = initialData.purchasePrice || 0;
       }
 
-      // Reset the entire form with the prepared data
       reset(formData);
     }
   }, [initialData, reset]);
@@ -303,15 +204,12 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
   return (
     <MaterialAssetFormView 
       assetType={assetType}
-      dividendFrequency={dividendFrequency}
       quantity={quantity}
       currentPrice={currentPrice}
       errors={errors}
       watch={watch}
       setValue={setValue}
       onFormSubmit={onFormSubmit}
-      paymentFields={paymentFields}
-      handleMonthChange={handleMonthChange}
       title={initialData ? t('assets.editAsset') : t('assets.addAsset')}
     />
   );

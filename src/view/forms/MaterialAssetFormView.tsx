@@ -1,5 +1,5 @@
 import React from 'react';
-import { AssetType, DividendFrequency } from '../../types';
+import { AssetType } from '../../types';
 import { UseFormSetValue } from 'react-hook-form';
 import { 
   StandardFormWrapper,
@@ -12,7 +12,7 @@ import { AssetSpecificFields } from '../../ui/specialized/AssetSpecificFields';
 import { useTranslation } from 'react-i18next';
 import { getAssetTypeOptions } from '../../constants';
 
-// Define the AssetFormData interface for the form
+// Define the AssetFormData interface for the form (cleaned up)
 interface AssetFormData {
   name: string;
   type: AssetType;
@@ -22,21 +22,9 @@ interface AssetFormData {
   quantity?: number;
   purchasePrice?: number;
   currentPrice?: number;
-  dividendFrequency?: DividendFrequency;
-  dividendAmount?: number;
-  dividendMonths?: number[];
-  dividendPaymentMonths?: number[];
-  customDividendAmounts?: { [key: string]: number };
   propertyValue?: number;
-  rentalAmount?: number;
-  interestRate?: number;
-  maturityDate?: string;
-  nominalValue?: number;
   symbol?: string;
   acquisitionCost?: number;
-  country?: string;
-  continent?: string;
-  sector?: string;
   notes?: string;
   id?: string;
   createdAt?: string;
@@ -46,7 +34,6 @@ interface AssetFormData {
 interface MaterialAssetFormViewProps {
   // Form state props
   assetType: AssetType;
-  dividendFrequency: DividendFrequency | undefined;
   quantity?: number;
   currentPrice?: number;
   errors: any;
@@ -56,27 +43,18 @@ interface MaterialAssetFormViewProps {
   setValue: UseFormSetValue<AssetFormData>;
   onFormSubmit: () => void;
   
-  // Payment schedule props
-  paymentFields: {
-    months?: number[];
-  };
-  handleMonthChange: (month: number, checked: boolean) => void;
-  
   // Title
   title: string;
 }
 
 export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
   assetType,
-  dividendFrequency,
   quantity,
   currentPrice,
   errors,
   watch,
   setValue,
   onFormSubmit,
-  paymentFields,
-  handleMonthChange,
   title
 }) => {
   const { t } = useTranslation();
@@ -134,13 +112,10 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
 
       <AssetSpecificFields
         assetType={assetType}
-        dividendFrequency={dividendFrequency}
         quantity={quantity}
         currentPrice={currentPrice}
         watch={watch}
         setValue={setValue}
-        paymentFields={paymentFields}
-        handleMonthChange={handleMonthChange}
       />
 
       <OptionalSection title={t('common.additionalInformation')}>
@@ -151,30 +126,6 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
             type="date"
             value={watch('purchaseDate')}
             onChange={(value) => setValue('purchaseDate', value)}
-          />
-          
-          <StandardFormField
-            label={t('assets.form.country')}
-            name="country"
-            value={watch('country')}
-            onChange={(value) => setValue('country', value)}
-            placeholder={t('assets.form.countryPlaceholder')}
-          />
-          
-          <StandardFormField
-            label={t('assets.form.continent')}
-            name="continent"
-            value={watch('continent')}
-            onChange={(value) => setValue('continent', value)}
-            placeholder={t('assets.form.continentPlaceholder')}
-          />
-          
-          <StandardFormField
-            label={t('assets.form.sector')}
-            name="sector"
-            value={watch('sector')}
-            onChange={(value) => setValue('sector', value)}
-            placeholder={t('assets.form.sectorPlaceholder')}
           />
           
           <StandardFormField
