@@ -9,4 +9,3 @@ export { OptionalFieldsSection } from './OptionalFieldsSection';
 export { RequiredSection } from './RequiredSection';
 export { StandardFormWrapper } from './StandardFormWrapper';
 export { MonthSelector } from './MonthSelector';
-export { MonthlyAmountEditor } from './MonthlyAmountEditor';
