@@ -4,12 +4,13 @@ import { UseFormSetValue } from 'react-hook-form';
 import { 
   StandardFormWrapper,
   RequiredSection,
-  OptionalSection,
   FormGrid,
   StandardFormField,
   CustomScheduleSection
 } from '../../ui/forms/StandardFormWrapper';
+import { OptionalFieldsSection } from '../../ui/forms';
 import { useTranslation } from 'react-i18next';
+import { getPaymentFrequencyOptions, getExpenseCategoryOptions } from '../../constants';
 
 // Define the ExpenseFormData interface for the form
 interface ExpenseFormData {
@@ -60,27 +61,8 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const categoryOptions = [
-    { value: 'housing', label: t('expenses.categories.housing') },
-    { value: 'transportation', label: t('expenses.categories.transportation') },
-    { value: 'food', label: t('expenses.categories.food') },
-    { value: 'utilities', label: t('expenses.categories.utilities') },
-    { value: 'insurance', label: t('expenses.categories.insurance') },
-    { value: 'healthcare', label: t('expenses.categories.healthcare') },
-    { value: 'entertainment', label: t('expenses.categories.entertainment') },
-    { value: 'personal', label: t('expenses.categories.personal') },
-    { value: 'debt_payments', label: t('expenses.categories.debt_payments') },
-    { value: 'education', label: t('expenses.categories.education') },
-    { value: 'subscriptions', label: t('expenses.categories.subscriptions') },
-    { value: 'other', label: t('expenses.categories.other') }
-  ];
-
-  const paymentFrequencyOptions = [
-    { value: 'monthly', label: t('frequency.monthly') },
-    { value: 'quarterly', label: t('frequency.quarterly') },
-    { value: 'annually', label: t('frequency.annually') },
-    { value: 'custom', label: t('frequency.custom') }
-  ];
+  const categoryOptions = getExpenseCategoryOptions(t);
+  const paymentFrequencyOptions = getPaymentFrequencyOptions(t);
 
   return (
     <StandardFormWrapper
@@ -156,26 +138,12 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
         title={t('expenses.form.paymentMonths')}
       />
 
-      <OptionalSection title={t('common.optionalFields')}>
-        <FormGrid>
-          <StandardFormField
-            label={t('common.endDate')}
-            name="endDate"
-            type="date"
-            value={watch('endDate')}
-            onChange={(value) => setValue('endDate', value)}
-          />
-          
-          <StandardFormField
-            label={t('common.notes')}
-            name="notes"
-            value={watch('notes')}
-            onChange={(value) => setValue('notes', value)}
-            placeholder={t('common.notesPlaceholder')}
-            gridColumn="1 / -1"
-          />
-        </FormGrid>
-      </OptionalSection>
+      <OptionalFieldsSection
+        endDateValue={watch('endDate')}
+        notesValue={watch('notes')}
+        onEndDateChange={(value) => setValue('endDate', value)}
+        onNotesChange={(value) => setValue('notes', value)}
+      />
     </StandardFormWrapper>
   );
 };

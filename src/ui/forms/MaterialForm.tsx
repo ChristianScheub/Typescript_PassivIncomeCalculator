@@ -15,6 +15,7 @@ import {
   alpha
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { FormFieldProps } from '../types/FormFieldProps';
 
 // Styled components for better Material Design look
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -53,26 +54,6 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
     },
   },
 }));
-
-interface FormFieldProps {
-  label: string;
-  name: string;
-  type?: 'text' | 'number' | 'date' | 'select' | 'textarea' | 'checkbox';
-  required?: boolean;
-  error?: string;
-  value?: any;
-  onChange?: (value: any) => void;
-  options?: Array<{ value: string; label: string }>;
-  placeholder?: string;
-  min?: number;
-  max?: number;
-  step?: number;
-  rows?: number;
-  helperText?: string;
-  disabled?: boolean;
-  fullWidth?: boolean;
-  multiline?: boolean;
-}
 
 export const MaterialFormField: React.FC<FormFieldProps> = ({
   label,

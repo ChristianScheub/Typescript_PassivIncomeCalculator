@@ -4,12 +4,13 @@ import { UseFormSetValue } from 'react-hook-form';
 import { 
   StandardFormWrapper,
   RequiredSection,
-  OptionalSection,
   FormGrid,
   StandardFormField,
   CustomScheduleSection
 } from '../../ui/forms/StandardFormWrapper';
+import { OptionalFieldsSection } from '../../ui/forms';
 import { useTranslation } from 'react-i18next';
+import { getPaymentFrequencyOptions, getIncomeTypeOptions } from '../../constants';
 
 // Define the IncomeFormData interface for the form
 interface IncomeFormData {
@@ -56,19 +57,8 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
   const { t } = useTranslation();
 
   // Type options for manual income entry (excludes auto-generated asset income)
-  const typeOptions = [
-    { value: 'salary', label: t('income.types.salary') },
-    { value: 'interest', label: t('income.types.interest') },
-    { value: 'side_hustle', label: t('income.types.side_hustle') },
-    { value: 'other', label: t('income.types.other') }
-  ];
-
-  const frequencyOptions = [
-    { value: 'monthly', label: t('frequency.monthly') },
-    { value: 'quarterly', label: t('frequency.quarterly') },
-    { value: 'annually', label: t('frequency.annually') },
-    { value: 'custom', label: t('frequency.custom') }
-  ];
+  const typeOptions = getIncomeTypeOptions(t);
+  const frequencyOptions = getPaymentFrequencyOptions(t);
 
   return (
     <StandardFormWrapper
@@ -150,26 +140,12 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
         title={t('income.form.paymentMonths')}
       />
 
-      <OptionalSection title={t('common.optionalFields')}>
-        <FormGrid>
-          <StandardFormField
-            label={t('common.endDate')}
-            name="endDate"
-            type="date"
-            value={watch('endDate')}
-            onChange={(value) => setValue('endDate', value)}
-          />
-          
-          <StandardFormField
-            label={t('common.notes')}
-            name="notes"
-            value={watch('notes')}
-            onChange={(value) => setValue('notes', value)}
-            placeholder={t('common.notesPlaceholder')}
-            gridColumn="1 / -1"
-          />
-        </FormGrid>
-      </OptionalSection>
+      <OptionalFieldsSection
+        endDateValue={watch('endDate')}
+        notesValue={watch('notes')}
+        onEndDateChange={(value) => setValue('endDate', value)}
+        onNotesChange={(value) => setValue('notes', value)}
+      />
     </StandardFormWrapper>
   );
 };

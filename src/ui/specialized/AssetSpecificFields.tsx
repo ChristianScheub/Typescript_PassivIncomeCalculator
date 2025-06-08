@@ -5,6 +5,7 @@ import { OptionalSection, FormGrid, StandardFormField } from '../forms/StandardF
 import { MonthSelector } from '../forms/MonthSelector';
 import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { getDividendFrequencyOptions } from '../../constants';
 
 interface AssetSpecificFieldsProps {
   assetType: AssetType;
@@ -29,13 +30,7 @@ export const AssetSpecificFields: React.FC<AssetSpecificFieldsProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const dividendFrequencyOptions = [
-    { value: 'monthly', label: t('frequency.monthly') },
-    { value: 'quarterly', label: t('frequency.quarterly') },
-    { value: 'annually', label: t('frequency.annually') },
-    { value: 'custom', label: t('frequency.custom') },
-    { value: 'none', label: t('frequency.none') }
-  ];
+  const dividendFrequencyOptions = getDividendFrequencyOptions(t);
 
   if (assetType === 'stock') {
     return (

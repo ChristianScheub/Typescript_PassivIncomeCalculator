@@ -15,7 +15,7 @@ import {
   SxProps,
   Theme
 } from '@mui/material';
-import { FormFieldProps } from '../types/form';
+import { FormFieldProps } from '../../types/form';
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiOutlinedInput-root': {

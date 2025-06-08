@@ -4,12 +4,13 @@ import { UseFormSetValue } from 'react-hook-form';
 import { 
   StandardFormWrapper,
   RequiredSection,
-  OptionalSection,
   FormGrid,
   StandardFormField,
   CustomScheduleSection
 } from '../../ui/forms/StandardFormWrapper';
+import { OptionalFieldsSection } from '../../ui/forms';
 import { useTranslation } from 'react-i18next';
+import { getPaymentFrequencyOptions, getLiabilityTypeOptions } from '../../constants';
 
 // Define the LiabilityFormData interface for the form
 interface LiabilityFormData {
@@ -63,21 +64,8 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const liabilityTypeOptions = [
-    { value: 'personal_loan', label: t('liabilities.types.personal_loan') },
-    { value: 'mortgage', label: t('liabilities.types.mortgage') },
-    { value: 'credit_card', label: t('liabilities.types.credit_card') },
-    { value: 'student_loan', label: t('liabilities.types.student_loan') },
-    { value: 'auto_loan', label: t('liabilities.types.auto_loan') },
-    { value: 'other', label: t('liabilities.types.other') }
-  ];
-
-  const paymentFrequencyOptions = [
-    { value: 'monthly', label: t('frequency.monthly') },
-    { value: 'quarterly', label: t('frequency.quarterly') },
-    { value: 'annually', label: t('frequency.annually') },
-    { value: 'custom', label: t('frequency.custom') }
-  ];
+  const liabilityTypeOptions = getLiabilityTypeOptions(t);
+  const paymentFrequencyOptions = getPaymentFrequencyOptions(t);
 
   return (
     <StandardFormWrapper
@@ -192,26 +180,12 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
         title={t('liabilities.form.paymentMonths')}
       />
 
-      <OptionalSection title={t('common.optionalFields')}>
-        <FormGrid>
-          <StandardFormField
-            label={t('common.endDate')}
-            name="endDate"
-            type="date"
-            value={watch('endDate')}
-            onChange={(value) => setValue('endDate', value)}
-          />
-          
-          <StandardFormField
-            label={t('common.notes')}
-            name="notes"
-            value={watch('notes')}
-            onChange={(value) => setValue('notes', value)}
-            placeholder={t('common.notesPlaceholder')}
-            gridColumn="1 / -1"
-          />
-        </FormGrid>
-      </OptionalSection>
+      <OptionalFieldsSection
+        endDateValue={watch('endDate')}
+        notesValue={watch('notes')}
+        onEndDateChange={(value) => setValue('endDate', value)}
+        onNotesChange={(value) => setValue('notes', value)}
+      />
     </StandardFormWrapper>
   );
 };

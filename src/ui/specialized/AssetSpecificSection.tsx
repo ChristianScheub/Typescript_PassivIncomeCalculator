@@ -7,6 +7,7 @@ import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { MonthSelector } from '../forms/MonthSelector';
 import { useTranslation } from 'react-i18next';
 import formatService from '../../service/formatService';
+import { getDividendFrequencyOptions } from '../../constants';
 
 interface AssetSpecificSectionProps {
   assetType: AssetType;
@@ -33,13 +34,7 @@ export const AssetSpecificSection: React.FC<AssetSpecificSectionProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const dividendFrequencyOptions = [
-    { value: 'monthly', label: t('frequency.monthly') },
-    { value: 'quarterly', label: t('frequency.quarterly') },
-    { value: 'annually', label: t('frequency.annually') },
-    { value: 'custom', label: t('frequency.custom') },
-    { value: 'none', label: t('frequency.none') }
-  ];
+  const dividendFrequencyOptions = getDividendFrequencyOptions(t);
 
   if (assetType === 'stock') {
     return (

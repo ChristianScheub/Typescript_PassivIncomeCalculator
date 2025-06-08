@@ -10,6 +10,7 @@ import {
 } from '../../ui/forms/StandardFormWrapper';
 import { AssetSpecificFields } from '../../ui/specialized/AssetSpecificFields';
 import { useTranslation } from 'react-i18next';
+import { getAssetTypeOptions } from '../../constants';
 
 // Define the AssetFormData interface for the form
 interface AssetFormData {
@@ -82,14 +83,7 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
   const formRef = React.useRef<HTMLFormElement>(null);
 
   // Options arrays (localized)
-  const assetTypeOptions = [
-    { value: 'stock', label: t('assets.types.stock') },
-    { value: 'bond', label: t('assets.types.bond') },
-    { value: 'real_estate', label: t('assets.types.real_estate') },
-    { value: 'crypto', label: t('assets.types.crypto') },
-    { value: 'cash', label: t('assets.types.cash') },
-    { value: 'other', label: t('assets.types.other') }
-  ];
+  const assetTypeOptions = getAssetTypeOptions(t);
 
   return (
     <StandardFormWrapper
