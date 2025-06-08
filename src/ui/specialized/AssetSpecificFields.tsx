@@ -1,28 +1,23 @@
 import React from 'react';
-import { Box } from '@mui/material';
-import { AssetType, DividendFrequency } from '../types';
+import { AssetType, DividendFrequency } from '../../types';
 import { UseFormSetValue } from 'react-hook-form';
-import { FormSection, SectionTitle } from './MaterialForm';
-import { FormGrid, StandardFormField } from './FormGrid';
-import { MonthSelector } from './MonthSelector';
+import { OptionalSection, FormGrid, StandardFormField } from '../forms/StandardFormWrapper';
+import { MonthSelector } from '../forms/MonthSelector';
+import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { SharedFormField } from './SharedFormField';
-import formatService from '../service/formatService';
 
-interface AssetSpecificSectionProps {
+interface AssetSpecificFieldsProps {
   assetType: AssetType;
   dividendFrequency?: DividendFrequency;
   quantity?: number;
   currentPrice?: number;
   watch: (field: string) => any;
-  setValue: UseFormSetValue<any>;
-  paymentFields: {
-    months?: number[];
-  };
+  setValue: UseFormSetValue<any>; // Use any to avoid strict typing issues
+  paymentFields: { months?: number[] };
   handleMonthChange: (month: number, checked: boolean) => void;
 }
 
-export const AssetSpecificSection: React.FC<AssetSpecificSectionProps> = ({
+export const AssetSpecificFields: React.FC<AssetSpecificFieldsProps> = ({
   assetType,
   dividendFrequency,
   quantity,
@@ -44,17 +39,7 @@ export const AssetSpecificSection: React.FC<AssetSpecificSectionProps> = ({
 
   if (assetType === 'stock') {
     return (
-      <FormSection>
-        <SectionTitle sx={{ 
-          fontSize: { xs: '1rem', sm: '1.1rem' },
-          mb: { xs: 2, sm: 3 },
-          display: 'flex',
-          alignItems: 'center',
-          gap: 1
-        }}>
-          {t('assets.form.stockSpecific')}
-        </SectionTitle>
-        
+      <OptionalSection title={t('assets.form.stockSpecific')}>
         <FormGrid>
           <StandardFormField
             label={t('assets.form.ticker')}
@@ -96,7 +81,7 @@ export const AssetSpecificSection: React.FC<AssetSpecificSectionProps> = ({
             step={0.01}
             min={0}
           />
-          
+
           {quantity && currentPrice && quantity > 0 && currentPrice > 0 && (
             <StandardFormField
               label={t('assets.form.calculatedValue')}
@@ -107,14 +92,7 @@ export const AssetSpecificSection: React.FC<AssetSpecificSectionProps> = ({
               placeholder={t('common.zeroAmountPlaceholder')}
               step={0.01}
               min={0}
-              disabled={true}
-              helperText={`${t('assets.calculatedValue')}: ${formatService.formatCurrency(quantity * currentPrice)}`}
-              gridColumn="span 2"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'action.hover'
-                }
-              }}
+              gridColumn="1 / -1"
             />
           )}
           
@@ -139,71 +117,49 @@ export const AssetSpecificSection: React.FC<AssetSpecificSectionProps> = ({
             />
           )}
         </FormGrid>
-        
-        {(dividendFrequency === 'quarterly' || dividendFrequency === 'annually') && (
+
+        {(dividendFrequency === 'quarterly' || dividendFrequency === 'annually' || dividendFrequency === 'custom') && (
           <Box sx={{ mt: 2 }}>
-            <MonthSelector
-              selectedMonths={paymentFields.months || []}
-              onChange={(month, checked) => {
-                handleMonthChange(month, checked);
-                
-                // Update the form field
-                const currentMonths = paymentFields.months || [];
-                const newMonths = checked 
-                  ? [...currentMonths, month].sort((a, b) => a - b)
-                  : currentMonths.filter(m => m !== month);
-                
-                setValue('dividendPaymentMonths', newMonths);
-              }}
-              label={dividendFrequency === 'quarterly' ? 
-                t('assets.form.quarterlyPaymentMonths') : 
-                t('assets.form.annualPaymentMonth')}
-            />
+            {(() => {
+              let monthSelectorLabel: string;
+              
+              if (dividendFrequency === 'quarterly') {
+                monthSelectorLabel = t('assets.form.quarterlyPaymentMonths');
+              } else if (dividendFrequency === 'annually') {
+                monthSelectorLabel = t('assets.form.annualPaymentMonth');
+              } else {
+                monthSelectorLabel = t('assets.form.customDividendMonths');
+              }
+
+              return (
+                <MonthSelector
+                  selectedMonths={paymentFields.months || []}
+                  onChange={(month: number, checked: boolean) => {
+                    handleMonthChange(month, checked);
+                    const currentMonths = paymentFields.months || [];
+                    const newMonths = checked 
+                      ? [...currentMonths, month].sort((a, b) => a - b)
+                      : currentMonths.filter(m => m !== month);
+                    
+                    if (dividendFrequency === 'custom') {
+                      setValue('dividendMonths', newMonths);
+                    } else {
+                      setValue('dividendPaymentMonths', newMonths);
+                    }
+                  }}
+                  label={monthSelectorLabel}
+                />
+              );
+            })()}
           </Box>
         )}
-        
-        {dividendFrequency === 'custom' && (
-          <Box sx={{ mt: 2 }}>
-            <MonthSelector
-              selectedMonths={paymentFields.months || []}
-              onChange={(month, checked) => {
-                handleMonthChange(month, checked);
-                
-                // Update the form field
-                const currentMonths = paymentFields.months || [];
-                const newMonths = checked 
-                  ? [...currentMonths, month].sort((a, b) => a - b)
-                  : currentMonths.filter(m => m !== month);
-                
-                setValue('dividendMonths', newMonths);
-              }}
-              label={t('assets.form.customDividendMonths')}
-            />
-          </Box>
-        )}
-      </FormSection>
+      </OptionalSection>
     );
   }
 
   if (assetType === 'real_estate') {
     return (
-      <Box sx={{ 
-        mb: { xs: 3, sm: 4 },
-        p: { xs: 2, sm: 3 },
-        borderRadius: 2,
-        backgroundColor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider'
-      }}>
-        <SectionTitle sx={{ 
-          fontSize: { xs: '1rem', sm: '1.1rem' }, 
-          mb: { xs: 2, sm: 3 },
-          color: 'primary.main',
-          fontWeight: 600
-        }}>
-          {t('assets.form.realEstateSpecific')}
-        </SectionTitle>
-        
+      <OptionalSection title={t('assets.form.realEstateSpecific')}>
         <FormGrid>
           <StandardFormField
             label={t('assets.form.propertyValue')}
@@ -227,29 +183,13 @@ export const AssetSpecificSection: React.FC<AssetSpecificSectionProps> = ({
             min={0}
           />
         </FormGrid>
-      </Box>
+      </OptionalSection>
     );
   }
 
   if (assetType === 'bond') {
     return (
-      <Box sx={{
-        mb: { xs: 3, sm: 4 },
-        p: { xs: 2, sm: 3 },
-        borderRadius: 2,
-        backgroundColor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider'
-      }}>
-        <SectionTitle sx={{ 
-          fontSize: { xs: '1rem', sm: '1.1rem' }, 
-          mb: { xs: 2, sm: 3 },
-          color: 'primary.main',
-          fontWeight: 600
-        }}>
-          {t('assets.form.bondSpecific')}
-        </SectionTitle>
-        
+      <OptionalSection title={t('assets.form.bondSpecific')}>
         <FormGrid>
           <StandardFormField
             label={t('assets.form.interestRatePercent')}
@@ -278,72 +218,33 @@ export const AssetSpecificSection: React.FC<AssetSpecificSectionProps> = ({
             placeholder={t('common.zeroAmountPlaceholder')}
             step={0.01}
             min={0}
-            gridColumn="span 2"
           />
         </FormGrid>
-      </Box>
-    );
-  }
-
-  if (assetType === 'cash') {
-    return (
-      <Box sx={{ 
-        mb: { xs: 3, sm: 4 },
-        p: { xs: 2, sm: 3 },
-        borderRadius: 2,
-        backgroundColor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider'
-      }}>
-        <SectionTitle sx={{ 
-          fontSize: { xs: '1rem', sm: '1.1rem' }, 
-          mb: { xs: 2, sm: 3 },
-          color: 'primary.main',
-          fontWeight: 600
-        }}>
-          {t('assets.form.cashSpecific') || 'Cash Details'}
-        </SectionTitle>
-        
-        <FormGrid>
-          <StandardFormField
-            label={t('assets.form.interestRatePercent') || 'Interest Rate (%)'}
-            name="interestRate"
-            type="number"
-            value={watch('interestRate')}
-            onChange={(value) => setValue('interestRate', value)}
-            step={0.01}
-            min={0}
-          />
-        </FormGrid>
-      </Box>
+      </OptionalSection>
     );
   }
 
   if (assetType === 'crypto') {
     return (
-      <Box sx={{ 
-        mb: { xs: 3, sm: 4 },
-        p: { xs: 2, sm: 3 },
-        borderRadius: 2,
-        backgroundColor: 'background.paper',
-        border: '1px solid',
-        borderColor: 'divider'
-      }}>
-        <SectionTitle sx={{ 
-          fontSize: { xs: '1rem', sm: '1.1rem' }, 
-          mb: { xs: 2, sm: 3 },
-          color: 'primary.main',
-          fontWeight: 600
-        }}>
-          {t('assets.form.cryptoSpecific')}
-        </SectionTitle>
-        
+      <OptionalSection title={t('assets.form.cryptoSpecific')}>
         <FormGrid>
           <StandardFormField
-            label={t('assets.form.tokenSymbol')}
+            label={t('assets.form.symbol')}
             name="symbol"
             value={watch('symbol')}
             onChange={(value) => setValue('symbol', value)}
+            placeholder={t('assets.form.symbolPlaceholder')}
+          />
+          
+          <StandardFormField
+            label={t('assets.form.quantity')}
+            name="quantity"
+            type="number"
+            value={watch('quantity')}
+            onChange={(value) => setValue('quantity', value)}
+            placeholder={t('common.zeroPlaceholder')}
+            step={0.00000001}
+            min={0}
           />
           
           <StandardFormField
@@ -352,11 +253,12 @@ export const AssetSpecificSection: React.FC<AssetSpecificSectionProps> = ({
             type="number"
             value={watch('acquisitionCost')}
             onChange={(value) => setValue('acquisitionCost', value)}
+            placeholder={t('common.zeroAmountPlaceholder')}
             step={0.01}
             min={0}
           />
         </FormGrid>
-      </Box>
+      </OptionalSection>
     );
   }
 

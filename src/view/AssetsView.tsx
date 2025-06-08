@@ -4,12 +4,12 @@ import { Asset, AssetType } from '../types';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import formatService from '../service/formatService';
-import { Modal } from '../ui/Modal';
+import { Modal } from '../ui/common/Modal';
 import { MaterialAssetForm } from '../container/forms/MaterialAssetForm';
-import { LoadingSpinner } from '../ui/LoadingSpinner';
-import { Button } from '../ui/Button';
-import { Card, CardContent } from '../ui/Card';
-import { EmptyState } from '../ui/EmptyState';
+import { LoadingSpinner } from '../ui/feedback/LoadingSpinner';
+import { Button } from '../ui/common/Button';
+import { Card, CardContent } from '../ui/common/Card';
+import { EmptyState } from '../ui/feedback/EmptyState';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
 
 interface AssetsViewProps {

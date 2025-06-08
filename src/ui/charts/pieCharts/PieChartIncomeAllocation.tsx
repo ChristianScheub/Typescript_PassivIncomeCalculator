@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { Card } from '../Card';
-import { IncomeAllocation } from '../../types';
-import { COLORS } from '../../utils/constants';
-import formatService from '../../service/formatService';
+import { Card } from '../../common/Card';
+import { IncomeAllocation } from '../../../types';
+import { COLORS } from '../../../utils/constants';
+import formatService from '../../../service/formatService';
 
 interface PieChartIncomeAllocationProps {
   readonly incomeAllocation: ReadonlyArray<IncomeAllocation>;

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Card } from '../Card';
+import { Card } from '../../common/Card';
 // Removed unused import
-import { MonthlyProjection } from '../../types';
+import { MonthlyProjection } from '../../../types';
 
 interface BarChartExpenseCoverageProps {
   projections: MonthlyProjection[];

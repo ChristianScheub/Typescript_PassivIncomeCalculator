@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Typography, Chip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { MonthSelector } from './MonthSelector';
-import { PaymentFrequency } from '../types';
+import { MonthSelector } from '../forms/MonthSelector';
+import { PaymentFrequency } from '../../types';
 
 interface CustomScheduleSectionProps {
   frequency: PaymentFrequency;

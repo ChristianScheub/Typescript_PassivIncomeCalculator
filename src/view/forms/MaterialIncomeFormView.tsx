@@ -8,7 +8,7 @@ import {
   FormGrid,
   StandardFormField,
   CustomScheduleSection
-} from '../../ui/StandardFormWrapper';
+} from '../../ui/forms/StandardFormWrapper';
 import { useTranslation } from 'react-i18next';
 
 // Define the IncomeFormData interface for the form

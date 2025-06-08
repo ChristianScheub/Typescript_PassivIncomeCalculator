@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from './Button';
-import { Card, CardHeader, CardTitle, CardContent } from './Card';
+import { Button } from '../common/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../common/Card';
 import { ChevronUp, ChevronDown, RefreshCw, FileText, Trash2 } from 'lucide-react';
 
 interface DebugSettingsProps {

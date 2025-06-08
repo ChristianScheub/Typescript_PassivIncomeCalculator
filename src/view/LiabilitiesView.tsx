@@ -1,13 +1,13 @@
 import React from 'react';
-import { Card, CardContent } from '../ui/Card';
-import { Button } from '../ui/Button';
+import { Card, CardContent } from '../ui/common/Card';
+import { Button } from '../ui/common/Button';
 import { Plus, Trash2, Edit, Landmark } from 'lucide-react';
 import { Liability } from '../types';
 import { MaterialLiabilityForm } from '../container/forms/MaterialLiabilityForm';
 import { useTranslation } from 'react-i18next';
-import { LoadingSpinner } from '../ui/LoadingSpinner';
-import { EmptyState } from '../ui/EmptyState';
-import { Modal } from '../ui/Modal';
+import { LoadingSpinner } from '../ui/feedback/LoadingSpinner';
+import { EmptyState } from '../ui/feedback/EmptyState';
+import { Modal } from '../ui/common/Modal';
 import formatService from '../service/formatService';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
 

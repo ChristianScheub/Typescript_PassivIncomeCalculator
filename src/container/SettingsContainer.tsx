@@ -11,7 +11,7 @@ import Logger from "../service/Logger/logger";
 import SettingsView from "../view/SettingsView";
 import { handleFileDownload } from "../service/helper/downloadFile";
 import {
-  setCurrency,
+  setCurrency as setGlobalCurrency,
   getCurrency,
 } from "../service/stockAPIService/utils/fetch";
 
@@ -33,7 +33,7 @@ const SettingsContainer: React.FC = () => {
     "idle" | "saving" | "success" | "error"
   >("idle");
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
-  const [currency, setCurrencyState] = useState<"EUR" | "USD">("EUR");
+  const [currency, setCurrency] = useState<"EUR" | "USD">("EUR");
   const [clearDataStatus, setClearDataStatus] = useState<
     "idle" | "clearing" | "success"
   >("idle");
@@ -50,7 +50,7 @@ const SettingsContainer: React.FC = () => {
     }
 
     const storedCurrency = getCurrency();
-    setCurrencyState(storedCurrency);
+    setCurrency(storedCurrency);
   }, []);
 
   const loadLogs = () => {
@@ -249,8 +249,8 @@ const SettingsContainer: React.FC = () => {
   };
 
   const handleCurrencyChange = (newCurrency: "EUR" | "USD") => {
+    setGlobalCurrency(newCurrency);
     setCurrency(newCurrency);
-    setCurrencyState(newCurrency);
     Logger.info(`Currency changed to ${newCurrency}`);
     analytics.trackEvent("settings_currency_changed", {
       currency: newCurrency,

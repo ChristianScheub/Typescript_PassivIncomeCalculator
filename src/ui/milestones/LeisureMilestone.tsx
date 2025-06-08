@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '../Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
 import { PartyPopper } from 'lucide-react';
 import formatService from '../../service/formatService';
 import { getHighestMilestone, getMilestoneKey } from '../../utils/milestoneUtils';

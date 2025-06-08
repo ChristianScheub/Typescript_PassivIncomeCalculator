@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/common/Card';
 import { ArrowUpCircle, ArrowDownCircle, Wallet, CreditCard } from 'lucide-react';
 import formatService from '../service/formatService';
 import { useTranslation } from 'react-i18next';

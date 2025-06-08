@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Card } from '../Card';
-import { MonthlyProjection } from '../../types';
-import formatService from '../../service/formatService';
+import { Card } from '../../common/Card';
+import { MonthlyProjection } from '../../../types';
+import formatService from '../../../service/formatService';
 
 interface BarChartCashFlowProjectionProps {
   projections: MonthlyProjection[];

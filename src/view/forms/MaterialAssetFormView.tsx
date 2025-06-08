@@ -7,8 +7,8 @@ import {
   OptionalSection,
   FormGrid,
   StandardFormField
-} from '../../ui/StandardFormWrapper';
-import { AssetSpecificFields } from '../../ui/AssetSpecificFields';
+} from '../../ui/forms/StandardFormWrapper';
+import { AssetSpecificFields } from '../../ui/specialized/AssetSpecificFields';
 import { useTranslation } from 'react-i18next';
 
 // Define the AssetFormData interface for the form

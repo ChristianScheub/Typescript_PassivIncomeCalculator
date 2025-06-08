@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
-import { Button } from '../ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/common/Card';
+import { Button } from '../ui/common/Button';
 import { Download, Upload, Eye, EyeOff, Key, ChevronRight, ChevronDown, Trash } from 'lucide-react';
-import DebugSettings from '../ui/DebugSettings';
+import DebugSettings from '../ui/specialized/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../config/featureFlags';
 
 interface SettingsViewProps {

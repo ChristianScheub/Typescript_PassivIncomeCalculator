@@ -1,13 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MonthlyProjection, AssetAllocation, ExpenseBreakdown, IncomeAllocation } from '../types';
-import TabSelector from '../ui/TabSelector';
-import AssetAllocationChart from '../ui/pieCharts/PieChartAssetAllocation';
-import PieChartIncomeAllocation from '../ui/pieCharts/PieChartIncomeAllocation';
-import PieChartExpenseBreakdown from '../ui/pieCharts/PieChartExpenseBreakdown';
-import BarChartCashFlowProjection from '../ui/barCharts/BarChartCashFlowProjection';
-import BarChartNetCashFlow from '../ui/barCharts/BarChartNetCashFlow';
-import BarChartExpenseCoverage from '../ui/barCharts/BarChartExpenseCoverage';
+import TabSelector from '../ui/navigation/TabSelector';
+import AssetAllocationChart from '../ui/charts/pieCharts/PieChartAssetAllocation';
+import PieChartIncomeAllocation from '../ui/charts/pieCharts/PieChartIncomeAllocation';
+import PieChartExpenseBreakdown from '../ui/charts/pieCharts/PieChartExpenseBreakdown';
+import BarChartCashFlowProjection from '../ui/charts/barCharts/BarChartCashFlowProjection';
+import BarChartNetCashFlow from '../ui/charts/barCharts/BarChartNetCashFlow';
+import BarChartExpenseCoverage from '../ui/charts/barCharts/BarChartExpenseCoverage';
 import MilestonesContainer from '../container/MilestonesContainer';
 
 type ForecastTab = 'projections' | 'allocations' | 'fire';

@@ -2,13 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
-import { Card } from '../Card';
-import { Button } from '../Button';
+import { Card } from '../../common/Card';
+import { Button } from '../../common/Button';
 import { CustomPieTooltip } from '../CustomPieTooltip';
-import { AssetAllocation } from '../../types';
-import { COLORS } from '../../utils/constants';
+import { AssetAllocation } from '../../../types';
+import { COLORS } from '../../../utils/constants';
 import { LineChart } from 'lucide-react';
-import formatService from '../../service/formatService';
+import formatService from '../../../service/formatService';
 
 interface AssetAllocationChartProps {
   title?: string;

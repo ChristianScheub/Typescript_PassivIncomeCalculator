@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box } from '@mui/material';
 import { Save, Close } from '@mui/icons-material';
-import FloatingBtn, { ButtonAlignment } from './floatingBtn';
+import FloatingBtn, { ButtonAlignment } from '../layout/floatingBtn';
 
 interface FormSubmitButtonProps {
   onSubmit: () => void;

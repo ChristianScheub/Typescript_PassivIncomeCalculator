@@ -1,11 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent } from '../ui/Card';
-import { Button } from '../ui/Button';
+import { Card, CardContent } from '../ui/common/Card';
+import { Button } from '../ui/common/Button';
 import { Plus, CreditCard, Edit, Trash2 } from 'lucide-react';
-import { LoadingSpinner } from '../ui/LoadingSpinner';
-import { Modal } from '../ui/Modal';
-import { EmptyState } from '../ui/EmptyState';
+import { LoadingSpinner } from '../ui/feedback/LoadingSpinner';
+import { Modal } from '../ui/common/Modal';
+import { EmptyState } from '../ui/feedback/EmptyState';
 import { Income } from '../types';
 import { MaterialIncomeForm } from '../container/forms/MaterialIncomeForm';
 import formatService from '../service/formatService';

@@ -66,6 +66,69 @@ const AssetCalendarContainer: React.FC = () => {
       : assets.filter(asset => asset.type === selectedAssetType);
   }, [assets, selectedAssetType]);
 
+  // Helper function to get income from cache result
+  const getIncomeFromCacheResult = useCallback((cacheResult: any, asset: Asset, month: number): number => {
+    if (cacheResult.cacheHit && cacheResult.monthlyBreakdown) {
+      const monthlyIncome = cacheResult.monthlyBreakdown[month] || 0;
+      Logger.cache(`Cache hit for asset ${asset.name} month ${month}: ${monthlyIncome}`);
+      return monthlyIncome;
+    }
+    
+    if (!cacheResult.cacheHit && cacheResult.cacheDataToUpdate) {
+      const monthlyIncome = cacheResult.cacheDataToUpdate.monthlyBreakdown?.[month] || 0;
+      Logger.cache(`Using cacheDataToUpdate for ${asset.name} month ${month}: ${monthlyIncome}`);
+      return monthlyIncome;
+    }
+    
+    Logger.cache(`No usable cache data for ${asset.name}, falling back to direct calculation`);
+    return 0;
+  }, []);
+
+  // Helper function to try cached calculation
+  const tryGetCachedIncome = useCallback((asset: Asset, month: number): number => {
+    if (!calculatorService.calculateAssetMonthlyIncomeWithCache) return 0;
+    
+    Logger.cache(`Trying cached calculation for ${asset.name}`);
+    try {
+      const cacheResult = calculatorService.calculateAssetMonthlyIncomeWithCache(asset);
+      Logger.cache(`Cache result for ${asset.name}: cacheHit=${cacheResult.cacheHit}, monthlyAmount=${cacheResult.monthlyAmount}`);
+      return getIncomeFromCacheResult(cacheResult, asset, month);
+    } catch (error) {
+      Logger.cache(`Error in cached calculation for ${asset.name}: ${error}`);
+      return 0;
+    }
+  }, [getIncomeFromCacheResult]);
+
+  // Helper function to try direct calculation
+  const tryGetDirectIncome = useCallback((asset: Asset, month: number): number => {
+    Logger.cache(`Falling back to direct calculation for ${asset.name} month ${month}`);
+    try {
+      const income = calculateAssetIncomeForMonth(asset, month);
+      Logger.cache(`Direct calculation result for ${asset.name} month ${month}: ${income}`);
+      return income;
+    } catch (error) {
+      Logger.cache(`Error in direct calculation for ${asset.name}: ${error}`);
+      return 0;
+    }
+  }, []);
+
+  // Helper function to try basic monthly calculation as fallback
+  const tryGetBasicMonthlyIncome = useCallback((asset: Asset, calculatedIncome: number): number => {
+    try {
+      const basicMonthly = calculatorService.calculateAssetMonthlyIncome(asset);
+      Logger.cache(`Basic monthly calculation for ${asset.name}: ${basicMonthly}`);
+      
+      const isMonthlyDividendStock = asset.type === 'stock' && asset.dividendInfo?.frequency === 'monthly';
+      if (isMonthlyDividendStock && calculatedIncome === 0 && basicMonthly > 0) {
+        Logger.cache(`Using basic monthly calculation as fallback for ${asset.name}: ${basicMonthly}`);
+        return basicMonthly;
+      }
+    } catch (error) {
+      Logger.cache(`Error in basic calculation for ${asset.name}: ${error}`);
+    }
+    return calculatedIncome;
+  }, []);
+
   // Memoize the calculation of asset income for a specific month using cache
   const calculateAssetIncomeForMonthCached = useCallback((asset: Asset, month: number): number => {
     Logger.cache(`=== Starting calculation for ${asset.name} (${asset.type}) month ${month} ===`);
@@ -76,61 +139,20 @@ const AssetCalendarContainer: React.FC = () => {
       Logger.cache(`Stock details - Quantity: ${asset.quantity}, DividendInfo: ${JSON.stringify(asset.dividendInfo)}`);
     }
     
-    let calculatedIncome = 0;
+    // Try cached calculation first
+    let calculatedIncome = tryGetCachedIncome(asset, month);
     
-    // Try to use cached calculation first
-    if (calculatorService.calculateAssetMonthlyIncomeWithCache) {
-      Logger.cache(`Trying cached calculation for ${asset.name}`);
-      try {
-        const cacheResult = calculatorService.calculateAssetMonthlyIncomeWithCache(asset);
-        Logger.cache(`Cache result for ${asset.name}: cacheHit=${cacheResult.cacheHit}, monthlyAmount=${cacheResult.monthlyAmount}`);
-        Logger.cache(`Cache breakdown available: ${!!cacheResult.monthlyBreakdown}`);
-        
-        if (cacheResult.cacheHit && cacheResult.monthlyBreakdown) {
-          const monthlyIncome = cacheResult.monthlyBreakdown[month] || 0;
-          Logger.cache(`Cache hit for asset ${asset.name} month ${month}: ${monthlyIncome}`);
-          calculatedIncome = monthlyIncome;
-        } else if (!cacheResult.cacheHit && cacheResult.cacheDataToUpdate) {
-          Logger.cache(`Cache miss but have data to update for ${asset.name}`);
-          const monthlyIncome = cacheResult.cacheDataToUpdate.monthlyBreakdown?.[month] || 0;
-          Logger.cache(`Using cacheDataToUpdate for ${asset.name} month ${month}: ${monthlyIncome}`);
-          calculatedIncome = monthlyIncome;
-        } else {
-          Logger.cache(`No usable cache data for ${asset.name}, falling back to direct calculation`);
-        }
-      } catch (error) {
-        Logger.cache(`Error in cached calculation for ${asset.name}: ${error}`);
-      }
-    }
-    
-    // If we still don't have income, try direct calculation
+    // If no cached income, try direct calculation
     if (calculatedIncome === 0) {
-      Logger.cache(`Falling back to direct calculation for ${asset.name} month ${month}`);
-      try {
-        calculatedIncome = calculateAssetIncomeForMonth(asset, month);
-        Logger.cache(`Direct calculation result for ${asset.name} month ${month}: ${calculatedIncome}`);
-      } catch (error) {
-        Logger.cache(`Error in direct calculation for ${asset.name}: ${error}`);
-      }
+      calculatedIncome = tryGetDirectIncome(asset, month);
     }
     
-    // Also try the basic monthly calculation to compare
-    try {
-      const basicMonthly = calculatorService.calculateAssetMonthlyIncome(asset);
-      Logger.cache(`Basic monthly calculation for ${asset.name}: ${basicMonthly}`);
-      
-      // For monthly dividends, the basic calculation should match each month
-      if (asset.type === 'stock' && asset.dividendInfo?.frequency === 'monthly' && calculatedIncome === 0 && basicMonthly > 0) {
-        Logger.cache(`Using basic monthly calculation as fallback for ${asset.name}: ${basicMonthly}`);
-        calculatedIncome = basicMonthly;
-      }
-    } catch (error) {
-      Logger.cache(`Error in basic calculation for ${asset.name}: ${error}`);
-    }
+    // Try basic monthly calculation as fallback for monthly dividends
+    calculatedIncome = tryGetBasicMonthlyIncome(asset, calculatedIncome);
     
     Logger.cache(`=== Final income for ${asset.name} month ${month}: ${calculatedIncome} ===`);
     return calculatedIncome;
-  }, []);
+  }, [tryGetCachedIncome, tryGetDirectIncome, tryGetBasicMonthlyIncome]);
 
   // Memoize months data calculation with proper dependencies
   const monthsData = useMemo(() => {
@@ -168,8 +190,8 @@ const AssetCalendarContainer: React.FC = () => {
 
       Logger.info(`Month ${month} (${monthNames[month - 1]}): ${monthAssets.length} assets with income, total: ${totalIncome}`);
 
-      // Sort by income descending
-      const sortedMonthAssets = monthAssets.sort((a, b) => b.income - a.income);
+      // Sort by income descending - using toSorted to avoid mutating the original array
+      const sortedMonthAssets = monthAssets.toSorted((a, b) => b.income - a.income);
 
       data.push({
         month,

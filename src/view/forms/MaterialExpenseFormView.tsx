@@ -8,7 +8,7 @@ import {
   FormGrid,
   StandardFormField,
   CustomScheduleSection
-} from '../../ui/StandardFormWrapper';
+} from '../../ui/forms/StandardFormWrapper';
 import { useTranslation } from 'react-i18next';
 
 // Define the ExpenseFormData interface for the form
@@ -37,7 +37,6 @@ interface MaterialExpenseFormViewProps {
   watch: (field: string) => any;
   setValue: UseFormSetValue<ExpenseFormData>;
   onFormSubmit: () => void;
-  onCancel?: () => void;
   
   // Payment schedule props
   paymentFields: {

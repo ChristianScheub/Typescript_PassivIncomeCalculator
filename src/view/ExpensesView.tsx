@@ -1,13 +1,13 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/Card';
-import { Button } from '../ui/Button';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/common/Card';
+import { Button } from '../ui/common/Button';
 import { Plus, Trash2, Edit, ReceiptText } from 'lucide-react';
 import { Expense } from '../types';
 import { MaterialExpenseForm } from '../container/forms/MaterialExpenseForm';
 import { useTranslation } from 'react-i18next';
 import formatService from '../service/formatService';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
-import { Modal } from '../ui/Modal';
+import { Modal } from '../ui/common/Modal';
 
 interface ExpensesViewProps {
   expenses: Expense[];
@@ -172,10 +172,6 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
         <MaterialExpenseForm
           initialData={editingExpense || undefined}
           onSubmit={editingExpense ? onUpdateExpense : onAddExpense}
-          onCancel={() => {
-            onSetIsAddingExpense(false);
-            onSetEditingExpense(null);
-          }}
         />
       </Modal>
     </div>

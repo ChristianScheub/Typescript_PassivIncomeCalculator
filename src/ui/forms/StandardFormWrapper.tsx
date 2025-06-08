@@ -5,7 +5,7 @@ import { FormSubmitButton } from './FormSubmitButton';
 import { RequiredSection } from './RequiredSection';
 import { OptionalSection } from './OptionalSection';
 import { FormGrid, StandardFormField } from './FormGrid';
-import { CustomScheduleSection } from './CustomScheduleSection';
+import { CustomScheduleSection } from '../specialized/CustomScheduleSection';
 
 interface StandardFormWrapperProps {
   title: string;

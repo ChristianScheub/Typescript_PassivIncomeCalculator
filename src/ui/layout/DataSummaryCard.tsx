@@ -1,6 +1,6 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from './Card';
-import { cn } from '../utils/cn';
+import { Card, CardHeader, CardTitle, CardContent } from '../common/Card';
+import { cn } from '../../utils/cn';
 
 interface SummaryItem {
   id: string;

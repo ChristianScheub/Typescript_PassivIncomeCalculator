@@ -1,8 +1,8 @@
 import React from 'react';
-import { Card, CardContent } from './Card';
-import { Button } from './Button';
+import { Card, CardContent } from '../common/Card';
+import { Button } from '../common/Button';
 import { Plus } from 'lucide-react';
-import { cn } from '../utils/cn';
+import { cn } from '../../utils/cn';
 
 interface EmptyStateProps {
   icon: React.ReactNode;

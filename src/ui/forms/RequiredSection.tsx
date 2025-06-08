@@ -1,5 +1,4 @@
 import React from 'react';
-import { Box } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { SectionTitle, RequiredFieldsSection } from './MaterialForm';
 

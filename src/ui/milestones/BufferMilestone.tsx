@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, CardHeader, CardTitle } from '../Card';
+import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
 import { Shield } from 'lucide-react';
 import formatService from '../../service/formatService';
 import { getHighestBufferMilestone, getBufferMilestoneKey } from '../../utils/milestoneUtils';
