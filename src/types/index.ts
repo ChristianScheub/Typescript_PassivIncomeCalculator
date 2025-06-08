@@ -64,6 +64,10 @@ export interface AssetDefinition extends BaseEntity {
   isin?: string;
   wkn?: string;
   
+  // Current market data
+  currentPrice?: number;
+  lastPriceUpdate?: string;
+  
   // Dividend/Income Information
   dividendInfo?: {
     frequency: DividendFrequency;
@@ -101,8 +105,8 @@ export interface AssetDefinition extends BaseEntity {
   isActive?: boolean;
 }
 
-// Erweiterte Asset Type für Transaktionen
-export interface Asset extends BaseEntity {
+// Transaction Type für Asset-Transaktionen
+export interface Transaction extends BaseEntity {
   type: AssetType;
   value: number;
   
@@ -116,19 +120,18 @@ export interface Asset extends BaseEntity {
   purchaseQuantity?: number;
   transactionCosts?: number;
   
-  // Current values (calculated or updated)
-  currentPrice?: number;
-  currentQuantity?: number; // Can change due to splits, etc.
-  lastPriceUpdate?: string;
-  
-  // Calculated fields
-  currentValue?: number;
+  // Calculated fields (derived values - not stored)
+  // currentQuantity = purchaseQuantity (can change due to splits, etc.)
+  // currentValue = assetDefinition.currentPrice * currentQuantity
   totalReturn?: number;
   totalReturnPercentage?: number;
   
   notes?: string;
   cachedDividends?: CachedDividends;
 }
+
+// Alias für Rückwärtskompatibilität während der Migration
+export type Asset = Transaction;
 
 // Liability Types
 export type LiabilityType = 'mortgage' | 'personal_loan' | 'credit_card' | 'student_loan' | 'auto_loan' | 'other';

@@ -1,6 +1,7 @@
 import { Asset, AssetDefinition } from '../../types';
 import Logger from '../Logger/logger';
 import { calculateDividendSchedule } from '../calculatorService/methods/calculatePayment';
+import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
 
 export interface PortfolioPosition {
   id: string; // AssetDefinitionId or fallback identifier
@@ -59,17 +60,17 @@ export const calculatePortfolioPositions = (
 
     // Calculate aggregated quantities and values
     const totalQuantity = transactions.reduce((sum, t) => {
-      return sum + (t.currentQuantity || t.purchaseQuantity || 1);
+      return sum + getCurrentQuantity(t);
     }, 0);
 
     const totalInvestment = transactions.reduce((sum, t) => {
-      const quantity = t.currentQuantity || t.purchaseQuantity || 1;
+      const quantity = getCurrentQuantity(t);
       const price = t.purchasePrice || 0;
       return sum + (price * quantity) + (t.transactionCosts || 0);
     }, 0);
 
     const currentValue = transactions.reduce((sum, t) => {
-      return sum + (t.currentValue || t.value || 0);
+      return sum + getCurrentValue(t);
     }, 0);
 
     const averagePurchasePrice = totalQuantity > 0 ? totalInvestment / totalQuantity : 0;
@@ -87,27 +88,21 @@ export const calculatePortfolioPositions = (
     const firstTransaction = sortedTransactions[0];
     const lastTransaction = sortedTransactions[sortedTransactions.length - 1];
 
-    // Get current price from the most recent transaction
-    const latestPriceTransaction = transactions.reduce((latest, current) => 
-      new Date(current.lastPriceUpdate || current.updatedAt || current.purchaseDate) > 
-      new Date(latest.lastPriceUpdate || latest.updatedAt || latest.purchaseDate) ? current : latest
-    );
-
     const position: PortfolioPosition = {
       id: key,
       assetDefinition,
       name: assetDefinition?.fullName || firstTransaction.name,
-      ticker: assetDefinition?.ticker || firstTransaction.ticker,
+      ticker: assetDefinition?.ticker,
       type: assetDefinition?.type || firstTransaction.type,
-      sector: assetDefinition?.sector || firstTransaction.sector,
-      country: assetDefinition?.country || firstTransaction.country,
+      sector: assetDefinition?.sector,
+      country: assetDefinition?.country,
       currency: assetDefinition?.currency || 'EUR',
       
       totalQuantity,
       averagePurchasePrice,
       totalInvestment,
       currentValue,
-      currentPrice: latestPriceTransaction.currentPrice,
+      currentPrice: assetDefinition?.currentPrice,
       
       totalReturn,
       totalReturnPercentage,
@@ -134,12 +129,11 @@ const calculatePositionMonthlyIncome = (
   sampleTransaction: Asset,
   totalQuantity: number
 ): number => {
-  // Use AssetDefinition dividend info if available, otherwise fall back to transaction dividend info
-  const dividendInfo = assetDefinition?.dividendInfo || sampleTransaction.dividendInfo;
+  // Use AssetDefinition data only (legacy fields have been removed from Transaction interface)
+  const dividendInfo = assetDefinition?.dividendInfo;
   const assetType = assetDefinition?.type || sampleTransaction.type;
-  const interestRate = assetDefinition?.bondInfo?.interestRate || sampleTransaction.interestRate;
+  const interestRate = assetDefinition?.bondInfo?.interestRate;
   const rentalInfo = assetDefinition?.rentalInfo;
-  const rentalIncome = sampleTransaction.rentalIncome;
 
   Logger.infoService(
     `Calculating income for position: type=${assetType}, quantity=${totalQuantity}, hasDefinition=${!!assetDefinition}`
@@ -161,7 +155,7 @@ const calculatePositionMonthlyIncome = (
 
   // Bond/Cash interest
   if ((assetType === 'bond' || assetType === 'cash') && interestRate !== undefined) {
-    const currentValue = sampleTransaction.currentValue || sampleTransaction.value || 0;
+    const currentValue = getCurrentValue(sampleTransaction);
     const annualInterest = (interestRate * currentValue) / 100;
     const monthlyInterest = annualInterest / 12;
     Logger.infoService(
@@ -172,8 +166,8 @@ const calculatePositionMonthlyIncome = (
 
   // Real estate rental income
   if (assetType === 'real_estate') {
-    // Prefer AssetDefinition rental info
-    const baseRent = rentalInfo?.baseRent || rentalIncome?.amount || 0;
+    // Use AssetDefinition rental info only (legacy fields have been removed from Transaction interface)
+    const baseRent = rentalInfo?.baseRent || 0;
     Logger.infoService(
       `Real estate rental calculation: baseRent=${baseRent}, fromDefinition=${!!rentalInfo}`
     );

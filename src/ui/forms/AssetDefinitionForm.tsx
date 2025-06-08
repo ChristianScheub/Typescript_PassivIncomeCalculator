@@ -28,6 +28,10 @@ const assetDefinitionSchema = z.object({
   description: z.string().optional(),
   riskLevel: z.enum(['low', 'medium', 'high']).optional(),
   
+  // Price fields
+  currentPrice: z.number().min(0).optional(),
+  lastPriceUpdate: z.string().optional(),
+  
   // Dividend fields
   hasDividend: z.boolean().optional(),
   dividendAmount: z.number().min(0).optional(),
@@ -48,6 +52,8 @@ const assetDefinitionSchema = z.object({
   maturityDate: z.string().optional(),
   nominalValue: z.number().min(0).optional(),
 });
+
+type AssetDefinitionFormData = z.infer<typeof assetDefinitionSchema>;
 
 interface AssetDefinitionFormProps {
   isOpen: boolean;
@@ -71,7 +77,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     { value: 'high', label: t('assets.riskLevels.high') }
   ];
 
-  const { handleSubmit, watch, setValue, formState: { errors }, reset } = useForm({
+  const { handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<AssetDefinitionFormData>({
     resolver: zodResolver(assetDefinitionSchema),
     defaultValues: editingDefinition ? {
       fullName: editingDefinition.fullName,
@@ -86,6 +92,10 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       wkn: editingDefinition.wkn || '',
       description: editingDefinition.description || '',
       riskLevel: editingDefinition.riskLevel || 'medium',
+      
+      // Price fields
+      currentPrice: editingDefinition.currentPrice || undefined,
+      lastPriceUpdate: editingDefinition.lastPriceUpdate || undefined,
       
       hasDividend: !!editingDefinition.dividendInfo,
       dividendAmount: editingDefinition.dividendInfo?.amount || 0,
@@ -168,7 +178,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     }
   }, [editingDefinition, reset]);
 
-  const handleFormSubmit = (data: any) => {
+  const handleFormSubmit = (data: AssetDefinitionFormData) => {
     const definitionData: Omit<AssetDefinition, 'id' | 'createdAt' | 'updatedAt'> = {
       name: data.fullName, // Use fullName as name
       fullName: data.fullName,
@@ -184,28 +194,32 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       description: data.description || undefined,
       riskLevel: data.riskLevel || undefined,
       isActive: true,
+      
+      // Price fields
+      currentPrice: data.currentPrice || undefined,
+      lastPriceUpdate: data.lastPriceUpdate || undefined,
     };
 
     // Add dividend info if enabled
-    if (data.hasDividend && data.dividendAmount > 0) {
+    if (data.hasDividend && data.dividendAmount && data.dividendAmount > 0) {
       definitionData.dividendInfo = {
-        frequency: data.dividendFrequency,
+        frequency: data.dividendFrequency as DividendFrequency,
         amount: data.dividendAmount,
         currency: data.currency,
       };
     }
 
     // Add rental info if enabled
-    if (data.hasRental && data.rentalAmount > 0) {
+    if (data.hasRental && data.rentalAmount && data.rentalAmount > 0) {
       definitionData.rentalInfo = {
         baseRent: data.rentalAmount,
-        frequency: data.rentalFrequency,
+        frequency: data.rentalFrequency as PaymentFrequency,
         currency: data.currency,
       };
     }
 
     // Add bond info if enabled
-    if (data.hasBond && data.interestRate > 0) {
+    if (data.hasBond && data.interestRate && data.interestRate > 0) {
       definitionData.bondInfo = {
         interestRate: data.interestRate,
         maturityDate: data.maturityDate || undefined,
@@ -289,6 +303,17 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
             value={watch('currency')}
             onChange={(value) => setValue('currency', value)}
             placeholder="EUR"
+          />
+
+          <StandardFormField
+            label={t('assets.currentPrice')}
+            name="currentPrice"
+            type="number"
+            value={watch('currentPrice')}
+            onChange={(value) => setValue('currentPrice', value)}
+            step={0.01}
+            min={0}
+            placeholder={t('assets.currentPricePlaceholder')}
           />
         </FormGrid>
       </RequiredSection>

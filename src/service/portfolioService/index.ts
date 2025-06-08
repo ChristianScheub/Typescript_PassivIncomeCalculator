@@ -5,6 +5,7 @@ import {
   PortfolioPosition 
 } from './portfolioCalculations';
 import Logger from '../Logger/logger';
+import { getCurrentQuantity } from '../../utils/transactionCalculations';
 
 export class PortfolioService {
   private static instance: PortfolioService;
@@ -70,7 +71,7 @@ export class PortfolioService {
   ): number {
     const positionTransactions = assets.filter(asset => asset.assetDefinitionId === definitionId);
     const totalQuantity = positionTransactions.reduce((sum, t) => {
-      return sum + (t.currentQuantity || t.purchaseQuantity || 1);
+      return sum + getCurrentQuantity(t);
     }, 0);
 
     if (totalQuantity <= 0 || !newDividendInfo?.frequency || newDividendInfo.frequency === 'none') {

@@ -8,6 +8,7 @@ import {
   getCachedDividendData,
   createCachedDividends,
 } from "../../../utils/dividendCacheUtils";
+import { getCurrentQuantity } from "../../../utils/transactionCalculations";
 
 // Helper: Calculate stock dividend income
 const getStockDividendIncome = (asset: Asset): number => {
@@ -16,8 +17,8 @@ const getStockDividendIncome = (asset: Asset): number => {
     const dividendInfo = asset.assetDefinition?.dividendInfo;
     
     if (dividendInfo?.frequency) {
-      // Use currentQuantity or purchaseQuantity 
-      const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+      // Use getCurrentQuantity helper function
+      const quantity = getCurrentQuantity(asset);
       
       if (quantity <= 0) {
         Logger.infoService(`Stock ${asset.name} has no valid quantity (${quantity}), skipping dividend calculation`);
@@ -84,7 +85,7 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
     `=== Calculating income for asset: ${asset.name} ===`
   );
   Logger.infoService(
-    `Asset type: ${asset.type}, Current quantity: ${asset.currentQuantity}, Purchase quantity: ${asset.purchaseQuantity}`
+    `Asset type: ${asset.type}, Current quantity: ${getCurrentQuantity(asset)}, Purchase quantity: ${asset.purchaseQuantity}`
   );
   
   // Check for dividend info from AssetDefinition only
@@ -127,8 +128,8 @@ const getStockDividendForMonth = (asset: Asset, monthNumber: number): number => 
     const dividendInfo = asset.assetDefinition?.dividendInfo;
     
     if (dividendInfo) {
-      // Use currentQuantity or purchaseQuantity
-      const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+      // Use getCurrentQuantity helper function
+      const quantity = getCurrentQuantity(asset);
       
       if (quantity <= 0) {
         Logger.infoService(`Stock ${asset.name} has no valid quantity (${quantity}) for month ${monthNumber}, skipping dividend calculation`);
@@ -336,8 +337,8 @@ function getStockDividendBreakdown(asset: Asset) {
   
   if (!dividendInfo) return null;
   
-  // Use currentQuantity or purchaseQuantity
-  const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+  // Use getCurrentQuantity helper function
+  const quantity = getCurrentQuantity(asset);
   if (quantity <= 0) return null;
   
   const dividendResult = calculateDividendSchedule(dividendInfo, quantity);

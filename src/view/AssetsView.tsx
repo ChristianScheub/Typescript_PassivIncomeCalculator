@@ -18,6 +18,7 @@ import {
   Trash2,
   Package
 } from 'lucide-react';
+import { getCurrentQuantity, getCurrentValue } from '../utils/transactionCalculations';
 
 interface PortfolioData {
   positions: PortfolioPosition[];
@@ -342,10 +343,10 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
                       </div>
                     )}
 
-                    {portfolioAsset.currentPrice && (
+                    {portfolioAsset.assetDefinition?.currentPrice && (
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">{t('assets.currentPrice')}:</span>
-                        <span className="text-gray-900 dark:text-gray-100">{formatService.formatCurrency(portfolioAsset.currentPrice)}</span>
+                        <span className="text-gray-900 dark:text-gray-100">{formatService.formatCurrency(portfolioAsset.assetDefinition.currentPrice)}</span>
                       </div>
                     )}
                   </div>
@@ -373,7 +374,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
                       <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">{asset.name}</h3>
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         {getAssetTypeLabel(asset.type)}
-                        {asset.ticker && ` • ${asset.ticker}`}
+                        {asset.assetDefinition?.ticker && ` • ${asset.assetDefinition.ticker}`}
                       </p>
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {t('assets.purchaseDate')}: {new Date(asset.purchaseDate).toLocaleDateString()}
@@ -388,7 +389,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">{t('assets.currentValue')}:</span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {formatService.formatCurrency(asset.currentValue || asset.value)}
+                        {formatService.formatCurrency(getCurrentValue(asset))}
                       </span>
                     </div>
                     
@@ -402,7 +403,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
                           );
                           if (position && position.totalQuantity > 0) {
                             // Calculate proportional income based on this transaction's quantity
-                            const transactionQuantity = asset.purchaseQuantity || asset.currentQuantity || 0;
+                            const transactionQuantity = getCurrentQuantity(asset);
                             const proportionalIncome = (position.monthlyIncome * transactionQuantity) / position.totalQuantity;
                             return formatService.formatCurrency(proportionalIncome);
                           }
@@ -425,10 +426,10 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
                       </div>
                     )}
 
-                    {asset.sector && (
+                    {asset.assetDefinition?.sector && (
                       <div className="flex justify-between">
                         <span className="text-gray-600 dark:text-gray-400">{t('assets.sector')}:</span>
-                        <span className="text-gray-900 dark:text-gray-100">{asset.sector}</span>
+                        <span className="text-gray-900 dark:text-gray-100">{asset.assetDefinition.sector}</span>
                       </div>
                     )}
                   </div>

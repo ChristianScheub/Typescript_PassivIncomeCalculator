@@ -6,7 +6,6 @@ import {
   updateAsset, 
   deleteAsset, 
   updateAssetDividendCache, 
-  updateStockPrices,
   calculatePortfolioData,
   selectAssets,
   selectAssetsStatus,
@@ -15,7 +14,7 @@ import {
   selectPortfolioTotals,
   selectSortedAssets
 } from '../store/slices/assetsSlice';
-import { fetchAssetDefinitions } from '../store/slices/assetDefinitionsSlice';
+import { fetchAssetDefinitions, updateAssetDefinition } from '../store/slices/assetDefinitionsSlice';
 import { AssetsView } from '../view/AssetsView';
 import { Asset } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -98,10 +97,7 @@ const AssetsContainer: React.FC = () => {
       Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
       analytics.trackEvent('asset_add', { type: data.type, hasDefinitionId: !!data.assetDefinitionId });
       
-      // Ensure currentQuantity is set from purchaseQuantity if not provided
-      if (!data.currentQuantity && data.purchaseQuantity) {
-        data.currentQuantity = data.purchaseQuantity;
-      }
+      // currentQuantity is now derived from purchaseQuantity - no need to set it explicitly
       
       await dispatch(addAsset(data));
       setIsAddingAsset(false);
@@ -113,14 +109,14 @@ const AssetsContainer: React.FC = () => {
 
   // Helper: Calculate stock value and differences
   function updateStockValueFields(data: any) {
-    if (data.type === 'stock' && data.purchaseQuantity && data.currentPrice && data.purchasePrice) {
-      const currentValue = data.purchaseQuantity * data.currentPrice;
+    if (data.type === 'stock' && data.purchaseQuantity && data.purchasePrice) {
+      // Note: currentPrice is now stored in AssetDefinition, not in transaction
+      // This function only calculates purchase-related values for transactions
       const purchaseValue = data.purchaseQuantity * data.purchasePrice;
-      const difference = currentValue - purchaseValue;
-      const percentageDiff = purchaseValue > 0 ? ((currentValue - purchaseValue) / purchaseValue) * 100 : 0;
-      data.valueDifference = difference !== 0 ? difference : undefined;
-      data.percentageDifference = difference !== 0 ? percentageDiff : undefined;
-      data.value = currentValue;
+      data.value = purchaseValue; // Transaction value is based on purchase data
+      
+      // Value differences will be calculated at portfolio level using AssetDefinition.currentPrice
+      Logger.info(`Transaction value calculated from purchase data: ${data.purchaseQuantity} × ${data.purchasePrice} = ${purchaseValue}`);
     }
   }
 
@@ -130,10 +126,7 @@ const AssetsContainer: React.FC = () => {
       Logger.info('Updating asset transaction' + " - " + JSON.stringify({ id: editingAsset.id, data }));
       analytics.trackEvent('asset_update', { id: editingAsset.id, type: data.type });
       
-      // Ensure currentQuantity is set from purchaseQuantity if not provided
-      if (!data.currentQuantity && data.purchaseQuantity) {
-        data.currentQuantity = data.purchaseQuantity;
-      }
+      // currentQuantity is now derived from purchaseQuantity - no need to set it explicitly
       
       updateStockValueFields(data);
       await dispatch(updateAsset({ ...data, id: editingAsset.id }));
@@ -190,28 +183,33 @@ const AssetsContainer: React.FC = () => {
     setIsUpdatingPrices(true);
     try {
       Logger.info('Starting stock price update');
-      const updatedStocks = await StockPriceUpdater.updateStockPrices(assets);
-      if (updatedStocks.length > 0) {
-        Logger.info(`Dispatching price updates for ${updatedStocks.length} stocks`);
-        await dispatch(updateStockPrices(updatedStocks));
+      
+      // Filter AssetDefinitions that have stock type and ticker symbols
+      const stockDefinitions = assetDefinitions.filter(def => 
+        def.type === 'stock' && def.ticker
+      );
+      
+      if (stockDefinitions.length === 0) {
+        Logger.info('No stock definitions found to update');
+        return;
+      }
+      
+      const updatedDefinitions = await StockPriceUpdater.updateStockPrices(stockDefinitions);
+      
+      if (updatedDefinitions.length > 0) {
+        Logger.info(`Dispatching price updates for ${updatedDefinitions.length} stock definitions`);
         
-        // Re-calculate cache for updated stocks since their values have changed
-        updatedStocks.forEach(asset => {
-          const result = calculatorService.calculateAssetMonthlyIncomeWithCache?.(asset);
-          if (result?.cacheDataToUpdate) {
-            const cachedDividends = createCachedDividends(
-              result.cacheDataToUpdate.monthlyAmount,
-              result.cacheDataToUpdate.annualAmount,
-              result.cacheDataToUpdate.monthlyBreakdown,
-              asset
-            );
-            dispatch(updateAssetDividendCache({ assetId: asset.id, cachedDividends }));
-          }
-        });
+        // Update each AssetDefinition in the store
+        for (const definition of updatedDefinitions) {
+          await dispatch(updateAssetDefinition(definition));
+        }
+        
+        // Re-calculate portfolio cache since stock prices have changed
+        await dispatch(calculatePortfolioData(assetDefinitions));
 
-        Logger.info('Successfully updated stock prices and recalculated caches');
+        Logger.info('Successfully updated stock prices and recalculated portfolio');
       } else {
-        Logger.info('No stocks were updated');
+        Logger.info('No stock definitions were updated');
       }
     } catch (error) {
       Logger.error('Failed to update stock prices' + ' - ' + JSON.stringify(error as Error));

@@ -28,7 +28,7 @@ export const stockFields = {
   ticker: z.string().optional(),
   quantity: amountSchema,  // Required for stocks
   purchasePrice: amountSchema,  // Required for stocks
-  currentPrice: amountSchema,  // Required for stocks
+  // Note: currentPrice is now stored in AssetDefinition, not in transactions
 };
 
 export const realEstateFields = {
@@ -75,11 +75,9 @@ export const createAssetSchema = () => {
     transactionCosts: z.number().min(0).optional(),
     
     // Current values (calculated or updated)
-    currentPrice: z.number({
-      invalid_type_error: "Current price must be a number"
-    }).min(0, "Current price must be positive").optional(),
-    currentQuantity: z.number().min(0).optional(),
-    currentValue: z.number().min(0).optional(),
+    // Note: currentPrice, currentQuantity, and currentValue are now derived values, not stored
+    // currentQuantity = purchaseQuantity (can change due to splits, etc.)
+    // currentValue = assetDefinition.currentPrice * currentQuantity
     
     // Stock specific fields (for backwards compatibility)
     ticker: z.string().optional(),
@@ -104,7 +102,7 @@ export const createAssetSchema = () => {
 
   return assetSchema.superRefine((data, ctx) => {
     if (data.type === 'stock') {
-      // For stocks, require quantity and prices - value will be calculated automatically
+      // For stocks, require quantity and purchase price - current price is in AssetDefinition
       if (!data.quantity || data.quantity <= 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -119,14 +117,8 @@ export const createAssetSchema = () => {
           path: ["purchasePrice"]
         });
       }
-      if (!data.currentPrice || data.currentPrice <= 0) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Current price is required for stocks",
-          path: ["currentPrice"]
-        });
-      }
-      // Note: value is not required for stocks as it's calculated from quantity * currentPrice
+      // Note: currentPrice is now stored in AssetDefinition, not in transactions
+      // Note: value is calculated from purchase data for transactions
     } else if (!data.value || data.value <= 0) {
       // For non-stocks, require value
       ctx.addIssue({

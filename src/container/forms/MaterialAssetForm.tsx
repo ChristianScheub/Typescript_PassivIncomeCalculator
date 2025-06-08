@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import { createAssetSchema } from '../../utils/validationSchemas';
 import { MaterialAssetFormView } from '../../view/forms/MaterialAssetFormView';
+import { getCurrentQuantity } from '../../utils/transactionCalculations';
 
 interface AssetFormData {
   // Required fields
@@ -53,12 +54,13 @@ const getDefaultValues = (initialData?: Asset): Partial<AssetFormData> => {
 
   return {
     ...initialData,
-    quantity: initialData.currentQuantity || initialData.purchaseQuantity,
+    quantity: getCurrentQuantity(initialData), // Use helper function instead of accessing currentQuantity directly
     propertyValue: initialData.value,
     // Get ticker and symbol from AssetDefinition
     ticker: initialData.assetDefinition?.ticker,
     symbol: initialData.assetDefinition?.ticker, // Use ticker for crypto symbol as well
-    acquisitionCost: initialData.purchasePrice // Use purchasePrice as acquisitionCost for crypto
+    acquisitionCost: initialData.purchasePrice, // Use purchasePrice as acquisitionCost for crypto
+    currentPrice: initialData.assetDefinition?.currentPrice // Get currentPrice from AssetDefinition
   };
 };
 
@@ -80,6 +82,7 @@ function calculateStockValues(data: AssetFormData) {
     Logger.info(`Stock value calculated: ${data.quantity} × ${data.currentPrice} = ${finalValue}`);
     Logger.info(`Value difference: ${valueDifference}`);
     Logger.info(`Percentage difference: ${percentageDifference}%`);
+    Logger.info(`Note: currentPrice (${data.currentPrice}) should be stored in AssetDefinition, not transaction`);
   }
   return { finalValue, valueDifference, percentageDifference };
 }
@@ -88,15 +91,13 @@ function calculateStockValues(data: AssetFormData) {
 function assignTypeSpecificFields(transformedData: Asset, data: AssetFormData) {
   switch (data.type) {
     case 'stock':
-      // Note: ticker is now stored in AssetDefinition, not directly on Asset
-      transformedData.currentQuantity = data.quantity;
+      // Note: ticker and currentPrice are now stored in AssetDefinition, not directly on Asset
+      // currentQuantity is now derived from purchaseQuantity - no need to set it explicitly
       transformedData.purchaseQuantity = data.quantity;
       if (data.purchasePrice !== undefined) {
         transformedData.purchasePrice = data.purchasePrice;
       }
-      if (data.currentPrice !== undefined) {
-        transformedData.currentPrice = data.currentPrice;
-      }
+      // currentPrice is no longer stored on the transaction
       break;
     case 'real_estate':
       if (data.propertyValue !== undefined) {
@@ -177,9 +178,9 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
       // Type-specific fields
       if (initialData.type === 'stock') {
         formData.ticker = initialData.assetDefinition?.ticker || '';
-        formData.quantity = initialData.currentQuantity || initialData.purchaseQuantity || 1;
+        formData.quantity = getCurrentQuantity(initialData); // Use helper function
         formData.purchasePrice = initialData.purchasePrice || 0;
-        formData.currentPrice = initialData.currentPrice || 0;
+        formData.currentPrice = initialData.assetDefinition?.currentPrice || 0;
       } else if (initialData.type === 'real_estate') {
         formData.propertyValue = initialData.value || 0;
       } else if (initialData.type === 'crypto') {

@@ -35,6 +35,7 @@
     "totalInvestment": "Total Investment",
     "totalReturn": "Total Return",
     "currentPrice": "Current Price",
+    "currentPricePlaceholder": "e.g. 150.00",
     "purchaseDates": "Purchase Dates",
     "viewTransactions": "View Transactions",
     "currentValue": "Current Value",

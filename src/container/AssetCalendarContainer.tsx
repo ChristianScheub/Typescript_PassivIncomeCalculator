@@ -7,6 +7,7 @@ import { Asset, AssetType } from '../types';
 import AssetCalendarView from '../view/AssetCalendarView';
 import calculatorService from '../service/calculatorService';
 import Logger from '../service/Logger/logger';
+import { getCurrentQuantity } from '../utils/transactionCalculations';
 
 interface MonthData {
   month: number;
@@ -141,7 +142,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
     // Log asset details first
     Logger.cache(`Asset details - Type: ${asset.type}, Value: ${asset.value}`);
     if (asset.type === 'stock') {
-      const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+      const quantity = getCurrentQuantity(asset);
       const dividendInfo = asset.assetDefinition?.dividendInfo;
       Logger.cache(`Stock details - Quantity: ${quantity}, DividendInfo: ${JSON.stringify(dividendInfo)}`);
     }

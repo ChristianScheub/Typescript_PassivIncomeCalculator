@@ -1,4 +1,5 @@
 import { Asset, CachedDividends } from '../types';
+import { getCurrentQuantity } from './transactionCalculations';
 
 /**
  * Simple hash function for browser environments
@@ -24,12 +25,13 @@ export function generateDividendCalculationHash(asset: Asset): string {
   const dividendInfo = asset.assetDefinition?.dividendInfo;
   const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
   const rentalInfo = asset.assetDefinition?.rentalInfo;
+  const currentPrice = asset.assetDefinition?.currentPrice;
   
   const relevantData = {
     dividendInfo: dividendInfo,
-    currentQuantity: asset.currentQuantity,
+    currentQuantity: getCurrentQuantity(asset), // Use helper function
     purchaseQuantity: asset.purchaseQuantity,
-    currentPrice: asset.currentPrice,
+    currentPrice: currentPrice, // Now from AssetDefinition
     type: asset.type,
     interestRate: interestRate,
     value: asset.value,

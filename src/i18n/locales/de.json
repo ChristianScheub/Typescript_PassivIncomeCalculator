@@ -11,7 +11,13 @@
         "july": "Juli",
         "august": "August",
         "september": "September",
-        "october": "Oktober",
+             "form": {
+        "value": "Wert",
+        "purchasePrice": "Kaufpreis",
+        "currentPrice": "Aktueller Preis",
+        "currentPricePlaceholder": "z.B. 150,00",
+        "quantity": "Anzahl",
+        "ticker": "Tickersymbol",ber": "Oktober",
         "november": "November",
         "december": "Dezember"
       },

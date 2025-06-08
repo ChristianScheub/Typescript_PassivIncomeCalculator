@@ -65,14 +65,16 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
   // Initialize form values when editing an asset
   useEffect(() => {
     if (editingAsset) {
+      // Find the asset definition to get the current price if needed
+      const assetDefinition = assetDefinitions.find(def => def.id === editingAsset.assetDefinitionId);
       
       // Prepare reset data with proper fallbacks
       const resetData = {
         assetDefinitionId: editingAsset.assetDefinitionId || '',
         name: editingAsset.name || '',
         purchaseDate: editingAsset.purchaseDate?.substring(0, 10) || new Date().toISOString().substring(0, 10),
-        purchasePrice: editingAsset.purchasePrice || editingAsset.currentPrice || 0,
-        purchaseQuantity: editingAsset.purchaseQuantity || editingAsset.currentQuantity || 1,
+        purchasePrice: editingAsset.purchasePrice || assetDefinition?.currentPrice || 0,
+        purchaseQuantity: editingAsset.purchaseQuantity || 1, // currentQuantity is now derived, so just use purchaseQuantity
         transactionCosts: editingAsset.transactionCosts || 0,
         notes: editingAsset.notes || '',
       };
@@ -138,9 +140,9 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
       // Asset transaction specific fields
       type: selectedDefinition.type,
       value: totalValue,
-      currentValue: totalValue,
-      currentPrice: data.purchasePrice,
-      currentQuantity: data.purchaseQuantity || 1,
+      // Note: currentValue and currentQuantity are now derived values, not stored
+      // currentValue = assetDefinition.currentPrice * purchaseQuantity
+      // currentQuantity = purchaseQuantity (can change due to splits, etc.)
       
       // Note: Dividend/rental income is now calculated centrally from AssetDefinitions
       // at the portfolio level, not stored in individual transactions

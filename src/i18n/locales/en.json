@@ -305,6 +305,7 @@
         "value": "Value",
         "purchasePrice": "Purchase price",
         "currentPrice": "Current price",
+        "currentPricePlaceholder": "e.g. 150.00",
         "quantity": "Quantity",
         "ticker": "Ticker symbol",
         "stockSpecific": "Stock-specific information",

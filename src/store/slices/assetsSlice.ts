@@ -6,6 +6,7 @@ import Logger from '../../service/Logger/logger';
 import { shouldInvalidateCache } from '../../utils/dividendCacheUtils';
 import { hydrateStore } from '../actions/hydrateAction';
 import { calculatePortfolioPositions, PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
+import { getCurrentQuantity } from '../../utils/transactionCalculations';
 
 interface PortfolioCache {
   positions: PortfolioPosition[];
@@ -139,8 +140,8 @@ export const calculatePortfolioData = createAsyncThunk(
     
     const assetData = assets.map(a => ({ 
       id: a.id, 
-      quantity: a.purchaseQuantity || a.currentQuantity, 
-      price: a.purchasePrice || a.currentPrice, 
+      quantity: getCurrentQuantity(a), // Use helper function instead of accessing currentQuantity directly
+      price: a.purchasePrice, // Use only purchasePrice from transaction
       updatedAt: a.updatedAt 
     }));
     const definitionData = assetDefinitions.map(d => ({ 
