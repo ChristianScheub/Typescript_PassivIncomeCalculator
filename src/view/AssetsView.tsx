@@ -98,6 +98,22 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
       new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime()
     );
   }, [assets]);
+
+  // Helper function to get dynamic font size based on number of digits
+  const getDynamicFontSize = (value: number) => {
+    const formattedValue = formatService.formatCurrency(value);
+    const digitCount = formattedValue.replace(/[^\d]/g, '').length;
+    
+    if (digitCount >= 7) {
+      return 'text-sm sm:text-base'; // 7+ digits: smaller font
+    } else if (digitCount >= 6) {
+      return 'text-base sm:text-lg'; // 6 digits: medium font
+    } else if (digitCount >= 5) {
+      return 'text-lg sm:text-xl'; // 5 digits: default-small font
+    } else {
+      return 'text-xl sm:text-2xl'; // 4 or fewer digits: largest font
+    }
+  };
   
   if (status === 'loading') {
     return (
@@ -274,9 +290,6 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
               </div>
               <Calendar className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
-            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {t('assets.calendar')}
-            </div>
           </div>
 
           <div 
@@ -321,84 +334,84 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
             className="bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-800 dark:to-purple-900 border-2 border-blue-600 dark:border-blue-700 rounded-xl shadow-2xl p-6 cursor-pointer hover:shadow-3xl hover:scale-[1.02] transition-all duration-300"
             onClick={onNavigateToCalendar}
           >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-white">
-                Portfolio Übersicht
-              </h2>
-              <div className="bg-white bg-opacity-20 p-3 rounded-full">
-                <Calendar className="h-8 w-8 text-white" />
+            <div className="flex items-start gap-4 mb-6">
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg sm:text-xl font-bold text-white break-words">
+                  Portfolio Übersicht
+                </h2>
+              </div>
+              <div className="bg-white bg-opacity-20 p-2.5 sm:p-3 rounded-full flex-shrink-0">
+                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
             
             <div className="space-y-4">
               {/* Gesamtwert */}
               <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-800 shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="bg-blue-500 p-3 rounded-xl mr-3 shadow-lg">
-                      <Wallet className="h-6 w-6 text-white" />
-                    </div>
-                    <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                      {t('assets.totalValue')}
-                    </span>
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-500 p-2.5 rounded-xl flex-shrink-0 shadow-lg">
+                    <Wallet className="h-5 w-5 text-white" />
                   </div>
-                  <div className="text-right">
-                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {formatService.formatCurrency(totalAssetValue)}
-                    </p>
-                    {(totalValueDifference !== 0) && (
-                      <p className={`text-sm font-bold ${totalValueDifference >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                        {totalValueDifference >= 0 ? '+' : ''}{formatService.formatCurrency(totalValueDifference)}
-                        ({totalPercentageDifference >= 0 ? '+' : ''}{formatService.formatPercentage(totalPercentageDifference)})
-                      </p>
-                    )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">
+                        {t('assets.totalValue')}
+                      </span>
+                      <div className="text-right sm:text-right">
+                        <p className={`${getDynamicFontSize(totalAssetValue)} font-bold text-blue-600 dark:text-blue-400 break-all text-right`}>
+                          {formatService.formatCurrency(totalAssetValue)}
+                        </p>
+                        {(totalValueDifference !== 0) && (
+                          <p className={`text-xs sm:text-sm font-bold ${totalValueDifference >= 0 ? 'text-green-500' : 'text-red-500'} break-all text-right`}>
+                            {totalValueDifference >= 0 ? '+' : ''}{formatService.formatCurrency(totalValueDifference)}
+                            ({totalPercentageDifference >= 0 ? '+' : ''}{formatService.formatPercentage(totalPercentageDifference)})
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
 
               {/* Monatliches Einkommen */}
               <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border-2 border-green-200 dark:border-green-800 shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="bg-green-500 p-3 rounded-xl mr-3 shadow-lg">
-                      <Calendar className="h-6 w-6 text-white" />
-                    </div>
-                    <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                      {t('assets.monthlyIncome')}
-                    </span>
+                <div className="flex items-start gap-3">
+                  <div className="bg-green-500 p-2.5 rounded-xl flex-shrink-0 shadow-lg">
+                    <Calendar className="h-5 w-5 text-white" />
                   </div>
-                  <p className="text-2xl font-bold text-green-500">
-                    {formatService.formatCurrency(monthlyAssetIncome)}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">
+                        {t('assets.monthlyIncome')}
+                      </span>
+                      <p className={`${getDynamicFontSize(monthlyAssetIncome)} font-bold text-green-500 break-all text-right`}>
+                        {formatService.formatCurrency(monthlyAssetIncome)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Jährliches Einkommen */}
               <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border-2 border-purple-200 dark:border-purple-800 shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="bg-purple-500 p-3 rounded-xl mr-3 shadow-lg">
-                      <TrendingUp className="h-6 w-6 text-white" />
-                    </div>
-                    <span className="text-sm font-bold text-gray-800 dark:text-gray-200">
-                      {t('assets.annualIncome')}
-                    </span>
+                <div className="flex items-start gap-3">
+                  <div className="bg-purple-500 p-2.5 rounded-xl flex-shrink-0 shadow-lg">
+                    <TrendingUp className="h-5 w-5 text-white" />
                   </div>
-                  <p className="text-2xl font-bold text-purple-500">
-                    {formatService.formatCurrency(annualAssetIncome)}
-                  </p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">
+                        {t('assets.annualIncome')}
+                      </span>
+                      <p className={`${getDynamicFontSize(annualAssetIncome)} font-bold text-purple-500 break-all text-right`}>
+                        {formatService.formatCurrency(annualAssetIncome)}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
             
-            <div className="mt-6 text-center">
-              <div className="inline-flex items-center px-6 py-3 bg-white bg-opacity-20 rounded-full">
-                <Calendar className="h-5 w-5 text-white mr-2" />
-                <span className="text-sm font-bold text-white">
-                  {t('assets.calendar')}
-                </span>
-              </div>
-            </div>
           </div>
 
           {/* Positions/Transactions Card */}
