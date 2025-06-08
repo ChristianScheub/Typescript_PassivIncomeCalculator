@@ -6,9 +6,10 @@ import { Card } from '../../common/Card';
 import { Button } from '../../common/Button';
 import { CustomPieTooltip } from '../CustomPieTooltip';
 import { AssetAllocation } from '../../../types';
-import { COLORS } from '../../../utils/constants';
+import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import { LineChart } from 'lucide-react';
 import formatService from '../../../service/formatService';
+import { useTheme } from '../../../hooks/useTheme';
 
 interface AssetAllocationChartProps {
   title?: string;
@@ -27,6 +28,10 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
   const isDashboard = location.pathname === '/';
+  const { theme } = useTheme();
+  
+  // Use theme-aware colors
+  const colors = theme === 'dark' ? COLORS_DARK : COLORS_LIGHT;
 
   return (
     <Card title={title}>
@@ -56,7 +61,7 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
                     dataKey="value"
                   >
                     {assetAllocation.map((item) => (
-                      <Cell key={item.name} fill={COLORS[assetAllocation.findIndex(a => a.name === item.name) % COLORS.length]} />
+                      <Cell key={item.name} fill={colors[assetAllocation.findIndex(a => a.name === item.name) % colors.length]} />
                     ))}
                   </Pie>
                   <Tooltip content={<CustomPieTooltip formatCurrency={formatService.formatCurrency} formatPercentage={(value) => `${(value).toFixed(1)}%`} />} />
@@ -69,7 +74,7 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
                 <div key={allocation.name} className="flex items-center space-x-2">
                   <div 
                     className="w-3 h-3 rounded-full" 
-                    style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                    style={{ backgroundColor: colors[index % colors.length] }}
                   />
                   <div className="min-w-0 flex-1">
                     <div className="text-sm font-medium truncate">{t(`assets.types.${allocation.name}`)}</div>

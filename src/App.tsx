@@ -19,6 +19,7 @@ import AssetCalendarContainer from './container/AssetCalendarContainer';
 
 // Context
 import { AppProvider } from './context/AppContext';
+import { ThemeProvider } from './theme/ThemeProvider';
 
 function App() {
   // Detect if mobile view (could be enhanced with a proper hook)
@@ -28,21 +29,23 @@ function App() {
   return (
     <Provider store={store}>
       <AppProvider>
-        <Router>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<DashboardContainer />} />
-              <Route path="/assets" element={<AssetsContainer />} />
-              <Route path="/liabilities" element={<LiabilitiesContainer />} />
-              <Route path="/expenses" element={<ExpensesContainer />} />
-              <Route path="/income" element={<IncomeContainer />} />
-              <Route path="/forecast" element={<ForecastContainer />} />
-              <Route path="/settings" element={<SettingsContainer />} />
-              <Route path="/asset-calendar" element={<AssetCalendarContainer />} />
-              <Route path="*" element={<Navigate to="/\" replace />} />
-            </Routes>
-          </Layout>
-        </Router>
+        <ThemeProvider>
+          <Router>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<DashboardContainer />} />
+                <Route path="/assets" element={<AssetsContainer />} />
+                <Route path="/liabilities" element={<LiabilitiesContainer />} />
+                <Route path="/expenses" element={<ExpensesContainer />} />
+                <Route path="/income" element={<IncomeContainer />} />
+                <Route path="/forecast" element={<ForecastContainer />} />
+                <Route path="/settings" element={<SettingsContainer />} />
+                <Route path="/asset-calendar" element={<AssetCalendarContainer />} />
+                <Route path="*" element={<Navigate to="/\" replace />} />
+              </Routes>
+            </Layout>
+          </Router>
+        </ThemeProvider>
       </AppProvider>
     </Provider>
   );

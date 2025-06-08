@@ -92,7 +92,7 @@ const DebugSettings: React.FC<DebugSettingsProps> = ({
                 type="checkbox"
                 checked={autoRefresh}
                 onChange={(e) => onAutoRefreshChange(e.target.checked)}
-                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="rounded border-gray-300 dark:border-gray-600 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-blue-400"
               />
               <span className="text-sm">Auto-refresh (2s)</span>
             </label>

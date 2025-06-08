@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../../common/Card';
 import { IncomeAllocation } from '../../../types';
-import { COLORS } from '../../../utils/constants';
+import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import formatService from '../../../service/formatService';
+import { useTheme } from '../../../hooks/useTheme';
 
 interface PieChartIncomeAllocationProps {
   readonly incomeAllocation: ReadonlyArray<IncomeAllocation>;
@@ -37,6 +38,10 @@ const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
   incomeAllocation = []
 }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  
+  // Use theme-aware colors
+  const colors = theme === 'dark' ? COLORS_DARK : COLORS_LIGHT;
 
   // Transform the data with unique IDs and computed indices
   const chartData = React.useMemo(() => Array.from(
@@ -70,7 +75,7 @@ const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
                 dataKey="amount"
               >
                 {chartData.map((income) => (
-                  <Cell key={income.id} fill={COLORS[chartData.findIndex(i => i.type === income.type) % COLORS.length]} />
+                  <Cell key={income.id} fill={colors[chartData.findIndex(i => i.type === income.type) % colors.length]} />
                 ))}
               </Pie>
               <Tooltip content={<IncomeTooltip />} />
@@ -89,7 +94,7 @@ const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
             <div key={income.id} className="flex items-center space-x-2">
               <div 
                 className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: COLORS[chartData.findIndex(i => i.type === income.type) % COLORS.length] }}
+                style={{ backgroundColor: colors[chartData.findIndex(i => i.type === income.type) % colors.length] }}
               />
               <div>
                 <div className="text-sm font-medium">{t(`income.types.${income.type}`)}</div>

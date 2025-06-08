@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../../common/Card';
 import { ExpenseBreakdown } from '../../../types';
-import { COLORS } from '../../../utils/constants';
+import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import formatService from '../../../service/formatService';
+import { useTheme } from '../../../hooks/useTheme';
 
 
 interface PieChartExpenseBreakdownProps {
@@ -43,6 +44,10 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
   liabilities = []
 }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  
+  // Use theme-aware colors
+  const colors = theme === 'dark' ? COLORS_DARK : COLORS_LIGHT;
 
   // Calculate total first for percentage calculation
   const total = React.useMemo(() => {
@@ -103,7 +108,7 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
                 {combinedData.map((entry) => (
                   <Cell 
                     key={entry.id}
-                    fill={entry.type === 'liability' ? '#ef4444' : COLORS[combinedData.findIndex(d => d.category === entry.category) % COLORS.length]} 
+                    fill={entry.type === 'liability' ? '#ef4444' : colors[combinedData.findIndex(d => d.category === entry.category) % colors.length]} 
                   />
                 ))}
               </Pie>
@@ -124,7 +129,7 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
               <div 
                 className="w-3 h-3 rounded-full" 
                 style={{ 
-                  backgroundColor: item.type === 'liability' ? '#ef4444' : COLORS[combinedData.findIndex(d => d.category === item.category) % COLORS.length]
+                  backgroundColor: item.type === 'liability' ? '#ef4444' : colors[combinedData.findIndex(d => d.category === item.category) % colors.length]
                 }}
               />
               <div>
