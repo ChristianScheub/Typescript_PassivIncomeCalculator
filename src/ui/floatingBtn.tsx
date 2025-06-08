@@ -17,6 +17,7 @@ interface FloatingBtnProps {
   onClick: () => void;
   backgroundColor?: string;
   hoverBackgroundColor?: string;
+  disabled?: boolean;
 }
 
 const FloatingBtn: React.FC<FloatingBtnProps> = ({ 
@@ -24,7 +25,8 @@ const FloatingBtn: React.FC<FloatingBtnProps> = ({
   icon, 
   onClick, 
   backgroundColor = '#9AB899',
-  hoverBackgroundColor = '#8BA88A'
+  hoverBackgroundColor = '#8BA88A',
+  disabled = false
 }) => {
   const IconComponent = icon;
 
@@ -75,6 +77,7 @@ const FloatingBtn: React.FC<FloatingBtnProps> = ({
     <div style={positionStyle} data-testid="floating-btnDiv">
       <StyledFabWithCustomColors
         onClick={onClick}
+        disabled={disabled}
         data-testid="floating-btn" 
       >
         <IconComponent sx={{ fontSize: 35 }} />
