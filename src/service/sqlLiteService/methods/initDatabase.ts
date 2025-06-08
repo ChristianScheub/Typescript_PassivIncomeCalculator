@@ -2,7 +2,7 @@ import { openDB } from 'idb';
 import { FinanceDB } from '../interfaces/ISQLiteService';
 
 const DB_NAME = 'finance-tracker';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 export const initDatabase = async () => {
   return openDB<FinanceDB>(DB_NAME, DB_VERSION, {
@@ -24,6 +24,12 @@ export const initDatabase = async () => {
       if (oldVersion < 2) {
         const exchangeRateStore = db.createObjectStore('exchangeRates', { keyPath: 'id', autoIncrement: true });
         exchangeRateStore.createIndex('by-date', 'date', { unique: true });
+      }
+
+      // Add asset definitions store for version 3
+      if (oldVersion < 3) {
+        const assetDefinitionStore = db.createObjectStore('assetDefinitions', { keyPath: 'id' });
+        assetDefinitionStore.createIndex('by-type', 'type');
       }
     },
   });

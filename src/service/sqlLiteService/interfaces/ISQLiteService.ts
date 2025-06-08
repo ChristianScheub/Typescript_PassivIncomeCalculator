@@ -1,11 +1,16 @@
 import { DBSchema } from 'idb';
-import { Asset, Liability, Expense, Income } from '../../../types';
+import { Asset, Liability, Expense, Income, AssetDefinition } from '../../../types';
 import { ExchangeRate } from '../../exchangeService/interfaces/IExchangeService';
 
 export interface FinanceDB extends DBSchema {
   assets: {
     key: string;
     value: Asset;
+    indexes: { 'by-type': string };
+  };
+  assetDefinitions: {
+    key: string;
+    value: AssetDefinition;
     indexes: { 'by-type': string };
   };
   liabilities: {
@@ -28,7 +33,7 @@ export interface FinanceDB extends DBSchema {
   };
 }
 
-export type StoreNames = 'assets' | 'liabilities' | 'expenses' | 'income' | 'exchangeRates';
+export type StoreNames = 'assets' | 'assetDefinitions' | 'liabilities' | 'expenses' | 'income' | 'exchangeRates';
 
 export interface ISQLiteService {
   getAll<K extends StoreNames>(storeName: K): Promise<FinanceDB[K]['value'][]>;

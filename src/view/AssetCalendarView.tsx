@@ -37,6 +37,7 @@ interface AssetCalendarViewProps {
   assets: Asset[];
   onBarClick: (data: any) => void;
   onAssetTypeChange: (type: AssetType | 'all') => void;
+  onBack?: () => void;
 }
 
 const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
@@ -47,7 +48,8 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
   filteredAssets,
   assets,
   onBarClick,
-  onAssetTypeChange
+  onAssetTypeChange,
+  onBack
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -71,7 +73,7 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <button
-                onClick={() => navigate(-1)}
+                onClick={onBack || (() => navigate(-1))}
                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
               >
                 <ArrowLeft className="w-5 h-5" />

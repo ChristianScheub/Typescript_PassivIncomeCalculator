@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import assetsReducer from './slices/assetsSlice';
+import assetDefinitionsReducer from './slices/assetDefinitionsSlice';
 import liabilitiesReducer from './slices/liabilitiesSlice';
 import expensesReducer from './slices/expensesSlice';
 import incomeReducer from './slices/incomeSlice';
@@ -23,6 +24,11 @@ const loadState = () => {
     return {
       assets: { 
         items: state.assets?.items || [],
+        status: 'idle' as Status,
+        error: null
+      },
+      assetDefinitions: {
+        items: state.assetDefinitions?.items || [],
         status: 'idle' as Status,
         error: null
       },
@@ -56,6 +62,7 @@ const persistedState = loadState();
 export const store = configureStore({
   reducer: {
     assets: assetsReducer,
+    assetDefinitions: assetDefinitionsReducer,
     liabilities: liabilitiesReducer,
     expenses: expensesReducer,
     income: incomeReducer,
@@ -83,6 +90,9 @@ store.subscribe(() => {
       assets: { 
         items: state.assets.items
       },
+      assetDefinitions: {
+        items: state.assetDefinitions.items
+      },
       liabilities: {
         items: state.liabilities.items
       },
@@ -99,6 +109,7 @@ store.subscribe(() => {
     
     // Check if we're clearing data (all arrays are empty)
     const isEmpty = state.assets.items.length === 0 && 
+                   state.assetDefinitions.items.length === 0 &&
                    state.liabilities.items.length === 0 && 
                    state.expenses.items.length === 0 && 
                    state.income.items.length === 0;

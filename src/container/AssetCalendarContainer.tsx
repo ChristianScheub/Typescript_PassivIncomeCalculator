@@ -25,7 +25,11 @@ interface ChartData {
   monthNumber: number;
 }
 
-const AssetCalendarContainer: React.FC = () => {
+interface AssetCalendarContainerProps {
+  onBack?: () => void;
+}
+
+const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack }) => {
   const assets = useSelector((state: RootState) => state.assets.items);
   const { t } = useTranslation();
   
@@ -136,7 +140,8 @@ const AssetCalendarContainer: React.FC = () => {
     // Log asset details first
     Logger.cache(`Asset details - Type: ${asset.type}, Value: ${asset.value}`);
     if (asset.type === 'stock') {
-      Logger.cache(`Stock details - Quantity: ${asset.quantity}, DividendInfo: ${JSON.stringify(asset.dividendInfo)}`);
+      const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+      Logger.cache(`Stock details - Quantity: ${quantity}, DividendInfo: ${JSON.stringify(asset.dividendInfo)}`);
     }
     
     // Try cached calculation first
@@ -270,6 +275,7 @@ const AssetCalendarContainer: React.FC = () => {
       assets={assets}
       onBarClick={handleBarClick}
       onAssetTypeChange={handleAssetTypeChange}
+      onBack={onBack}
     />
   );
 };

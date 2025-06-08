@@ -51,38 +51,104 @@ export interface CachedDividends {
   calculationHash: string;
 }
 
-export interface Asset extends BaseEntity {
-  name: string;
-  type: AssetType;
-  value: number;
-  purchaseDate?: string;
-  propertyValue?: number;
-  quantity?: number;
-  purchasePrice?: number;
-  currentPrice?: number;
-  lastPriceUpdate?: string;  // New field for price update timestamp
-  valueDifference?: number; // New field for storing value difference
-  percentageDifference?: number; // New field for storing percentage difference
+// Asset Definition Types (Stammdaten)
+export interface AssetDefinition extends BaseEntity {
   ticker?: string;
-  interestRate?: number;
-  maturityDate?: string;
-  nominalValue?: number;
-  symbol?: string;
-  acquisitionCost?: number;
+  fullName: string;
+  type: AssetType;
   country?: string;
   continent?: string;
   sector?: string;
+  currency?: string;
+  exchange?: string;
+  isin?: string;
+  wkn?: string;
+  
+  // Dividend/Income Information
   dividendInfo?: {
+    frequency: DividendFrequency;
+    amount: number;
+    currency?: string;
+    months?: number[];
+    paymentMonths?: number[];
+    customAmounts?: Record<number, number>;
+    lastDividendDate?: string;
+    nextDividendDate?: string;
+    dividendGrowthRate?: number; // Jährliche Steigerung in %
+  };
+  
+  // Real Estate specific
+  rentalInfo?: {
+    baseRent: number;
+    currency?: string;
+    rentGrowthRate?: number; // Jährliche Mietsteigerung in %
+    frequency: PaymentFrequency;
+    months?: number[];
+    customAmounts?: Record<number, number>;
+  };
+  
+  // Bond specific
+  bondInfo?: {
+    interestRate: number;
+    maturityDate?: string;
+    nominalValue?: number;
+    currency?: string;
+  };
+  
+  // Additional metadata
+  description?: string;
+  riskLevel?: 'low' | 'medium' | 'high';
+  isActive?: boolean;
+}
+
+// Erweiterte Asset Type für Transaktionen
+export interface Asset extends BaseEntity {
+  type: AssetType;
+  value: number;
+  
+  // Reference to Asset Definition
+  assetDefinitionId?: string;
+  assetDefinition?: AssetDefinition; // Populated reference
+  
+  // Transaction specific data
+  purchaseDate: string;
+  purchasePrice: number;
+  purchaseQuantity?: number;
+  transactionCosts?: number;
+  
+  // Current values (calculated or updated)
+  currentPrice?: number;
+  currentQuantity?: number; // Can change due to splits, etc.
+  lastPriceUpdate?: string;
+  
+  // Calculated fields
+  currentValue?: number;
+  totalReturn?: number;
+  totalReturnPercentage?: number;
+  
+  // Legacy fields for backward compatibility
+  ticker?: string;
+  symbol?: string;
+  country?: string;
+  continent?: string;
+  sector?: string;
+  acquisitionCost?: number;
+  dividendInfo?: DividendSchedule;
+  rentalIncome?: {
+    amount: number;
+    frequency: PaymentFrequency;
+  };
+  interestRate?: number;
+  
+  // Override fields (if user wants to override definition data)
+  overrideDividendInfo?: {
     frequency: DividendFrequency;
     amount: number;
     months?: number[];
     paymentMonths?: number[];
     customAmounts?: Record<number, number>;
   };
-  rentalIncome?: {
-    amount: number;
-    frequency: PaymentFrequency;
-  };
+  
   notes?: string;
   cachedDividends?: CachedDividends;
 }

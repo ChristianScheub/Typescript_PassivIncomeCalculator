@@ -3,18 +3,16 @@ import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { fetchAssets, addAsset, updateAsset, deleteAsset, updateAssetDividendCache, updateStockPrices } from '../store/slices/assetsSlice';
 import { fetchAssetDefinitions } from '../store/slices/assetDefinitionsSlice';
 import { AssetsView } from '../view/AssetsView';
-import { Asset } from '../types';
+import { Asset, AssetType } from '../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
-import portfolioService from '../service/portfolioService';
 import { createDividendCacheService } from '../service/dividendCacheService';
 import { createCachedDividends } from '../utils/dividendCacheUtils';
 import { sortAssets } from '../utils/sortingUtils';
 import { StockPriceUpdater } from '../service/helper/stockPriceUpdater';
 import AssetDefinitionsContainer from './AssetDefinitionsContainer';
-import AssetCalendarContainer from './AssetCalendarContainer';
 
 const AssetsContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -26,7 +24,6 @@ const AssetsContainer: React.FC = () => {
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
   const [isUpdatingPrices, setIsUpdatingPrices] = useState(false);
   const [isShowingDefinitions, setIsShowingDefinitions] = useState(false);
-  const [isShowingCalendar, setIsShowingCalendar] = useState(false);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -41,45 +38,98 @@ const AssetsContainer: React.FC = () => {
     createDividendCacheService(dispatch);
   }, [dispatch, status]);
 
+  const calculateAssetMonthlyIncome = useCallback((asset: Asset): number => {
+    // Verwende immer die gecachte Version direkt vom CacheService
+    if (calculatorService.calculateAssetMonthlyIncomeWithCache) {
+      const cacheResult = calculatorService.calculateAssetMonthlyIncomeWithCache(asset);
+      
+      // Update Redux cache if we got new calculation data
+      if (!cacheResult.cacheHit && cacheResult.cacheDataToUpdate) {
+        const { monthlyAmount, annualAmount, monthlyBreakdown } = cacheResult.cacheDataToUpdate;
+        if (monthlyAmount > 0 || annualAmount > 0) {
+          const cachedDividends = createCachedDividends(
+            monthlyAmount,
+            annualAmount, 
+            monthlyBreakdown,
+            asset
+          );
+          dispatch(updateAssetDividendCache({ assetId: asset.id, cachedDividends }));
+        }
+      }
+      
+      return cacheResult.monthlyAmount;
+    }
+    
+    // Fallback zur nicht-gecachten Version
+    return calculatorService.calculateAssetMonthlyIncome(asset);
+  }, [dispatch]);
+
   // Sort assets by value (highest to lowest)
   const sortedAssets = useMemo(() => {
     return sortAssets(assets);
   }, [assets]);
 
-  // Calculate portfolio data using the new portfolio service
-  const portfolioData = useMemo(() => {
-    return portfolioService.calculatePortfolio(assets, assetDefinitions);
-  }, [assets, assetDefinitions]);
-
   const { totalAssetValue, monthlyAssetIncome, annualAssetIncome } = useMemo(() => {
+    const total = calculatorService.calculateTotalAssetValue(assets);
+    const monthly = assets.reduce(
+      (sum, asset) => sum + calculateAssetMonthlyIncome(asset),
+      0
+    );
     return {
-      totalAssetValue: portfolioData.totals.totalValue,
-      monthlyAssetIncome: portfolioData.totals.monthlyIncome,
-      annualAssetIncome: portfolioData.totals.annualIncome
+      totalAssetValue: total,
+      monthlyAssetIncome: monthly,
+      annualAssetIncome: monthly * 12
     };
-  }, [portfolioData]);
+  }, [assets, calculateAssetMonthlyIncome]);
+
+  const totalInitialValue = useMemo(() => {
+    return assets.reduce((sum, asset) => {
+      if (asset.type === 'stock') {
+        // Use 0 as fallback if either purchasePrice or purchaseQuantity is undefined
+        const price = asset.purchasePrice || 0;
+        const quantity = asset.purchaseQuantity || 1; // Default to 1 for stocks
+        return sum + (price * quantity);
+      } else {
+        // For non-stock assets, use purchasePrice directly (quantity is usually 1)
+        return sum + (asset.purchasePrice || 0);
+      }
+    }, 0);
+  }, [assets]);
 
   const totalValueDifference = useMemo(() => {
-    return portfolioData.totals.totalReturn;
-  }, [portfolioData]);
+    return totalAssetValue - totalInitialValue;
+  }, [totalAssetValue, totalInitialValue]);
 
   const totalPercentageDifference = useMemo(() => {
-    return portfolioData.totals.totalReturnPercentage;
-  }, [portfolioData]);
+    return totalInitialValue > 0 ? (totalValueDifference / totalInitialValue) * 100 : 0;
+  }, [totalValueDifference, totalInitialValue]);
 
   const handleAddAsset = async (data: any) => {
     try {
       Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
       analytics.trackEvent('asset_add', { type: data.type, hasDefinitionId: !!data.assetDefinitionId });
-      
-      // Ensure currentQuantity is set from purchaseQuantity if not provided
-      if (!data.currentQuantity && data.purchaseQuantity) {
-        data.currentQuantity = data.purchaseQuantity;
-      }
-      
       await dispatch(addAsset(data));
       setIsAddingAsset(false);
       
+      // Cache handling for new asset
+      const newAsset = assets[assets.length - 1];
+      if (newAsset) {
+        const monthlyAmount = calculatorService.calculateAssetMonthlyIncome(newAsset);
+        const annualAmount = monthlyAmount * 12;
+        const monthlyBreakdown: Record<number, number> = {};
+        
+        for (let month = 1; month <= 12; month++) {
+          monthlyBreakdown[month] = calculatorService.calculateAssetIncomeForMonth(newAsset, month);
+        }
+        
+        const cachedDividends = createCachedDividends(
+          monthlyAmount,
+          annualAmount,
+          monthlyBreakdown,
+          newAsset
+        );
+        dispatch(updateAssetDividendCache({ assetId: newAsset.id, cachedDividends }));
+      }
     } catch (error) {
       Logger.error('Failed to add asset transaction' + " - " + JSON.stringify(error as Error));
     }
@@ -98,20 +148,35 @@ const AssetsContainer: React.FC = () => {
     }
   }
 
+  // Helper: Update asset cache in Redux
+  async function updateAssetCacheAfterEdit(editingAsset: Asset, assets: Asset[], dispatch: any) {
+    const updatedAsset = assets.find(a => a.id === editingAsset.id);
+    if (updatedAsset) {
+      const monthlyAmount = calculatorService.calculateAssetMonthlyIncome(updatedAsset);
+      const annualAmount = monthlyAmount * 12;
+      const monthlyBreakdown: Record<number, number> = {};
+      for (let month = 1; month <= 12; month++) {
+        monthlyBreakdown[month] = calculatorService.calculateAssetIncomeForMonth(updatedAsset, month);
+      }
+      const cachedDividends = createCachedDividends(
+        monthlyAmount,
+        annualAmount,
+        monthlyBreakdown,
+        updatedAsset
+      );
+      dispatch(updateAssetDividendCache({ assetId: updatedAsset.id, cachedDividends }));
+    }
+  }
+
   const handleUpdateAsset = async (data: any) => {
     if (!editingAsset) return;
     try {
       Logger.info('Updating asset transaction' + " - " + JSON.stringify({ id: editingAsset.id, data }));
       analytics.trackEvent('asset_update', { id: editingAsset.id, type: data.type });
-      
-      // Ensure currentQuantity is set from purchaseQuantity if not provided
-      if (!data.currentQuantity && data.purchaseQuantity) {
-        data.currentQuantity = data.purchaseQuantity;
-      }
-      
       updateStockValueFields(data);
       await dispatch(updateAsset({ ...data, id: editingAsset.id }));
       setEditingAsset(null);
+      await updateAssetCacheAfterEdit(editingAsset, assets, dispatch);
     } catch (error) {
       Logger.error('Failed to update asset transaction' + " - " + JSON.stringify(error as Error));
     }
@@ -198,13 +263,8 @@ const AssetsContainer: React.FC = () => {
     setIsShowingDefinitions(true);
   };
 
-  const handleNavigateToCalendar = () => {
-    setIsShowingCalendar(true);
-  };
-
   const handleBackToAssets = () => {
     setIsShowingDefinitions(false);
-    setIsShowingCalendar(false);
   };
 
   // If showing definitions, render the definitions container instead
@@ -216,19 +276,9 @@ const AssetsContainer: React.FC = () => {
     );
   }
 
-  // If showing calendar, render the calendar container instead
-  if (isShowingCalendar) {
-    return (
-      <AssetCalendarContainer 
-        onBack={handleBackToAssets}
-      />
-    );
-  }
-
   return (
     <AssetsView
       assets={sortedAssets}
-      portfolioData={portfolioData}
       status={status}
       totalAssetValue={totalAssetValue}
       totalValueDifference={totalValueDifference}
@@ -239,6 +289,7 @@ const AssetsContainer: React.FC = () => {
       editingAsset={editingAsset}
       isUpdatingPrices={isUpdatingPrices}
       isApiEnabled={isApiEnabled}
+      calculateAssetMonthlyIncome={calculateAssetMonthlyIncome}
       getAssetTypeLabel={getAssetTypeLabel}
       onAddAsset={handleAddAsset}
       onUpdateAsset={handleUpdateAsset}
@@ -247,7 +298,6 @@ const AssetsContainer: React.FC = () => {
       onSetEditingAsset={setEditingAsset}
       onUpdateStockPrices={handleUpdateStockPrices}
       onNavigateToDefinitions={handleNavigateToDefinitions}
-      onNavigateToCalendar={handleNavigateToCalendar}
     />
   );
 };

@@ -11,10 +11,18 @@ import {
 
 // Helper: Calculate stock dividend income
 const getStockDividendIncome = (asset: Asset): number => {
-  if (asset.type === "stock" && asset.dividendInfo?.frequency && asset.quantity) {
-    const dividendResult = calculateDividendSchedule(asset.dividendInfo, asset.quantity);
+  if (asset.type === "stock" && asset.dividendInfo?.frequency) {
+    // Use currentQuantity or purchaseQuantity 
+    const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+    
+    if (quantity <= 0) {
+      Logger.infoService(`Stock ${asset.name} has no valid quantity (${quantity}), skipping dividend calculation`);
+      return 0;
+    }
+    
+    const dividendResult = calculateDividendSchedule(asset.dividendInfo, quantity);
     Logger.infoService(
-      `Individual dividend calculation result for ${asset.name}: ${JSON.stringify(dividendResult)}`
+      `Individual dividend calculation result for ${asset.name}: quantity=${quantity}, result=${JSON.stringify(dividendResult)}`
     );
     return isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
   }
@@ -49,6 +57,22 @@ const getRentalIncome = (asset: Asset): number => {
 };
 
 export const calculateAssetMonthlyIncome = (asset: Asset): number => {
+  // Debug logging für Asset-Details
+  Logger.infoService(
+    `=== Calculating income for asset: ${asset.name} ===`
+  );
+  Logger.infoService(
+    `Asset type: ${asset.type}, Current quantity: ${asset.currentQuantity}, Purchase quantity: ${asset.purchaseQuantity}`
+  );
+  
+  if (asset.dividendInfo) {
+    Logger.infoService(
+      `Dividend info found - Frequency: ${asset.dividendInfo.frequency}, Amount: ${asset.dividendInfo.amount}`
+    );
+  } else {
+    Logger.infoService(`No dividend info found for asset ${asset.name}`);
+  }
+
   // Zuerst prüfen, ob gecachte Daten vorhanden sind
   const cachedData = getCachedDividendData(asset);
   if (cachedData) {
@@ -73,14 +97,22 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
 
 // Helper: Calculate stock dividend for a specific month
 const getStockDividendForMonth = (asset: Asset, monthNumber: number): number => {
-  if (asset.type === "stock" && asset.dividendInfo && asset.quantity) {
+  if (asset.type === "stock" && asset.dividendInfo) {
+    // Use currentQuantity or purchaseQuantity
+    const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+    
+    if (quantity <= 0) {
+      Logger.infoService(`Stock ${asset.name} has no valid quantity (${quantity}) for month ${monthNumber}, skipping dividend calculation`);
+      return 0;
+    }
+    
     const dividendForMonth = calculateDividendForMonth(
       asset.dividendInfo,
-      asset.quantity,
+      quantity,
       monthNumber
     );
     Logger.infoService(
-      `Dividend for ${asset.name} in month ${monthNumber}: ${dividendForMonth}`
+      `Dividend for ${asset.name} in month ${monthNumber}: quantity=${quantity}, dividend=${dividendForMonth}`
     );
     return isFinite(dividendForMonth) ? dividendForMonth : 0;
   }
@@ -250,13 +282,18 @@ export const calculateAssetMonthlyIncomeWithCache = (
 
 // Helper: Stock dividend calculation
 function getStockDividendBreakdown(asset: Asset) {
-  if (asset.type !== "stock" || !asset?.dividendInfo || !asset?.quantity) return null;
-  const dividendResult = calculateDividendSchedule(asset.dividendInfo, asset.quantity);
+  if (asset.type !== "stock" || !asset?.dividendInfo) return null;
+  
+  // Use currentQuantity or purchaseQuantity
+  const quantity = asset.currentQuantity || asset.purchaseQuantity || 0;
+  if (quantity <= 0) return null;
+  
+  const dividendResult = calculateDividendSchedule(asset.dividendInfo, quantity);
   const monthlyAmount = isFinite(dividendResult.monthlyAmount) ? dividendResult.monthlyAmount : 0;
   const annualAmount = isFinite(dividendResult.annualAmount) ? dividendResult.annualAmount : 0;
   const monthlyBreakdown: Record<number, number> = {};
   for (let month = 1; month <= 12; month++) {
-    const monthlyDividend = calculateDividendForMonth(asset.dividendInfo, asset.quantity, month);
+    const monthlyDividend = calculateDividendForMonth(asset.dividendInfo, quantity, month);
     monthlyBreakdown[month] = isFinite(monthlyDividend) ? monthlyDividend : 0;
   }
   return { monthlyAmount, annualAmount, monthlyBreakdown };
