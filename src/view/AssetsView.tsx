@@ -4,12 +4,13 @@ import { Asset } from '../types';
 import { PortfolioPosition } from '../service/portfolioService/portfolioCalculations';
 import { AssetTransactionForm } from '../ui/forms/AssetTransactionForm';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
+import { MobileAssetSummaryCard } from '../ui/layout/MobileAssetSummaryCard';
+import { DesktopAssetSummaryCards } from '../ui/layout/DesktopAssetSummaryCards';
 import formatService from '../service/formatService';
 import FloatingBtn, { ButtonAlignment } from '../ui/layout/floatingBtn';
 import { Add } from '@mui/icons-material';
 import { 
   RefreshCw, 
-  Wallet, 
   TrendingUp, 
   Calendar,
   Settings,
@@ -45,8 +46,6 @@ interface AssetsViewProps {
   totalAssetValue: number;
   monthlyAssetIncome: number;
   annualAssetIncome: number;
-  totalValueDifference: number;
-  totalPercentageDifference: number;
   isAddingAsset: boolean;
   editingAsset: Asset | null;
   isUpdatingPrices: boolean;
@@ -58,8 +57,8 @@ interface AssetsViewProps {
   onSetIsAddingAsset: (isAdding: boolean) => void;
   onSetEditingAsset: (asset: Asset | null) => void;
   onUpdateStockPrices: () => void;
-  onNavigateToDefinitions?: () => void;
-  onNavigateToCalendar?: () => void;
+  onNavigateToDefinitions: () => void;
+  onNavigateToCalendar: () => void;
 }
 
 export const AssetsView: React.FC<AssetsViewProps> = ({
@@ -69,8 +68,6 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
   totalAssetValue,
   monthlyAssetIncome,
   annualAssetIncome,
-  totalValueDifference,
-  totalPercentageDifference,
   isAddingAsset,
   editingAsset,
   isUpdatingPrices,
@@ -98,22 +95,6 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
       new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime()
     );
   }, [assets]);
-
-  // Helper function to get dynamic font size based on number of digits
-  const getDynamicFontSize = (value: number) => {
-    const formattedValue = formatService.formatCurrency(value);
-    const digitCount = formattedValue.replace(/[^\d]/g, '').length;
-    
-    if (digitCount >= 7) {
-      return 'text-sm sm:text-base'; // 7+ digits: smaller font
-    } else if (digitCount >= 6) {
-      return 'text-base sm:text-lg'; // 6 digits: medium font
-    } else if (digitCount >= 5) {
-      return 'text-lg sm:text-xl'; // 5 digits: default-small font
-    } else {
-      return 'text-xl sm:text-2xl'; // 4 or fewer digits: largest font
-    }
-  };
   
   if (status === 'loading') {
     return (
@@ -251,171 +232,24 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
 
       {/* Summary Cards */}
       {isDesktop ? (
-        // Desktop Layout: Four separate cards
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {t('assets.totalValue')}
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {formatService.formatCurrency(totalAssetValue)}
-                </p>
-              </div>
-              <Wallet className="h-8 w-8 text-blue-600 dark:text-blue-400" />
-            </div>
-            {(totalValueDifference !== 0) && (
-              <div className="mt-2 flex items-center text-sm">
-                <span className={`${totalValueDifference >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                  {totalValueDifference >= 0 ? '+' : ''}{formatService.formatCurrency(totalValueDifference)}
-                  ({totalPercentageDifference >= 0 ? '+' : ''}{formatService.formatPercentage(totalPercentageDifference)})
-                </span>
-              </div>
-            )}
-          </div>
-
-          <div 
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition-shadow"
-            onClick={onNavigateToCalendar}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {t('assets.monthlyIncome')}
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {formatService.formatCurrency(monthlyAssetIncome)}
-                </p>
-              </div>
-              <Calendar className="h-8 w-8 text-green-600 dark:text-green-400" />
-            </div>
-          </div>
-
-          <div 
-            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition-shadow"
-            onClick={onNavigateToCalendar}
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {t('assets.annualIncome')}
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {formatService.formatCurrency(annualAssetIncome)}
-                </p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-            </div>
-            <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-              {t('assets.calendar')}
-            </div>
-          </div>
-
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                  {viewMode === 'portfolio' ? t('assets.totalPositions') : t('assets.totalTransactions')}
-                </p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {viewMode === 'portfolio' ? portfolioAssets.length : assets.length}
-                </p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-gray-600 dark:text-gray-400" />
-            </div>
-          </div>
-        </div>
+        <DesktopAssetSummaryCards
+          totalAssetValue={totalAssetValue}
+          monthlyAssetIncome={monthlyAssetIncome}
+          annualAssetIncome={annualAssetIncome}
+          totalAssets={viewMode === 'portfolio' ? portfolioAssets.length : assets.length}
+          onNavigateToCalendar={onNavigateToCalendar}
+        />
       ) : (
-        // Mobile Layout: One combined card + Positions card
-        <div className="grid grid-cols-1 gap-4 mb-6">
-          {/* Combined Income Card */}
-          <div 
-            className="bg-gradient-to-br from-blue-500 to-purple-600 dark:from-blue-800 dark:to-purple-900 border-2 border-blue-600 dark:border-blue-700 rounded-xl shadow-2xl p-6 cursor-pointer hover:shadow-3xl hover:scale-[1.02] transition-all duration-300"
-            onClick={onNavigateToCalendar}
-          >
-            <div className="flex items-start gap-4 mb-6">
-              <div className="flex-1 min-w-0">
-                <h2 className="text-lg sm:text-xl font-bold text-white break-words">
-                  Portfolio Übersicht
-                </h2>
-              </div>
-              <div className="bg-white bg-opacity-20 p-2.5 sm:p-3 rounded-full flex-shrink-0">
-                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              {/* Gesamtwert */}
-              <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-800 shadow-lg">
-                <div className="flex items-start gap-3">
-                  <div className="bg-blue-500 p-2.5 rounded-xl flex-shrink-0 shadow-lg">
-                    <Wallet className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">
-                        {t('assets.totalValue')}
-                      </span>
-                      <div className="text-right sm:text-right">
-                        <p className={`${getDynamicFontSize(totalAssetValue)} font-bold text-blue-600 dark:text-blue-400 break-all text-right`}>
-                          {formatService.formatCurrency(totalAssetValue)}
-                        </p>
-                        {(totalValueDifference !== 0) && (
-                          <p className={`text-xs sm:text-sm font-bold ${totalValueDifference >= 0 ? 'text-green-500' : 'text-red-500'} break-all text-right`}>
-                            {totalValueDifference >= 0 ? '+' : ''}{formatService.formatCurrency(totalValueDifference)}
-                            ({totalPercentageDifference >= 0 ? '+' : ''}{formatService.formatPercentage(totalPercentageDifference)})
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Monatliches Einkommen */}
-              <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border-2 border-green-200 dark:border-green-800 shadow-lg">
-                <div className="flex items-start gap-3">
-                  <div className="bg-green-500 p-2.5 rounded-xl flex-shrink-0 shadow-lg">
-                    <Calendar className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">
-                        {t('assets.monthlyIncome')}
-                      </span>
-                      <p className={`${getDynamicFontSize(monthlyAssetIncome)} font-bold text-green-500 break-all text-right`}>
-                        {formatService.formatCurrency(monthlyAssetIncome)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Jährliches Einkommen */}
-              <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border-2 border-purple-200 dark:border-purple-800 shadow-lg">
-                <div className="flex items-start gap-3">
-                  <div className="bg-purple-500 p-2.5 rounded-xl flex-shrink-0 shadow-lg">
-                    <TrendingUp className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <span className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate">
-                        {t('assets.annualIncome')}
-                      </span>
-                      <p className={`${getDynamicFontSize(annualAssetIncome)} font-bold text-purple-500 break-all text-right`}>
-                        {formatService.formatCurrency(annualAssetIncome)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-          </div>
-
+        <>
+          <MobileAssetSummaryCard
+            totalAssetValue={totalAssetValue}
+            monthlyAssetIncome={monthlyAssetIncome}
+            annualAssetIncome={annualAssetIncome}
+            onNavigateToCalendar={onNavigateToCalendar}
+          />
+          
           {/* Positions/Transactions Card */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -428,7 +262,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
               <TrendingUp className="h-8 w-8 text-gray-600 dark:text-gray-400" />
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Assets List */}
@@ -526,19 +360,6 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
                         .join(', ')}${portfolioAsset.transactions.length > 2 ? '...' : ''}`
                     }
                   </div>
-                  <button 
-                    onClick={() => {
-                      // For portfolio view, edit the latest transaction
-                      const latestTransaction = portfolioAsset.transactions.reduce((latest, current) => 
-                        new Date(current.purchaseDate) > new Date(latest.purchaseDate) ? current : latest
-                      );
-                      onSetEditingAsset(latestTransaction);
-                    }}
-                    className="flex items-center px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                  >
-                    <Edit size={14} className="mr-1" />
-                    {t('assets.viewTransactions')}
-                  </button>
                 </div>
               </div>
             ))
@@ -654,13 +475,16 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
         </div>
       )}
 
-      <FloatingBtn
-        alignment={ButtonAlignment.RIGHT}
-        icon={Add}
-        onClick={() => onSetIsAddingAsset(true)}
-        backgroundColor="#2563eb"
-        hoverBackgroundColor="#1d4ed8"
-      />
+      {/* Hide floating button when AssetTransactionForm is open */}
+      {!isAddingAsset && !editingAsset && (
+        <FloatingBtn
+          alignment={ButtonAlignment.RIGHT}
+          icon={Add}
+          onClick={() => onSetIsAddingAsset(true)}
+          backgroundColor="#2563eb"
+          hoverBackgroundColor="#1d4ed8"
+        />
+      )}
 
       <AssetTransactionForm
         isOpen={isAddingAsset || !!editingAsset}

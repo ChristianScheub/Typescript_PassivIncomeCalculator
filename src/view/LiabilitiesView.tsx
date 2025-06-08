@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { LoadingSpinner } from '../ui/feedback/LoadingSpinner';
 import { EmptyState } from '../ui/feedback/EmptyState';
 import { Modal } from '../ui/common/Modal';
+import { SummaryCard } from '../ui/common/SummaryCard';
 import formatService from '../service/formatService';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
 
@@ -57,42 +58,20 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
       </div>
 
       {/* Summary Card */}
-      <Card className="bg-gradient-to-br from-rose-700 to-rose-500 dark:from-rose-900 dark:to-rose-700 rounded-[2rem] overflow-hidden">
-        <CardContent className="pt-6 pb-4">
-          <div className="flex justify-between items-start mb-8">
-            <div className="space-y-1">
-              <h2 className="text-lg font-medium text-white">
-                {t('liabilities.summary')}
-              </h2>
-              <p className="text-sm font-medium text-rose-100/80">
-                {t('common.across', { count: liabilities.length })}
-              </p>
-            </div>
-            <div className="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
-              <Landmark className="w-5 h-5 text-white" />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-1">
-              <div className="text-3xl font-bold text-white">
-                {formatService.formatCurrency(totalDebt)}
-              </div>
-              <p className="text-sm text-rose-100/90">
-                {t('liabilities.totalDebt')}
-              </p>
-            </div>
-            <div className="space-y-1">
-              <div className="text-3xl font-bold text-white">
-                {formatService.formatCurrency(totalMonthlyPayment)}
-              </div>
-              <p className="text-sm text-rose-100/90">
-                {t('liabilities.monthlyPayments')}
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <SummaryCard
+        title={t('liabilities.title')}
+        subtitle={t('common.across', { count: liabilities.length })}
+        value={formatService.formatCurrency(totalDebt)}
+        valueDescription={t('liabilities.totalDebt')}
+        secondaryValue={formatService.formatCurrency(totalMonthlyPayment)}
+        secondaryValueDescription={t('liabilities.monthlyPayments')}
+        icon={Landmark}
+        gradientFrom="from-blue-600"
+        gradientTo="to-indigo-500"
+        darkGradientFrom="from-blue-700"
+        darkGradientTo="to-indigo-600"
+        accentColor="blue-100/80"
+      />
 
       {/* Liabilities List */}
       {liabilities.length > 0 ? (

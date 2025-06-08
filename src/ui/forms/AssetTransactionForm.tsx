@@ -6,6 +6,14 @@ import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../hooks/redux';
 import { Asset, AssetDefinition } from '../../types';
 import { Search } from 'lucide-react';
+import { Modal } from '../common/Modal';
+import { 
+  StandardFormWrapper,
+  RequiredSection,
+  OptionalSection,
+  FormGrid,
+  StandardFormField
+} from './StandardFormWrapper';
 
 const assetTransactionSchema = z.object({
   assetDefinitionId: z.string().min(1, 'Please select an asset'),
@@ -170,223 +178,173 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-              {editingAsset ? t('assets.editTransaction') : t('assets.addTransaction')}
-            </h2>
-            <button
-              onClick={handleFormClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-            >
-              ✕
-            </button>
+  // Handle case when no asset definitions exist
+  if (assetDefinitions.length === 0) {
+    return (
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <StandardFormWrapper title={t('assets.addTransaction')} onSubmit={() => {}}>
+          <div className="text-center py-8">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              {t('assets.noDefinitionsAvailable')}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mb-4">
+              {t('assets.createDefinitionsFirst')}
+            </p>
           </div>
+        </StandardFormWrapper>
+      </Modal>
+    );
+  }
 
-          {assetDefinitions.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                {t('assets.noDefinitionsAvailable')}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-500 mb-4">
-                {t('assets.createDefinitionsFirst')}
-              </p>
-              <button
-                onClick={onClose}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-              >
-                {t('common.close')}
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-              {/* Asset Selection */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  {t('assets.selectAsset')} *
-                </label>
-                
-                {/* Search Bar */}
-                <div className="relative mb-2">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <input
-                    type="text"
-                    placeholder={t('assets.searchAssets')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                </div>
-
-                {/* Asset Selection Dropdown */}
-                <select
-                  {...register('assetDefinitionId')}
-                  onChange={(e) => handleDefinitionSelect(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  required
-                >
-                  <option value="">{t('assets.selectAssetOption')}</option>
-                  {filteredDefinitions.map(definition => (
-                    <option key={definition.id} value={definition.id}>
-                      {definition.fullName} {definition.ticker && `(${definition.ticker})`}
-                      {definition.sector && ` - ${definition.sector}`}
-                    </option>
-                  ))}
-                </select>
-                {errors.assetDefinitionId && (
-                  <p className="mt-1 text-sm text-red-600">{errors.assetDefinitionId.message}</p>
-                )}
-
-                {/* Selected Asset Info */}
-                {selectedDefinition && (
-                  <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                    <div className="grid grid-cols-2 gap-2 text-sm">
-                      <div><strong>{t('assets.type')}:</strong> {t(`assets.types.${selectedDefinition.type}`)}</div>
-                      <div><strong>{t('assets.sector')}:</strong> {selectedDefinition.sector || 'N/A'}</div>
-                      <div><strong>{t('assets.country')}:</strong> {selectedDefinition.country || 'N/A'}</div>
-                      <div><strong>{t('assets.currency')}:</strong> {selectedDefinition.currency || 'N/A'}</div>
-                      {selectedDefinition.dividendInfo && (
-                        <>
-                          <div><strong>{t('assets.dividend')}:</strong> {selectedDefinition.dividendInfo.amount}</div>
-                          <div><strong>{t('assets.frequency')}:</strong> {t(`paymentFrequency.${selectedDefinition.dividendInfo.frequency}`)}</div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Transaction Name */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  {t('assets.transactionName')} *
-                </label>
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <StandardFormWrapper
+        title={editingAsset ? t('assets.editTransaction') : t('assets.addTransaction')}
+        onSubmit={handleSubmit(handleFormSubmit)}
+      >
+        <RequiredSection>
+          <FormGrid columns={{ xs: '1fr', sm: '1fr' }}>
+            {/* Asset Selection with custom rendering for search */}
+            <div>
+              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                {t('assets.selectAsset')} *
+              </label>
+              
+              {/* Search Bar */}
+              <div className="relative mb-2">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <input
-                  {...register('name')}
                   type="text"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  placeholder={t('assets.transactionNamePlaceholder')}
-                />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-                )}
-              </div>
-
-              {/* Purchase Details */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    {t('assets.purchaseDate')} *
-                  </label>
-                  <input
-                    {...register('purchaseDate')}
-                    type="date"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                  {errors.purchaseDate && (
-                    <p className="mt-1 text-sm text-red-600">{errors.purchaseDate.message}</p>
-                  )}
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    {t('assets.purchasePrice')} *
-                  </label>
-                  <input
-                    {...register('purchasePrice', { valueAsNumber: true })}
-                    type="number"
-                    step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                  {errors.purchasePrice && (
-                    <p className="mt-1 text-sm text-red-600">{errors.purchasePrice.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Quantity and Transaction Costs */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    {t('assets.quantity')}
-                  </label>
-                  <input
-                    {...register('purchaseQuantity', { valueAsNumber: true })}
-                    type="number"
-                    step="0.001"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                  {errors.purchaseQuantity && (
-                    <p className="mt-1 text-sm text-red-600">{errors.purchaseQuantity.message}</p>
-                  )}
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    {t('assets.transactionCosts')}
-                  </label>
-                  <input
-                    {...register('transactionCosts', { valueAsNumber: true })}
-                    type="number"
-                    step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                  {errors.transactionCosts && (
-                    <p className="mt-1 text-sm text-red-600">{errors.transactionCosts.message}</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Total Value Display */}
-              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium text-gray-700 dark:text-gray-300">{t('assets.totalInvestment')}:</span>
-                  <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                    {new Intl.NumberFormat('de-DE', { 
-                      style: 'currency', 
-                      currency: selectedDefinition?.currency || 'EUR' 
-                    }).format(totalValue)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                  {t('assets.notes')}
-                </label>
-                <textarea
-                  {...register('notes')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  rows={3}
-                  placeholder={t('assets.notesPlaceholder')}
+                  placeholder={t('assets.searchAssets')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               </div>
 
-              {/* Form Actions */}
-              <div className="flex justify-end space-x-2 pt-4">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={!selectedDefinition}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {editingAsset ? t('common.update') : t('common.add')}
-                </button>
+              {/* Asset Selection Dropdown */}
+              <select
+                {...register('assetDefinitionId')}
+                onChange={(e) => handleDefinitionSelect(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                required
+              >
+                <option value="">{t('assets.selectAssetOption')}</option>
+                {filteredDefinitions.map(definition => (
+                  <option key={definition.id} value={definition.id}>
+                    {definition.fullName} {definition.ticker && `(${definition.ticker})`}
+                    {definition.sector && ` - ${definition.sector}`}
+                  </option>
+                ))}
+              </select>
+              {errors.assetDefinitionId && (
+                <p className="mt-1 text-sm text-red-600">{errors.assetDefinitionId.message}</p>
+              )}
+
+              {/* Selected Asset Info */}
+              {selectedDefinition && (
+                <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div><strong>{t('assets.type')}:</strong> {t(`assets.types.${selectedDefinition.type}`)}</div>
+                    <div><strong>{t('assets.sector')}:</strong> {selectedDefinition.sector || 'N/A'}</div>
+                    <div><strong>{t('assets.country')}:</strong> {selectedDefinition.country || 'N/A'}</div>
+                    <div><strong>{t('assets.currency')}:</strong> {selectedDefinition.currency || 'N/A'}</div>
+                    {selectedDefinition.dividendInfo && (
+                      <>
+                        <div><strong>{t('assets.dividend')}:</strong> {selectedDefinition.dividendInfo.amount}</div>
+                        <div><strong>{t('assets.frequency')}:</strong> {t(`paymentFrequency.${selectedDefinition.dividendInfo.frequency}`)}</div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <StandardFormField
+              label={t('assets.transactionName')}
+              name="name"
+              required
+              error={errors.name?.message}
+              value={watch('name')}
+              onChange={(value) => setValue('name', value)}
+              placeholder={t('assets.transactionNamePlaceholder')}
+            />
+
+            <StandardFormField
+              label={t('assets.purchaseDate')}
+              name="purchaseDate"
+              type="date"
+              required
+              error={errors.purchaseDate?.message}
+              value={watch('purchaseDate')}
+              onChange={(value) => setValue('purchaseDate', value)}
+            />
+
+            <StandardFormField
+              label={t('assets.purchasePrice')}
+              name="purchasePrice"
+              type="number"
+              required
+              error={errors.purchasePrice?.message}
+              value={watch('purchasePrice')}
+              onChange={(value) => setValue('purchasePrice', value)}
+              step={0.01}
+              min={0}
+            />
+
+            <StandardFormField
+              label={t('assets.quantity')}
+              name="purchaseQuantity"
+              type="number"
+              error={errors.purchaseQuantity?.message}
+              value={watch('purchaseQuantity')}
+              onChange={(value) => setValue('purchaseQuantity', value)}
+              step={0.001}
+              min={0.001}
+            />
+          </FormGrid>
+        </RequiredSection>
+
+        <OptionalSection title={t('common.additionalInformation')}>
+          <FormGrid columns={{ xs: '1fr', sm: '1fr' }}>
+            <StandardFormField
+              label={t('assets.transactionCosts')}
+              name="transactionCosts"
+              type="number"
+              error={errors.transactionCosts?.message}
+              value={watch('transactionCosts')}
+              onChange={(value) => setValue('transactionCosts', value)}
+              step={0.01}
+              min={0}
+            />
+
+            {/* Total Value Display */}
+            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-gray-700 dark:text-gray-300">{t('assets.totalInvestment')}:</span>
+                <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
+                  {new Intl.NumberFormat('de-DE', { 
+                    style: 'currency', 
+                    currency: selectedDefinition?.currency || 'EUR' 
+                  }).format(totalValue)}
+                </span>
               </div>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
+            </div>
+
+            <StandardFormField
+              label={t('assets.notes')}
+              name="notes"
+              type="textarea"
+              error={errors.notes?.message}
+              value={watch('notes')}
+              onChange={(value) => setValue('notes', value)}
+              placeholder={t('assets.notesPlaceholder')}
+              rows={3}
+              gridColumn="1 / -1"
+            />
+          </FormGrid>
+        </OptionalSection>
+      </StandardFormWrapper>
+    </Modal>
   );
 };

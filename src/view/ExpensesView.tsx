@@ -1,6 +1,7 @@
 import React from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '../ui/common/Card';
+import { Card, CardContent } from '../ui/common/Card';
 import { Button } from '../ui/common/Button';
+import { SummaryCard } from '../ui/common/SummaryCard';
 import { Plus, Trash2, Edit, ReceiptText } from 'lucide-react';
 import { Expense } from '../types';
 import { MaterialExpenseForm } from '../container/forms/MaterialExpenseForm';
@@ -58,33 +59,18 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
       </div>
 
       {/* Summary Card */}
-      <Card className="bg-gradient-to-br from-red-600 to-red-400 dark:from-red-800 dark:to-red-600 rounded-[2rem] overflow-hidden">
-        <CardHeader className="pb-2">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <CardTitle className="text-lg font-medium text-white">
-                {t('expenses.summary')}
-              </CardTitle>
-              <p className="text-sm font-medium text-red-100/80">
-                {t('common.across', { count: expenses.length })}
-              </p>
-            </div>
-            <div className="bg-white/10 p-2 rounded-xl backdrop-blur-sm">
-              <ReceiptText className="w-5 h-5 text-white" />
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-1">
-            <div className="text-3xl font-bold text-white">
-              {formatService.formatCurrency(totalMonthlyExpenses)}
-            </div>
-            <p className="text-sm text-red-100/90">
-              Monthly expenses
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <SummaryCard
+        title={t('expenses.summary')}
+        subtitle={t('common.across', { count: expenses.length })}
+        value={formatService.formatCurrency(totalMonthlyExpenses)}
+        valueDescription="Monthly expenses"
+        icon={ReceiptText}
+        gradientFrom="from-red-600"
+        gradientTo="to-red-400"
+        darkGradientFrom="from-red-800"
+        darkGradientTo="to-red-600"
+        accentColor="red-100/80"
+      />
 
       {/* Expenses List */}
       {expenses.length > 0 ? (

@@ -59,14 +59,6 @@ const AssetsContainer: React.FC = () => {
     };
   }, [portfolioData]);
 
-  const totalValueDifference = useMemo(() => {
-    return portfolioData.totals.totalReturn;
-  }, [portfolioData]);
-
-  const totalPercentageDifference = useMemo(() => {
-    return portfolioData.totals.totalReturnPercentage;
-  }, [portfolioData]);
-
   const handleAddAsset = async (data: any) => {
     try {
       Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
@@ -231,8 +223,6 @@ const AssetsContainer: React.FC = () => {
       portfolioData={portfolioData}
       status={status}
       totalAssetValue={totalAssetValue}
-      totalValueDifference={totalValueDifference}
-      totalPercentageDifference={totalPercentageDifference}
       monthlyAssetIncome={monthlyAssetIncome}
       annualAssetIncome={annualAssetIncome}
       isAddingAsset={isAddingAsset}
