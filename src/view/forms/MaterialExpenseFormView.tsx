@@ -6,10 +6,9 @@ import { UseFormSetValue } from 'react-hook-form';
 import { 
   MaterialForm, 
   SectionTitle,
-  RequiredFieldsSection,
-  OptionalFieldsSection
+  RequiredFieldsSection
 } from '../../ui/MaterialForm';
-import { SharedFormField } from '../../components/SharedFormField';
+import { SharedFormField } from '../../ui/SharedFormField';
 import { MonthSelector } from '../../ui/MonthSelector';
 import FloatingBtn, { ButtonAlignment } from '../../ui/floatingBtn';
 import { useTranslation } from 'react-i18next';
@@ -88,121 +87,218 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
   ];
 
   return (
-    <Box sx={{ pb: 10 }}>
+    <Box sx={{ 
+      pb: { xs: 12, sm: 10 },
+      pt: { xs: 3, sm: 4 },
+      px: { xs: 1, sm: 2 },
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, rgba(244, 67, 54, 0.03) 0%, rgba(255, 87, 34, 0.03) 100%)'
+    }}>
       <MaterialForm 
         title={title}
         onSubmit={onFormSubmit}
       >
         <RequiredFieldsSection>
-          <SectionTitle>{t('common.requiredFields')}</SectionTitle>
+          <SectionTitle sx={{ 
+            fontSize: { xs: '1rem', sm: '1.1rem' }, 
+            mb: { xs: 2, sm: 3 },
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            '&::before': {
+              content: '"*"',
+              color: 'error.main',
+              fontWeight: 'bold',
+              fontSize: '1.2em'
+            }
+          }}>
+            {t('common.requiredFields')}
+          </SectionTitle>
           
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-            <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
-              <Box gridColumn={{ xs: "span 12", md: "span 6" }}>
-                <SharedFormField
-                  label={t('common.name')}
-                  name="name"
-                  required
-                  error={errors.name?.message}
-                  value={watch('name')}
-                  onChange={(value: string) => setValue('name', value)}
-                />
-              </Box>
-              
-              <Box gridColumn={{ xs: "span 12", md: "span 6" }}>
-                <SharedFormField
-                  label={t('expenses.form.category')}
-                  name="category"
-                  type="select"
-                  required
-                  options={categoryOptions}
-                  value={watch('category')}
-                  onChange={(value: ExpenseCategory) => setValue('category', value)}
-                />
-              </Box>
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+            gap: { xs: 2.5, sm: 3 },
+            mb: 2
+          }}>
+            <SharedFormField
+              label={t('common.name')}
+              name="name"
+              required
+              error={errors.name?.message}
+              value={watch('name')}
+              onChange={(value) => setValue('name', value)}
+              placeholder={t('expenses.form.enterExpenseName')}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  minHeight: { xs: '56px', sm: '48px' }
+                }
+              }}
+            />
+            
+            <SharedFormField
+              label={t('expenses.form.category')}
+              name="category"
+              type="select"
+              required
+              options={categoryOptions}
+              value={watch('category')}
+              onChange={(value) => setValue('category', value)}
+              placeholder={t('expenses.form.selectCategory')}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  minHeight: { xs: '56px', sm: '48px' }
+                }
+              }}
+            />
 
-              <Box gridColumn={{ xs: "span 12", md: "span 6" }}>
-                <SharedFormField
-                  label={t('expenses.form.paymentFrequency')}
-                  name="paymentSchedule.frequency"
-                  type="select"
-                  required
-                  options={paymentFrequencyOptions}
-                  value={watch('paymentSchedule.frequency')}
-                  onChange={(value: PaymentFrequency) => setValue('paymentSchedule.frequency', value)}
-                />
-              </Box>
+            <SharedFormField
+              label={t('expenses.form.paymentFrequency')}
+              name="paymentSchedule.frequency"
+              type="select"
+              required
+              options={paymentFrequencyOptions}
+              value={watch('paymentSchedule.frequency')}
+              onChange={(value) => setValue('paymentSchedule.frequency', value)}
+              placeholder={t('expenses.form.selectFrequency')}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  minHeight: { xs: '56px', sm: '48px' }
+                }
+              }}
+            />
 
-              <Box gridColumn={{ xs: "span 12", md: "span 6" }}>
-                <SharedFormField
-                  label={t('expenses.form.paymentAmount')}
-                  name="paymentSchedule.amount"
-                  type="number"
-                  required
-                  error={errors.paymentSchedule?.amount?.message}
-                  value={watch('paymentSchedule.amount')}
-                  onChange={(value: number) => setValue('paymentSchedule.amount', value)}
-                  step={0.01}
-                  min={0}
-                />
-              </Box>
+            <SharedFormField
+              label={t('expenses.form.paymentAmount')}
+              name="paymentSchedule.amount"
+              type="number"
+              required
+              error={errors.paymentSchedule?.amount?.message}
+              value={watch('paymentSchedule.amount')}
+              onChange={(value) => setValue('paymentSchedule.amount', value)}
+              placeholder="0"
+              step={0.01}
+              min={0}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  minHeight: { xs: '56px', sm: '48px' }
+                }
+              }}
+            />
 
-              <Box gridColumn="span 12">
-                <SharedFormField
-                  label={t('common.startDate')}
-                  name="startDate"
-                  type="date"
-                  required
-                  value={watch('startDate')}
-                  onChange={(value: string) => setValue('startDate', value)}
-                />
-              </Box>
-
-              {paymentFrequency === 'custom' && (
-                <Box gridColumn="span 12" mt={2}>
-                  <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 600 }}>
-                    {t('expenses.form.paymentMonths')}
-                  </Typography>
-                  <MonthSelector
-                    selectedMonths={paymentFields.months || []}
-                    onChange={handleMonthChange}
-                    label={t('expenses.form.paymentMonths')}
-                  />
-                </Box>
-              )}
-            </Box>
-          </Box>
-        </RequiredFieldsSection>
-
-        <OptionalFieldsSection>
-          <SectionTitle>{t('common.optionalFields')}</SectionTitle>
-          
-          <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={2}>
-            <Box gridColumn={{ xs: "span 12", md: "span 6" }}>
+            <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
               <SharedFormField
-                label={t('common.endDate')}
-                name="endDate"
+                label={t('common.startDate')}
+                name="startDate"
                 type="date"
-                value={watch('endDate')}
-                onChange={(value: string) => setValue('endDate', value)}
+                required
+                value={watch('startDate')}
+                onChange={(value) => setValue('startDate', value)}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    minHeight: { xs: '56px', sm: '48px' }
+                  }
+                }}
               />
             </Box>
 
-            <Box gridColumn="span 12">
+            {paymentFrequency === 'custom' && (
+              <Box sx={{ 
+                gridColumn: { xs: '1', sm: '1 / -1' }, 
+                mt: { xs: 2, sm: 3 },
+                p: { xs: 2, sm: 3 },
+                borderRadius: 2,
+                backgroundColor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider'
+              }}>
+                <Typography variant="subtitle2" sx={{ 
+                  mb: { xs: 2, sm: 3 }, 
+                  fontWeight: 600,
+                  fontSize: { xs: '0.95rem', sm: '1rem' },
+                  color: 'primary.main'
+                }}>
+                  {t('expenses.form.paymentMonths')}
+                </Typography>
+                <MonthSelector
+                  selectedMonths={paymentFields.months || []}
+                  onChange={handleMonthChange}
+                  label={t('expenses.form.paymentMonths')}
+                />
+              </Box>
+            )}
+          </Box>
+        </RequiredFieldsSection>
+
+        <Box sx={{ 
+          mb: { xs: 3, sm: 4 },
+          p: { xs: 2, sm: 3 },
+          borderRadius: 2,
+          backgroundColor: 'background.paper',
+          border: '1px solid',
+          borderColor: 'divider'
+        }}>
+          <SectionTitle sx={{ 
+            fontSize: { xs: '1rem', sm: '1.1rem' }, 
+            mb: { xs: 2, sm: 3 },
+            color: 'primary.main',
+            fontWeight: 600
+          }}>
+            {t('common.optionalFields')}
+          </SectionTitle>
+          
+          <Box sx={{ 
+            display: 'grid', 
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+            gap: { xs: 2.5, sm: 3 }
+          }}>
+            <SharedFormField
+              label={t('common.endDate')}
+              name="endDate"
+              type="date"
+              value={watch('endDate')}
+              onChange={(value) => setValue('endDate', value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 2,
+                  minHeight: { xs: '56px', sm: '48px' }
+                }
+              }}
+            />
+
+            <Box sx={{ gridColumn: { xs: '1', sm: '1 / -1' } }}>
               <SharedFormField
                 label={t('common.notes')}
                 name="notes"
                 type="textarea"
                 value={watch('notes')}
-                onChange={(value: string) => setValue('notes', value)}
+                onChange={(value) => setValue('notes', value)}
                 rows={3}
+                placeholder={t('common.enterNotes')}
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2
+                  }
+                }}
               />
             </Box>
           </Box>
-        </OptionalFieldsSection>
+        </Box>
       </MaterialForm>
 
-      <Box sx={{ display: 'flex', gap: 2, position: 'fixed', bottom: '16px', right: '16px', zIndex: 1100 }}>
+      <Box sx={{ 
+        display: 'flex', 
+        gap: { xs: 1.5, sm: 2 }, 
+        position: 'fixed', 
+        bottom: { xs: '16px', sm: '20px' }, 
+        right: { xs: '16px', sm: '20px' }, 
+        zIndex: 1100 
+      }}>
         {onCancel && (
           <FloatingBtn
             alignment={ButtonAlignment.RIGHT}

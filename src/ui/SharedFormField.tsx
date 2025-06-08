@@ -27,6 +27,19 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
       borderColor: theme.palette.primary.main,
     },
   },
+  '& .MuiInputLabel-root': {
+    // Ensure labels have enough space and are not cut off
+    marginTop: theme.spacing(0.5),
+    paddingTop: theme.spacing(0.5),
+    paddingBottom: theme.spacing(0.5),
+    backgroundColor: 'transparent',
+    '&.MuiInputLabel-shrunk': {
+      marginTop: 0,
+      paddingTop: 0,
+      paddingBottom: 0,
+      transform: 'translate(14px, -9px) scale(0.75)',
+    },
+  },
 }));
 
 export type SharedFormFieldProps = FormFieldProps & {
@@ -95,7 +108,22 @@ export const SharedFormField: React.FC<SharedFormFieldProps> = ({
         disabled={disabled}
         variant="outlined"
         className={className}
-        sx={sx}
+        sx={{
+          ...sx,
+          '& .MuiInputLabel-root': {
+            // Ensure select labels have enough space and are not cut off
+            marginTop: theme.spacing(0.5),
+            paddingTop: theme.spacing(0.5),
+            paddingBottom: theme.spacing(0.5),
+            backgroundColor: 'transparent',
+            '&.MuiInputLabel-shrunk': {
+              marginTop: 0,
+              paddingTop: 0,
+              paddingBottom: 0,
+              transform: 'translate(14px, -9px) scale(0.75)',
+            },
+          },
+        }}
       >
         <InputLabel id={`${name}-label`} required={required}>
           {label}
@@ -131,9 +159,11 @@ export const SharedFormField: React.FC<SharedFormFieldProps> = ({
         <Typography 
           variant="body2" 
           sx={{ 
-            mb: 1, 
+            mb: 1.5, 
+            mt: 0.5,
             fontWeight: required ? 600 : 400,
-            color: theme.palette.text.primary
+            color: theme.palette.text.primary,
+            lineHeight: 1.2
           }}
         >
           {label} {required && '*'}
@@ -151,6 +181,79 @@ export const SharedFormField: React.FC<SharedFormFieldProps> = ({
           variant="outlined"
         />
       </Box>
+    );
+  }
+
+  // Special handling for date fields to fix placeholder issues
+  if (type === 'date') {
+    return (
+      <StyledTextField
+        fullWidth={fullWidth}
+        label={label}
+        required={required}
+        type={type}
+        value={value || ''}
+        onChange={handleChange}
+        error={Boolean(error)}
+        helperText={error || helperText}
+        disabled={disabled}
+        variant="outlined"
+        className={className}
+        InputLabelProps={{
+          shrink: true, // Always shrink label for date fields
+        }}
+        inputProps={{
+          placeholder: '', // Remove HTML5 date placeholder to avoid conflicts
+        }}
+        sx={{
+          ...sx,
+          '& .MuiInputLabel-root': {
+            lineHeight: 1.2,
+          },
+          '& input[type="date"]::-webkit-datetime-edit-text': {
+            color: 'transparent',
+          },
+          '& input[type="date"]::-webkit-datetime-edit-month-field': {
+            color: 'transparent',
+          },
+          '& input[type="date"]::-webkit-datetime-edit-day-field': {
+            color: 'transparent',
+          },
+          '& input[type="date"]::-webkit-datetime-edit-year-field': {
+            color: 'transparent',
+          },
+          '& input[type="date"]::-webkit-calendar-picker-indicator': {
+            opacity: 1,
+          },
+          '& input[type="date"]:focus::-webkit-datetime-edit-text': {
+            color: theme.palette.text.primary,
+          },
+          '& input[type="date"]:focus::-webkit-datetime-edit-month-field': {
+            color: theme.palette.text.primary,
+          },
+          '& input[type="date"]:focus::-webkit-datetime-edit-day-field': {
+            color: theme.palette.text.primary,
+          },
+          '& input[type="date"]:focus::-webkit-datetime-edit-year-field': {
+            color: theme.palette.text.primary,
+          },
+          '& input[type="date"][value=""]::-webkit-datetime-edit-text': {
+            color: 'transparent',
+          },
+          '& input[type="date"]:not([value=""])::-webkit-datetime-edit-text': {
+            color: theme.palette.text.primary,
+          },
+          '& input[type="date"]:not([value=""])::-webkit-datetime-edit-month-field': {
+            color: theme.palette.text.primary,
+          },
+          '& input[type="date"]:not([value=""])::-webkit-datetime-edit-day-field': {
+            color: theme.palette.text.primary,
+          },
+          '& input[type="date"]:not([value=""])::-webkit-datetime-edit-year-field': {
+            color: theme.palette.text.primary,
+          },
+        }}
+      />
     );
   }
 
@@ -175,7 +278,13 @@ export const SharedFormField: React.FC<SharedFormFieldProps> = ({
       multiline={multiline}
       rows={multiline ? rows : undefined}
       className={className}
-      sx={sx}
+      sx={{
+        ...sx,
+        '& .MuiInputLabel-root': {
+          // Additional label spacing for consistency
+          lineHeight: 1.2,
+        },
+      }}
     />
   );
 };
