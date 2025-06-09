@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, TrendingUp, Calendar, DollarSign, Package, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
-import formatService from '../../service/formatService';
+import { PortfolioPosition } from '../service/portfolioService/portfolioCalculations';
+import formatService from '../service/formatService';
 
 interface AssetDetailViewProps {
   asset: PortfolioPosition;

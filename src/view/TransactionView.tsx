@@ -1,10 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Edit, Trash2 } from 'lucide-react';
-import { Asset } from '../../types';
-import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
-import formatService from '../../service/formatService';
-import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
+import { Asset } from '../types';
+import { PortfolioPosition } from '../service/portfolioService/portfolioCalculations';
+import formatService from '../service/formatService';
+import { getCurrentQuantity, getCurrentValue } from '../utils/transactionCalculations';
 
 interface TransactionViewProps {
   assets: Asset[];

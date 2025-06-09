@@ -6,9 +6,9 @@ import { AssetTransactionForm } from '../ui/forms/AssetTransactionForm';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
 import { MobileAssetSummaryCard } from '../ui/layout/MobileAssetSummaryCard';
 import { DesktopAssetSummaryCards } from '../ui/layout/DesktopAssetSummaryCards';
-import { PortfolioView } from '../ui/layout/PortfolioView';
-import { TransactionView } from '../ui/layout/TransactionView';
-import { AssetDetailView } from '../ui/layout/AssetDetailView';
+import { PortfolioView } from './PortfolioView';
+import { TransactionView } from './TransactionView';
+import { AssetDetailView } from './AssetDetailView';
 import FloatingBtn, { ButtonAlignment } from '../ui/layout/floatingBtn';
 import { Add } from '@mui/icons-material';
 import { 
