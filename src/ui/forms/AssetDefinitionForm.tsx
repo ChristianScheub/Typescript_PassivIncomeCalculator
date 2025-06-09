@@ -10,6 +10,8 @@ import {
   StandardFormField
 } from './StandardFormWrapper';
 import { Modal } from '../common/Modal';
+import { MonthSelector } from './MonthSelector';
+import { CustomAmountsSection } from '../specialized/CustomAmountsSection';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import { getAssetTypeOptions } from '../../constants';
@@ -38,6 +40,7 @@ const assetDefinitionSchema = z.object({
   dividendFrequency: z.enum(['monthly', 'quarterly', 'annually', 'custom', 'none']).optional(),
   dividendMonths: z.array(z.number().min(1).max(12)).optional(),
   dividendCustomAmounts: z.record(z.string(), z.number()).optional(),
+  dividendPaymentMonths: z.array(z.number().min(1).max(12)).optional(),
   
   // Rental fields  
   hasRental: z.boolean().optional(),
@@ -45,6 +48,7 @@ const assetDefinitionSchema = z.object({
   rentalFrequency: z.enum(['monthly', 'quarterly', 'annually', 'custom']).optional(),
   rentalMonths: z.array(z.number().min(1).max(12)).optional(),
   rentalCustomAmounts: z.record(z.string(), z.number()).optional(),
+  rentalPaymentMonths: z.array(z.number().min(1).max(12)).optional(),
   
   // Bond fields
   hasBond: z.boolean().optional(),
@@ -100,10 +104,14 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       hasDividend: !!editingDefinition.dividendInfo,
       dividendAmount: editingDefinition.dividendInfo?.amount || 0,
       dividendFrequency: editingDefinition.dividendInfo?.frequency || 'quarterly',
+      dividendPaymentMonths: editingDefinition.dividendInfo?.paymentMonths || editingDefinition.dividendInfo?.months || [],
+      dividendCustomAmounts: editingDefinition.dividendInfo?.customAmounts || {},
       
       hasRental: !!editingDefinition.rentalInfo,
       rentalAmount: editingDefinition.rentalInfo?.baseRent || 0,
       rentalFrequency: editingDefinition.rentalInfo?.frequency || 'monthly',
+      rentalPaymentMonths: editingDefinition.rentalInfo?.months || [],
+      rentalCustomAmounts: editingDefinition.rentalInfo?.customAmounts || {},
       
       hasBond: !!editingDefinition.bondInfo,
       interestRate: editingDefinition.bondInfo?.interestRate || 0,
@@ -121,6 +129,10 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       rentalFrequency: 'monthly' as PaymentFrequency,
       dividendMonths: [],
       rentalMonths: [],
+      dividendPaymentMonths: [],
+      rentalPaymentMonths: [],
+      dividendCustomAmounts: {},
+      rentalCustomAmounts: {},
     }
   });
 
@@ -128,10 +140,60 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
   const hasDividend = watch('hasDividend');
   const hasRental = watch('hasRental');
   const hasBond = watch('hasBond');
+  const dividendFrequency = watch('dividendFrequency');
+  const rentalFrequency = watch('rentalFrequency');
+  const dividendPaymentMonths = watch('dividendPaymentMonths') || [];
+  const rentalPaymentMonths = watch('rentalPaymentMonths') || [];
+  const dividendCustomAmounts = watch('dividendCustomAmounts') || {};
+  const rentalCustomAmounts = watch('rentalCustomAmounts') || {};
 
   React.useEffect(() => {
     setSelectedType(watchedType as AssetType);
   }, [watchedType]);
+
+  // Handler functions for dividend payment months
+  const handleDividendMonthChange = (month: number, checked: boolean) => {
+    const currentMonths = dividendPaymentMonths || [];
+    let newMonths: number[];
+    
+    if (checked) {
+      newMonths = [...currentMonths, month].sort((a, b) => a - b);
+    } else {
+      newMonths = currentMonths.filter(m => m !== month);
+    }
+    
+    setValue('dividendPaymentMonths', newMonths);
+  };
+
+  const handleDividendCustomAmountChange = (month: number, amount: number) => {
+    const currentAmounts = dividendCustomAmounts || {};
+    setValue('dividendCustomAmounts', {
+      ...currentAmounts,
+      [month]: amount
+    });
+  };
+
+  // Handler functions for rental payment months
+  const handleRentalMonthChange = (month: number, checked: boolean) => {
+    const currentMonths = rentalPaymentMonths || [];
+    let newMonths: number[];
+    
+    if (checked) {
+      newMonths = [...currentMonths, month].sort((a, b) => a - b);
+    } else {
+      newMonths = currentMonths.filter(m => m !== month);
+    }
+    
+    setValue('rentalPaymentMonths', newMonths);
+  };
+
+  const handleRentalCustomAmountChange = (month: number, amount: number) => {
+    const currentAmounts = rentalCustomAmounts || {};
+    setValue('rentalCustomAmounts', {
+      ...currentAmounts,
+      [month]: amount
+    });
+  };
 
   // Reset form when editingDefinition changes
   React.useEffect(() => {
@@ -206,6 +268,8 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         frequency: data.dividendFrequency as DividendFrequency,
         amount: data.dividendAmount,
         currency: data.currency,
+        paymentMonths: data.dividendPaymentMonths && data.dividendPaymentMonths.length > 0 ? data.dividendPaymentMonths : undefined,
+        customAmounts: data.dividendCustomAmounts && Object.keys(data.dividendCustomAmounts).length > 0 ? data.dividendCustomAmounts : undefined,
       };
     }
 
@@ -215,6 +279,8 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         baseRent: data.rentalAmount,
         frequency: data.rentalFrequency as PaymentFrequency,
         currency: data.currency,
+        months: data.rentalPaymentMonths && data.rentalPaymentMonths.length > 0 ? data.rentalPaymentMonths : undefined,
+        customAmounts: data.rentalCustomAmounts && Object.keys(data.rentalCustomAmounts).length > 0 ? data.rentalCustomAmounts : undefined,
       };
     }
 
@@ -356,6 +422,35 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
             </>
           )}
         </FormGrid>
+
+        {/* Dividend Month Selection */}
+        {hasDividend && dividendFrequency && (dividendFrequency === 'quarterly' || dividendFrequency === 'annually' || dividendFrequency === 'custom') && (
+          <div style={{ marginTop: '16px' }}>
+            <MonthSelector
+              selectedMonths={dividendPaymentMonths}
+              onChange={handleDividendMonthChange}
+              label={
+                dividendFrequency === 'quarterly' 
+                  ? t('assets.selectQuarterlyMonths')
+                  : dividendFrequency === 'annually'
+                  ? t('assets.selectAnnualMonth')
+                  : t('assets.selectDividendMonths')
+              }
+            />
+          </div>
+        )}
+
+        {/* Custom Dividend Amounts */}
+        {hasDividend && dividendFrequency === 'custom' && (
+          <CustomAmountsSection
+            frequency={dividendFrequency}
+            selectedMonths={dividendPaymentMonths}
+            customAmounts={dividendCustomAmounts}
+            onAmountChange={handleDividendCustomAmountChange}
+            title={t('assets.customDividendAmounts')}
+            currency={watch('currency') || 'EUR'}
+          />
+        )}
       </OptionalSection>
 
       {selectedType === 'real_estate' && (
@@ -397,6 +492,35 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
               </>
             )}
           </FormGrid>
+
+          {/* Rental Month Selection */}
+          {hasRental && rentalFrequency && (rentalFrequency === 'quarterly' || rentalFrequency === 'annually' || rentalFrequency === 'custom') && (
+            <div style={{ marginTop: '16px' }}>
+              <MonthSelector
+                selectedMonths={rentalPaymentMonths}
+                onChange={handleRentalMonthChange}
+                label={
+                  rentalFrequency === 'quarterly' 
+                    ? t('assets.selectQuarterlyMonths')
+                    : rentalFrequency === 'annually'
+                    ? t('assets.selectAnnualMonth')
+                    : t('assets.selectRentalMonths')
+                }
+              />
+            </div>
+          )}
+
+          {/* Custom Rental Amounts */}
+          {hasRental && rentalFrequency === 'custom' && (
+            <CustomAmountsSection
+              frequency={rentalFrequency}
+              selectedMonths={rentalPaymentMonths}
+              customAmounts={rentalCustomAmounts}
+              onAmountChange={handleRentalCustomAmountChange}
+              title={t('assets.customRentalAmounts')}
+              currency={watch('currency') || 'EUR'}
+            />
+          )}
         </OptionalSection>
       )}
 

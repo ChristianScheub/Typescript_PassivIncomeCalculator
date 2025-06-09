@@ -147,13 +147,8 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
       // Note: Dividend/rental income is now calculated centrally from AssetDefinitions
       // at the portfolio level, not stored in individual transactions
       
-      // Copy metadata for easier access (denormalization for performance)
-      country: selectedDefinition.country,
-      continent: selectedDefinition.continent,
-      sector: selectedDefinition.sector,
-      ticker: selectedDefinition.ticker,
-      symbol: selectedDefinition.ticker, // Legacy compatibility
-      acquisitionCost: totalValue,
+      // Note: Master data (country, continent, sector, ticker) is ONLY stored in AssetDefinition
+      // and should NOT be duplicated in transactions
       
       // Set purchase date properly
       purchaseDate: new Date(data.purchaseDate).toISOString(),

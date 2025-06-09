@@ -79,6 +79,8 @@
     "rentalAmount": "Rental Amount",
     "rentalFrequency": "Rental Frequency",
     "customRentalAmounts": "Custom Rental Amounts per Month",
+    "selectDividendMonths": "Select Dividend Payment Months",
+    "selectRentalMonths": "Select Rental Payment Months",
     "rent": "Rent",
     "hasBondInfo": "Bond Information Available",
     "interestRate": "Interest Rate",
@@ -113,6 +115,8 @@
     "delete": "Delete",
     "close": "Close",
     "loading": "Loading...",
-    "deleteConfirm": "Are you sure you want to delete this item?"
+    "deleteConfirm": "Are you sure you want to delete this item?",
+    "customAmounts": "Custom Amounts",
+    "totalAnnualAmount": "Total Annual Amount"
   }
 }
