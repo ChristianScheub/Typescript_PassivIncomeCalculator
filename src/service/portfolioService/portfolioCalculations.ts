@@ -64,18 +64,24 @@ export const calculatePortfolioPositions = (
     }, 0);
 
     const totalInvestment = transactions.reduce((sum, t) => {
-      const quantity = getCurrentQuantity(t);
-      const price = t.purchasePrice || 0;
-      return sum + (price * quantity) + (t.transactionCosts || 0);
+      if (t.transactionType === 'buy') {
+        const quantity = t.purchaseQuantity || 0;
+        const price = t.purchasePrice || 0;
+        return sum + (price * quantity) + (t.transactionCosts || 0);
+      } else if (t.transactionType === 'sell') {
+        // For sells, subtract the sale proceeds (but keep transaction costs as expense)
+        const quantity = t.saleQuantity || 0;
+        const price = t.salePrice || 0;
+        return sum - (price * quantity) + (t.transactionCosts || 0);
+      }
+      return sum;
     }, 0);
 
-    const currentValue = transactions.reduce((sum, t) => {
-      return sum + getCurrentValue(t);
-    }, 0);
+    const currentValue = totalQuantity > 0 ? (assetDefinition?.currentPrice || 0) * totalQuantity : 0;
 
-    const averagePurchasePrice = totalQuantity > 0 ? totalInvestment / totalQuantity : 0;
+    const averagePurchasePrice = totalQuantity > 0 ? Math.abs(totalInvestment / totalQuantity) : 0;
     const totalReturn = currentValue - totalInvestment;
-    const totalReturnPercentage = totalInvestment > 0 ? (totalReturn / totalInvestment) * 100 : 0;
+    const totalReturnPercentage = totalInvestment !== 0 ? (totalReturn / Math.abs(totalInvestment)) * 100 : 0;
 
     // Calculate monthly income based on AssetDefinition and total quantity
     const monthlyIncome = calculatePositionMonthlyIncome(assetDefinition, transactions[0], totalQuantity);

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
+import { runMigrations } from './utils/migrations';
 
 // Layouts
 import MobileLayout from './layouts/MobileLayout';
@@ -22,6 +23,11 @@ import { AppProvider } from './context/AppContext';
 import { ThemeProvider } from './theme/ThemeProvider';
 
 function App() {
+  // Run database migrations on app start
+  useEffect(() => {
+    runMigrations();
+  }, []);
+
   // Detect if mobile view (could be enhanced with a proper hook)
   const isMobile = window.innerWidth < 768;
   const Layout = isMobile ? MobileLayout : DesktopLayout;

@@ -340,7 +340,17 @@
         "dividendAmountPositive": "Dividendenbetrag muss positiv sein",
         "rentalAmountPositive": "Mietbetrag muss positiv sein",
         "addAsset": "Vermögenswert hinzufügen",
-        "updateAsset": "Vermögenswert aktualisieren"
+        "updateAsset": "Vermögenswert aktualisieren",
+        "transactionType": "Transaktionstyp",
+        "buyTransaction": "Kauf",
+        "sellTransaction": "Verkauf",
+        "saleDate": "Verkaufsdatum",
+        "salePrice": "Verkaufspreis",
+        "saleQuantity": "Verkaufsmenge",
+        "salePricePositive": "Verkaufspreis muss positiv sein",
+        "saleQuantityPositive": "Verkaufsmenge muss positiv sein",
+        "sellAsset": "Asset verkaufen",
+        "totalSaleValue": "Gesamt-Verkaufswert"
       },
       "types": {
         "all": "Alle Asset-Typen",
@@ -361,7 +371,20 @@
         "country": "Land",
         "continent": "Kontinent",
         "sector": "Sektor"
-      }
+      },
+      "transactionName": "Transaktionsname",
+      "transactionNamePlaceholder": "z.B. MSFT Kauf 06/2025",
+      "notesPlaceholder": "Zusätzliche Notizen zur Transaktion...",
+      "selectAsset": "Asset auswählen",
+      "searchAssets": "Assets durchsuchen",
+      "selectAssetOption": "Bitte Asset auswählen",
+      "noDefinitionsAvailable": "Keine Asset-Definitionen verfügbar",
+      "createDefinitionsFirst": "Erstellen Sie zuerst Asset-Definitionen im Asset-Manager.",
+      "addTransaction": "Transaktion hinzufügen",
+      "editTransaction": "Transaktion bearbeiten",
+      "transactions": "Transaktionen",
+      "transactionsView": "Transaktionsansicht",
+      "portfolioView": "Portfolio-Ansicht"
     },
     "liabilities": {
       "title": "Verbindlichkeiten",

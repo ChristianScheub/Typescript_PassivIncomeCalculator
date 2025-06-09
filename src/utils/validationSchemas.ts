@@ -64,6 +64,9 @@ export const createAssetSchema = () => {
     // Asset Definition reference
     assetDefinitionId: z.string().optional(),
     
+    // Transaction type
+    transactionType: z.enum(['buy', 'sell'] as const).optional(),
+    
     // Transaction specific data
     purchaseDate: z.string().optional(),
     purchasePrice: z.number({
@@ -72,6 +75,16 @@ export const createAssetSchema = () => {
     purchaseQuantity: z.number({
       invalid_type_error: "Purchase quantity must be a number"
     }).min(0, "Purchase quantity must be positive").optional(),
+    
+    // Sale specific data
+    saleDate: z.string().optional(),
+    salePrice: z.number({
+      invalid_type_error: "Sale price must be a number"
+    }).min(0, "Sale price must be positive").optional(),
+    saleQuantity: z.number({
+      invalid_type_error: "Sale quantity must be a number"
+    }).min(0, "Sale quantity must be positive").optional(),
+    
     transactionCosts: z.number().min(0).optional(),
     
     // Current values (calculated or updated)

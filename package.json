@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "migrate": "node migrate-transaction-type.js"
   },
   "dependencies": {
     "@capacitor/android": "^7.2.0",

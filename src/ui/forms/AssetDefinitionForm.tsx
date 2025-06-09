@@ -213,18 +213,29 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         description: editingDefinition.description || '',
         riskLevel: editingDefinition.riskLevel || 'medium',
         
+        // Price fields
+        currentPrice: editingDefinition.currentPrice || undefined,
+        lastPriceUpdate: editingDefinition.lastPriceUpdate || undefined,
+        
         hasDividend: !!editingDefinition.dividendInfo,
         dividendAmount: editingDefinition.dividendInfo?.amount || 0,
         dividendFrequency: editingDefinition.dividendInfo?.frequency || 'quarterly',
+        dividendPaymentMonths: editingDefinition.dividendInfo?.paymentMonths || editingDefinition.dividendInfo?.months || [],
+        dividendCustomAmounts: editingDefinition.dividendInfo?.customAmounts || {},
         
         hasRental: !!editingDefinition.rentalInfo,
         rentalAmount: editingDefinition.rentalInfo?.baseRent || 0,
         rentalFrequency: editingDefinition.rentalInfo?.frequency || 'monthly',
+        rentalPaymentMonths: editingDefinition.rentalInfo?.months || [],
+        rentalCustomAmounts: editingDefinition.rentalInfo?.customAmounts || {},
         
         hasBond: !!editingDefinition.bondInfo,
         interestRate: editingDefinition.bondInfo?.interestRate || 0,
         maturityDate: editingDefinition.bondInfo?.maturityDate?.substring(0, 10) || '',
         nominalValue: editingDefinition.bondInfo?.nominalValue || 0,
+        
+        dividendMonths: editingDefinition.dividendInfo?.months || [],
+        rentalMonths: editingDefinition.rentalInfo?.months || [],
       };
 
       reset(resetData);

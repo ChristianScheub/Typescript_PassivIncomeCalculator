@@ -97,9 +97,13 @@ const AssetsContainer: React.FC = () => {
       Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
       analytics.trackEvent('asset_add', { type: data.type, hasDefinitionId: !!data.assetDefinitionId });
       
-      // currentQuantity is now derived from purchaseQuantity - no need to set it explicitly
+      // Ensure transactionType is set, default to 'buy'
+      const transactionData = {
+        ...data,
+        transactionType: data.transactionType || 'buy'
+      };
       
-      await dispatch(addAsset(data));
+      await dispatch(addAsset(transactionData));
       setIsAddingAsset(false);
       
     } catch (error) {
@@ -126,10 +130,14 @@ const AssetsContainer: React.FC = () => {
       Logger.info('Updating asset transaction' + " - " + JSON.stringify({ id: editingAsset.id, data }));
       analytics.trackEvent('asset_update', { id: editingAsset.id, type: data.type });
       
-      // currentQuantity is now derived from purchaseQuantity - no need to set it explicitly
+      // Ensure transactionType is preserved, default to 'buy'
+      const transactionData = {
+        ...data,
+        transactionType: data.transactionType || editingAsset.transactionType || 'buy'
+      };
       
-      updateStockValueFields(data);
-      await dispatch(updateAsset({ ...data, id: editingAsset.id }));
+      updateStockValueFields(transactionData);
+      await dispatch(updateAsset({ ...transactionData, id: editingAsset.id }));
       setEditingAsset(null);
     } catch (error) {
       Logger.error('Failed to update asset transaction' + " - " + JSON.stringify(error as Error));

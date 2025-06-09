@@ -24,6 +24,7 @@ export interface DebtWithCoverage {
 
 // Asset Types
 export type AssetType = 'stock' | 'bond' | 'real_estate' | 'crypto' | 'cash' | 'other';
+export type TransactionType = 'buy' | 'sell';
 
 export type DividendFrequency = 'monthly' | 'quarterly' | 'annually' | 'custom' | 'none';
 export type PaymentFrequency = 'monthly' | 'quarterly' | 'annually' | 'custom';
@@ -114,11 +115,19 @@ export interface Transaction extends BaseEntity {
   assetDefinitionId?: string;
   assetDefinition?: AssetDefinition; // Populated reference
   
+  // Transaction type (buy/sell)
+  transactionType: TransactionType;
+  
   // Transaction specific data
   purchaseDate: string;
   purchasePrice: number;
   purchaseQuantity?: number;
   transactionCosts?: number;
+  
+  // Sale-specific fields (only for sell transactions)
+  saleDate?: string;
+  salePrice?: number;
+  saleQuantity?: number;
   
   // Calculated fields (derived values - not stored)
   // currentQuantity = purchaseQuantity (can change due to splits, etc.)

@@ -129,6 +129,18 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                     </div>
                   )}
 
+                  {definition.currentPrice && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600 dark:text-gray-400">{t('assets.currentPrice')}:</span>
+                      <span className="text-gray-900 dark:text-gray-100">
+                        {new Intl.NumberFormat('de-DE', {
+                          style: 'currency',
+                          currency: definition.currency || 'EUR'
+                        }).format(definition.currentPrice)}
+                      </span>
+                    </div>
+                  )}
+
                   {definition.dividendInfo && (
                     <div className="flex justify-between">
                       <span className="text-gray-600 dark:text-gray-400">{t('assets.dividend')}:</span>

@@ -7,29 +7,31 @@ import { Transaction, Asset } from '../types';
 
 /**
  * Gets the current quantity for a transaction
- * In most cases this is the purchaseQuantity, but could change due to stock splits, etc.
+ * For buy transactions: returns purchaseQuantity
+ * For sell transactions: returns negative saleQuantity (to subtract from portfolio)
  */
 export function getCurrentQuantity(transaction: Transaction | Asset): number {
-  // For now, return purchaseQuantity as currentQuantity
-  // In the future, this could account for stock splits and other adjustments
+  if (transaction.transactionType === 'sell') {
+    return -(transaction.saleQuantity || 0);
+  }
   return transaction.purchaseQuantity || 0;
 }
 
 /**
  * Calculates the current value of a transaction based on:
  * - Current market price from AssetDefinition
- * - Current quantity (accounting for splits, etc.)
+ * - Current quantity (accounting for buy/sell and splits, etc.)
  */
 export function getCurrentValue(transaction: Transaction | Asset): number {
   const currentPrice = transaction.assetDefinition?.currentPrice;
   const quantity = getCurrentQuantity(transaction);
   
-  if (!currentPrice || !quantity) {
+  if (!currentPrice) {
     // Fallback to original transaction value if no current price available
     return transaction.value || 0;
   }
   
-  return currentPrice * quantity;
+  return Math.abs(quantity) * currentPrice;
 }
 
 /**
