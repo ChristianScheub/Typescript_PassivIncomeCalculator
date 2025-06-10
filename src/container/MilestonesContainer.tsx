@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppSelector } from '../hooks/redux';
 import calculatorService from '../service/calculatorService';
-import MilestonesView from '../view/MilestonesView';
+import MilestonesView from '../view/milestones/MilestonesView';
 
 const MilestonesContainer: React.FC = () => {
   // Get necessary data from the store

@@ -27,6 +27,7 @@ interface PortfolioCache {
     positionCount: number;
     assetHash: string; // Hash of asset data to detect changes
     definitionHash: string; // Hash of definition data to detect changes
+    combinedHash: string; // Combined hash including category data
   };
 }
 
@@ -119,9 +120,17 @@ export const deleteAsset = createAsyncThunk('assets/deleteAsset', async (id: str
 // New action to calculate portfolio data
 export const calculatePortfolioData = createAsyncThunk(
   'assets/calculatePortfolioData',
-  async (assetDefinitions: AssetDefinition[], { getState }) => {
+  async (params: { 
+    assetDefinitions: AssetDefinition[], 
+    categoryData?: { 
+      categories: any[], 
+      categoryOptions: any[], 
+      categoryAssignments: any[] 
+    } 
+  }, { getState }) => {
     const state = getState() as { assets: AssetsState };
     const assets = state.assets.items;
+    const { assetDefinitions, categoryData } = params;
     
     Logger.infoRedux(`Calculating portfolio data for ${assets.length} assets and ${assetDefinitions.length} definitions`);
     
@@ -149,22 +158,37 @@ export const calculatePortfolioData = createAsyncThunk(
       dividendInfo: d.dividendInfo, 
       updatedAt: d.updatedAt 
     }));
+    const categoryDataHash = categoryData ? generateHash({
+      categories: categoryData.categories,
+      categoryOptions: categoryData.categoryOptions,
+      categoryAssignments: categoryData.categoryAssignments
+    }) : '';
     
     const assetHash = generateHash(assetData);
     const definitionHash = generateHash(definitionData);
+    const combinedHash = generateHash({ assetHash, definitionHash, categoryDataHash });
     
     // Check if cache is still valid
     const currentCache = state.assets.portfolioCache;
     if (currentCache && 
         currentCache.metadata.assetHash === assetHash && 
         currentCache.metadata.definitionHash === definitionHash &&
+        currentCache.metadata.combinedHash === combinedHash &&
         state.assets.portfolioCacheValid) {
       Logger.infoRedux('Portfolio cache is still valid, skipping calculation');
       return currentCache;
     }
     
-    // Calculate portfolio positions
-    const positions = calculatePortfolioPositions(assets, assetDefinitions);
+    // Calculate portfolio positions with category data
+    const positions = categoryData 
+      ? calculatePortfolioPositions(
+          assets, 
+          assetDefinitions, 
+          categoryData.categories, 
+          categoryData.categoryOptions, 
+          categoryData.categoryAssignments
+        )
+      : calculatePortfolioPositions(assets, assetDefinitions);
     
     // Calculate totals
     const totals = {
@@ -192,7 +216,8 @@ export const calculatePortfolioData = createAsyncThunk(
         definitionCount: assetDefinitions.length,
         positionCount: positions.length,
         assetHash,
-        definitionHash
+        definitionHash,
+        combinedHash
       }
     };
     

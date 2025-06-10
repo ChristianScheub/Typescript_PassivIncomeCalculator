@@ -1,4 +1,4 @@
-import { Asset, AssetDefinition } from '../../types';
+import { Asset, AssetDefinition, AssetCategory, AssetCategoryOption } from '../../types';
 import Logger from '../Logger/logger';
 import { calculateDividendSchedule } from '../calculatorService/methods/calculatePayment';
 import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
@@ -28,6 +28,12 @@ export interface PortfolioPosition {
   monthlyIncome: number;
   annualIncome: number;
   
+  // Category information
+  categoryAssignments?: {
+    category: AssetCategory;
+    option: AssetCategoryOption;
+  }[];
+  
   // Transaction details
   transactions: Asset[];
   transactionCount: number;
@@ -37,7 +43,10 @@ export interface PortfolioPosition {
 
 export const calculatePortfolioPositions = (
   assets: Asset[],
-  assetDefinitions: AssetDefinition[] = []
+  assetDefinitions: AssetDefinition[] = [],
+  categories: AssetCategory[] = [],
+  categoryOptions: AssetCategoryOption[] = [],
+  categoryAssignments: any[] = []
 ): PortfolioPosition[] => {
   Logger.infoService('Calculating portfolio positions from assets');
   
@@ -94,6 +103,18 @@ export const calculatePortfolioPositions = (
     const firstTransaction = sortedTransactions[0];
     const lastTransaction = sortedTransactions[sortedTransactions.length - 1];
 
+    // Calculate category assignments for this position
+    const positionCategoryAssignments = assetDefinition?.id 
+      ? categoryAssignments
+          .filter(assignment => assignment.assetDefinitionId === assetDefinition.id)
+          .map(assignment => {
+            const category = categories.find(cat => cat.id === assignment.categoryId);
+            const option = categoryOptions.find(opt => opt.id === assignment.categoryOptionId);
+            return category && option ? { category, option } : null;
+          })
+          .filter((item): item is { category: AssetCategory; option: AssetCategoryOption } => item !== null)
+      : [];
+
     const position: PortfolioPosition = {
       id: key,
       assetDefinition,
@@ -115,6 +136,8 @@ export const calculatePortfolioPositions = (
       
       monthlyIncome,
       annualIncome,
+      
+      categoryAssignments: positionCategoryAssignments,
       
       transactions,
       transactionCount: transactions.length,

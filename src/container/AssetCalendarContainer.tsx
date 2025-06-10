@@ -2,19 +2,19 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { RootState } from '../store';
-import { calculateAssetIncomeForMonth } from '../service/calculatorService/methods/calculateAssetIncome';
-import { Asset, AssetType } from '../types';
-import AssetCalendarView from '../view/AssetCalendarView';
-import calculatorService from '../service/calculatorService';
+import { AssetType } from '../types';
+import AssetCalendarView from '../view/assets/AssetCalendarView';
 import Logger from '../service/Logger/logger';
-import { getCurrentQuantity } from '../utils/transactionCalculations';
+import { PortfolioService } from '../service/portfolioService';
+import { PortfolioPosition } from '../service/portfolioService/portfolioCalculations';
+import { calculateDividendForMonth } from '../service/calculatorService/methods/calculatePayment';
 
 interface MonthData {
   month: number;
   name: string;
   totalIncome: number;
-  assets: Array<{
-    asset: Asset;
+  positions: Array<{
+    position: PortfolioPosition;
     income: number;
   }>;
 }
@@ -32,10 +32,29 @@ interface AssetCalendarContainerProps {
 
 const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack }) => {
   const assets = useSelector((state: RootState) => state.assets.items);
+  const assetDefinitions = useSelector((state: RootState) => state.assetDefinitions.items);
+  const assetCategories = useSelector((state: RootState) => state.assetCategories.categories);
+  const categoryOptions = useSelector((state: RootState) => state.assetCategories.categoryOptions);
+  const categoryAssignments = useSelector((state: RootState) => state.assetCategories.categoryAssignments);
   const { t } = useTranslation();
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Current month (1-12)
   const [selectedAssetType, setSelectedAssetType] = useState<AssetType | 'all'>('all');
+
+  // Get portfolio service instance
+  const portfolioService = PortfolioService.getInstance();
+
+  // Calculate portfolio positions (grouped by AssetDefinition)
+  const portfolioData = useMemo(() => {
+    Logger.info(`Calculating portfolio for asset calendar with ${assets.length} assets and ${assetDefinitions.length} definitions`);
+    return portfolioService.calculatePortfolio(
+      assets, 
+      assetDefinitions, 
+      assetCategories, 
+      categoryOptions, 
+      categoryAssignments
+    );
+  }, [assets, assetDefinitions, assetCategories, categoryOptions, categoryAssignments, portfolioService]);
 
   // Memoize month names to prevent recreation on every render
   const monthNames = useMemo(() => [
@@ -64,158 +83,118 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
     { value: 'other' as const, label: t('assets.types.other') },
   ], [t]);
 
-  // Memoize filtered assets to prevent unnecessary recalculations
-  const filteredAssets = useMemo(() => {
+  // Filter portfolio positions by asset type
+  const filteredPositions = useMemo(() => {
     return selectedAssetType === 'all' 
-      ? assets 
-      : assets.filter(asset => asset.type === selectedAssetType);
-  }, [assets, selectedAssetType]);
+      ? portfolioData.positions 
+      : portfolioData.positions.filter(position => position.type === selectedAssetType);
+  }, [portfolioData.positions, selectedAssetType]);
 
-  // Helper function to get income from cache result
-  const getIncomeFromCacheResult = useCallback((cacheResult: any, asset: Asset, month: number): number => {
-    if (cacheResult.cacheHit && cacheResult.monthlyBreakdown) {
-      const monthlyIncome = cacheResult.monthlyBreakdown[month] || 0;
-      Logger.cache(`Cache hit for asset ${asset.name} month ${month}: ${monthlyIncome}`);
-      return monthlyIncome;
+  // Helper function to calculate position income for a specific month
+  const calculatePositionIncomeForMonth = useCallback((position: PortfolioPosition, month: number): number => {
+    if (!position.assetDefinition) {
+      Logger.cache(`Position ${position.name} has no asset definition, skipping`);
+      return 0;
     }
-    
-    if (!cacheResult.cacheHit && cacheResult.cacheDataToUpdate) {
-      const monthlyIncome = cacheResult.cacheDataToUpdate.monthlyBreakdown?.[month] || 0;
-      Logger.cache(`Using cacheDataToUpdate for ${asset.name} month ${month}: ${monthlyIncome}`);
-      return monthlyIncome;
+
+    const assetDefinition = position.assetDefinition;
+    const totalQuantity = position.totalQuantity;
+
+    Logger.cache(`=== Calculating income for position ${position.name} (${position.type}) month ${month} ===`);
+    Logger.cache(`Position details - Type: ${position.type}, Quantity: ${totalQuantity}`);
+
+    // Stock dividends
+    if (position.type === 'stock' && assetDefinition.dividendInfo?.frequency && assetDefinition.dividendInfo.frequency !== 'none') {
+      if (totalQuantity <= 0) {
+        Logger.cache(`Stock position ${position.name} has no valid quantity (${totalQuantity}), skipping dividend calculation`);
+        return 0;
+      }
+      
+      try {
+        const dividendForMonth = calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
+        Logger.cache(`Dividend for ${position.name} month ${month}: ${dividendForMonth}`);
+        return isFinite(dividendForMonth) ? dividendForMonth : 0;
+      } catch (error) {
+        Logger.cache(`Error calculating dividend for ${position.name}: ${error}`);
+        return 0;
+      }
     }
-    
-    Logger.cache(`No usable cache data for ${asset.name}, falling back to direct calculation`);
+
+    // Bond/Cash interest
+    if ((position.type === 'bond' || position.type === 'cash') && assetDefinition.bondInfo?.interestRate !== undefined) {
+      const interestRate = assetDefinition.bondInfo.interestRate;
+      const currentValue = position.currentValue;
+      const annualInterest = (interestRate * currentValue) / 100;
+      const monthlyInterest = annualInterest / 12;
+      Logger.cache(`Interest for ${position.name} month ${month}: ${monthlyInterest}`);
+      return isFinite(monthlyInterest) ? monthlyInterest : 0;
+    }
+
+    // Real estate rental
+    if (position.type === 'real_estate' && assetDefinition.rentalInfo?.baseRent !== undefined) {
+      const monthlyRent = assetDefinition.rentalInfo.baseRent;
+      Logger.cache(`Rental for ${position.name} month ${month}: ${monthlyRent}`);
+      return isFinite(monthlyRent) ? monthlyRent : 0;
+    }
+
+    Logger.cache(`No income calculation available for position ${position.name} type ${position.type}`);
     return 0;
   }, []);
 
-  // Helper function to try cached calculation
-  const tryGetCachedIncome = useCallback((asset: Asset, month: number): number => {
-    if (!calculatorService.calculateAssetMonthlyIncomeWithCache) return 0;
-    
-    Logger.cache(`Trying cached calculation for ${asset.name}`);
-    try {
-      const cacheResult = calculatorService.calculateAssetMonthlyIncomeWithCache(asset);
-      Logger.cache(`Cache result for ${asset.name}: cacheHit=${cacheResult.cacheHit}, monthlyAmount=${cacheResult.monthlyAmount}`);
-      return getIncomeFromCacheResult(cacheResult, asset, month);
-    } catch (error) {
-      Logger.cache(`Error in cached calculation for ${asset.name}: ${error}`);
-      return 0;
-    }
-  }, [getIncomeFromCacheResult]);
-
-  // Helper function to try direct calculation
-  const tryGetDirectIncome = useCallback((asset: Asset, month: number): number => {
-    Logger.cache(`Falling back to direct calculation for ${asset.name} month ${month}`);
-    try {
-      const income = calculateAssetIncomeForMonth(asset, month);
-      Logger.cache(`Direct calculation result for ${asset.name} month ${month}: ${income}`);
-      return income;
-    } catch (error) {
-      Logger.cache(`Error in direct calculation for ${asset.name}: ${error}`);
-      return 0;
-    }
-  }, []);
-
-  // Helper function to try basic monthly calculation as fallback
-  const tryGetBasicMonthlyIncome = useCallback((asset: Asset, calculatedIncome: number): number => {
-    try {
-      const basicMonthly = calculatorService.calculateAssetMonthlyIncome(asset);
-      Logger.cache(`Basic monthly calculation for ${asset.name}: ${basicMonthly}`);
-      
-      const dividendInfo = asset.assetDefinition?.dividendInfo;
-      const isMonthlyDividendStock = asset.type === 'stock' && dividendInfo?.frequency === 'monthly';
-      if (isMonthlyDividendStock && calculatedIncome === 0 && basicMonthly > 0) {
-        Logger.cache(`Using basic monthly calculation as fallback for ${asset.name}: ${basicMonthly}`);
-        return basicMonthly;
-      }
-    } catch (error) {
-      Logger.cache(`Error in basic calculation for ${asset.name}: ${error}`);
-    }
-    return calculatedIncome;
-  }, []);
-
-  // Memoize the calculation of asset income for a specific month using cache
-  const calculateAssetIncomeForMonthCached = useCallback((asset: Asset, month: number): number => {
-    Logger.cache(`=== Starting calculation for ${asset.name} (${asset.type}) month ${month} ===`);
-    
-    // Log asset details first
-    Logger.cache(`Asset details - Type: ${asset.type}, Value: ${asset.value}`);
-    if (asset.type === 'stock') {
-      const quantity = getCurrentQuantity(asset);
-      const dividendInfo = asset.assetDefinition?.dividendInfo;
-      Logger.cache(`Stock details - Quantity: ${quantity}, DividendInfo: ${JSON.stringify(dividendInfo)}`);
-    }
-    
-    // Try cached calculation first
-    let calculatedIncome = tryGetCachedIncome(asset, month);
-    
-    // If no cached income, try direct calculation
-    if (calculatedIncome === 0) {
-      calculatedIncome = tryGetDirectIncome(asset, month);
-    }
-    
-    // Try basic monthly calculation as fallback for monthly dividends
-    calculatedIncome = tryGetBasicMonthlyIncome(asset, calculatedIncome);
-    
-    Logger.cache(`=== Final income for ${asset.name} month ${month}: ${calculatedIncome} ===`);
-    return calculatedIncome;
-  }, [tryGetCachedIncome, tryGetDirectIncome, tryGetBasicMonthlyIncome]);
-
-  // Memoize months data calculation with proper dependencies
+  // Memoize months data calculation with portfolio positions
   const monthsData = useMemo(() => {
-    Logger.info(`Calculating months data for ${filteredAssets.length} filtered assets`);
+    Logger.info(`Calculating months data for ${filteredPositions.length} portfolio positions`);
     
-    // Log asset details for debugging
-    filteredAssets.forEach(asset => {
-      Logger.info(`Asset: ${asset.name} (${asset.type}) - Value: ${asset.value}`);
+    // Log position details for debugging
+    filteredPositions.forEach(position => {
+      Logger.info(`Position: ${position.name} (${position.type}) - Value: ${position.currentValue}`);
       
-      // Check dividend info from AssetDefinition or legacy Asset fields
-      const dividendInfo = asset.assetDefinition?.dividendInfo;
-      if (asset.type === 'stock' && dividendInfo) {
-        Logger.info(`  Dividend Info: frequency=${dividendInfo.frequency}, amount=${dividendInfo.amount} (source: definition)`);
+      // Check dividend info from AssetDefinition
+      const dividendInfo = position.assetDefinition?.dividendInfo;
+      if (position.type === 'stock' && dividendInfo) {
+        Logger.info(`  Dividend Info: frequency=${dividendInfo.frequency}, amount=${dividendInfo.amount}`);
       }
       
-      // Check interest rate from AssetDefinition or legacy Asset fields
-      const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
-      if (asset.type === 'bond' && interestRate) {
-        Logger.info(`  Interest Rate: ${interestRate}% (source: definition)`);
+      // Check interest rate from AssetDefinition
+      const interestRate = position.assetDefinition?.bondInfo?.interestRate;
+      if (position.type === 'bond' && interestRate) {
+        Logger.info(`  Interest Rate: ${interestRate}%`);
       }
       
-      // Check rental info from AssetDefinition or legacy Asset fields
-      const rentalInfo = asset.assetDefinition?.rentalInfo;
-      if (asset.type === 'real_estate' && rentalInfo) {
+      // Check rental info from AssetDefinition
+      const rentalInfo = position.assetDefinition?.rentalInfo;
+      if (position.type === 'real_estate' && rentalInfo) {
         const amount = rentalInfo.baseRent;
-        Logger.info(`  Rental Income: ${amount} (source: definition)`);
+        Logger.info(`  Rental Income: ${amount}`);
       }
     });
     
     const data: MonthData[] = [];
     
     for (let month = 1; month <= 12; month++) {
-      const monthAssets: Array<{ asset: Asset; income: number }> = [];
+      const monthPositions: Array<{ position: PortfolioPosition; income: number }> = [];
       let totalIncome = 0;
 
-      filteredAssets.forEach((asset: Asset) => {
-        const income = calculateAssetIncomeForMonthCached(asset, month);
-        Logger.cache(`Asset ${asset.name} income for month ${month}: ${income}`);
+      filteredPositions.forEach((position) => {
+        const income = calculatePositionIncomeForMonth(position, month);
+        Logger.cache(`Position ${position.name} income for month ${month}: ${income}`);
         
         if (income > 0) {
-          monthAssets.push({ asset, income });
+          monthPositions.push({ position, income });
           totalIncome += income;
         }
       });
 
-      Logger.info(`Month ${month} (${monthNames[month - 1]}): ${monthAssets.length} assets with income, total: ${totalIncome}`);
+      Logger.info(`Month ${month} (${monthNames[month - 1]}): ${monthPositions.length} positions with income, total: ${totalIncome}`);
 
       // Sort by income descending - using toSorted to avoid mutating the original array
-      const sortedMonthAssets = monthAssets.toSorted((a, b) => b.income - a.income);
+      const sortedMonthPositions = monthPositions.toSorted((a, b) => b.income - a.income);
 
       data.push({
         month,
         name: monthNames[month - 1],
         totalIncome,
-        assets: sortedMonthAssets
+        positions: sortedMonthPositions
       });
     }
 
@@ -225,11 +204,11 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
     const monthsWithIncome = data.filter(m => m.totalIncome > 0);
     Logger.info(`Months with income: ${monthsWithIncome.length} out of ${data.length}`);
     monthsWithIncome.forEach(m => {
-      Logger.info(`  ${m.name}: ${m.totalIncome} from ${m.assets.length} assets`);
+      Logger.info(`  ${m.name}: ${m.totalIncome} from ${m.positions.length} positions`);
     });
     
     return data;
-  }, [filteredAssets, monthNames, calculateAssetIncomeForMonthCached]);
+  }, [filteredPositions, monthNames, calculatePositionIncomeForMonth]);
 
   // Memoize selected month data
   const selectedMonthData = useMemo(() => {
@@ -275,8 +254,8 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
 
   // Log when component mounts or key data changes
   useEffect(() => {
-    Logger.info(`AssetCalendarContainer: ${assets.length} total assets, ${filteredAssets.length} filtered assets`);
-  }, [assets.length, filteredAssets.length]);
+    Logger.info(`AssetCalendarContainer: ${assets.length} total assets, ${filteredPositions.length} filtered positions`);
+  }, [assets.length, filteredPositions.length]);
 
   return (
     <AssetCalendarView
@@ -284,8 +263,8 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
       chartData={chartData}
       selectedAssetType={selectedAssetType}
       assetTypeOptions={assetTypeOptions}
-      filteredAssets={filteredAssets}
-      assets={assets}
+      filteredAssets={filteredPositions} // Filtered positions
+      positions={portfolioData.positions} // All positions
       onBarClick={handleBarClick}
       onAssetTypeChange={handleAssetTypeChange}
       onBack={onBack}

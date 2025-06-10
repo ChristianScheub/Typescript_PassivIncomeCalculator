@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
-import IncomeView from '../view/IncomeView';
+import IncomeView from '../view/income/IncomeView';
 import { sortIncome, SortOrder } from '../utils/sortingUtils';
 
 const IncomeContainer: React.FC = () => {

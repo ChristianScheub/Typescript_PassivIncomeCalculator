@@ -15,6 +15,7 @@ interface MobileAssetSummaryCardProps {
   monthlyAssetIncome: number;
   annualAssetIncome: number;
   onNavigateToCalendar: () => void;
+  onNavigateToAnalytics?: () => void;
 }
 
 export const MobileAssetSummaryCard: React.FC<MobileAssetSummaryCardProps> = ({
@@ -22,9 +23,10 @@ export const MobileAssetSummaryCard: React.FC<MobileAssetSummaryCardProps> = ({
   monthlyAssetIncome,
   annualAssetIncome,
   onNavigateToCalendar,
+  onNavigateToAnalytics
 }) => {
   const { t } = useTranslation();
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <div className="sm:hidden">
@@ -73,7 +75,13 @@ export const MobileAssetSummaryCard: React.FC<MobileAssetSummaryCardProps> = ({
           >
             <div className="space-y-4">
               {/* Gesamtwert */}
-              <div className="bg-white dark:bg-gray-900 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-800 shadow-lg">
+              <div 
+                className="bg-white dark:bg-gray-900 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-800 shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNavigateToAnalytics && onNavigateToAnalytics();
+                }}
+              >
                 <div className="flex items-start gap-3">
                   <div className="bg-blue-500 p-2.5 rounded-xl flex-shrink-0 shadow-lg">
                     <Wallet className="h-5 w-5 text-white" />

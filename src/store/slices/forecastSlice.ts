@@ -1,17 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { MonthlyProjection, AssetAllocation, ExpenseBreakdown, IncomeAllocation } from '../../types';
+import { MonthlyProjection } from '../../types';
 import calculatorService from '../../service/calculatorService';
-import { calculateLiabilityMonthlyPayment } from '../../service/calculatorService/methods/calculateLiabilities';
 import { RootState } from '..';
 import Logger from '../../service/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
 
 interface ForecastState {
   projections: MonthlyProjection[];
-  assetAllocation: AssetAllocation[];
-  expenseBreakdown: ExpenseBreakdown[];
-  incomeAllocation: IncomeAllocation[];
-  transformedLiabilities: { category: string; amount: number }[];
   isLoading: boolean;
   lastUpdated: string | null;
   // Cache für monatliche Asset-Einkommen um Dividendentermine zu berücksichtigen
@@ -20,10 +15,6 @@ interface ForecastState {
 
 const initialState: ForecastState = {
   projections: [],
-  assetAllocation: [],
-  expenseBreakdown: [],
-  incomeAllocation: [],
-  transformedLiabilities: [],
   isLoading: false,
   lastUpdated: null,
   monthlyAssetIncomeCache: {},
@@ -66,25 +57,8 @@ export const updateForecastValues = createAsyncThunk(
       monthlyAssetIncomeCache
     );
 
-    // Verwende bereits berechnete Asset Allocation aus Dashboard wenn verfügbar
-    const assetAllocation = dashboard.assetAllocation.length > 0 
-      ? dashboard.assetAllocation 
-      : calculatorService.calculateAssetAllocation(assets.items);
-
-    const expenseBreakdown = calculatorService.calculateExpenseBreakdown(expenses.items);
-    const incomeAllocation = calculatorService.calculateIncomeAllocation(income.items, assets.items);
-    
-    const transformedLiabilities = liabilities.items.map(liability => ({
-      category: liability.type,
-      amount: calculateLiabilityMonthlyPayment(liability)
-    }));
-
     const values = {
       projections,
-      assetAllocation,
-      expenseBreakdown,
-      incomeAllocation,
-      transformedLiabilities,
       monthlyAssetIncomeCache,
       lastUpdated: new Date().toISOString(),
     };
@@ -133,10 +107,6 @@ const forecastSlice = createSlice({
         Logger.infoRedux('Forecast values updated successfully');
         state.isLoading = false;
         state.projections = action.payload.projections;
-        state.assetAllocation = action.payload.assetAllocation;
-        state.expenseBreakdown = action.payload.expenseBreakdown;
-        state.incomeAllocation = action.payload.incomeAllocation;
-        state.transformedLiabilities = action.payload.transformedLiabilities;
         state.monthlyAssetIncomeCache = action.payload.monthlyAssetIncomeCache;
         state.lastUpdated = action.payload.lastUpdated;
       })
@@ -153,10 +123,6 @@ const forecastSlice = createSlice({
           Logger.infoRedux('Hydrating forecast state');
           const forecastData = action.payload.forecast;
           state.projections = forecastData.projections || state.projections;
-          state.assetAllocation = forecastData.assetAllocation || state.assetAllocation;
-          state.expenseBreakdown = forecastData.expenseBreakdown || state.expenseBreakdown;
-          state.incomeAllocation = forecastData.incomeAllocation || state.incomeAllocation;
-          state.transformedLiabilities = forecastData.transformedLiabilities || state.transformedLiabilities;
           state.monthlyAssetIncomeCache = forecastData.monthlyAssetIncomeCache || state.monthlyAssetIncomeCache;
           state.lastUpdated = forecastData.lastUpdated || state.lastUpdated;
           state.isLoading = forecastData.isLoading !== undefined ? forecastData.isLoading : state.isLoading;

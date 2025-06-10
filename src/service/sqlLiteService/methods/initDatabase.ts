@@ -2,7 +2,7 @@ import { openDB } from 'idb';
 import { FinanceDB } from '../interfaces/ISQLiteService';
 
 const DB_NAME = 'finance-tracker';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 export const initDatabase = async () => {
   return openDB<FinanceDB>(DB_NAME, DB_VERSION, {
@@ -30,6 +30,20 @@ export const initDatabase = async () => {
       if (oldVersion < 3) {
         const assetDefinitionStore = db.createObjectStore('assetDefinitions', { keyPath: 'id' });
         assetDefinitionStore.createIndex('by-type', 'type');
+      }
+
+      // Add asset category stores for version 4
+      if (oldVersion < 4) {
+        const assetCategoryStore = db.createObjectStore('assetCategories', { keyPath: 'id' });
+        assetCategoryStore.createIndex('by-name', 'name');
+
+        const assetCategoryOptionStore = db.createObjectStore('assetCategoryOptions', { keyPath: 'id' });
+        assetCategoryOptionStore.createIndex('by-category', 'categoryId');
+        assetCategoryOptionStore.createIndex('by-name', 'name');
+
+        const assetCategoryAssignmentStore = db.createObjectStore('assetCategoryAssignments', { keyPath: 'id' });
+        assetCategoryAssignmentStore.createIndex('by-asset', 'assetDefinitionId');
+        assetCategoryAssignmentStore.createIndex('by-category', 'categoryId');
       }
     },
   });

@@ -142,6 +142,32 @@ export interface Transaction extends BaseEntity {
 // Alias für Rückwärtskompatibilität während der Migration
 export type Asset = Transaction;
 
+// Asset Category Types
+export interface AssetCategory extends BaseEntity {
+  name: string;
+  description?: string;
+  isActive: boolean;
+  sortOrder?: number;
+}
+
+export interface AssetCategoryOption extends BaseEntity {
+  categoryId: string;
+  name: string;
+  isActive: boolean;
+  sortOrder?: number;
+}
+
+export interface AssetCategoryAssignment extends BaseEntity {
+  assetDefinitionId: string;
+  categoryId: string;
+  categoryOptionId: string;
+}
+
+// Enhanced AssetDefinition with categories
+export interface EnhancedAssetDefinition extends AssetDefinition {
+  categoryAssignments?: AssetCategoryAssignment[];
+}
+
 // Liability Types
 export type LiabilityType = 'mortgage' | 'personal_loan' | 'credit_card' | 'student_loan' | 'auto_loan' | 'other';
 
@@ -241,12 +267,6 @@ export interface IncomeAllocation {
 
 export interface ExpenseBreakdown {
   category: ExpenseCategory;
-  amount: number;
-  percentage: number;
-}
-
-export interface IncomeAllocation {
-  type: IncomeType;
   amount: number;
   percentage: number;
 }

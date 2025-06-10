@@ -5,10 +5,11 @@ import { clearAllAssets } from "../store/slices/assetsSlice";
 import { clearAllLiabilities } from "../store/slices/liabilitiesSlice";
 import { clearAllExpenses } from "../store/slices/expensesSlice";
 import { clearAllIncome } from "../store/slices/incomeSlice";
+import { clearAllAssetCategories } from "../store/slices/assetCategoriesSlice";
 import sqliteService, { StoreNames } from "../service/sqlLiteService";
 import { analytics } from "../service/analytics";
 import Logger from "../service/Logger/logger";
-import SettingsView from "../view/SettingsView";
+import SettingsView from "../view/settings/SettingsView";
 import { handleFileDownload } from "../service/helper/downloadFile";
 import {
   setCurrency as setGlobalCurrency,
@@ -317,10 +318,15 @@ const SettingsContainer: React.FC = () => {
       dispatch(clearAllLiabilities());
       dispatch(clearAllExpenses());
       dispatch(clearAllIncome());
+      dispatch(clearAllAssetCategories());
 
       // 2. Clear all data from SQLite
       const stores: StoreNames[] = [
         "assets",
+        "assetDefinitions",
+        "assetCategories",
+        "assetCategoryOptions",
+        "assetCategoryAssignments",
         "liabilities",
         "expenses",
         "income",

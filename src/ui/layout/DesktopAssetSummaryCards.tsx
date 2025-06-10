@@ -9,6 +9,7 @@ interface DesktopAssetSummaryCardsProps {
   annualAssetIncome: number;
   totalAssets: number;
   onNavigateToCalendar?: () => void;
+  onNavigateToAnalytics?: () => void;
 }
 
 export const DesktopAssetSummaryCards: React.FC<DesktopAssetSummaryCardsProps> = ({
@@ -16,14 +17,17 @@ export const DesktopAssetSummaryCards: React.FC<DesktopAssetSummaryCardsProps> =
   monthlyAssetIncome,
   annualAssetIncome,
   totalAssets,
-  onNavigateToCalendar
+  onNavigateToCalendar,
+  onNavigateToAnalytics
 }) => {
   const { t } = useTranslation();
   
   return (
     <div className="hidden sm:block">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition-shadow"
+          onClick={onNavigateToAnalytics}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -69,16 +73,15 @@ export const DesktopAssetSummaryCards: React.FC<DesktopAssetSummaryCardsProps> =
             </div>
             <TrendingUp className="h-8 w-8 text-purple-600 dark:text-purple-400" />
           </div>
-          <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            {t('assets.calendar')}
-          </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 cursor-pointer hover:shadow-md transition-shadow"
+          onClick={onNavigateToAnalytics}
+        >
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                {t('assets.totalAssets')}
+                {t('assets.totalPositions')}
               </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {totalAssets}

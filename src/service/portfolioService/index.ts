@@ -20,10 +20,16 @@ export class PortfolioService {
   /**
    * Calculate complete portfolio data including positions and totals
    */
-  calculatePortfolio(assets: Asset[], assetDefinitions: AssetDefinition[] = []) {
+  calculatePortfolio(
+    assets: Asset[], 
+    assetDefinitions: AssetDefinition[] = [],
+    categories: any[] = [],
+    categoryOptions: any[] = [],
+    categoryAssignments: any[] = []
+  ) {
     Logger.infoService(`Calculating portfolio with ${assets.length} assets and ${assetDefinitions.length} definitions`);
     
-    const positions = calculatePortfolioPositions(assets, assetDefinitions);
+    const positions = calculatePortfolioPositions(assets, assetDefinitions, categories, categoryOptions, categoryAssignments);
     const totals = calculatePortfolioTotals(positions);
     
     Logger.infoService(
@@ -45,8 +51,15 @@ export class PortfolioService {
   /**
    * Get portfolio position by AssetDefinition ID or transaction identifier
    */
-  getPosition(assets: Asset[], assetDefinitions: AssetDefinition[], positionId: string): PortfolioPosition | null {
-    const positions = calculatePortfolioPositions(assets, assetDefinitions);
+  getPosition(
+    assets: Asset[], 
+    assetDefinitions: AssetDefinition[], 
+    positionId: string,
+    categories: any[] = [],
+    categoryOptions: any[] = [],
+    categoryAssignments: any[] = []
+  ): PortfolioPosition | null {
+    const positions = calculatePortfolioPositions(assets, assetDefinitions, categories, categoryOptions, categoryAssignments);
     return positions.find(pos => pos.id === positionId) || null;
   }
 

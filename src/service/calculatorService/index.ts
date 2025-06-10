@@ -29,6 +29,7 @@ import { calculateMonthlyCashFlow } from './methods/calculateCashFlow';
 import { calculateAssetAllocation, calculateIncomeAllocation } from './methods/calculateAllocations';
 import { calculateExpenseBreakdown } from './methods/calculateExpenseBreakdown';
 import { calculateProjections, calculateProjectionsWithCache } from './methods/calculateProjections';
+import { calculatePortfolioAnalytics, calculateIncomeAnalytics } from './methods/calculatePortfolioAnalytics';
 import { getDividendCacheService } from '../dividendCacheService';
 
 const calculatorService: ICalculatorService = {
@@ -149,6 +150,8 @@ const calculatorService: ICalculatorService = {
   calculateExpenseBreakdown,
   calculateProjections,
   calculateProjectionsWithCache,
+  calculatePortfolioAnalytics,
+  calculateIncomeAnalytics,
 
   // Cache status helpers
   areAssetsCached: (assets) => areAssetsCached(assets),

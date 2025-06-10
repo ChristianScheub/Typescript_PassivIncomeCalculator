@@ -14,14 +14,12 @@ import { useTheme } from '../../../hooks/useTheme';
 interface AssetAllocationChartProps {
   title?: string;
   assetAllocation: AssetAllocation[];
-  height?: number | string;
   showTitle?: boolean;
 }
 
 const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
   title,
   assetAllocation,
-  height = 400,
   showTitle = true
 }) => {
   const { t } = useTranslation();
@@ -35,18 +33,19 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
 
   return (
     <Card title={title}>
-      <div className="h-[500px] w-full flex flex-col">
+      <div className="w-full flex flex-col">
         {assetAllocation.length > 0 ? (
-          <div className="flex flex-col h-full">
-            <div className="h-[300px] w-full">
+          <div className="flex flex-col">
+            {/* Chart container with proper spacing */}
+            <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   {showTitle && (
                     <text
                       x="50%"
-                      y="20"
+                      y="25"
                       textAnchor="middle"
-                      className="text-lg font-semibold"
+                      className="text-lg font-semibold fill-current"
                     >
                       {title || t('forecast.assetAllocation')}
                     </text>
@@ -54,9 +53,9 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
                   <Pie
                     data={assetAllocation}
                     cx="50%"
-                    cy="50%"
-                    outerRadius={90}
-                    innerRadius={45}
+                    cy={showTitle ? "60%" : "50%"}
+                    outerRadius={showTitle ? 85 : 100}
+                    innerRadius={showTitle ? 40 : 50}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -69,17 +68,21 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
               </ResponsiveContainer>
             </div>
 
-            <div className="mt-4 grid grid-cols-2 gap-3 px-4">
+            {/* Legend - Single column layout for better readability */}
+            <div className="mt-6 space-y-3 px-4 max-h-48 overflow-y-auto">
               {assetAllocation.map((allocation, index) => (
-                <div key={allocation.name} className="flex items-center space-x-2">
+                <div key={allocation.name} className="flex items-center space-x-3 py-1">
                   <div 
-                    className="w-3 h-3 rounded-full" 
+                    className="w-4 h-4 rounded-full flex-shrink-0" 
                     style={{ backgroundColor: colors[index % colors.length] }}
                   />
-                  <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium truncate">{t(`assets.types.${allocation.name}`)}</div>
-                    <div className="text-sm text-gray-500">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {t(`assets.types.${allocation.name}`)}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
                       {formatService.formatCurrency(allocation.value)}
+                      {allocation.percentage && ` (${allocation.percentage.toFixed(1)}%)`}
                     </div>
                   </div>
                 </div>
@@ -87,7 +90,7 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
             </div>
 
             {isDashboard && (
-              <div className="flex justify-center mt-4 mb-2">
+              <div className="flex justify-center mt-6 mb-2">
                 <Button 
                   variant="outline" 
                   onClick={() => navigate('/forecast?tab=allocations')}
@@ -100,7 +103,7 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
             )}
           </div>
         ) : (
-          <div className="h-full flex items-center justify-center">
+          <div className="h-64 flex items-center justify-center">
             <p className="text-gray-500 dark:text-gray-400">{t('forecast.noAssetData')}</p>
           </div>
         )}

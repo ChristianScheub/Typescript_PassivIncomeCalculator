@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { analytics } from '../service/analytics';
 import Logger from '../service/Logger/logger';
-import DashboardView from '../view/DashboardView';
+import DashboardView from '../view/dashboard/DashboardView';
 import { createDividendCacheService } from '../service/dividendCacheService';
 import { updateDashboardValues } from '../store/slices/dashboardSlice';
 

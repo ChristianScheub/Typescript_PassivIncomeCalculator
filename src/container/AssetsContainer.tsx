@@ -14,18 +14,19 @@ import {
   selectPortfolioTotals,
   selectSortedAssets
 } from '../store/slices/assetsSlice';
-import { fetchAssetDefinitions, updateAssetDefinition } from '../store/slices/assetDefinitionsSlice';
-import { AssetsView } from '../view/AssetsView';
+import { fetchAssetDefinitions } from '../store/slices/assetDefinitionsSlice';
+import { AssetsView } from '../view/assets/AssetsView';
 import { Asset } from '../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../service/Logger/logger';
+import PortfolioAnalyticsContainer from './PortfolioAnalyticsContainer';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import { createDividendCacheService } from '../service/dividendCacheService';
 import { createCachedDividends } from '../utils/dividendCacheUtils';
-import { StockPriceUpdater } from '../service/helper/stockPriceUpdater';
 import AssetDefinitionsContainer from './AssetDefinitionsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
+import { AssetCategoryContainer } from './AssetCategoryContainer';
 
 const AssetsContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -40,13 +41,20 @@ const AssetsContainer: React.FC = () => {
   const sortedAssets = useAppSelector(selectSortedAssets);
   
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions || { items: [] });
-  const { isEnabled: isApiEnabled } = useAppSelector(state => state.apiConfig);
+  
+  // Get category data from Redux store
+  const { categories, categoryOptions, categoryAssignments } = useAppSelector(state => state.assetCategories || {
+    categories: [],
+    categoryOptions: [],
+    categoryAssignments: []
+  });
   
   const [isAddingAsset, setIsAddingAsset] = useState(false);
   const [editingAsset, setEditingAsset] = useState<Asset | null>(null);
-  const [isUpdatingPrices, setIsUpdatingPrices] = useState(false);
   const [isShowingDefinitions, setIsShowingDefinitions] = useState(false);
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
+  const [isShowingCategories, setIsShowingCategories] = useState(false);
+  const [isShowingAnalytics, setIsShowingAnalytics] = useState(false);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -65,9 +73,12 @@ const AssetsContainer: React.FC = () => {
   useEffect(() => {
     if (assets.length > 0 && assetDefinitions.length > 0 && !portfolioCacheValid) {
       Logger.info('Calculating portfolio data');
-      dispatch(calculatePortfolioData(assetDefinitions));
+      dispatch(calculatePortfolioData({ 
+        assetDefinitions, 
+        categoryData: { categories, categoryOptions, categoryAssignments } 
+      }));
     }
-  }, [assets.length, assetDefinitions.length, portfolioCacheValid, dispatch]);
+  }, [assets.length, assetDefinitions.length, portfolioCacheValid, dispatch, categories, categoryOptions, categoryAssignments]);
 
   // Extract values from cached totals
   const { totalAssetValue, monthlyAssetIncome, annualAssetIncome } = useMemo(() => {
@@ -187,44 +198,7 @@ const AssetsContainer: React.FC = () => {
     });
   }, [assets, dispatch]);
 
-  const handleUpdateStockPrices = async () => {
-    setIsUpdatingPrices(true);
-    try {
-      Logger.info('Starting stock price update');
-      
-      // Filter AssetDefinitions that have stock type and ticker symbols
-      const stockDefinitions = assetDefinitions.filter(def => 
-        def.type === 'stock' && def.ticker
-      );
-      
-      if (stockDefinitions.length === 0) {
-        Logger.info('No stock definitions found to update');
-        return;
-      }
-      
-      const updatedDefinitions = await StockPriceUpdater.updateStockPrices(stockDefinitions);
-      
-      if (updatedDefinitions.length > 0) {
-        Logger.info(`Dispatching price updates for ${updatedDefinitions.length} stock definitions`);
-        
-        // Update each AssetDefinition in the store
-        for (const definition of updatedDefinitions) {
-          await dispatch(updateAssetDefinition(definition));
-        }
-        
-        // Re-calculate portfolio cache since stock prices have changed
-        await dispatch(calculatePortfolioData(assetDefinitions));
 
-        Logger.info('Successfully updated stock prices and recalculated portfolio');
-      } else {
-        Logger.info('No stock definitions were updated');
-      }
-    } catch (error) {
-      Logger.error('Failed to update stock prices' + ' - ' + JSON.stringify(error as Error));
-    } finally {
-      setIsUpdatingPrices(false);
-    }
-  };
 
   const handleNavigateToDefinitions = () => {
     setIsShowingDefinitions(true);
@@ -234,9 +208,19 @@ const AssetsContainer: React.FC = () => {
     setIsShowingCalendar(true);
   };
 
+  const handleNavigateToCategories = () => {
+    setIsShowingCategories(true);
+  };
+
+  const handleNavigateToAnalytics = () => {
+    setIsShowingAnalytics(true);
+  };
+
   const handleBackToAssets = () => {
     setIsShowingDefinitions(false);
     setIsShowingCalendar(false);
+    setIsShowingCategories(false);
+    setIsShowingAnalytics(false);
   };
 
   // If showing definitions, render the definitions container instead
@@ -257,6 +241,24 @@ const AssetsContainer: React.FC = () => {
     );
   }
 
+  // If showing categories, render the categories container instead
+  if (isShowingCategories) {
+    return (
+      <AssetCategoryContainer 
+        onBack={handleBackToAssets}
+      />
+    );
+  }
+
+  // If showing analytics, render the analytics container instead
+  if (isShowingAnalytics) {
+    return (
+      <PortfolioAnalyticsContainer 
+        onBack={handleBackToAssets}
+      />
+    );
+  }
+
   return (
     <AssetsView
       assets={sortedAssets}
@@ -267,17 +269,16 @@ const AssetsContainer: React.FC = () => {
       annualAssetIncome={annualAssetIncome}
       isAddingAsset={isAddingAsset}
       editingAsset={editingAsset}
-      isUpdatingPrices={isUpdatingPrices}
-      isApiEnabled={isApiEnabled}
       getAssetTypeLabel={getAssetTypeLabel}
       onAddAsset={handleAddAsset}
       onUpdateAsset={handleUpdateAsset}
       onDeleteAsset={handleDeleteAsset}
       onSetIsAddingAsset={setIsAddingAsset}
       onSetEditingAsset={setEditingAsset}
-      onUpdateStockPrices={handleUpdateStockPrices}
       onNavigateToDefinitions={handleNavigateToDefinitions}
+      onNavigateToCategories={handleNavigateToCategories}
       onNavigateToCalendar={handleNavigateToCalendar}
+      onNavigateToAnalytics={handleNavigateToAnalytics}
     />
   );
 };

@@ -1,5 +1,5 @@
 import { DBSchema } from 'idb';
-import { Asset, Liability, Expense, Income, AssetDefinition } from '../../../types';
+import { Asset, Liability, Expense, Income, AssetDefinition, AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../../types';
 import { ExchangeRate } from '../../exchangeService/interfaces/IExchangeService';
 
 export interface FinanceDB extends DBSchema {
@@ -12,6 +12,21 @@ export interface FinanceDB extends DBSchema {
     key: string;
     value: AssetDefinition;
     indexes: { 'by-type': string };
+  };
+  assetCategories: {
+    key: string;
+    value: AssetCategory;
+    indexes: { 'by-name': string };
+  };
+  assetCategoryOptions: {
+    key: string;
+    value: AssetCategoryOption;
+    indexes: { 'by-category': string, 'by-name': string };
+  };
+  assetCategoryAssignments: {
+    key: string;
+    value: AssetCategoryAssignment;
+    indexes: { 'by-asset': string, 'by-category': string };
   };
   liabilities: {
     key: string;
@@ -33,7 +48,7 @@ export interface FinanceDB extends DBSchema {
   };
 }
 
-export type StoreNames = 'assets' | 'assetDefinitions' | 'liabilities' | 'expenses' | 'income' | 'exchangeRates';
+export type StoreNames = 'assets' | 'assetDefinitions' | 'assetCategories' | 'assetCategoryOptions' | 'assetCategoryAssignments' | 'liabilities' | 'expenses' | 'income' | 'exchangeRates';
 
 export interface ISQLiteService {
   getAll<K extends StoreNames>(storeName: K): Promise<FinanceDB[K]['value'][]>;

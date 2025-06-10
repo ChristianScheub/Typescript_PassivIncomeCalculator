@@ -53,59 +53,65 @@ const PieChartIncomeAllocation: React.FC<PieChartIncomeAllocationProps> = ({
 
   return (
     <Card title={t('forecast.incomeAllocation')}>
-      <div className="h-[400px]">
+      <div className="w-full">
         {chartData.length > 0 ? (
-          <ResponsiveContainer>
-            <PieChart>
-              <text
-                x="50%"
-                y="20"
-                textAnchor="middle"
-                className="text-lg font-semibold"
-              >
-                {t('forecast.incomeAllocation')}
-              </text>
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="55%"
-                outerRadius={120}
-                innerRadius={60}
-                fill="#8884d8"
-                dataKey="amount"
-              >
-                {chartData.map((income) => (
-                  <Cell key={income.id} fill={colors[chartData.findIndex(i => i.type === income.type) % colors.length]} />
-                ))}
-              </Pie>
-              <Tooltip content={<IncomeTooltip />} />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="flex flex-col">
+            {/* Chart container with proper spacing */}
+            <div className="h-[280px] w-full">
+              <ResponsiveContainer>
+                <PieChart>
+                  <text
+                    x="50%"
+                    y="25"
+                    textAnchor="middle"
+                    className="text-lg font-semibold fill-current"
+                  >
+                    {t('forecast.incomeAllocation')}
+                  </text>
+                  <Pie
+                    data={chartData}
+                    cx="50%"
+                    cy="60%"
+                    outerRadius={85}
+                    innerRadius={40}
+                    fill="#8884d8"
+                    dataKey="amount"
+                  >
+                    {chartData.map((income) => (
+                      <Cell key={income.id} fill={colors[chartData.findIndex(i => i.type === income.type) % colors.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<IncomeTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            
+            {/* Legend - Single column layout for better readability */}
+            <div className="mt-6 space-y-3 px-4 max-h-48 overflow-y-auto">
+              {chartData.map((income) => (
+                <div key={income.id} className="flex items-center space-x-3 py-1">
+                  <div 
+                    className="w-4 h-4 rounded-full flex-shrink-0" 
+                    style={{ backgroundColor: colors[chartData.findIndex(i => i.type === income.type) % colors.length] }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {t(`income.types.${income.type}`)}
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {formatService.formatCurrency(income.amount)} ({income.percentage.toFixed(1)}%)
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
-          <div className="h-full flex items-center justify-center">
+          <div className="h-64 flex items-center justify-center">
             <p className="text-gray-500 dark:text-gray-400">{t('forecast.noIncomeData')}</p>
           </div>
         )}
       </div>
-      
-      {chartData.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          {chartData.map((income) => (
-            <div key={income.id} className="flex items-center space-x-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ backgroundColor: colors[chartData.findIndex(i => i.type === income.type) % colors.length] }}
-              />
-              <div>
-                <div className="text-sm font-medium">{t(`income.types.${income.type}`)}</div>
-                <div className="text-sm text-gray-500">
-                  {formatService.formatCurrency(income.amount)} ({income.percentage.toFixed(1)}%)
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </Card>
   );
 };

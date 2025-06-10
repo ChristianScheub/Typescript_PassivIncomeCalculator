@@ -39,6 +39,9 @@ export const importExportOperations = {
     // Export all data stores including new ones
     const assets = await dbOperations.getAll('assets');
     const assetDefinitions = await dbOperations.getAll('assetDefinitions');
+    const assetCategories = await dbOperations.getAll('assetCategories');
+    const assetCategoryOptions = await dbOperations.getAll('assetCategoryOptions');
+    const assetCategoryAssignments = await dbOperations.getAll('assetCategoryAssignments');
     const liabilities = await dbOperations.getAll('liabilities');
     const expenses = await dbOperations.getAll('expenses');
     const income = await dbOperations.getAll('income');
@@ -47,15 +50,18 @@ export const importExportOperations = {
     const data = {
       assets,
       assetDefinitions,
+      assetCategories,
+      assetCategoryOptions,
+      assetCategoryAssignments,
       liabilities,
       expenses,
       income,
       exchangeRates,
       exportDate: new Date().toISOString(),
-      version: '2.0.0', // Add version for future compatibility
+      version: '2.1.0', // Increment version for asset categories support
     };
 
-    Logger.infoService(`Exporting complete backup: ${assets.length} assets, ${assetDefinitions.length} asset definitions, ${liabilities.length} liabilities, ${expenses.length} expenses, ${income.length} income, ${exchangeRates.length} exchange rates`);
+    Logger.infoService(`Exporting complete backup: ${assets.length} assets, ${assetDefinitions.length} asset definitions, ${assetCategories.length} asset categories, ${assetCategoryOptions.length} category options, ${assetCategoryAssignments.length} category assignments, ${liabilities.length} liabilities, ${expenses.length} expenses, ${income.length} income, ${exchangeRates.length} exchange rates`);
     return JSON.stringify(data, null, 2);
   },
 
@@ -65,9 +71,9 @@ export const importExportOperations = {
       throw new Error('Invalid backup file format: not an object');
     }
 
-    // Support both old format (v1.x) and new format (v2.x)
+    // Support both old format (v1.x), v2.0 and new format (v2.1+)
     const requiredArrays = ['assets', 'liabilities', 'expenses', 'income'];
-    const optionalArrays = ['assetDefinitions', 'exchangeRates']; // These may not exist in older exports
+    const optionalArrays = ['assetDefinitions', 'assetCategories', 'assetCategoryOptions', 'assetCategoryAssignments', 'exchangeRates']; // These may not exist in older exports
 
     for (const arrayName of requiredArrays) {
       if (!Array.isArray(data[arrayName])) {
@@ -95,10 +101,13 @@ export const importExportOperations = {
       // Determine import version and available data
       const isV2Format = data.version && data.version.startsWith('2.');
       const hasAssetDefinitions = Array.isArray(data.assetDefinitions);
+      const hasAssetCategories = Array.isArray(data.assetCategories);
+      const hasAssetCategoryOptions = Array.isArray(data.assetCategoryOptions);
+      const hasAssetCategoryAssignments = Array.isArray(data.assetCategoryAssignments);
       const hasExchangeRates = Array.isArray(data.exchangeRates);
       
       Logger.infoService(`Import format: ${isV2Format ? 'v2.x (complete)' : 'v1.x (legacy)'}`);
-      Logger.infoService(`Data validation passed - Assets: ${data.assets.length}, Liabilities: ${data.liabilities.length}, Expenses: ${data.expenses.length}, Income: ${data.income.length}${hasAssetDefinitions ? `, Asset Definitions: ${data.assetDefinitions.length}` : ''}${hasExchangeRates ? `, Exchange Rates: ${data.exchangeRates.length}` : ''}`);
+      Logger.infoService(`Data validation passed - Assets: ${data.assets.length}, Liabilities: ${data.liabilities.length}, Expenses: ${data.expenses.length}, Income: ${data.income.length}${hasAssetDefinitions ? `, Asset Definitions: ${data.assetDefinitions.length}` : ''}${hasAssetCategories ? `, Asset Categories: ${data.assetCategories.length}` : ''}${hasAssetCategoryOptions ? `, Category Options: ${data.assetCategoryOptions.length}` : ''}${hasAssetCategoryAssignments ? `, Category Assignments: ${data.assetCategoryAssignments.length}` : ''}${hasExchangeRates ? `, Exchange Rates: ${data.exchangeRates.length}` : ''}`);
 
       // Import core data stores (required)
       const coreStores: StoreNames[] = ['assets', 'liabilities', 'expenses', 'income'];
@@ -121,6 +130,37 @@ export const importExportOperations = {
         Logger.infoService('Asset definitions import completed successfully');
       } else {
         Logger.infoService('No asset definitions found in backup (legacy format)');
+      }
+
+      // Import asset categories data (v2.1+)
+      if (hasAssetCategories) {
+        Logger.infoService(`Importing ${data.assetCategories.length} asset categories`);
+        for (const item of data.assetCategories) {
+          await dbOperations.update('assetCategories', item);
+        }
+        Logger.infoService('Asset categories import completed successfully');
+      } else {
+        Logger.infoService('No asset categories found in backup (legacy format)');
+      }
+
+      if (hasAssetCategoryOptions) {
+        Logger.infoService(`Importing ${data.assetCategoryOptions.length} asset category options`);
+        for (const item of data.assetCategoryOptions) {
+          await dbOperations.update('assetCategoryOptions', item);
+        }
+        Logger.infoService('Asset category options import completed successfully');
+      } else {
+        Logger.infoService('No asset category options found in backup (legacy format)');
+      }
+
+      if (hasAssetCategoryAssignments) {
+        Logger.infoService(`Importing ${data.assetCategoryAssignments.length} asset category assignments`);
+        for (const item of data.assetCategoryAssignments) {
+          await dbOperations.update('assetCategoryAssignments', item);
+        }
+        Logger.infoService('Asset category assignments import completed successfully');
+      } else {
+        Logger.infoService('No asset category assignments found in backup (legacy format)');
       }
 
       if (hasExchangeRates) {

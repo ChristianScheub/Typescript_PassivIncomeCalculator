@@ -84,70 +84,74 @@ const PieChartExpenseBreakdown: React.FC<PieChartExpenseBreakdownProps> = ({
 
   return (
     <Card title={t('forecast.expenseBreakdown')}>
-      <div className="h-[400px]">
+      <div className="w-full">
         {combinedData.length > 0 ? (
-          <ResponsiveContainer>
-            <PieChart>
-              <text
-                x="50%"
-                y="20"
-                textAnchor="middle"
-                className="text-lg font-semibold fill-current"
-              >
-                {t('forecast.expenseBreakdown')}
-              </text>
-              <Pie
-                data={combinedData}
-                cx="50%"
-                cy="55%"
-                outerRadius={120}
-                innerRadius={60}
-                fill="#8884d8"
-                dataKey="amount"
-              >
-                {combinedData.map((entry) => (
-                  <Cell 
-                    key={entry.id}
-                    fill={entry.type === 'liability' ? '#ef4444' : colors[combinedData.findIndex(d => d.category === entry.category) % colors.length]} 
+          <div className="flex flex-col">
+            {/* Chart container with proper spacing */}
+            <div className="h-[280px] w-full">
+              <ResponsiveContainer>
+                <PieChart>
+                  <text
+                    x="50%"
+                    y="25"
+                    textAnchor="middle"
+                    className="text-lg font-semibold fill-current"
+                  >
+                    {t('forecast.expenseBreakdown')}
+                  </text>
+                  <Pie
+                    data={combinedData}
+                    cx="50%"
+                    cy="60%"
+                    outerRadius={85}
+                    innerRadius={40}
+                    fill="#8884d8"
+                    dataKey="amount"
+                  >
+                    {combinedData.map((entry) => (
+                      <Cell 
+                        key={entry.id}
+                        fill={entry.type === 'liability' ? '#ef4444' : colors[combinedData.findIndex(d => d.category === entry.category) % colors.length]} 
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<PieChartExpenseBreakdownTooltip />} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+            
+            {/* Legend - Single column layout for better readability */}
+            <div className="mt-6 space-y-3 px-4 max-h-48 overflow-y-auto">
+              {combinedData.map((item) => (
+                <div key={item.id} className="flex items-center space-x-3 py-1">
+                  <div 
+                    className="w-4 h-4 rounded-full flex-shrink-0" 
+                    style={{ 
+                      backgroundColor: item.type === 'liability' ? '#ef4444' : colors[combinedData.findIndex(d => d.category === item.category) % colors.length]
+                    }}
                   />
-                ))}
-              </Pie>
-              <Tooltip content={<PieChartExpenseBreakdownTooltip />} />
-            </PieChart>
-          </ResponsiveContainer>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {item.type === 'liability'
+                        ? t(`liabilities.types.${item.category}`)
+                        : t(`expenses.categories.${item.category}`)
+                      }
+                    </div>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {formatService.formatCurrency(item.amount)}
+                      {total > 0 && ` (${item.percentage.toFixed(1)}%)`}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         ) : (
-          <div className="h-full flex items-center justify-center">
+          <div className="h-64 flex items-center justify-center">
             <p className="text-gray-500 dark:text-gray-400">{t('forecast.noData')}</p>
           </div>
         )}
       </div>
-      
-      {combinedData.length > 0 && (
-        <div className="mt-4 grid grid-cols-2 gap-3">
-          {combinedData.map((item) => (
-            <div key={item.id} className="flex items-center space-x-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ 
-                  backgroundColor: item.type === 'liability' ? '#ef4444' : colors[combinedData.findIndex(d => d.category === item.category) % colors.length]
-                }}
-              />
-              <div>
-                <div className="text-sm font-medium">
-                  {item.type === 'liability'
-                    ? t(`liabilities.types.${item.category}`)
-                    : t(`expenses.categories.${item.category}`)
-                  }
-                </div>
-                <div className="text-sm text-gray-500">
-                  {formatService.formatCurrency(item.amount)}
-                  {total > 0 && ` (${item.percentage.toFixed(1)}%)`}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </Card>
   );
 };
