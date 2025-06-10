@@ -52,16 +52,29 @@ export const updateDashboardValues = createAsyncThunk(
     const monthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses.items);
     const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities.items);
 
-    // Use cached calculation for monthly asset income
-    const monthlyAssetIncome = calculatorService.calculateTotalMonthlyAssetIncomeWithCache
-      ? calculatorService.calculateTotalMonthlyAssetIncomeWithCache(assets.items)
-      : calculatorService.calculateTotalMonthlyAssetIncome(assets.items);
+    // Use portfolio cache for asset income and totals if available
+    const portfolioCache = assets.portfolioCache;
+    let monthlyAssetIncome = 0;
+    let totalAssets = 0;
+    
+    if (portfolioCache && assets.portfolioCacheValid) {
+      // Use cached portfolio data (new transaction-based system)
+      monthlyAssetIncome = portfolioCache.totals.monthlyIncome;
+      totalAssets = portfolioCache.totals.totalValue;
+      Logger.infoRedux(`Using portfolio cache for asset calculations - monthlyIncome: ${monthlyAssetIncome}, totalValue: ${totalAssets}`);
+    } else {
+      // Fallback to legacy asset-based calculations
+      monthlyAssetIncome = calculatorService.calculateTotalMonthlyAssetIncomeWithCache
+        ? calculatorService.calculateTotalMonthlyAssetIncomeWithCache(assets.items)
+        : calculatorService.calculateTotalMonthlyAssetIncome(assets.items);
+      totalAssets = calculatorService.calculateTotalAssetValue(assets.items);
+      Logger.infoRedux(`Using legacy asset calculations as fallback - monthlyIncome: ${monthlyAssetIncome}, totalValue: ${totalAssets}`);
+    }
 
     // Only consider income entries marked as passive
     const passiveIncome = calculatorService.calculatePassiveIncome(income.items);
 
     // Calculate derived values
-    const totalAssets = calculatorService.calculateTotalAssetValue(assets.items);
     const totalLiabilities = calculatorService.calculateTotalDebt(liabilities.items);
     const netWorth = calculatorService.calculateNetWorth(totalAssets, totalLiabilities);
 
@@ -72,12 +85,21 @@ export const updateDashboardValues = createAsyncThunk(
     );
     
     const passiveIncomeRatio = calculatorService.calculatePassiveIncomeRatio(monthlyIncome, passiveIncome);
-    const assetAllocation = calculatorService.calculateAssetAllocation(assets.items);
+    
+    // Use portfolio cache for asset allocation if available
+    let assetAllocation;
+    if (portfolioCache && assets.portfolioCacheValid) {
+      assetAllocation = calculatorService.calculatePortfolioAssetAllocation(portfolioCache.positions);
+      Logger.infoRedux('Using portfolio cache for asset allocation calculation');
+    } else {
+      assetAllocation = calculatorService.calculateAssetAllocation(assets.items);
+      Logger.infoRedux('Using legacy assets for asset allocation calculation');
+    }
 
     // Calculate total asset gain and percentage directly in the thunk
     const totalInitialInvestment = assets.items.reduce((sum, asset) => {
       if (asset.type === 'stock') {
-        return sum + (asset.purchasePrice || 0) * (asset.quantity || 0);
+        return sum + (asset.purchasePrice || 0) * (asset.purchaseQuantity || 0);
       }
       return sum + (asset.purchasePrice || 0);
     }, 0);

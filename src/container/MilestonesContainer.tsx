@@ -2,32 +2,34 @@ import React from 'react';
 import { useAppSelector } from '../hooks/redux';
 import calculatorService from '../service/calculatorService';
 import MilestonesView from '../view/milestones/MilestonesView';
+import { Expense, Liability } from '../types';
 
 const MilestonesContainer: React.FC = () => {
   // Get necessary data from the store
-  const { items: assets } = useAppSelector(state => state.assets);
+  const { portfolioCache } = useAppSelector(state => state.assets);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: income } = useAppSelector(state => state.income);
 
   // Calculate values needed for the milestones
-  const monthlyPassiveIncome = calculatorService.calculatePassiveIncome(income) +
-                              calculatorService.calculateTotalMonthlyAssetIncome(assets);
+  const normalIncome = calculatorService.calculatePassiveIncome(income);
+  const assetIncome = portfolioCache?.totals?.monthlyIncome || 0;
+  const monthlyPassiveIncome = normalIncome + assetIncome;
 
   // Calculate fixed costs (only specific categories - WITHOUT liabilities for cleaner calculation)
   const monthlyFixedExpenses = expenses
-    .filter(expense => ['housing', 'transportation', 'utilities', 'insurance', 'health'].includes(expense.category))
-    .reduce((total, expense) => total + calculatorService.calculateMonthlyExpense(expense), 0);
+    .filter((expense: Expense) => ['housing', 'transportation', 'utilities', 'insurance', 'health'].includes(expense.category))
+    .reduce((total: number, expense: Expense) => total + calculatorService.calculateMonthlyExpense(expense), 0);
 
   const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
   
   // Fixed costs includes fixed expenses + liability payments
   const monthlyFixedCosts = monthlyFixedExpenses + monthlyLiabilityPayments;
 
-  const liquidAssets = calculatorService.calculateLiquidAssetValue(assets);
+  const liquidAssets = portfolioCache?.totals?.totalValue || 0;
 
   // Transform data for DebtBreaker component
-  const debts = liabilities.map(liability => {
+  const debts = liabilities.map((liability: Liability) => {
     // Avoid division by zero and ensure valid numbers
     const initialAmount = liability.initialBalance || 0;
     const currentAmount = liability.currentBalance || 0;
@@ -44,13 +46,13 @@ const MilestonesContainer: React.FC = () => {
   });
 
   // Calculate total progress based on how much debt has been paid off
-  const totalInitialDebt = liabilities.reduce((sum, l) => sum + (l.initialBalance || 0), 0);
-  const totalCurrentDebt = liabilities.reduce((sum, l) => sum + (l.currentBalance || 0), 0);
+  const totalInitialDebt = liabilities.reduce((sum: number, l: Liability) => sum + (l.initialBalance || 0), 0);
+  const totalCurrentDebt = liabilities.reduce((sum: number, l: Liability) => sum + (l.currentBalance || 0), 0);
   const totalPaidDebt = Math.max(0, totalInitialDebt - totalCurrentDebt);
   const totalProgress = totalInitialDebt > 0 ? (totalPaidDebt / totalInitialDebt) * 100 : 0;
 
   // Transform data for DebtCoverage component  
-  const debtCoverageData = liabilities.map(liability => {
+  const debtCoverageData = liabilities.map((liability: Liability) => {
     const monthlyPayment = calculatorService.calculateLiabilityMonthlyPayment(liability);
     return {
       name: liability.name,
@@ -64,8 +66,8 @@ const MilestonesContainer: React.FC = () => {
 
   // Calculate leisure expenses (entertainment + personal categories)
   const monthlyLeisureExpenses = expenses
-    .filter(expense => expense.category === 'entertainment' || expense.category === 'personal')
-    .reduce((total, expense) => total + calculatorService.calculateMonthlyExpense(expense), 0);
+    .filter((expense: Expense) => expense.category === 'entertainment' || expense.category === 'personal')
+    .reduce((total: number, expense: Expense) => total + calculatorService.calculateMonthlyExpense(expense), 0);
 
   // Calculate ALL monthly expenses (using the calculator service)
   const monthlyTotalExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);

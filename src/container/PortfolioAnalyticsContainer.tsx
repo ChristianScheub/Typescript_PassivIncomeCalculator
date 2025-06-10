@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import { useAppSelector } from '../hooks/redux';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import PortfolioAnalyticsView from '../view/analytics/assets/PortfolioAnalyticsView';
 import calculatorService from '../service/calculatorService';
 import { AssetType } from '../types';
+import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../store/slices/assetsSlice';
+import Logger from '../service/Logger/logger';
 
 type AnalyticsTab = 'asset_distribution' | 'income_distribution' | 'custom';
 
@@ -14,8 +16,28 @@ const PortfolioAnalyticsContainer: React.FC<PortfolioAnalyticsContainerProps> = 
   const [selectedTab, setSelectedTab] = useState<AnalyticsTab>('asset_distribution');
   const [selectedAssetType, setSelectedAssetType] = useState<AssetType | 'all'>('all');
   
-  // Get portfolio data from Redux store
-  const portfolioCache = useAppSelector(state => state.assets.portfolioCache);
+  // Get portfolio data from Redux cache
+  const dispatch = useAppDispatch();
+  const portfolioCache = useAppSelector(selectPortfolioCache);
+  const portfolioCacheValid = useAppSelector(selectPortfolioCacheValid);
+  const assets = useAppSelector(state => state.assets.items);
+  const assetDefinitions = useAppSelector(state => state.assetDefinitions.items);
+  const { categories, categoryOptions, categoryAssignments } = useAppSelector(state => state.assetCategories || {
+    categories: [],
+    categoryOptions: [],
+    categoryAssignments: []
+  });
+
+  // Ensure portfolio cache is available
+  useEffect(() => {
+    if (!portfolioCacheValid && assets.length > 0 && assetDefinitions.length > 0) {
+      Logger.info('Portfolio cache invalid, recalculating for analytics');
+      dispatch(calculatePortfolioData({ 
+        assetDefinitions, 
+        categoryData: { categories, categoryOptions, categoryAssignments } 
+      }));
+    }
+  }, [assets.length, assetDefinitions.length, portfolioCacheValid, dispatch, categories, categoryOptions, categoryAssignments]);
   
   // Calculate analytics data from portfolio positions with asset type filtering
   const { portfolioAnalytics, incomeAnalytics, filteredPositions } = useMemo(() => {

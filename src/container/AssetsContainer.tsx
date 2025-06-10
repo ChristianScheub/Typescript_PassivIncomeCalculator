@@ -172,8 +172,12 @@ const AssetsContainer: React.FC = () => {
   }, [t]);
 
   // Cache-Miss-Handling: Nach jedem Render Cache für fehlende/ungültige Assets nachziehen
+  // Optimiert: Läuft nur wenn sich assets ändern oder Portfolio-Cache invalidiert wird
   useEffect(() => {
     if (!assets || assets.length === 0) return;
+    if (portfolioCacheValid) return; // Skip wenn Portfolio-Cache gültig ist
+    
+    Logger.info('Checking and updating asset dividend caches');
     
     // Sammle erst alle Assets die ein Cache-Update benötigen
     const assetsNeedingUpdate = assets.filter(asset => {
@@ -182,21 +186,25 @@ const AssetsContainer: React.FC = () => {
       return !result.cacheHit && result.cacheDataToUpdate;
     });
 
-    // Führe Updates nur für die benötigten Assets durch
-    assetsNeedingUpdate.forEach(asset => {
-      if (!calculatorService.calculateAssetMonthlyIncomeWithCache) return;
-      const result = calculatorService.calculateAssetMonthlyIncomeWithCache(asset);
-      if (!result.cacheHit && result.cacheDataToUpdate) {
-        const cachedDividends = createCachedDividends(
-          result.cacheDataToUpdate.monthlyAmount,
-          result.cacheDataToUpdate.annualAmount,
-          result.cacheDataToUpdate.monthlyBreakdown,
-          asset
-        );
-        dispatch(updateAssetDividendCache({ assetId: asset.id, cachedDividends }));
-      }
-    });
-  }, [assets, dispatch]);
+    if (assetsNeedingUpdate.length > 0) {
+      Logger.info(`Updating dividend cache for ${assetsNeedingUpdate.length} assets`);
+      
+      // Führe Updates nur für die benötigten Assets durch
+      assetsNeedingUpdate.forEach(asset => {
+        if (!calculatorService.calculateAssetMonthlyIncomeWithCache) return;
+        const result = calculatorService.calculateAssetMonthlyIncomeWithCache(asset);
+        if (!result.cacheHit && result.cacheDataToUpdate) {
+          const cachedDividends = createCachedDividends(
+            result.cacheDataToUpdate.monthlyAmount,
+            result.cacheDataToUpdate.annualAmount,
+            result.cacheDataToUpdate.monthlyBreakdown,
+            asset
+          );
+          dispatch(updateAssetDividendCache({ assetId: asset.id, cachedDividends }));
+        }
+      });
+    }
+  }, [assets.length, portfolioCacheValid, dispatch]); // Dependency auf asset length und cache validity
 
 
 

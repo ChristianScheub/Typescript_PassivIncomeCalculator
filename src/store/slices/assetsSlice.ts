@@ -7,6 +7,8 @@ import { shouldInvalidateCache } from '../../utils/dividendCacheUtils';
 import { hydrateStore } from '../actions/hydrateAction';
 import { calculatePortfolioPositions, PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
 import { getCurrentQuantity } from '../../utils/transactionCalculations';
+import { formatCurrency } from '../../service/formatService/methods/formatCurrency';
+import { formatPercentage } from '../../service/formatService/methods/formatPercentage';
 
 interface PortfolioCache {
   positions: PortfolioPosition[];
@@ -19,6 +21,15 @@ interface PortfolioCache {
     annualIncome: number;
     positionCount: number;
     transactionCount: number;
+    // Pre-formatted values
+    formatted: {
+      totalValue: string;
+      totalInvestment: string;
+      totalReturn: string;
+      totalReturnPercentage: string;
+      monthlyIncome: string;
+      annualIncome: string;
+    };
   };
   metadata: {
     lastCalculated: string;
@@ -199,13 +210,32 @@ export const calculatePortfolioData = createAsyncThunk(
       monthlyIncome: positions.reduce((sum, pos) => sum + pos.monthlyIncome, 0),
       annualIncome: positions.reduce((sum, pos) => sum + pos.annualIncome, 0),
       positionCount: positions.length,
-      transactionCount: assets.length
+      transactionCount: assets.length,
+      // Pre-format totals for UI
+      formatted: {
+        totalValue: '',
+        totalInvestment: '',
+        totalReturn: '',
+        totalReturnPercentage: '',
+        monthlyIncome: '',
+        annualIncome: '',
+      }
     };
     
     // Calculate total return percentage
     totals.totalReturnPercentage = totals.totalInvestment > 0 
       ? (totals.totalReturn / totals.totalInvestment) * 100 
       : 0;
+    
+    // Format all totals once for UI
+    totals.formatted = {
+      totalValue: formatCurrency(totals.totalValue),
+      totalInvestment: formatCurrency(Math.abs(totals.totalInvestment)),
+      totalReturn: formatCurrency(totals.totalReturn),
+      totalReturnPercentage: formatPercentage(totals.totalReturnPercentage),
+      monthlyIncome: formatCurrency(totals.monthlyIncome),
+      annualIncome: formatCurrency(totals.annualIncome),
+    };
     
     const portfolioCache: PortfolioCache = {
       positions,
@@ -414,7 +444,26 @@ export const selectPortfolioTotals = (state: { assets: AssetsState }) =>
     monthlyIncome: 0,
     annualIncome: 0,
     positionCount: 0,
-    transactionCount: 0
+    transactionCount: 0,
+    formatted: {
+      totalValue: '0,00 €',
+      totalInvestment: '0,00 €',
+      totalReturn: '0,00 €',
+      totalReturnPercentage: '0,00%',
+      monthlyIncome: '0,00 €',
+      annualIncome: '0,00 €',
+    }
+  };
+
+// NEW: Selector for formatted totals only
+export const selectFormattedPortfolioTotals = (state: { assets: AssetsState }) => 
+  state.assets.portfolioCache?.totals.formatted || {
+    totalValue: '0,00 €',
+    totalInvestment: '0,00 €',
+    totalReturn: '0,00 €',
+    totalReturnPercentage: '0,00%',
+    monthlyIncome: '0,00 €',
+    annualIncome: '0,00 €',
   };
 
 export const selectSortedAssets = (state: { assets: AssetsState }) =>

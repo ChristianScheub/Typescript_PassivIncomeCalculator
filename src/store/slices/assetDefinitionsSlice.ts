@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AssetDefinition } from '../../types';
 import Logger from '../../service/Logger/logger';
 import sqliteService from '../../service/sqlLiteService';
+import { invalidatePortfolioCache } from './assetsSlice';
 
 interface AssetDefinitionsState {
   items: AssetDefinition[];
@@ -120,6 +121,7 @@ const assetDefinitionsSlice = createSlice({
       // Add asset definition
       .addCase(addAssetDefinition.fulfilled, (state, action) => {
         state.items.push(action.payload);
+        Logger.info(`Asset definition added: ${action.payload.name}, invalidating portfolio cache`);
       })
       
       // Update asset definition
@@ -127,12 +129,14 @@ const assetDefinitionsSlice = createSlice({
         const index = state.items.findIndex(item => item.id === action.payload.id);
         if (index !== -1) {
           state.items[index] = action.payload;
+          Logger.info(`Asset definition updated: ${action.payload.name}, invalidating portfolio cache`);
         }
       })
       
       // Delete asset definition
       .addCase(deleteAssetDefinition.fulfilled, (state, action) => {
         state.items = state.items.filter(item => item.id !== action.payload);
+        Logger.info(`Asset definition deleted: ${action.payload}, invalidating portfolio cache`);
       });
   },
 });

@@ -2,6 +2,8 @@ import { Asset, AssetDefinition, AssetCategory, AssetCategoryOption } from '../.
 import Logger from '../Logger/logger';
 import { calculateDividendSchedule } from '../calculatorService/methods/calculatePayment';
 import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
+import { formatCurrency } from '../formatService/methods/formatCurrency';
+import { formatPercentage } from '../formatService/methods/formatPercentage';
 
 export interface PortfolioPosition {
   id: string; // AssetDefinitionId or fallback identifier
@@ -27,6 +29,18 @@ export interface PortfolioPosition {
   // Income calculations (based on AssetDefinition and total quantity)
   monthlyIncome: number;
   annualIncome: number;
+  
+  // PRE-FORMATTED VALUES FOR UI (to avoid repeated formatting calls)
+  formatted: {
+    currentValue: string;
+    totalInvestment: string;
+    totalReturn: string;
+    totalReturnPercentage: string;
+    monthlyIncome: string;
+    annualIncome: string;
+    averagePurchasePrice: string;
+    currentPrice: string;
+  };
   
   // Category information
   categoryAssignments?: {
@@ -115,6 +129,18 @@ export const calculatePortfolioPositions = (
           .filter((item): item is { category: AssetCategory; option: AssetCategoryOption } => item !== null)
       : [];
 
+    // Pre-format all values for UI to avoid repeated formatting calls
+    const formattedValues = {
+      currentValue: formatCurrency(currentValue),
+      totalInvestment: formatCurrency(Math.abs(totalInvestment)),
+      totalReturn: formatCurrency(totalReturn),
+      totalReturnPercentage: formatPercentage(totalReturnPercentage),
+      monthlyIncome: formatCurrency(monthlyIncome),
+      annualIncome: formatCurrency(annualIncome),
+      averagePurchasePrice: formatCurrency(averagePurchasePrice),
+      currentPrice: formatCurrency(assetDefinition?.currentPrice || 0),
+    };
+    
     const position: PortfolioPosition = {
       id: key,
       assetDefinition,
@@ -136,6 +162,9 @@ export const calculatePortfolioPositions = (
       
       monthlyIncome,
       annualIncome,
+      
+      // Pre-formatted values
+      formatted: formattedValues,
       
       categoryAssignments: positionCategoryAssignments,
       

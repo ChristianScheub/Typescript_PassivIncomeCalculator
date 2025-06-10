@@ -26,7 +26,7 @@ import {
 } from './methods/calculateExpenses';
 import { calculateNetWorth } from './methods/calculateNetWorth';
 import { calculateMonthlyCashFlow } from './methods/calculateCashFlow';
-import { calculateAssetAllocation, calculateIncomeAllocation } from './methods/calculateAllocations';
+import { calculateAssetAllocation, calculateIncomeAllocation, calculatePortfolioAssetAllocation } from './methods/calculateAllocations';
 import { calculateExpenseBreakdown } from './methods/calculateExpenseBreakdown';
 import { calculateProjections, calculateProjectionsWithCache } from './methods/calculateProjections';
 import { calculatePortfolioAnalytics, calculateIncomeAnalytics } from './methods/calculatePortfolioAnalytics';
@@ -146,6 +146,7 @@ const calculatorService: ICalculatorService = {
 
   // Analysis calculations
   calculateAssetAllocation,
+  calculatePortfolioAssetAllocation, // New portfolio-based calculation
   calculateIncomeAllocation,
   calculateExpenseBreakdown,
   calculateProjections,

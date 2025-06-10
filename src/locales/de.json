@@ -249,6 +249,9 @@
         "description": "Überwache, wie gut dein passives Einkommen deine Schulden deckt. Eine höhere Abdeckung bedeutet weniger finanziellen Stress und mehr Freiheit.",
         "noDebts": "Noch keine Schulden erfasst. Füge deine Verbindlichkeiten hinzu, um deine Schuldenabdeckung zu überwachen.",
         "noDebt": "Noch keine Schulden erfasst. Füge deine Verbindlichkeiten hinzu, um deine Schuldenabdeckung zu überwachen.",
+        "totalCoverage": "{{percent}}% Gesamtabdeckung",
+        "monthlyCost": "Monatliche Kosten: {{amount}}",
+        "perDebt": "{{name}}: {{percent}}% Abdeckung",
         "percentCovered": "{{percent}}% der Schulden durch passives Einkommen gedeckt",
         "milestone10": "10% der Schulden durch passives Einkommen gedeckt - Ein guter Anfang!",
         "milestone25": "25% der Schulden durch passives Einkommen gedeckt - Auf dem richtigen Weg!",
@@ -468,6 +471,7 @@
     "all": "Alle"
   },
   "expenses": {
+    "title": "Ausgaben",
     "summary": "Monatliche Ausgaben",
     "addExpense": "Ausgabe hinzufügen",
     "noExpenses": "Noch keine Ausgaben",
@@ -616,6 +620,9 @@
     "assetTypeIncomeDistribution": "Asset-Typ-Einkommensverteilung",
     "sectorIncomeDistribution": "Sektor-Einkommensverteilung",
     "countryIncomeDistribution": "Länder-Einkommensverteilung",
+    "noAssetData": "Keine Asset-Daten verfügbar",
+    "noSectorData": "Keine Sektor-Daten verfügbar",
+    "noCountryData": "Keine Länder-Daten verfügbar",
     "customAnalytics": {
       "title": "Benutzerdefinierte Analysen",
       "addChart": "Diagramm hinzufügen",

@@ -4,6 +4,49 @@ import calculatorService from '../../service/calculatorService';
 import { RootState } from '..';
 import Logger from '../../service/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
+import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
+import { calculateDividendForMonth } from '../../service/calculatorService/methods/calculatePayment';
+
+// Helper function to calculate monthly income from portfolio positions for a specific month
+const calculatePortfolioMonthlyIncome = (positions: PortfolioPosition[], month: number): number => {
+  let totalIncome = 0;
+  
+  positions.forEach(position => {
+    if (!position.assetDefinition) return;
+    
+    const assetDefinition = position.assetDefinition;
+    const totalQuantity = position.totalQuantity;
+    
+    // Stock dividends
+    if (position.type === 'stock' && assetDefinition.dividendInfo?.frequency && assetDefinition.dividendInfo.frequency !== 'none') {
+      if (totalQuantity <= 0) return;
+      
+      try {
+        const dividendForMonth = calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
+        totalIncome += isFinite(dividendForMonth) ? dividendForMonth : 0;
+      } catch (error) {
+        Logger.cache(`Error calculating dividend for ${position.name}: ${error}`);
+      }
+    }
+
+    // Bond/Cash interest
+    if ((position.type === 'bond' || position.type === 'cash') && assetDefinition.bondInfo?.interestRate !== undefined) {
+      const interestRate = assetDefinition.bondInfo.interestRate;
+      const currentValue = position.currentValue;
+      const annualInterest = (interestRate * currentValue) / 100;
+      const monthlyInterest = annualInterest / 12;
+      totalIncome += isFinite(monthlyInterest) ? monthlyInterest : 0;
+    }
+
+    // Real estate rental
+    if (position.type === 'real_estate' && assetDefinition.rentalInfo?.baseRent !== undefined) {
+      const monthlyRent = assetDefinition.rentalInfo.baseRent;
+      totalIncome += isFinite(monthlyRent) ? monthlyRent : 0;
+    }
+  });
+  
+  return isFinite(totalIncome) ? totalIncome : 0;
+};
 
 interface ForecastState {
   projections: MonthlyProjection[];
@@ -47,8 +90,20 @@ export const updateForecastValues = createAsyncThunk(
 
     // Cache Asset-Einkommen für jeden Monat (berücksichtigt Dividendentermine)
     const monthlyAssetIncomeCache: Record<number, number> = {};
-    for (let month = 1; month <= 12; month++) {
-      monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(assets.items, month);
+    
+    // Use portfolio cache if available (new transaction-based system)
+    const portfolioCache = assets.portfolioCache;
+    if (portfolioCache && assets.portfolioCacheValid) {
+      Logger.infoRedux('Using portfolio positions for monthly asset income cache');
+      for (let month = 1; month <= 12; month++) {
+        monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
+      }
+    } else {
+      // Fallback to legacy asset-based calculations
+      Logger.infoRedux('Using legacy assets for monthly asset income cache');
+      for (let month = 1; month <= 12; month++) {
+        monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(assets.items, month);
+      }
     }
 
     // Verwende die gecachten Werte für Projektionen
@@ -69,7 +124,11 @@ export const updateForecastValues = createAsyncThunk(
 );
 
 // Thunk to update only monthly asset income cache when assets change
-export const updateMonthlyAssetIncomeCache = createAsyncThunk(
+export const updateMonthlyAssetIncomeCache = createAsyncThunk<
+  { monthlyAssetIncomeCache: Record<number, number> },
+  void,
+  { state: RootState }
+>(
   'forecast/updateAssetIncomeCache',
   async (_, { getState }) => {
     Logger.infoRedux('Updating monthly asset income cache');
@@ -77,8 +136,20 @@ export const updateMonthlyAssetIncomeCache = createAsyncThunk(
     const { assets } = state;
 
     const monthlyAssetIncomeCache: Record<number, number> = {};
-    for (let month = 1; month <= 12; month++) {
-      monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(assets.items, month);
+    
+    // Use portfolio cache if available (new transaction-based system)
+    const portfolioCache = assets.portfolioCache;
+    if (portfolioCache && assets.portfolioCacheValid) {
+      Logger.infoRedux('Using portfolio positions for cache update');
+      for (let month = 1; month <= 12; month++) {
+        monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
+      }
+    } else {
+      // Fallback to legacy asset-based calculations
+      Logger.infoRedux('Using legacy assets for cache update');
+      for (let month = 1; month <= 12; month++) {
+        monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(assets.items, month);
+      }
     }
 
     Logger.infoRedux('Monthly asset income cache updated');

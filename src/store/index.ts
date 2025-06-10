@@ -10,7 +10,9 @@ import forecastReducer from './slices/forecastSlice';
 import apiConfigReducer from './slices/apiConfigSlice';
 import customAnalyticsReducer from './slices/customAnalyticsSlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
+import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
 import Logger from '../service/Logger/logger';
+import { validatePortfolioCache } from '../utils/portfolioCacheUtils';
 
 type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
 
@@ -23,12 +25,24 @@ const loadState = () => {
       return undefined;
     }
     const state = JSON.parse(serializedState);
+    
+    // Validate portfolio cache from localStorage
+    const cacheValid = validatePortfolioCache(
+      state.assets?.portfolioCache, 
+      state.assets?.portfolioCacheValid
+    );
+    
+    Logger.infoRedux(`Loading state from localStorage - portfolio cache ${cacheValid ? 'valid' : 'invalid/missing'}`);
+    
     return {
       assets: { 
         items: state.assets?.items || [],
         status: 'idle' as Status,
         error: null,
-        portfolioCacheValid: false
+        // Restore portfolio cache from localStorage if valid
+        portfolioCache: cacheValid ? state.assets?.portfolioCache : undefined,
+        portfolioCacheValid: cacheValid,
+        lastPortfolioCalculation: cacheValid ? state.assets?.lastPortfolioCalculation : undefined
       },
       assetDefinitions: {
         items: state.assetDefinitions?.items || [],
@@ -91,7 +105,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false, // For storing Date objects in state
-    }).concat(dataChangeMiddleware as any)
+    }).concat(dataChangeMiddleware as any, portfolioCacheMiddleware)
 });
 
 // Subscribe to store changes and save to localStorage
@@ -105,7 +119,11 @@ store.subscribe(() => {
   try {
     const stateToSave = {
       assets: { 
-        items: state.assets.items
+        items: state.assets.items,
+        // Save portfolio cache to localStorage
+        portfolioCache: state.assets.portfolioCache,
+        portfolioCacheValid: state.assets.portfolioCacheValid,
+        lastPortfolioCalculation: state.assets.lastPortfolioCalculation
       },
       assetDefinitions: {
         items: state.assetDefinitions.items

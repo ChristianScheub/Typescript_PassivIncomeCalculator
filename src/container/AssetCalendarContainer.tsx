@@ -5,9 +5,10 @@ import { RootState } from '../store';
 import { AssetType } from '../types';
 import AssetCalendarView from '../view/assets/AssetCalendarView';
 import Logger from '../service/Logger/logger';
-import { PortfolioService } from '../service/portfolioService';
 import { PortfolioPosition } from '../service/portfolioService/portfolioCalculations';
 import { calculateDividendForMonth } from '../service/calculatorService/methods/calculatePayment';
+import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../store/slices/assetsSlice';
 
 interface MonthData {
   month: number;
@@ -36,25 +37,56 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
   const assetCategories = useSelector((state: RootState) => state.assetCategories.categories);
   const categoryOptions = useSelector((state: RootState) => state.assetCategories.categoryOptions);
   const categoryAssignments = useSelector((state: RootState) => state.assetCategories.categoryAssignments);
+  
+  // Use Redux cache instead of recalculating
+  const dispatch = useAppDispatch();
+  const portfolioCache = useAppSelector(selectPortfolioCache);
+  const portfolioCacheValid = useAppSelector(selectPortfolioCacheValid);
+  
   const { t } = useTranslation();
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Current month (1-12)
   const [selectedAssetType, setSelectedAssetType] = useState<AssetType | 'all'>('all');
 
-  // Get portfolio service instance
-  const portfolioService = PortfolioService.getInstance();
+  // Ensure portfolio cache is available
+  useEffect(() => {
+    if (!portfolioCacheValid && assets.length > 0 && assetDefinitions.length > 0) {
+      Logger.info('Portfolio cache invalid, recalculating for asset calendar');
+      dispatch(calculatePortfolioData({ 
+        assetDefinitions, 
+        categoryData: { categories: assetCategories, categoryOptions, categoryAssignments } 
+      }));
+    }
+  }, [assets.length, assetDefinitions.length, portfolioCacheValid, dispatch, assetCategories, categoryOptions, categoryAssignments]);
 
-  // Calculate portfolio positions (grouped by AssetDefinition)
+  // Get portfolio data from cache or provide empty fallback
   const portfolioData = useMemo(() => {
-    Logger.info(`Calculating portfolio for asset calendar with ${assets.length} assets and ${assetDefinitions.length} definitions`);
-    return portfolioService.calculatePortfolio(
-      assets, 
-      assetDefinitions, 
-      assetCategories, 
-      categoryOptions, 
-      categoryAssignments
-    );
-  }, [assets, assetDefinitions, assetCategories, categoryOptions, categoryAssignments, portfolioService]);
+    if (portfolioCache) {
+      Logger.info(`Using cached portfolio data for asset calendar: ${portfolioCache.positions.length} positions`);
+      return portfolioCache;
+    } else {
+      Logger.info('No portfolio cache available, using empty data');
+      return {
+        positions: [],
+        totals: {
+          totalValue: 0,
+          totalInvestment: 0,
+          totalReturn: 0,
+          totalReturnPercentage: 0,
+          monthlyIncome: 0,
+          annualIncome: 0,
+          positionCount: 0,
+          transactionCount: 0
+        },
+        metadata: {
+          lastCalculated: new Date().toISOString(),
+          assetCount: assets.length,
+          definitionCount: assetDefinitions.length,
+          positionCount: 0
+        }
+      };
+    }
+  }, [portfolioCache, assets.length, assetDefinitions.length]);
 
   // Memoize month names to prevent recreation on every render
   const monthNames = useMemo(() => [

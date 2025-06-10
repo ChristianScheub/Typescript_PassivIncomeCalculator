@@ -72,6 +72,7 @@ export interface ICalculatorService {
 
   // Analysis calculations
   calculateAssetAllocation: (assets: Asset[]) => AssetAllocation[];
+  calculatePortfolioAssetAllocation: (positions: PortfolioPosition[]) => AssetAllocation[];
   calculateIncomeAllocation: (income: Income[], assets: Asset[]) => IncomeAllocation[];
   calculateExpenseBreakdown: (expenses: Expense[]) => ExpenseBreakdown[];
   calculateProjections: (
