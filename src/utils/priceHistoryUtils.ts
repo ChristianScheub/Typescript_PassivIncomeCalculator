@@ -9,8 +9,8 @@ import { PriceHistoryEntry, AssetDefinition } from '../types';
  * Preserves all historical prices, only removes duplicates if same date, price, and source
  */
 export function addPriceToHistory(
-  currentHistory: PriceHistoryEntry[] = [],
   price: number,
+  currentHistory: PriceHistoryEntry[] = [],
   date?: string,
   source: string = 'manual'
 ): PriceHistoryEntry[] {
@@ -45,8 +45,8 @@ export function addPriceToHistory(
  * This is useful for API updates where you want the latest price for the day
  */
 export function addOrUpdateDailyPrice(
-  currentHistory: PriceHistoryEntry[] = [],
   price: number,
+  currentHistory: PriceHistoryEntry[] = [],
   date?: string,
   source: string = 'manual'
 ): PriceHistoryEntry[] {
@@ -86,9 +86,9 @@ export function getLatestPrice(priceHistory: PriceHistoryEntry[] = []): PriceHis
  * Get price history for a specific date range
  */
 export function getPriceHistoryForRange(
-  priceHistory: PriceHistoryEntry[] = [],
   startDate: string,
-  endDate: string
+  endDate: string,
+  priceHistory: PriceHistoryEntry[] = []
 ): PriceHistoryEntry[] {
   const start = new Date(startDate).getTime();
   const end = new Date(endDate).getTime();
@@ -105,9 +105,9 @@ export function getPriceHistoryForRange(
  * Calculate price change percentage between two dates
  */
 export function calculatePriceChangePercentage(
-  priceHistory: PriceHistoryEntry[] = [],
   fromDate: string,
-  toDate: string
+  toDate: string,
+  priceHistory: PriceHistoryEntry[] = []
 ): number | null {
   const fromEntry = priceHistory.find(entry => 
     entry.date.startsWith(fromDate.split('T')[0])
@@ -127,8 +127,8 @@ export function calculatePriceChangePercentage(
  * Get the closest price entry to a specific date
  */
 export function getClosestPriceToDate(
-  priceHistory: PriceHistoryEntry[] = [],
-  targetDate: string
+  targetDate: string,
+  priceHistory: PriceHistoryEntry[] = []
 ): PriceHistoryEntry | null {
   if (priceHistory.length === 0) return null;
   
@@ -175,8 +175,8 @@ export function updateAssetDefinitionPrice(
     currentPrice: newPrice,
     lastPriceUpdate: currentDate,
     priceHistory: priceHistoryFunction(
-      definition.priceHistory,
       newPrice,
+      definition.priceHistory,
       currentDate,
       source
     ),

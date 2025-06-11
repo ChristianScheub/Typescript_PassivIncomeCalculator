@@ -11,6 +11,29 @@ interface GenericBarChartProps<T extends Record<string, any> = { name: string; v
   orientation?: 'horizontal' | 'vertical';
 }
 
+// Custom tooltip component moved outside of parent component
+const CustomTooltip = ({ active, payload, formatValue }: { active?: boolean; payload?: any; formatValue: (value: number) => string }) => {
+  if (active && payload?.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
+        <p className="font-medium text-gray-900 dark:text-gray-100">
+          {data.displayName}
+        </p>
+        <p className="text-blue-600 dark:text-blue-400">
+          {`${formatValue(data.value)} €`}
+        </p>
+        {data.percentage && (
+          <p className="text-gray-600 dark:text-gray-400 text-sm">
+            {`${data.percentage.toFixed(1)}%`}
+          </p>
+        )}
+      </div>
+    );
+  }
+  return null;
+};
+
 const GenericBarChart = <T extends Record<string, any> = { name: string; value: number; percentage?: number }>({
   title,
   data,
@@ -76,28 +99,6 @@ const GenericBarChart = <T extends Record<string, any> = { name: string; value: 
     color: colors[index % colors.length]
   }));
 
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900 dark:text-gray-100">
-            {data.displayName}
-          </p>
-          <p className="text-blue-600 dark:text-blue-400">
-            {`${formatValue(data[valueKey])} €`}
-          </p>
-          {data.percentage && (
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              {`${data.percentage.toFixed(1)}%`}
-            </p>
-          )}
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
@@ -124,10 +125,10 @@ const GenericBarChart = <T extends Record<string, any> = { name: string; value: 
                 axisLine={{ stroke: 'currentColor' }}
                 tickFormatter={formatValue}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip formatValue={formatValue} />} />
               <Bar dataKey={valueKey} radius={[4, 4, 0, 0]}>
-                {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                {chartData.map((entry) => (
+                  <Cell key={`cell-${entry.displayName}-${entry[valueKey]}`} fill={entry.color} />
                 ))}
               </Bar>
             </BarChart>
@@ -153,10 +154,10 @@ const GenericBarChart = <T extends Record<string, any> = { name: string; value: 
                 axisLine={{ stroke: 'currentColor' }}
                 width={80}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip formatValue={formatValue} />} />
               <Bar dataKey={valueKey} radius={[0, 4, 4, 0]}>
-                {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+                {chartData.map((entry) => (
+                  <Cell key={`cell-${entry.displayName}-${entry[valueKey]}`} fill={entry.color} />
                 ))}
               </Bar>
             </BarChart>
@@ -166,8 +167,8 @@ const GenericBarChart = <T extends Record<string, any> = { name: string; value: 
 
       {/* Legend */}
       <div className="mt-4 flex flex-wrap gap-3">
-        {chartData.slice(0, 8).map((item, index) => (
-          <div key={index} className="flex items-center space-x-2">
+        {chartData.slice(0, 8).map((item) => (
+          <div key={`legend-${item.displayName}`} className="flex items-center space-x-2">
             <div 
               className="w-3 h-3 rounded-sm" 
               style={{ backgroundColor: item.color }}

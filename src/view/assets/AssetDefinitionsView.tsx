@@ -7,6 +7,9 @@ import { ViewHeader } from "../../ui/layout/ViewHeader";
 import { Add } from "@mui/icons-material";
 import { Edit, Trash2, Wallet, RefreshCw } from "lucide-react";
 
+type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt">;
+type CreateCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
+
 interface AssetDefinitionsViewProps {
   assetDefinitions: AssetDefinition[];
   status: string;
@@ -15,9 +18,7 @@ interface AssetDefinitionsViewProps {
   isUpdatingPrices: boolean;
   isApiEnabled: boolean;
   getAssetTypeIcon: (type: string) => React.ReactNode;
-  onAddDefinition: (
-    data: Omit<AssetDefinition, "id" | "createdAt" | "updatedAt">
-  ) => void;
+  onAddDefinition: (data: CreateAssetDefinitionData) => void;
   onUpdateDefinition: (data: AssetDefinition) => void;
   onDeleteDefinition: (id: string) => void;
   onSetIsAddingDefinition: (isAdding: boolean) => void;
@@ -25,18 +26,12 @@ interface AssetDefinitionsViewProps {
   onUpdateStockPrices: () => void;
   onBack?: () => void;
   onAddDefinitionWithCategories?: (
-    data: Omit<AssetDefinition, "id" | "createdAt" | "updatedAt">,
-    categoryAssignments: Omit<
-      AssetCategoryAssignment,
-      "id" | "createdAt" | "updatedAt"
-    >[]
+    data: CreateAssetDefinitionData,
+    categoryAssignments: CreateCategoryAssignmentData[]
   ) => void;
   onUpdateDefinitionWithCategories?: (
     data: AssetDefinition,
-    categoryAssignments: Omit<
-      AssetCategoryAssignment,
-      "id" | "createdAt" | "updatedAt"
-    >[]
+    categoryAssignments: CreateCategoryAssignmentData[]
   ) => void;
 }
 
@@ -275,13 +270,10 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                     ...data,
                   });
                 }
+              } else if (onAddDefinitionWithCategories) {
+                onAddDefinitionWithCategories(data, categoryAssignments);
               } else {
-                // For new definitions, just pass the form data
-                if (onAddDefinitionWithCategories) {
-                  onAddDefinitionWithCategories(data, categoryAssignments);
-                } else {
-                  onAddDefinition(data);
-                }
+                onAddDefinition(data);
               }
             }}
             editingDefinition={editingDefinition}

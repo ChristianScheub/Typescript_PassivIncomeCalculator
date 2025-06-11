@@ -183,7 +183,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
   // Filter asset definitions based on search
   const filteredDefinitions = assetDefinitions.filter(def => 
     def.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (def.ticker && def.ticker.toLowerCase().includes(searchQuery.toLowerCase()))
+    def.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Calculate total value based on transaction type

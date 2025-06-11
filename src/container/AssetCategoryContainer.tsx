@@ -19,6 +19,11 @@ import { AssetCategory, AssetCategoryOption } from '../types';
 import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 
+// Type aliases for complex union types
+type NewAssetCategory = Omit<AssetCategory, 'id' | 'createdAt' | 'updatedAt'>;
+type NewAssetCategoryOption = Omit<AssetCategoryOption, 'id' | 'createdAt' | 'updatedAt' | 'categoryId'>;
+type NewAssetCategoryOptionWithCategory = Omit<AssetCategoryOption, 'id' | 'createdAt' | 'updatedAt'>;
+
 const categorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
   isActive: z.boolean().optional(),
@@ -50,9 +55,7 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   const [isAddingOption, setIsAddingOption] = useState(false);
   const [editingCategory, setEditingCategory] = useState<AssetCategory | null>(null);
   const [editingOption, setEditingOption] = useState<AssetCategoryOption | null>(null);
-  const [newCategoryOptions, setNewCategoryOptions] = useState<
-    Omit<AssetCategoryOption, "id" | "createdAt" | "updatedAt" | "categoryId">[]
-  >([]);
+  const [newCategoryOptions, setNewCategoryOptions] = useState<NewAssetCategoryOption[]>([]);
 
   // Category form
   const categoryForm = useForm<CategoryFormData>({
@@ -153,7 +156,7 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   // Helper functions
   const handleDeleteCategoryInternal = (category: AssetCategory) => {
     const relatedOptions = categoryOptions.filter(
-      (opt) => opt.categoryId === category.id
+      (opt: AssetCategoryOption) => opt.categoryId === category.id
     );
     if (relatedOptions.length > 0) {
       if (
@@ -163,24 +166,19 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
       ) {
         handleDeleteCategory(category.id);
       }
-    } else {
-      if (window.confirm('Are you sure you want to delete this category?')) {
-        handleDeleteCategory(category.id);
-      }
+    } else if (window.confirm('Are you sure you want to delete this category?')) {
+      handleDeleteCategory(category.id);
     }
   };
 
-  const getOptionsForCategory = (categoryId: string) => {
-    return categoryOptions.filter((option) => option.categoryId === categoryId);
+  const getOptionsForCategory = (categoryId: string): AssetCategoryOption[] => {
+    return categoryOptions.filter((option: AssetCategoryOption) => option.categoryId === categoryId);
   };
 
   const handleAddOptionToNewCategory = (optionData: CategoryOptionFormData) => {
     if (!optionData.name?.trim()) return;
 
-    const newOption: Omit<
-      AssetCategoryOption,
-      "id" | "createdAt" | "updatedAt" | "categoryId"
-    > = {
+    const newOption: NewAssetCategoryOption = {
       name: optionData.name,
       isActive: optionData.isActive ?? true,
       sortOrder: optionData.sortOrder || newCategoryOptions.length,
@@ -194,7 +192,7 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
     setNewCategoryOptions((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleAddCategory = async (data: Omit<AssetCategory, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleAddCategory = async (data: NewAssetCategory) => {
     try {
       Logger.info('Adding new asset category: ' + JSON.stringify(data));
       analytics.trackEvent('asset_category_add');
@@ -205,8 +203,8 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   };
 
   const handleAddCategoryWithOptions = async (
-    categoryData: Omit<AssetCategory, 'id' | 'createdAt' | 'updatedAt'>, 
-    options: Omit<AssetCategoryOption, 'id' | 'createdAt' | 'updatedAt' | 'categoryId'>[]
+    categoryData: NewAssetCategory, 
+    options: NewAssetCategoryOption[]
   ) => {
     try {
       Logger.info('Adding new asset category with options: ' + JSON.stringify({ category: categoryData, optionsCount: options.length }));
@@ -251,7 +249,7 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
     }
   };
 
-  const handleAddCategoryOption = async (data: Omit<AssetCategoryOption, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleAddCategoryOption = async (data: NewAssetCategoryOptionWithCategory) => {
     try {
       Logger.info('Adding new category option: ' + JSON.stringify(data));
       analytics.trackEvent('asset_category_option_add');
@@ -294,7 +292,6 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   return (
     <AssetCategoryManagerView
       categories={categories}
-      categoryOptions={categoryOptions}
       selectedCategoryId={selectedCategoryId}
       isAddingCategory={isAddingCategory}
       isAddingOption={isAddingOption}

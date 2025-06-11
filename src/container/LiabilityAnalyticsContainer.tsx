@@ -164,7 +164,14 @@ const LiabilityAnalyticsContainer: React.FC<LiabilityAnalyticsContainerProps> = 
       }));
       
       // Calculate intervals for better visualization
-      const interval = months <= 60 ? 1 : months <= 120 ? 3 : 12; // Monthly for 5yr, quarterly for 10yr, yearly for 30yr
+      let interval: number;
+      if (months <= 60) {
+        interval = 1; // Monthly for 5yr
+      } else if (months <= 120) {
+        interval = 3; // Quarterly for 10yr
+      } else {
+        interval = 12; // Yearly for 30yr
+      }
       
       for (let month = 0; month <= months; month += interval) {
         let monthLabel: string;

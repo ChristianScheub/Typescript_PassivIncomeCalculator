@@ -259,7 +259,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({
                 {priceLevels.map((price, index) => {
                   const y = 200 - (index * 40);
                   return (
-                    <g key={index}>
+                    <g key={`price-level-${price.toFixed(2)}`}>
                       <line
                         x1="50"
                         y1={y}
@@ -304,7 +304,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({
                   const y = 200 - ((entry.price - paddedMin) / (paddedRange || 1)) * 150;
                   
                   return (
-                    <g key={index}>
+                    <g key={`data-point-${entry.date}-${entry.price}`}>
                       <circle
                         cx={x}
                         cy={y}
@@ -329,7 +329,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({
                   
                   return (
                     <text
-                      key={index}
+                      key={`x-axis-${entry.date}`}
                       x={x}
                       y="225"
                       textAnchor="middle"
