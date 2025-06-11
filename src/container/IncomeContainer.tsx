@@ -7,6 +7,7 @@ import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import IncomeView from '../view/income/IncomeView';
+import IncomeAnalyticsContainer from './IncomeAnalyticsContainer';
 import { sortIncome, SortOrder } from '../utils/sortingUtils';
 
 const IncomeContainer: React.FC = () => {
@@ -15,6 +16,7 @@ const IncomeContainer: React.FC = () => {
   const { items: incomeItems, status } = useAppSelector(state => state.income);
   const [isAddingIncome, setIsAddingIncome] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Income | null>(null);
+  const [isShowingAnalytics, setIsShowingAnalytics] = useState(false);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -72,8 +74,23 @@ const IncomeContainer: React.FC = () => {
     }
   };
 
+  const handleNavigateToAnalytics = () => {
+    Logger.info('Navigating to income analytics');
+    setIsShowingAnalytics(true);
+  };
+
+  const handleBackToIncome = () => {
+    Logger.info('Navigating back to income view');
+    setIsShowingAnalytics(false);
+  };
+
   // Calculate annual income
   const annualIncome = totalMonthlyIncome * 12;
+
+  // Show analytics if requested
+  if (isShowingAnalytics) {
+    return <IncomeAnalyticsContainer onBack={handleBackToIncome} />;
+  }
 
   return (
     <IncomeView
@@ -90,6 +107,7 @@ const IncomeContainer: React.FC = () => {
       onDeleteIncome={handleDeleteIncome}
       onSetIsAddingIncome={setIsAddingIncome}
       onSetEditingIncome={setEditingIncome}
+      onNavigateToAnalytics={handleNavigateToAnalytics}
     />
   );
 };

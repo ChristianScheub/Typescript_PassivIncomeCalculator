@@ -52,6 +52,13 @@ export interface CachedDividends {
   calculationHash: string;
 }
 
+// Historical price data interface
+export interface PriceHistoryEntry {
+  date: string;
+  price: number;
+  source?: string; // 'manual' | 'api' | 'import'
+}
+
 // Asset Definition Types (Stammdaten)
 export interface AssetDefinition extends BaseEntity {
   ticker?: string;
@@ -68,6 +75,10 @@ export interface AssetDefinition extends BaseEntity {
   // Current market data
   currentPrice?: number;
   lastPriceUpdate?: string;
+  autoUpdatePrice?: boolean; // Whether to auto-update price via API (only for stocks)
+  
+  // Historical price data
+  priceHistory?: PriceHistoryEntry[];
   
   // Dividend/Income Information
   dividendInfo?: {

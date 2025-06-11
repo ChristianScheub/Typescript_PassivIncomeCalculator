@@ -7,6 +7,7 @@ import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import ExpensesView from '../view/expenses/ExpensesView';
+import ExpenseAnalyticsContainer from './ExpenseAnalyticsContainer';
 import { sortExpenses, SortOrder } from '../utils/sortingUtils';
 
 const ExpensesContainer: React.FC = () => {
@@ -15,6 +16,7 @@ const ExpensesContainer: React.FC = () => {
   const { items: expenses, status } = useAppSelector(state => state.expenses);
   const [isAddingExpense, setIsAddingExpense] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [isShowingAnalytics, setIsShowingAnalytics] = useState(false);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -66,6 +68,26 @@ const ExpensesContainer: React.FC = () => {
     }
   };
 
+  const handleNavigateToAnalytics = () => {
+    Logger.info('Navigating to expense analytics');
+    analytics.trackEvent('expense_analytics_open');
+    setIsShowingAnalytics(true);
+  };
+
+  const handleBackToExpenses = () => {
+    Logger.info('Returning to expenses from analytics');
+    setIsShowingAnalytics(false);
+  };
+
+  // If showing analytics, render the analytics container instead
+  if (isShowingAnalytics) {
+    return (
+      <ExpenseAnalyticsContainer 
+        onBack={handleBackToExpenses}
+      />
+    );
+  }
+
   return (
     <ExpensesView
       expenses={sortedExpenses}
@@ -79,6 +101,7 @@ const ExpensesContainer: React.FC = () => {
       onDeleteExpense={handleDeleteExpense}
       onSetIsAddingExpense={setIsAddingExpense}
       onSetEditingExpense={setEditingExpense}
+      onNavigateToAnalytics={handleNavigateToAnalytics}
     />
   );
 };

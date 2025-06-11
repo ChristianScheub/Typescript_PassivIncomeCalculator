@@ -3,11 +3,13 @@ import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../
 import Logger from '../../service/Logger/logger';
 import sqliteService from '../../service/sqlLiteService';
 
+type AssetCategoriesStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
+
 interface AssetCategoriesState {
   categories: AssetCategory[];
   categoryOptions: AssetCategoryOption[];
   categoryAssignments: AssetCategoryAssignment[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
+  status: AssetCategoriesStatus;
   error: string | null;
 }
 
@@ -46,7 +48,7 @@ export const addAssetCategory = createAsyncThunk(
         if (typeof crypto !== 'undefined' && crypto.randomUUID) {
           return crypto.randomUUID();
         }
-        return `category-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return `category-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
       };
 
       const newCategory: AssetCategory = {
@@ -145,7 +147,7 @@ export const addAssetCategoryOption = createAsyncThunk(
         if (typeof crypto !== 'undefined' && crypto.randomUUID) {
           return crypto.randomUUID();
         }
-        return `option-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return `option-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
       };
 
       const newOption: AssetCategoryOption = {

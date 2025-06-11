@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AssetDefinition, AssetType, DividendFrequency, PaymentFrequency, AssetCategoryAssignment } from '../../types';
+import { updateAssetDefinitionPrice } from '../../utils/priceHistoryUtils';
 import { 
   StandardFormWrapper,
   RequiredSection,
@@ -35,6 +36,7 @@ const assetDefinitionSchema = z.object({
   // Price fields
   currentPrice: z.number().min(0).optional(),
   lastPriceUpdate: z.string().optional(),
+  autoUpdatePrice: z.boolean().optional(),
   
   // Dividend fields
   hasDividend: z.boolean().optional(),
@@ -82,6 +84,11 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
   const { categories, categoryOptions, categoryAssignments: allAssignments } = useAppSelector(
     state => state.assetCategories
   );
+  
+  // Get API configuration from Redux store
+  const { isEnabled: isApiEnabled } = useAppSelector(
+    state => state.apiConfig
+  );
 
   const getRiskLevelOptions = (t: any) => [
     { value: 'low', label: t('assets.riskLevels.low') },
@@ -108,6 +115,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       // Price fields
       currentPrice: editingDefinition.currentPrice || undefined,
       lastPriceUpdate: editingDefinition.lastPriceUpdate || undefined,
+      autoUpdatePrice: editingDefinition.autoUpdatePrice || false,
       
       hasDividend: !!editingDefinition.dividendInfo,
       dividendAmount: editingDefinition.dividendInfo?.amount || 0,
@@ -224,6 +232,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         // Price fields
         currentPrice: editingDefinition.currentPrice || undefined,
         lastPriceUpdate: editingDefinition.lastPriceUpdate || undefined,
+        autoUpdatePrice: editingDefinition.autoUpdatePrice || false,
         
         hasDividend: !!editingDefinition.dividendInfo,
         dividendAmount: editingDefinition.dividendInfo?.amount || 0,
@@ -260,7 +269,10 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
   }, [editingDefinition, reset]);
 
   const handleFormSubmit = (data: AssetDefinitionFormData) => {
-    const definitionData: Omit<AssetDefinition, 'id' | 'createdAt' | 'updatedAt'> = {
+    // Get existing definition if editing to preserve price history
+    const existingDefinition = editingDefinition || null;
+    
+    let definitionData: Omit<AssetDefinition, 'id' | 'createdAt' | 'updatedAt'> = {
       name: data.fullName, // Use fullName as name
       fullName: data.fullName,
       ticker: data.ticker || undefined,
@@ -276,10 +288,32 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       riskLevel: data.riskLevel || undefined,
       isActive: true,
       
-      // Price fields
+      // Price fields and history
       currentPrice: data.currentPrice || undefined,
       lastPriceUpdate: data.lastPriceUpdate || undefined,
+      autoUpdatePrice: data.autoUpdatePrice || false,
+      priceHistory: existingDefinition?.priceHistory || [],
     };
+
+    // If current price has changed, use utility function to update price and history
+    if (data.currentPrice && 
+        (!existingDefinition?.currentPrice || data.currentPrice !== existingDefinition.currentPrice)) {
+      // Create a temporary definition object for the utility function
+      const tempDefinition: AssetDefinition = {
+        ...definitionData,
+        id: existingDefinition?.id || '',
+        createdAt: existingDefinition?.createdAt || new Date().toISOString(),
+        updatedAt: existingDefinition?.updatedAt || new Date().toISOString(),
+      };
+      
+      // Use utility function to properly manage price history
+      const updatedDefinition = updateAssetDefinitionPrice(tempDefinition, data.currentPrice, 'manual');
+      
+      // Update our definition data with the new price and history
+      definitionData.currentPrice = updatedDefinition.currentPrice;
+      definitionData.lastPriceUpdate = updatedDefinition.lastPriceUpdate;
+      definitionData.priceHistory = updatedDefinition.priceHistory;
+    }
 
     // Add dividend info if enabled
     if (data.hasDividend && data.dividendAmount && data.dividendAmount > 0) {
@@ -403,6 +437,17 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
             min={0}
             placeholder={t('assets.currentPricePlaceholder')}
           />
+
+          {/* Auto Update Price Toggle - only visible for stocks when API is enabled */}
+          {selectedType === 'stock' && isApiEnabled && (
+            <StandardFormField
+              label={t('assets.autoUpdatePrice')}
+              name="autoUpdatePrice"
+              type="checkbox"
+              value={watch('autoUpdatePrice')}
+              onChange={(value) => setValue('autoUpdatePrice', value)}
+            />
+          )}
         </FormGrid>
       </RequiredSection>
 

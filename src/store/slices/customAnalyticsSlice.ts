@@ -37,7 +37,7 @@ const customAnalyticsSlice = createSlice({
       const now = new Date().toISOString();
       const newChart: CustomAnalyticsConfig = {
         ...action.payload,
-        id: `chart_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `chart_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
         createdAt: now,
         updatedAt: now,
       };

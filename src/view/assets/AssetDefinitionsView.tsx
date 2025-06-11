@@ -2,7 +2,6 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { AssetDefinition, AssetCategoryAssignment } from "../../types";
 import { AssetDefinitionForm } from "../../ui/forms/AssetDefinitionForm";
-import { useDeviceCheck } from "../../service/helper/useDeviceCheck";
 import FloatingBtn, { ButtonAlignment } from "../../ui/layout/floatingBtn";
 import { ViewHeader } from "../../ui/layout/ViewHeader";
 import { Add } from "@mui/icons-material";
@@ -60,7 +59,6 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   onUpdateDefinitionWithCategories,
 }) => {
   const { t } = useTranslation();
-  const isDesktop = useDeviceCheck();
 
   if (status === "loading") {
     return (
@@ -163,12 +161,19 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                           <span className="text-gray-600 dark:text-gray-400">
                             {t("assets.currentPrice")}:
                           </span>
-                          <span className="text-gray-900 dark:text-gray-100">
-                            {new Intl.NumberFormat("de-DE", {
-                              style: "currency",
-                              currency: definition.currency || "EUR",
-                            }).format(definition.currentPrice)}
-                          </span>
+                          <div className="text-right">
+                            <span className="text-gray-900 dark:text-gray-100">
+                              {new Intl.NumberFormat("de-DE", {
+                                style: "currency",
+                                currency: definition.currency || "EUR",
+                              }).format(definition.currentPrice)}
+                            </span>
+                            {definition.priceHistory && definition.priceHistory.length > 1 && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400">
+                                {definition.priceHistory.length} {t("assets.priceHistory.entries")}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       )}
 

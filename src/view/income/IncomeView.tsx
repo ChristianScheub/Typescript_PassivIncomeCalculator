@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '../../ui/common/Card';
 import { SummaryCard } from '../../ui/common/SummaryCard';
 import { Button } from '../../ui/common/Button';
-import { Plus, CreditCard, Edit, Trash2 } from 'lucide-react';
+import { CreditCard, Edit, Trash2 } from 'lucide-react';
 import { LoadingSpinner } from '../../ui/feedback/LoadingSpinner';
 import { Modal } from '../../ui/common/Modal';
 import { EmptyState } from '../../ui/feedback/EmptyState';
@@ -11,6 +11,8 @@ import { Income } from '../../types';
 import { MaterialIncomeForm } from '../../container/forms/MaterialIncomeForm';
 import formatService from '../../service/formatService';
 import { useDeviceCheck } from '../../service/helper/useDeviceCheck';
+import FloatingBtn, { ButtonAlignment } from '../../ui/layout/floatingBtn';
+import { Add } from '@mui/icons-material';
 
 interface IncomeViewProps {
   status: string;
@@ -26,6 +28,7 @@ interface IncomeViewProps {
   onAddIncome: (income: Income) => Promise<void>;
   onUpdateIncome: (income: Income) => Promise<void>;
   onDeleteIncome: (id: string) => void;
+  onNavigateToAnalytics: () => void;
 }
 
 const IncomeView: React.FC<IncomeViewProps> = ({
@@ -41,7 +44,8 @@ const IncomeView: React.FC<IncomeViewProps> = ({
   onSetEditingIncome,
   onAddIncome,
   onUpdateIncome,
-  onDeleteIncome
+  onDeleteIncome,
+  onNavigateToAnalytics
 }) => {
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
@@ -54,10 +58,6 @@ const IncomeView: React.FC<IncomeViewProps> = ({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">{t('income.title')}</h1>
-        <Button onClick={() => onSetIsAddingIncome(true)}>
-          <Plus size={16} className="mr-2" />
-          {isDesktop && t('income.addIncome')}
-        </Button>
       </div>
 
       <SummaryCard
@@ -73,6 +73,7 @@ const IncomeView: React.FC<IncomeViewProps> = ({
         darkGradientFrom="from-emerald-800"
         darkGradientTo="to-emerald-600"
         accentColor="emerald-100/80"
+        onClick={onNavigateToAnalytics}
       />
 
       {items.length > 0 ? (
@@ -166,6 +167,17 @@ const IncomeView: React.FC<IncomeViewProps> = ({
           }}
         />
       </Modal>
+
+      {/* FloatingBtn nur anzeigen wenn kein Modal geöffnet ist */}
+      {!isAddingIncome && !editingIncome && (
+        <FloatingBtn
+          alignment={ButtonAlignment.RIGHT}
+          icon={Add}
+          onClick={() => onSetIsAddingIncome(true)}
+          backgroundColor="#10B981"
+          hoverBackgroundColor="#059669"
+        />
+      )}
     </div>
   );
 };

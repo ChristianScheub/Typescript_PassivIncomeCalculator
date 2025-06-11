@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from '../../ui/common/Card';
 import { Button } from '../../ui/common/Button';
-import { Plus, Trash2, Edit, Landmark } from 'lucide-react';
+import { Trash2, Edit, Landmark } from 'lucide-react';
 import { Liability } from '../../types';
 import { MaterialLiabilityForm } from '../../container/forms/MaterialLiabilityForm';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,8 @@ import { Modal } from '../../ui/common/Modal';
 import { SummaryCard } from '../../ui/common/SummaryCard';
 import formatService from '../../service/formatService';
 import { useDeviceCheck } from '../../service/helper/useDeviceCheck';
+import FloatingBtn, { ButtonAlignment } from '../../ui/layout/floatingBtn';
+import { Add } from '@mui/icons-material';
 
 interface LiabilitiesViewProps {
   liabilities: Liability[];
@@ -24,6 +26,7 @@ interface LiabilitiesViewProps {
   onDeleteLiability: (id: string) => void;
   onSetIsAddingLiability: (isAdding: boolean) => void;
   onSetEditingLiability: (liability: Liability | null) => void;
+  onShowAnalytics: () => void;
 }
 
 const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
@@ -37,7 +40,8 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
   onUpdateLiability,
   onDeleteLiability,
   onSetIsAddingLiability,
-  onSetEditingLiability
+  onSetEditingLiability,
+  onShowAnalytics
 }) => {
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
@@ -51,10 +55,6 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">{t('liabilities.title')}</h1>
-        <Button onClick={() => onSetIsAddingLiability(true)}>
-          <Plus size={16} className="mr-2" />
-          {isDesktop && t('liabilities.addLiability')}
-        </Button>
       </div>
 
       {/* Summary Card */}
@@ -66,11 +66,12 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
         secondaryValue={formatService.formatCurrency(totalMonthlyPayment)}
         secondaryValueDescription={t('liabilities.monthlyPayments')}
         icon={Landmark}
-        gradientFrom="from-blue-600"
-        gradientTo="to-indigo-500"
-        darkGradientFrom="from-blue-700"
-        darkGradientTo="to-indigo-600"
-        accentColor="blue-100/80"
+        gradientFrom="from-red-500"
+        gradientTo="to-orange-400"
+        darkGradientFrom="from-red-600"
+        darkGradientTo="to-orange-500"
+        accentColor="red-100/80"
+        onClick={onShowAnalytics}
       />
 
       {/* Liabilities List */}
@@ -150,6 +151,17 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
           onSubmit={editingLiability ? onUpdateLiability : onAddLiability}
         />
       </Modal>
+
+      {/* FloatingBtn nur anzeigen wenn kein Modal geöffnet ist */}
+      {!isAddingLiability && !editingLiability && (
+        <FloatingBtn
+          alignment={ButtonAlignment.RIGHT}
+          icon={Add}
+          onClick={() => onSetIsAddingLiability(true)}
+          backgroundColor="#EF4444"
+          hoverBackgroundColor="#DC2626"
+        />
+      )}
     </div>
   );
 };

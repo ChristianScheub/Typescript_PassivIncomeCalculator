@@ -16,6 +16,7 @@ interface SummaryCardProps {
   darkGradientTo: string;
   accentColor: string; // For text colors like "red-100/80"
   className?: string;
+  onClick?: () => void;
 }
 
 export const SummaryCard: React.FC<SummaryCardProps> = ({
@@ -31,10 +32,13 @@ export const SummaryCard: React.FC<SummaryCardProps> = ({
   darkGradientFrom,
   darkGradientTo,
   accentColor,
-  className = ""
+  className = "",
+  onClick
 }) => {
+  const cardClassName = `bg-gradient-to-br ${gradientFrom} ${gradientTo} dark:${darkGradientFrom} dark:${darkGradientTo} rounded-[2rem] overflow-hidden ${className} ${onClick ? 'cursor-pointer hover:shadow-lg transition-shadow duration-200' : ''}`;
+  
   return (
-    <Card className={`bg-gradient-to-br ${gradientFrom} ${gradientTo} dark:${darkGradientFrom} dark:${darkGradientTo} rounded-[2rem] overflow-hidden ${className}`}>
+    <Card className={cardClassName} onClick={onClick}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="space-y-1">

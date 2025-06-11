@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { AssetCategory, AssetCategoryOption } from "../../types";
-import { Plus, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { Add } from "@mui/icons-material";
 import { Modal } from "../../ui/common/Modal";
 import FloatingBtn, { ButtonAlignment } from "../../ui/layout/floatingBtn";

@@ -2,6 +2,7 @@ import { AssetDefinition } from '../../types';
 import Logger from '../Logger/logger';
 import { createStockAPIService } from '../stockAPIService';
 import { isApiKeyConfigured } from '../stockAPIService/utils/fetch';
+import { updateAssetDefinitionPrice, cleanupOldPriceHistory } from '../../utils/priceHistoryUtils';
 
 /**
  * Helper class to update stock prices in batch
@@ -19,15 +20,19 @@ export class StockPriceUpdater {
     }
 
     const stockDefinitionsToUpdate = definitions
-      .filter(definition => definition.type === 'stock' && definition.ticker)
+      .filter(definition => 
+        definition.type === 'stock' && 
+        definition.ticker && 
+        definition.autoUpdatePrice === true  // Only update if auto-update is enabled
+      )
       .slice(0, 30);
 
     if (stockDefinitionsToUpdate.length === 0) {
-      Logger.info('No stock definitions to update');
+      Logger.info('No stock definitions with auto-update enabled to update');
       return [];
     }
 
-    Logger.info(`Updating prices for ${stockDefinitionsToUpdate.length} stock definitions`);
+    Logger.info(`Updating prices for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`);
     const stockAPI = createStockAPIService();
     const updatedDefinitions: AssetDefinition[] = [];
 
@@ -50,15 +55,19 @@ export class StockPriceUpdater {
     const quote = await stockAPI.getQuote(definition.ticker!);
     if (!quote?.price) return null;
 
-    const updatedDefinition = {
-      ...definition,
-      currentPrice: quote.price,
-      lastPriceUpdate: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+    const newPrice = quote.price;
+    
+    // Use utility function to update price and manage history
+    const updatedDefinition = updateAssetDefinitionPrice(definition, newPrice, 'api');
+    
+    // Clean up old price history to prevent unlimited growth
+    const finalDefinition = {
+      ...updatedDefinition,
+      priceHistory: cleanupOldPriceHistory(updatedDefinition.priceHistory)
     };
     
-    Logger.info(`Updated price for ${definition.ticker} (${definition.fullName}): ${quote.price}`);
-    Logger.info(`Price will be applied to all transactions using this definition`);
-    return updatedDefinition;
+    Logger.info(`Updated price for ${definition.ticker} (${definition.fullName}): ${newPrice}`);
+    Logger.info(`Price history entries: ${finalDefinition.priceHistory?.length || 0}`);
+    return finalDefinition;
   }
 }

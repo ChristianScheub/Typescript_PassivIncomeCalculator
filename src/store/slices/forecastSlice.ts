@@ -7,6 +7,50 @@ import { hydrateStore } from '../actions/hydrateAction';
 import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
 import { calculateDividendForMonth } from '../../service/calculatorService/methods/calculatePayment';
 
+// Helper functions to calculate income for different asset types
+const calculateStockDividendIncome = (position: PortfolioPosition, month: number): number => {
+  const { assetDefinition, totalQuantity, name } = position;
+  
+  if (!assetDefinition?.dividendInfo?.frequency || assetDefinition.dividendInfo.frequency === 'none') {
+    return 0;
+  }
+  
+  if (totalQuantity <= 0) return 0;
+  
+  try {
+    const dividendForMonth = calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
+    return isFinite(dividendForMonth) ? dividendForMonth : 0;
+  } catch (error) {
+    Logger.cache(`Error calculating dividend for ${name}: ${error}`);
+    return 0;
+  }
+};
+
+const calculateBondInterestIncome = (position: PortfolioPosition): number => {
+  const { assetDefinition, currentValue } = position;
+  
+  if (assetDefinition?.bondInfo?.interestRate === undefined) {
+    return 0;
+  }
+  
+  const interestRate = assetDefinition.bondInfo.interestRate;
+  const annualInterest = (interestRate * currentValue) / 100;
+  const monthlyInterest = annualInterest / 12;
+  
+  return isFinite(monthlyInterest) ? monthlyInterest : 0;
+};
+
+const calculateRealEstateIncome = (position: PortfolioPosition): number => {
+  const { assetDefinition } = position;
+  
+  if (assetDefinition?.rentalInfo?.baseRent === undefined) {
+    return 0;
+  }
+  
+  const monthlyRent = assetDefinition.rentalInfo.baseRent;
+  return isFinite(monthlyRent) ? monthlyRent : 0;
+};
+
 // Helper function to calculate monthly income from portfolio positions for a specific month
 const calculatePortfolioMonthlyIncome = (positions: PortfolioPosition[], month: number): number => {
   let totalIncome = 0;
@@ -14,34 +58,17 @@ const calculatePortfolioMonthlyIncome = (positions: PortfolioPosition[], month: 
   positions.forEach(position => {
     if (!position.assetDefinition) return;
     
-    const assetDefinition = position.assetDefinition;
-    const totalQuantity = position.totalQuantity;
-    
-    // Stock dividends
-    if (position.type === 'stock' && assetDefinition.dividendInfo?.frequency && assetDefinition.dividendInfo.frequency !== 'none') {
-      if (totalQuantity <= 0) return;
-      
-      try {
-        const dividendForMonth = calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
-        totalIncome += isFinite(dividendForMonth) ? dividendForMonth : 0;
-      } catch (error) {
-        Logger.cache(`Error calculating dividend for ${position.name}: ${error}`);
-      }
-    }
-
-    // Bond/Cash interest
-    if ((position.type === 'bond' || position.type === 'cash') && assetDefinition.bondInfo?.interestRate !== undefined) {
-      const interestRate = assetDefinition.bondInfo.interestRate;
-      const currentValue = position.currentValue;
-      const annualInterest = (interestRate * currentValue) / 100;
-      const monthlyInterest = annualInterest / 12;
-      totalIncome += isFinite(monthlyInterest) ? monthlyInterest : 0;
-    }
-
-    // Real estate rental
-    if (position.type === 'real_estate' && assetDefinition.rentalInfo?.baseRent !== undefined) {
-      const monthlyRent = assetDefinition.rentalInfo.baseRent;
-      totalIncome += isFinite(monthlyRent) ? monthlyRent : 0;
+    switch (position.type) {
+      case 'stock':
+        totalIncome += calculateStockDividendIncome(position, month);
+        break;
+      case 'bond':
+      case 'cash':
+        totalIncome += calculateBondInterestIncome(position);
+        break;
+      case 'real_estate':
+        totalIncome += calculateRealEstateIncome(position);
+        break;
     }
   });
   

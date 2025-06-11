@@ -7,6 +7,7 @@ import Logger from '../service/Logger/logger';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import LiabilitiesView from '../view/liabilities/LiabilitiesView';
+import LiabilityAnalyticsContainer from './LiabilityAnalyticsContainer';
 import { sortLiabilitiesByPayment, SortOrder } from '../utils/sortingUtils';
 
 const LiabilitiesContainer: React.FC = () => {
@@ -15,6 +16,7 @@ const LiabilitiesContainer: React.FC = () => {
   const { items: liabilities, status } = useAppSelector(state => state.liabilities);
   const [isAddingLiability, setIsAddingLiability] = useState(false);
   const [editingLiability, setEditingLiability] = useState<Liability | null>(null);
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -67,6 +69,24 @@ const LiabilitiesContainer: React.FC = () => {
     }
   };
 
+  const handleShowAnalytics = () => {
+    Logger.info('Navigating to liability analytics');
+    analytics.trackEvent('liability_analytics_view');
+    setShowAnalytics(true);
+  };
+
+  const handleBackFromAnalytics = () => {
+    Logger.info('Returning from liability analytics to main view');
+    setShowAnalytics(false);
+  };
+
+  // Show analytics view if requested
+  if (showAnalytics) {
+    return (
+      <LiabilityAnalyticsContainer onBack={handleBackFromAnalytics} />
+    );
+  }
+
   return (
     <LiabilitiesView
       liabilities={sortedLiabilities}
@@ -80,6 +100,7 @@ const LiabilitiesContainer: React.FC = () => {
       onDeleteLiability={handleDeleteLiability}
       onSetIsAddingLiability={setIsAddingLiability}
       onSetEditingLiability={setEditingLiability}
+      onShowAnalytics={handleShowAnalytics}
     />
   );
 };

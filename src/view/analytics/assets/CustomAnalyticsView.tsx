@@ -8,9 +8,10 @@ import {
   updateChart, 
   removeChart, 
   openConfigPanel, 
-  closeConfigPanel 
+  closeConfigPanel,
+  ChartType, CustomAnalyticsConfig, DataSource, GroupBy
 } from '../../../store/slices/customAnalyticsSlice';
-import { ChartType, CustomAnalyticsConfig, DataSource, GroupBy } from '../../../store/slices/customAnalyticsSlice';
+import { PortfolioPosition } from '../../../service/portfolioService/portfolioCalculations';
 import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
 import { Plus, Trash2, Edit3, X } from 'lucide-react';
 
@@ -169,7 +170,7 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({
 };
 
 interface CustomAnalyticsViewProps {
-  filteredPositions?: any[]; // Optional: wenn bereitgestellt, werden diese anstelle der Portfolio-Cache-Positions verwendet
+  filteredPositions?: PortfolioPosition[]; // Updated type
 }
 
 const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPositions }) => {
@@ -221,7 +222,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
     return calculatorService.calculateIncomeAnalytics(positions);
   }, [filteredPositions, portfolioCache?.positions]);
 
-  const editingChart = editingChartId ? charts.find(chart => chart.id === editingChartId) || null : null;
+  const editingChart = editingChartId ? charts.find((chart: CustomAnalyticsConfig) => chart.id === editingChartId) || null : null;
 
   const handleAddChart = () => {
     dispatch(openConfigPanel(null));
@@ -266,125 +267,110 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
     dispatch(closeConfigPanel());
   };
 
+  // Helper function to get positions data
+  const getPositionsData = () => {
+    return filteredPositions && filteredPositions.length > 0 
+      ? filteredPositions 
+      : portfolioCache?.positions || [];
+  };
+
+  // Helper function to map asset type data with translation
+  const mapAssetTypeData = (items: any[]) => {
+    return items.map(item => ({
+      name: t(`assets.types.${item.name}`),
+      value: item.value,
+      percentage: item.percentage
+    }));
+  };
+
+  // Helper function to map generic data
+  const mapGenericData = (items: any[]) => {
+    return items.map(item => ({
+      name: item.name,
+      value: item.value,
+      percentage: item.percentage
+    }));
+  };
+
+  // Helper function to get asset definition data (value-based)
+  const getAssetDefinitionValueData = () => {
+    const positions = getPositionsData();
+    if (positions.length === 0) return [];
+    
+    const totalValue = positions.reduce((sum: number, pos: PortfolioPosition) => sum + pos.currentValue, 0);
+    return positions.map((position: PortfolioPosition) => ({
+      name: position.name,
+      value: position.currentValue,
+      percentage: totalValue > 0 ? (position.currentValue / totalValue) * 100 : 0
+    }));
+  };
+
+  // Helper function to get asset definition data (income-based)
+  const getAssetDefinitionIncomeData = () => {
+    const positions = getPositionsData();
+    if (positions.length === 0) return [];
+    
+    const totalIncome = positions.reduce((sum: number, pos: PortfolioPosition) => sum + pos.monthlyIncome, 0);
+    return positions
+      .filter((position: PortfolioPosition) => position.monthlyIncome > 0)
+      .map((position: PortfolioPosition) => ({
+        name: position.name,
+        value: position.monthlyIncome,
+        percentage: totalIncome > 0 ? (position.monthlyIncome / totalIncome) * 100 : 0
+      }));
+  };
+
   const getChartData = (chart: CustomAnalyticsConfig) => {
     switch (chart.dataSource) {
-      case 'assetValue':
-        // Get asset allocation data based on groupBy option
+      case 'assetValue': {
         switch (chart.groupBy) {
           case 'assetType':
-            return portfolioAnalytics.assetAllocation.map(item => ({
-              name: t(`assets.types.${item.name}`),
-              value: item.value,
-              percentage: item.percentage
-            }));
+            return mapAssetTypeData(portfolioAnalytics.assetAllocation);
           case 'sector':
-            return portfolioAnalytics.sectorAllocation.map(item => ({
-              name: item.name,
-              value: item.value,
-              percentage: item.percentage
-            }));
+            return mapGenericData(portfolioAnalytics.sectorAllocation);
           case 'country':
-            return portfolioAnalytics.countryAllocation.map(item => ({
-              name: item.name,
-              value: item.value,
-              percentage: item.percentage
-            }));
+            return mapGenericData(portfolioAnalytics.countryAllocation);
           case 'category':
-            return portfolioAnalytics.categoryAllocation.map(item => ({
-              name: item.name,
-              value: item.value,
-              percentage: item.percentage
-            }));
+            return mapGenericData(portfolioAnalytics.categoryAllocation);
           case 'assetDefinition':
-            // Group by individual asset definitions (portfolio positions)
-            const positions = filteredPositions && filteredPositions.length > 0 
-              ? filteredPositions 
-              : portfolioCache?.positions || [];
-              
-            if (positions.length > 0) {
-              const totalValue = positions.reduce((sum, pos) => sum + pos.currentValue, 0);
-              return positions.map(position => ({
-                name: position.name,
-                value: position.currentValue,
-                percentage: totalValue > 0 ? (position.currentValue / totalValue) * 100 : 0
-              }));
-            }
-            return [];
+            return getAssetDefinitionValueData();
           default:
-            // Fallback to dashboard asset allocation if portfolio analytics not available
-            return assetAllocation.map(item => ({
+            return assetAllocation.map((item: any) => ({
               name: t(`assets.types.${item.name}`),
               value: item.value,
               percentage: item.percentage
             }));
         }
+      }
       
-      case 'income':
-        // Get asset income allocation data based on groupBy option
+      case 'income': {
         switch (chart.groupBy) {
           case 'assetType':
-            return incomeAnalytics.assetTypeIncome.map(item => ({
-              name: t(`assets.types.${item.name}`),
-              value: item.value,
-              percentage: item.percentage
-            }));
+            return mapAssetTypeData(incomeAnalytics.assetTypeIncome);
           case 'sector':
-            return incomeAnalytics.sectorIncome.map(item => ({
-              name: item.name,
-              value: item.value,
-              percentage: item.percentage
-            }));
+            return mapGenericData(incomeAnalytics.sectorIncome);
           case 'country':
-            return incomeAnalytics.countryIncome.map(item => ({
-              name: item.name,
-              value: item.value,
-              percentage: item.percentage
-            }));
+            return mapGenericData(incomeAnalytics.countryIncome);
           case 'category':
-            return incomeAnalytics.categoryIncome.map(item => ({
-              name: item.name,
-              value: item.value,
-              percentage: item.percentage
-            }));
+            return mapGenericData(incomeAnalytics.categoryIncome);
           case 'assetDefinition':
-            // Group by individual asset definitions - show income per position
-            const positions = filteredPositions && filteredPositions.length > 0 
-              ? filteredPositions 
-              : portfolioCache?.positions || [];
-              
-            if (positions.length > 0) {
-              const totalIncome = positions.reduce((sum, pos) => sum + pos.monthlyIncome, 0);
-              return positions
-                .filter(position => position.monthlyIncome > 0) // Only show positions with income
-                .map(position => ({
-                  name: position.name,
-                  value: position.monthlyIncome,
-                  percentage: totalIncome > 0 ? (position.monthlyIncome / totalIncome) * 100 : 0
-                }));
-            }
-            return [];
+            return getAssetDefinitionIncomeData();
           default:
-            return incomeAnalytics.assetTypeIncome.map(item => ({
-              name: t(`assets.types.${item.name}`),
-              value: item.value,
-              percentage: item.percentage
-            }));
+            return mapAssetTypeData(incomeAnalytics.assetTypeIncome);
         }
+      }
       
-      case 'growth':
-        // Get asset performance data from portfolio
-        const positions = filteredPositions && filteredPositions.length > 0 
-          ? filteredPositions 
-          : portfolioCache?.positions || [];
-          
+      case 'growth': {
+        const positions = getPositionsData();
         if (positions.length > 0) {
-          return positions.map(position => ({
+          return positions.map((position: PortfolioPosition) => ({
             name: position.name,
             value: position.totalReturn,
             percentage: position.totalReturnPercentage
-          })).filter(item => item.value !== 0);
+          })).filter((item: any) => item.value !== 0);
         }
         return [];
+      }
       
       default:
         return [];
@@ -463,7 +449,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {charts.map((chart) => (
+            {charts.map((chart: CustomAnalyticsConfig) => (
               <div
                 key={chart.id}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 relative group"

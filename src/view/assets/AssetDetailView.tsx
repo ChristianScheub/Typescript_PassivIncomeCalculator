@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { X, TrendingUp, Calendar, DollarSign, Package, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
 import formatService from '../../service/formatService';
+import { PriceHistoryView } from '../../ui/components/PriceHistoryView';
+import { PriceChart } from '../../ui/components/PriceChart';
 
 interface AssetDetailViewProps {
   asset: PortfolioPosition;
@@ -193,7 +195,24 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
             </div>
           </div>
 
+          {/* Price History */}
+          {asset.assetDefinition?.priceHistory && asset.assetDefinition.priceHistory.length > 0 && (
+            <PriceHistoryView
+              priceHistory={asset.assetDefinition.priceHistory}
+              currency={asset.assetDefinition.currency}
+              showSourceIcons={true}
+              maxEntries={10}
+            />
+          )}
 
+          {/* Price Chart */}
+          {asset.assetDefinition?.priceHistory && asset.assetDefinition.priceHistory.length > 1 && (
+            <PriceChart
+              priceHistory={asset.assetDefinition.priceHistory}
+              currency={asset.assetDefinition.currency}
+              ticker={asset.assetDefinition.ticker}
+            />
+          )}
 
           {/* Asset Information - Country, Sector, Description */}
           {asset.assetDefinition && (

@@ -2,36 +2,95 @@ import { StoreNames } from '../interfaces/ISQLiteService';
 import { dbOperations } from './dbOperations';
 import Logger from '../../Logger/logger';
 
-// Helper function to migrate legacy asset data
-const migrateLegacyAssetData = (asset: any) => {
-  // Create a copy to avoid modifying the original
-  const migratedAsset = { ...asset };
+interface ImportDataFlags {
+  isV2Format: boolean;
+  hasAssetDefinitions: boolean;
+  hasAssetCategories: boolean;
+  hasAssetCategoryOptions: boolean;
+  hasAssetCategoryAssignments: boolean;
+  hasExchangeRates: boolean;
+}
+
+// Helper function to determine import data flags
+const getImportDataFlags = (data: any): ImportDataFlags => ({
+  isV2Format: data.version?.startsWith('2.') ?? false,
+  hasAssetDefinitions: Array.isArray(data.assetDefinitions),
+  hasAssetCategories: Array.isArray(data.assetCategories),
+  hasAssetCategoryOptions: Array.isArray(data.assetCategoryOptions),
+  hasAssetCategoryAssignments: Array.isArray(data.assetCategoryAssignments),
+  hasExchangeRates: Array.isArray(data.exchangeRates)
+});
+
+// Helper function to create validation log message
+const createValidationLogMessage = (data: any, flags: ImportDataFlags): string => {
+  const baseCounts = [
+    `Assets: ${data.assets.length}`,
+    `Liabilities: ${data.liabilities.length}`,
+    `Expenses: ${data.expenses.length}`,
+    `Income: ${data.income.length}`
+  ];
+
+  const optionalCounts = [
+    flags.hasAssetDefinitions && `Asset Definitions: ${data.assetDefinitions.length}`,
+    flags.hasAssetCategories && `Asset Categories: ${data.assetCategories.length}`,
+    flags.hasAssetCategoryOptions && `Category Options: ${data.assetCategoryOptions.length}`,
+    flags.hasAssetCategoryAssignments && `Category Assignments: ${data.assetCategoryAssignments.length}`,
+    flags.hasExchangeRates && `Exchange Rates: ${data.exchangeRates.length}`
+  ].filter(Boolean);
+
+  return `Data validation passed - ${[...baseCounts, ...optionalCounts].join(', ')}`;
+};
+
+// Helper function to import core data stores
+const importCoreDataStores = async (data: any): Promise<void> => {
+  const coreStores: StoreNames[] = ['assets', 'liabilities', 'expenses', 'income'];
   
-  // Check for legacy fields in the imported data (these may exist in old backup files)
-  const hasLegacyDividendInfo = 'dividendInfo' in asset && asset.dividendInfo;
-  const hasLegacyRentalIncome = 'rentalIncome' in asset && asset.rentalIncome;
-  const hasLegacyInterestRate = 'interestRate' in asset && asset.interestRate !== undefined;
-  
-  // Log if we're migrating legacy dividend/rental/interest data
-  if (hasLegacyDividendInfo || hasLegacyRentalIncome || hasLegacyInterestRate) {
-    Logger.infoService(
-      `Migrating legacy data for asset ${asset.name}: ` +
-      `hasDividend=${hasLegacyDividendInfo}, hasRental=${hasLegacyRentalIncome}, hasInterest=${hasLegacyInterestRate}`
-    );
+  for (const storeName of coreStores) {
+    Logger.infoService(`Importing ${data[storeName].length} ${storeName}`);
     
-    // Log deprecation warnings for legacy fields found in import data
-    if (hasLegacyDividendInfo) {
-      Logger.infoService(`Asset ${asset.name} contains legacy dividendInfo in import data - should be migrated to assetDefinition`);
+    for (const item of data[storeName]) {
+      await dbOperations.update(storeName, item);
     }
-    if (hasLegacyRentalIncome) {
-      Logger.infoService(`Asset ${asset.name} contains legacy rentalIncome in import data - should be migrated to assetDefinition`);
-    }
-    if (hasLegacyInterestRate) {
-      Logger.infoService(`Asset ${asset.name} contains legacy interestRate in import data - should be migrated to assetDefinition`);
-    }
+    
+    Logger.infoService(`${storeName} import completed successfully`);
   }
+};
+
+// Helper function to import optional data store
+const importOptionalDataStore = async (
+  data: any,
+  storeName: StoreNames,
+  hasData: boolean,
+  displayName: string
+): Promise<void> => {
+  if (hasData) {
+    Logger.infoService(`Importing ${data[storeName].length} ${displayName}`);
+    
+    for (const item of data[storeName]) {
+      await dbOperations.update(storeName, item);
+    }
+    
+    Logger.infoService(`${displayName} import completed successfully`);
+  } else {
+    Logger.infoService(`No ${displayName} found in backup (legacy format)`);
+  }
+};
+
+// Helper function to create export log message
+const createExportLogMessage = (data: any): string => {
+  const counts = [
+    `${data.assets.length} assets`,
+    `${data.assetDefinitions.length} asset definitions`,
+    `${data.assetCategories.length} asset categories`,
+    `${data.assetCategoryOptions.length} category options`,
+    `${data.assetCategoryAssignments.length} category assignments`,
+    `${data.liabilities.length} liabilities`,
+    `${data.expenses.length} expenses`,
+    `${data.income.length} income`,
+    `${data.exchangeRates.length} exchange rates`
+  ];
   
-  return migratedAsset;
+  return `Exporting complete backup: ${counts.join(', ')}`;
 };
 
 export const importExportOperations = {
@@ -61,7 +120,7 @@ export const importExportOperations = {
       version: '2.1.0', // Increment version for asset categories support
     };
 
-    Logger.infoService(`Exporting complete backup: ${assets.length} assets, ${assetDefinitions.length} asset definitions, ${assetCategories.length} asset categories, ${assetCategoryOptions.length} category options, ${assetCategoryAssignments.length} category assignments, ${liabilities.length} liabilities, ${expenses.length} expenses, ${income.length} income, ${exchangeRates.length} exchange rates`);
+    Logger.infoService(createExportLogMessage(data));
     return JSON.stringify(data, null, 2);
   },
 
@@ -98,80 +157,20 @@ export const importExportOperations = {
       
       this.validateData(data);
       
-      // Determine import version and available data
-      const isV2Format = data.version && data.version.startsWith('2.');
-      const hasAssetDefinitions = Array.isArray(data.assetDefinitions);
-      const hasAssetCategories = Array.isArray(data.assetCategories);
-      const hasAssetCategoryOptions = Array.isArray(data.assetCategoryOptions);
-      const hasAssetCategoryAssignments = Array.isArray(data.assetCategoryAssignments);
-      const hasExchangeRates = Array.isArray(data.exchangeRates);
+      const flags = getImportDataFlags(data);
       
-      Logger.infoService(`Import format: ${isV2Format ? 'v2.x (complete)' : 'v1.x (legacy)'}`);
-      Logger.infoService(`Data validation passed - Assets: ${data.assets.length}, Liabilities: ${data.liabilities.length}, Expenses: ${data.expenses.length}, Income: ${data.income.length}${hasAssetDefinitions ? `, Asset Definitions: ${data.assetDefinitions.length}` : ''}${hasAssetCategories ? `, Asset Categories: ${data.assetCategories.length}` : ''}${hasAssetCategoryOptions ? `, Category Options: ${data.assetCategoryOptions.length}` : ''}${hasAssetCategoryAssignments ? `, Category Assignments: ${data.assetCategoryAssignments.length}` : ''}${hasExchangeRates ? `, Exchange Rates: ${data.exchangeRates.length}` : ''}`);
+      Logger.infoService(`Import format: ${flags.isV2Format ? 'v2.x (complete)' : 'v1.x (legacy)'}`);
+      Logger.infoService(createValidationLogMessage(data, flags));
 
-      // Import core data stores (required)
-      const coreStores: StoreNames[] = ['assets', 'liabilities', 'expenses', 'income'];
-      for (const storeName of coreStores) {
-        Logger.infoService(`Importing ${data[storeName].length} ${storeName}`);
-        for (const item of data[storeName]) {
-          // Apply migration for assets to handle legacy dividend data
-          const processedItem = storeName === 'assets' ? migrateLegacyAssetData(item) : item;
-          await dbOperations.update(storeName, processedItem);
-        }
-        Logger.infoService(`${storeName} import completed successfully`);
-      }
+      // Import core data stores
+      await importCoreDataStores(data);
 
-      // Import additional data stores if available
-      if (hasAssetDefinitions) {
-        Logger.infoService(`Importing ${data.assetDefinitions.length} asset definitions`);
-        for (const item of data.assetDefinitions) {
-          await dbOperations.update('assetDefinitions', item);
-        }
-        Logger.infoService('Asset definitions import completed successfully');
-      } else {
-        Logger.infoService('No asset definitions found in backup (legacy format)');
-      }
-
-      // Import asset categories data (v2.1+)
-      if (hasAssetCategories) {
-        Logger.infoService(`Importing ${data.assetCategories.length} asset categories`);
-        for (const item of data.assetCategories) {
-          await dbOperations.update('assetCategories', item);
-        }
-        Logger.infoService('Asset categories import completed successfully');
-      } else {
-        Logger.infoService('No asset categories found in backup (legacy format)');
-      }
-
-      if (hasAssetCategoryOptions) {
-        Logger.infoService(`Importing ${data.assetCategoryOptions.length} asset category options`);
-        for (const item of data.assetCategoryOptions) {
-          await dbOperations.update('assetCategoryOptions', item);
-        }
-        Logger.infoService('Asset category options import completed successfully');
-      } else {
-        Logger.infoService('No asset category options found in backup (legacy format)');
-      }
-
-      if (hasAssetCategoryAssignments) {
-        Logger.infoService(`Importing ${data.assetCategoryAssignments.length} asset category assignments`);
-        for (const item of data.assetCategoryAssignments) {
-          await dbOperations.update('assetCategoryAssignments', item);
-        }
-        Logger.infoService('Asset category assignments import completed successfully');
-      } else {
-        Logger.infoService('No asset category assignments found in backup (legacy format)');
-      }
-
-      if (hasExchangeRates) {
-        Logger.infoService(`Importing ${data.exchangeRates.length} exchange rates`);
-        for (const item of data.exchangeRates) {
-          await dbOperations.update('exchangeRates', item);
-        }
-        Logger.infoService('Exchange rates import completed successfully');
-      } else {
-        Logger.infoService('No exchange rates found in backup (legacy format)');
-      }
+      // Import optional data stores
+      await importOptionalDataStore(data, 'assetDefinitions', flags.hasAssetDefinitions, 'asset definitions');
+      await importOptionalDataStore(data, 'assetCategories', flags.hasAssetCategories, 'asset categories');
+      await importOptionalDataStore(data, 'assetCategoryOptions', flags.hasAssetCategoryOptions, 'asset category options');
+      await importOptionalDataStore(data, 'assetCategoryAssignments', flags.hasAssetCategoryAssignments, 'asset category assignments');
+      await importOptionalDataStore(data, 'exchangeRates', flags.hasExchangeRates, 'exchange rates');
 
       Logger.infoService('Data import completed successfully');
     } catch (error) {

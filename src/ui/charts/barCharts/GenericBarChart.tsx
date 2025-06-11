@@ -1,28 +1,25 @@
-import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useTranslation } from 'react-i18next';
 
-interface GenericBarChartProps {
+interface GenericBarChartProps<T extends Record<string, any> = { name: string; value: number; percentage?: number }> {
   title: string;
-  data: Array<{ name: string; value: number; percentage?: number }>;
-  nameKey: string;
-  valueKey: string;
+  data: T[];
+  nameKey: Extract<keyof T, string>;
+  valueKey: Extract<keyof T, string>;
   translationKey?: string;
   emptyStateMessage?: string;
-  showValues?: boolean;
   orientation?: 'horizontal' | 'vertical';
 }
 
-const GenericBarChart: React.FC<GenericBarChartProps> = ({
+const GenericBarChart = <T extends Record<string, any> = { name: string; value: number; percentage?: number }>({
   title,
   data,
   nameKey,
   valueKey,
   translationKey,
   emptyStateMessage = 'No data available',
-  showValues = true,
   orientation = 'vertical'
-}) => {
+}: GenericBarChartProps<T>) => {
   const { t } = useTranslation();
 
   // Color palette for bars
@@ -48,19 +45,15 @@ const GenericBarChart: React.FC<GenericBarChartProps> = ({
     return value.toFixed(0);
   };
 
-  const formatTooltip = (value: number, name: string) => {
-    return [`${formatValue(value)} €`, name];
-  };
-
-  const getTranslatedName = (name: string) => {
+  const getTranslatedName = (name: string | number) => {
     if (translationKey) {
       try {
-        return t(`${translationKey}.${name}`, name);
+        return t(`${translationKey}.${name}`, String(name));
       } catch {
-        return name;
+        return String(name);
       }
     }
-    return name;
+    return String(name);
   };
 
   if (!data || data.length === 0) {
@@ -83,7 +76,7 @@ const GenericBarChart: React.FC<GenericBarChartProps> = ({
     color: colors[index % colors.length]
   }));
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (

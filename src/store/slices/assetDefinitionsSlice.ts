@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AssetDefinition } from '../../types';
 import Logger from '../../service/Logger/logger';
 import sqliteService from '../../service/sqlLiteService';
-import { invalidatePortfolioCache } from './assetsSlice';
 
 interface AssetDefinitionsState {
   items: AssetDefinition[];

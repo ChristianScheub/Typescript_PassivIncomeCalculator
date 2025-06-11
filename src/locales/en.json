@@ -58,7 +58,9 @@
     "loading": "Loading...",
     "deleteConfirm": "Are you sure you want to delete this item?",
     "customAmounts": "Custom Amounts",
-    "totalAnnualAmount": "Total Annual Amount"
+    "totalAnnualAmount": "Total Annual Amount",
+    "expand": "Expand",
+    "collapse": "Collapse"
   },
   "customAnalytics": {
     "title": "Custom Analytics",
@@ -88,6 +90,91 @@
       "sector": "Sector",
       "country": "Country",
       "categoryOptions": "Category Options"
+    }
+  },
+  "analytics": {
+    "portfolioAnalytics": "Portfolio Analytics",
+    "assetDistribution": "Assets",
+    "incomeDistribution": "Income",
+    "custom": "More",
+    "assetTypeDistribution": "Asset Type Distribution",
+    "sectorDistribution": "Sector Distribution",
+    "countryDistribution": "Country Distribution",
+    "assetTypeIncomeDistribution": "Asset Type Income Distribution",
+    "sectorIncomeDistribution": "Sector Income Distribution",
+    "countryIncomeDistribution": "Country Income Distribution",
+    "noAssetData": "No asset data available",
+    "noSectorData": "No sector data available",
+    "noCountryData": "No country data available",
+    "expenses": {
+      "title": "Expense Analytics",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "monthlyByCategories": "Monthly Expenses by Categories",
+      "monthlyIndividual": "Monthly Individual Expenses",
+      "annualByCategories": "Annual Expenses by Categories",
+      "annualIndividual": "Annual Individual Expenses",
+      "noCategoryData": "No category data available",
+      "noIndividualData": "No individual expense data available"
+    },
+    "income": {
+      "title": "Income Analytics",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "monthlyByCategories": "Monthly Income by Categories",
+      "monthlyIndividual": "Monthly Individual Income",
+      "annualByCategories": "Annual Income by Categories",
+      "annualIndividual": "Annual Individual Income",
+      "noCategoryData": "No category data available",
+      "noIndividualData": "No individual income data available"
+    },
+    "liabilities": {
+      "title": "Liability Analytics",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "more": "More",
+      "monthlyByCategories": "Monthly Payments by Categories",
+      "monthlyIndividual": "Monthly Individual Payments",
+      "annualByCategories": "Annual Payments by Categories",
+      "annualIndividual": "Annual Individual Payments",
+      "paymentSchedule": "Payment Schedule",
+      "monthlyPayments": "Monthly Payments",
+      "debtBalanceByType": "Debt Balance by Type",
+      "annualInterestByType": "Annual Interest by Type",
+      "interestRateComparison": "Interest Rate Comparison",
+      "interestRate": "Interest Rate",
+      "debtProjection": "Debt Projection (5 Years)",
+      "debtProjection5Years": "Debt Projection (5 Years)",
+      "debtProjection10Years": "Debt Projection (10 Years)",
+      "debtProjection30Years": "Debt Projection (30 Years)",
+      "noCategoryData": "No category data available",
+      "noIndividualData": "No individual payment data available",
+      "noPaymentData": "No payment schedule data available",
+      "noInterestData": "No interest data available",
+      "noInterestRateData": "No interest rate data available",
+      "noProjectionData": "No projection data available"
+    }
+  },
+  "assets": {
+    "title": "Assets", 
+    "currentPrice": "Current Price",
+    "autoUpdatePrice": "Auto-update price via API",
+    "priceHistory": {
+      "entries": "price history entries",
+      "title": "Price History",
+      "noHistory": "No price history available",
+      "latestPrice": "Latest Price",
+      "priceChange": "Price Change",
+      "since": "since",
+      "manual": "Manual",
+      "api": "API",
+      "import": "Import"
+    },
+    "priceChart": {
+      "title": "Price Chart",
+      "min": "Min",
+      "max": "Max",
+      "latestPrice": "Latest Price"
     }
   }
 }

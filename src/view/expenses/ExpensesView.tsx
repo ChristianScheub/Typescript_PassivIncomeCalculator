@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next';
 import formatService from '../../service/formatService';
 import { useDeviceCheck } from '../../service/helper/useDeviceCheck';
 import { Modal } from '../../ui/common/Modal';
+import FloatingBtn, { ButtonAlignment } from '../../ui/layout/floatingBtn';
+import { Add } from '@mui/icons-material';
 
 interface ExpensesViewProps {
   expenses: Expense[];
@@ -22,6 +24,7 @@ interface ExpensesViewProps {
   onDeleteExpense: (id: string) => void;
   onSetIsAddingExpense: (isAdding: boolean) => void;
   onSetEditingExpense: (expense: Expense | null) => void;
+  onNavigateToAnalytics: () => void;
 }
 
 const ExpensesView: React.FC<ExpensesViewProps> = ({
@@ -35,7 +38,8 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
   onUpdateExpense,
   onDeleteExpense,
   onSetIsAddingExpense,
-  onSetEditingExpense
+  onSetEditingExpense,
+  onNavigateToAnalytics
 }) => {
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
@@ -52,10 +56,6 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-bold">{t('expenses.title')}</h1>
-        <Button onClick={() => onSetIsAddingExpense(true)}>
-          <Plus size={16} className="mr-2" />
-          {isDesktop && t('expenses.addExpense')}
-        </Button>
       </div>
 
       {/* Summary Card */}
@@ -65,11 +65,12 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
         value={formatService.formatCurrency(totalMonthlyExpenses)}
         valueDescription={t('expenses.summary')}
         icon={ReceiptText}
-        gradientFrom="from-red-600"
-        gradientTo="to-red-400"
-        darkGradientFrom="from-red-800"
-        darkGradientTo="to-red-600"
-        accentColor="red-100/80"
+        gradientFrom="from-red-700"
+        gradientTo="to-red-500"
+        darkGradientFrom="from-red-900"
+        darkGradientTo="to-red-700"
+        accentColor="red-200/80"
+        onClick={onNavigateToAnalytics}
       />
 
       {/* Expenses List */}
@@ -160,6 +161,17 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
           onSubmit={editingExpense ? onUpdateExpense : onAddExpense}
         />
       </Modal>
+
+      {/* FloatingBtn nur anzeigen wenn kein Modal geöffnet ist */}
+      {!isAddingExpense && !editingExpense && (
+        <FloatingBtn
+          alignment={ButtonAlignment.RIGHT}
+          icon={Add}
+          onClick={() => onSetIsAddingExpense(true)}
+          backgroundColor="#B91C1C"
+          hoverBackgroundColor="#991B1B"
+        />
+      )}
     </div>
   );
 };
