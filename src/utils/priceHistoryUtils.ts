@@ -77,7 +77,8 @@ export function getLatestPrice(priceHistory: PriceHistoryEntry[] = []): PriceHis
   if (priceHistory.length === 0) return null;
   
   return priceHistory.reduce((latest, current) => 
-    new Date(current.date).getTime() > new Date(latest.date).getTime() ? current : latest
+    new Date(current.date).getTime() > new Date(latest.date).getTime() ? current : latest,
+    priceHistory[0]
   );
 }
 
@@ -138,7 +139,7 @@ export function getClosestPriceToDate(
     const closestDiff = Math.abs(new Date(closest.date).getTime() - target);
     
     return currentDiff < closestDiff ? current : closest;
-  });
+  }, priceHistory[0]);
 }
 
 /**

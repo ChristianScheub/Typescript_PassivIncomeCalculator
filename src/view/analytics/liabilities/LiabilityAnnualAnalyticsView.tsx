@@ -91,7 +91,7 @@ const LiabilityAnnualAnalyticsView: React.FC<LiabilityAnnualAnalyticsViewProps> 
                 <YAxis 
                   stroke="#6B7280"
                   fontSize={12}
-                  tickFormatter={(value) => formatService.formatCurrency(value, true)}
+                  tickFormatter={(value) => formatService.formatCurrency(value, "EUR")}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />

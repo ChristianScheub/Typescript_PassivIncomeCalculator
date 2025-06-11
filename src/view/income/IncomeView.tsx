@@ -10,7 +10,6 @@ import { EmptyState } from '../../ui/feedback/EmptyState';
 import { Income } from '../../types';
 import { MaterialIncomeForm } from '../../container/forms/MaterialIncomeForm';
 import formatService from '../../service/formatService';
-import { useDeviceCheck } from '../../service/helper/useDeviceCheck';
 import FloatingBtn, { ButtonAlignment } from '../../ui/layout/floatingBtn';
 import { Add } from '@mui/icons-material';
 
@@ -48,7 +47,6 @@ const IncomeView: React.FC<IncomeViewProps> = ({
   onNavigateToAnalytics
 }) => {
   const { t } = useTranslation();
-  const isDesktop = useDeviceCheck();
 
   if (status === 'loading') {
     return <LoadingSpinner />;

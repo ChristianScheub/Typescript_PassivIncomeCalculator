@@ -15,7 +15,6 @@ import {
 
 interface AssetCategoryManagerViewProps {
   categories: AssetCategory[];
-  categoryOptions: AssetCategoryOption[];
   selectedCategoryId: string | null;
   isAddingCategory: boolean;
   isAddingOption: boolean;
@@ -25,8 +24,8 @@ interface AssetCategoryManagerViewProps {
     AssetCategoryOption,
     "id" | "createdAt" | "updatedAt" | "categoryId"
   >[];
-  categoryForm: any; // UseFormReturn type from react-hook-form
-  optionForm: any; // UseFormReturn type from react-hook-form
+  categoryForm: any;
+  optionForm: any; 
   onSetSelectedCategoryId: (id: string | null) => void;
   onSetIsAddingCategory: (isAdding: boolean) => void;
   onSetIsAddingOption: (isAdding: boolean) => void;
@@ -46,7 +45,6 @@ export const AssetCategoryManagerView: React.FC<
   AssetCategoryManagerViewProps
 > = ({
   categories,
-  categoryOptions,
   selectedCategoryId,
   isAddingCategory,
   isAddingOption,
@@ -72,14 +70,13 @@ export const AssetCategoryManagerView: React.FC<
   const { t } = useTranslation();
 
   return (
-    <>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Header */}
-          <ViewHeader
-            title={t("categories.title")}
-            onBack={onBack}
-          />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <ViewHeader
+          title={t("categories.title")}
+          onBack={onBack}
+        />
           
           <div className="mb-6">
             {/* Categories Section */}
@@ -286,7 +283,7 @@ export const AssetCategoryManagerView: React.FC<
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {newCategoryOptions.map((option, index) => (
                             <div
-                              key={index}
+                              key={`new-option-${option.name}-${index}`}
                               className="flex items-center justify-between bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-3"
                             >
                               <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -370,6 +367,5 @@ export const AssetCategoryManagerView: React.FC<
           </div>
         </div>
       </div>
-    </>
   );
 };

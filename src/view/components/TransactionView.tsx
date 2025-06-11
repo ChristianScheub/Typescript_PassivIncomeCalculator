@@ -23,6 +23,19 @@ export const TransactionView: React.FC<TransactionViewProps> = ({
 }) => {
   const { t } = useTranslation();
 
+  const calculateMonthlyIncomeForAsset = (asset: Asset): number => {
+    const position = portfolioData.positions.find(pos => 
+      pos.transactions.some(t => t.id === asset.id)
+    );
+    
+    if (!position || position.totalQuantity <= 0) {
+      return 0;
+    }
+    
+    const transactionQuantity = getCurrentQuantity(asset);
+    return (position.monthlyIncome * transactionQuantity) / position.totalQuantity;
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {assets.map(asset => (
@@ -55,19 +68,7 @@ export const TransactionView: React.FC<TransactionViewProps> = ({
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">{t('assets.monthlyIncome')}:</span>
                 <span className="font-medium text-green-600 dark:text-green-400">
-                  {(() => {
-                    // Find the portfolio position for this asset
-                    const position = portfolioData.positions.find(pos => 
-                      pos.transactions.some(t => t.id === asset.id)
-                    );
-                    if (position && position.totalQuantity > 0) {
-                      // Calculate proportional income based on this transaction's quantity
-                      const transactionQuantity = getCurrentQuantity(asset);
-                      const proportionalIncome = (position.monthlyIncome * transactionQuantity) / position.totalQuantity;
-                      return formatService.formatCurrency(proportionalIncome);
-                    }
-                    return formatService.formatCurrency(0);
-                  })()}
+                  {formatService.formatCurrency(calculateMonthlyIncomeForAsset(asset))}
                 </span>
               </div>
 

@@ -367,8 +367,8 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
                 {t('categories.title')}
               </h3>
               <div className="space-y-3">
-                {asset.categoryAssignments.map((assignment, index) => (
-                  <div key={index} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+                {asset.categoryAssignments.map((assignment) => (
+                  <div key={`${assignment.category.id}-${assignment.option.id}`} className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                     <div className="flex justify-between items-center">
                       <div>
                         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">

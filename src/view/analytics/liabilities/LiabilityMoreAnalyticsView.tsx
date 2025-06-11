@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area } from 'recharts';
+import { ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area } from 'recharts';
 import formatService from '../../../service/formatService';
 
 interface LiabilityMoreAnalyticsViewProps {
@@ -11,6 +11,23 @@ interface LiabilityMoreAnalyticsViewProps {
   debtProjectionData10Years: Array<{ month: string; total: number; [key: string]: any }>;
   debtProjectionData30Years: Array<{ month: string; total: number; [key: string]: any }>;
 }
+
+// Custom tooltip component moved outside of parent component
+const DebtProjectionTooltip = ({ active, payload, label }: any) => {
+  if (active && payload?.length) {
+    return (
+      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
+        <p className="font-medium text-gray-900 dark:text-gray-100 mb-2">{`${label}`}</p>
+        {payload.map((entry: any) => (
+          <p key={`${entry.dataKey}-${entry.value}`} style={{ color: entry.color }}>
+            {`${entry.dataKey === 'total' ? 'Gesamtschuld' : entry.dataKey}: ${formatService.formatCurrency(entry.value)}`}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 const LiabilityMoreAnalyticsView: React.FC<LiabilityMoreAnalyticsViewProps> = ({
   debtBalanceBreakdown,
@@ -38,23 +55,6 @@ const LiabilityMoreAnalyticsView: React.FC<LiabilityMoreAnalyticsViewProps> = ({
   // Generate colors for debt projection chart
   const colors = ['#DC2626', '#2563EB', '#16A34A', '#CA8A04', '#9333EA', '#C2410C', '#0891B2', '#BE123C'];
 
-  // Custom tooltip for debt projection chart
-  const DebtProjectionTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900 dark:text-gray-100 mb-2">{`${label}`}</p>
-          {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.color }}>
-              {`${entry.dataKey === 'total' ? 'Gesamtschuld' : entry.dataKey}: ${formatService.formatCurrency(entry.value)}`}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
-
   // Helper function to render debt projection charts
   const renderDebtProjectionChart = (data: any[], title: string, height: string = 'h-96') => (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
@@ -76,7 +76,7 @@ const LiabilityMoreAnalyticsView: React.FC<LiabilityMoreAnalyticsViewProps> = ({
               <YAxis 
                 stroke="#6B7280"
                 fontSize={12}
-                tickFormatter={(value) => formatService.formatCurrency(value, true)}
+                tickFormatter={(value) => formatService.formatCurrency(value)}
               />
               <Tooltip content={<DebtProjectionTooltip />} />
               <Legend />

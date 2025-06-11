@@ -7,7 +7,6 @@ import { Expense } from '../../types';
 import { MaterialExpenseForm } from '../../container/forms/MaterialExpenseForm';
 import { useTranslation } from 'react-i18next';
 import formatService from '../../service/formatService';
-import { useDeviceCheck } from '../../service/helper/useDeviceCheck';
 import { Modal } from '../../ui/common/Modal';
 import FloatingBtn, { ButtonAlignment } from '../../ui/layout/floatingBtn';
 import { Add } from '@mui/icons-material';
@@ -42,7 +41,6 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
   onNavigateToAnalytics
 }) => {
   const { t } = useTranslation();
-  const isDesktop = useDeviceCheck();
 
   if (status === 'loading') {
     return (

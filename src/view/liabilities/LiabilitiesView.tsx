@@ -10,7 +10,6 @@ import { EmptyState } from '../../ui/feedback/EmptyState';
 import { Modal } from '../../ui/common/Modal';
 import { SummaryCard } from '../../ui/common/SummaryCard';
 import formatService from '../../service/formatService';
-import { useDeviceCheck } from '../../service/helper/useDeviceCheck';
 import FloatingBtn, { ButtonAlignment } from '../../ui/layout/floatingBtn';
 import { Add } from '@mui/icons-material';
 
@@ -44,7 +43,6 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
   onShowAnalytics
 }) => {
   const { t } = useTranslation();
-  const isDesktop = useDeviceCheck();
 
 
   if (status === 'loading') {
