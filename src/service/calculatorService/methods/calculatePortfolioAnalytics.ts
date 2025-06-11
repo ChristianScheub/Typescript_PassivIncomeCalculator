@@ -57,12 +57,25 @@ export const calculatePortfolioAnalytics = (positions: PortfolioPosition[]): Por
     }))
     .sort((a, b) => b.value - a.value);
 
-  // Sector Allocation
+  // Sector Allocation - Supporting both single and multi-sector assets
   const sectorMap = new Map<string, number>();
   positions.forEach(position => {
-    const sector = position.sector || 'Unknown';
-    const currentValue = sectorMap.get(sector) || 0;
-    sectorMap.set(sector, currentValue + position.currentValue);
+    // Check if asset has multi-sector allocation
+    const sectors = position.assetDefinition?.sectors;
+    if (sectors && sectors.length > 0) {
+      // Multi-sector asset: distribute value proportionally
+      sectors.forEach(sectorAllocation => {
+        const sectorName = sectorAllocation.sectorName || 'Unknown';
+        const proportionalValue = (position.currentValue * sectorAllocation.percentage) / 100;
+        const currentValue = sectorMap.get(sectorName) || 0;
+        sectorMap.set(sectorName, currentValue + proportionalValue);
+      });
+    } else {
+      // Single sector asset (legacy or no sectors)
+      const sector = position.sector || 'Unknown';
+      const currentValue = sectorMap.get(sector) || 0;
+      sectorMap.set(sector, currentValue + position.currentValue);
+    }
   });
 
   const sectorAllocation = Array.from(sectorMap.entries())
@@ -151,7 +164,7 @@ export const calculatePortfolioAnalytics = (positions: PortfolioPosition[]): Por
   });
 
   const categoryBreakdown = Array.from(categoryBreakdownMap.entries())
-    .map(([categoryId, { categoryData, optionMap }]) => {
+    .map(([, { categoryData, optionMap }]) => {
       const totalCategoryValue = Array.from(optionMap.values()).reduce((sum, value) => sum + value, 0);
       const options = Array.from(optionMap.entries())
         .map(([optionName, value]) => ({
@@ -227,13 +240,26 @@ export const calculateIncomeAnalytics = (positions: PortfolioPosition[]): Income
     }))
     .sort((a, b) => b.value - a.value);
 
-  // Sector Income Distribution
+  // Sector Income Distribution - Supporting both single and multi-sector assets
   const sectorIncomeMap = new Map<string, number>();
   positions.forEach(position => {
     if (position.monthlyIncome > 0) {
-      const sector = position.sector || 'Unknown';
-      const currentIncome = sectorIncomeMap.get(sector) || 0;
-      sectorIncomeMap.set(sector, currentIncome + position.monthlyIncome);
+      // Check if asset has multi-sector allocation
+      const sectors = position.assetDefinition?.sectors;
+      if (sectors && sectors.length > 0) {
+        // Multi-sector asset: distribute income proportionally
+        sectors.forEach(sectorAllocation => {
+          const sectorName = sectorAllocation.sectorName || 'Unknown';
+          const proportionalIncome = (position.monthlyIncome * sectorAllocation.percentage) / 100;
+          const currentIncome = sectorIncomeMap.get(sectorName) || 0;
+          sectorIncomeMap.set(sectorName, currentIncome + proportionalIncome);
+        });
+      } else {
+        // Single sector asset (legacy or no sectors)
+        const sector = position.sector || 'Unknown';
+        const currentIncome = sectorIncomeMap.get(sector) || 0;
+        sectorIncomeMap.set(sector, currentIncome + position.monthlyIncome);
+      }
     }
   });
 
@@ -329,7 +355,7 @@ export const calculateIncomeAnalytics = (positions: PortfolioPosition[]): Income
   });
 
   const categoryIncomeBreakdown = Array.from(categoryIncomeBreakdownMap.entries())
-    .map(([categoryId, { categoryData, optionMap }]) => {
+    .map(([, { categoryData, optionMap }]) => {
       const totalCategoryIncome = Array.from(optionMap.values()).reduce((sum, income) => sum + income, 0);
       const options = Array.from(optionMap.entries())
         .map(([optionName, income]) => ({
