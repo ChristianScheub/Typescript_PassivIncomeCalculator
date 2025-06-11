@@ -113,7 +113,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       Logger.info('Starting stock price update for asset definitions');
       
       // Filter AssetDefinitions that have stock type and ticker symbols
-      const stockDefinitions = assetDefinitions.filter(def => 
+      const stockDefinitions = assetDefinitions.filter((def: AssetDefinition) => 
         def.type === 'stock' && def.ticker
       );
       
@@ -159,9 +159,14 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     }
   };
 
+  // Sort asset definitions alphabetically by fullName
+  const sortedAssetDefinitions = [...assetDefinitions].sort((a, b) => 
+    a.fullName.localeCompare(b.fullName, 'de', { sensitivity: 'base' })
+  );
+
   return (
     <AssetDefinitionsView
-      assetDefinitions={assetDefinitions}
+      assetDefinitions={sortedAssetDefinitions}
       status={status}
       isAddingDefinition={isAddingDefinition}
       editingDefinition={editingDefinition}

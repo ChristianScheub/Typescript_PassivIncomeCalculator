@@ -270,10 +270,13 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                     ...data,
                   });
                 }
-              } else if (onAddDefinitionWithCategories) {
-                onAddDefinitionWithCategories(data, categoryAssignments);
               } else {
-                onAddDefinition(data);
+                // For new definitions, just pass the form data
+                if (onAddDefinitionWithCategories) {
+                  onAddDefinitionWithCategories(data, categoryAssignments);
+                } else {
+                  onAddDefinition(data);
+                }
               }
             }}
             editingDefinition={editingDefinition}

@@ -29,6 +29,12 @@ export type TransactionType = 'buy' | 'sell';
 export type DividendFrequency = 'monthly' | 'quarterly' | 'annually' | 'custom' | 'none';
 export type PaymentFrequency = 'monthly' | 'quarterly' | 'annually' | 'custom';
 
+// Sector allocation interface for multi-sector support
+export interface SectorAllocation {
+  sectorName: string;
+  percentage: number;
+}
+
 export interface PaymentSchedule {
   frequency: PaymentFrequency;
   amount: number;
@@ -66,7 +72,8 @@ export interface AssetDefinition extends BaseEntity {
   type: AssetType;
   country?: string;
   continent?: string;
-  sector?: string;
+  sector?: string; // Legacy single sector for backward compatibility
+  sectors?: SectorAllocation[]; // New multi-sector support
   currency?: string;
   exchange?: string;
   isin?: string;

@@ -446,6 +446,12 @@
     "assetInformation": "Asset-Informationen",
     "transactionHistory": "Transaktionshistorie",
     "sale": "Verkauf",
+    "useMultipleSectors": "Mehrere Sektoren verwenden",
+    "sectors": "Sektoren",
+    "sectorName": "Sektorname",
+    "percentage": "Anteil",
+    "addSector": "Sektor hinzufügen",
+    "total": "Gesamt",
     "form": {
       "transactionType": "Transaktionstyp",
       "buyTransaction": "Kauf-Transaktion",
@@ -467,6 +473,7 @@
   "common": {
     "back": "Zurück",
     "add": "Hinzufügen",
+    "remove": "Löschen",
     "update": "Aktualisieren",
     "cancel": "Abbrechen",
     "edit": "Bearbeiten",

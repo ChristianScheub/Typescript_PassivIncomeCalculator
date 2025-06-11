@@ -159,6 +159,10 @@
     "title": "Assets", 
     "currentPrice": "Current Price",
     "autoUpdatePrice": "Auto-update price via API",
+    "useMultipleSectors": "Use Multiple Sectors",
+    "sectors": "Sectors",
+    "addSector": "Add Sector",
+    "total": "Total",
     "priceHistory": {
       "entries": "price history entries",
       "title": "Price History",
