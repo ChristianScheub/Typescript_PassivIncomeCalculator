@@ -28,26 +28,38 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
   const [isAddingDefinition, setIsAddingDefinition] = useState(false);
   const [editingDefinition, setEditingDefinition] = useState<AssetDefinition | null>(null);
   const [isUpdatingPrices, setIsUpdatingPrices] = useState(false);
+  const [isUpdatingHistoricalData, setIsUpdatingHistoricalData] = useState(false);
 
   useEffect(() => {
-    Logger.info('Fetching asset definitions and categories');
-    dispatch(fetchAssetDefinitions());
-    dispatch(fetchAssetCategories());
-    dispatch(fetchAssetCategoryOptions());
-    dispatch(fetchAssetCategoryAssignments());
+    const fetchData = async () => {
+      Logger.info('Fetching asset definitions and categories');
+      try {
+        await Promise.all([
+          dispatch(fetchAssetDefinitions()).unwrap(),
+          dispatch(fetchAssetCategories()).unwrap(),
+          dispatch(fetchAssetCategoryOptions()).unwrap(),
+          dispatch(fetchAssetCategoryAssignments()).unwrap()
+        ]);
+      } catch (error) {
+        Logger.error('Error fetching data: ' + JSON.stringify(error));
+      }
+    };
+
+    fetchData();
   }, [dispatch]);
 
   const handleAddDefinition = async (data: any, categoryAssignments: Omit<AssetCategoryAssignment, 'id' | 'createdAt' | 'updatedAt'>[]) => {
     try {
       Logger.info('Adding new asset definition' + " - " + JSON.stringify(data));
       analytics.trackEvent('asset_definition_add');
-      const newDefinition = await dispatch(addAssetDefinition(data));
+      const action = await dispatch(addAssetDefinition(data));
+      const newDefinition = addAssetDefinition.fulfilled.match(action) ? action.payload : null;
       
       // Add category assignments if any
-      if (categoryAssignments.length > 0 && (newDefinition.payload as any)?.id) {
+      if (categoryAssignments.length > 0 && newDefinition?.id) {
         const assignmentsWithAssetId = categoryAssignments.map(assignment => ({
           ...assignment,
-          assetDefinitionId: (newDefinition.payload as any).id
+          assetDefinitionId: newDefinition.id
         }));
         
         for (const assignment of assignmentsWithAssetId) {
@@ -61,12 +73,12 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     }
   };
 
-  const handleUpdateDefinition = async (data: any, categoryAssignments: Omit<AssetCategoryAssignment, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+  const handleUpdateDefinition = async (data: Partial<AssetDefinition>, categoryAssignments: Omit<AssetCategoryAssignment, 'id' | 'createdAt' | 'updatedAt'>[]) => {
     if (!editingDefinition) return;
     try {
       Logger.info('Updating asset definition' + " - " + JSON.stringify({ id: editingDefinition.id, data }));
       analytics.trackEvent('asset_definition_update', { id: editingDefinition.id });
-      await dispatch(updateAssetDefinition({ ...data, id: editingDefinition.id }));
+      const action = await dispatch(updateAssetDefinition({ ...data, id: editingDefinition.id }));
       
       // Update category assignments
       // First delete existing assignments
@@ -97,10 +109,16 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         analytics.trackEvent('asset_definition_delete', { id });
         
         // Delete category assignments first
-        await dispatch(deleteAssetCategoryAssignmentsByAssetId(id));
+        const deleteAssignmentsAction = await dispatch(deleteAssetCategoryAssignmentsByAssetId(id));
+        if (!deleteAssetCategoryAssignmentsByAssetId.fulfilled.match(deleteAssignmentsAction)) {
+          throw new Error('Failed to delete category assignments');
+        }
         
         // Then delete the definition
-        await dispatch(deleteAssetDefinition(id));
+        const deleteDefinitionAction = await dispatch(deleteAssetDefinition(id));
+        if (!deleteAssetDefinition.fulfilled.match(deleteDefinitionAction)) {
+          throw new Error('Failed to delete asset definition');
+        }
       } catch (error) {
         Logger.error('Failed to delete asset definition' + " - " + JSON.stringify(error as Error));
       }
@@ -128,8 +146,9 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         Logger.info(`Dispatching price updates for ${updatedDefinitions.length} stock definitions`);
         
         // Update each AssetDefinition in the store
-        for (const definition of updatedDefinitions) {
-          await dispatch(updateAssetDefinition(definition));
+        for (const updatedDefinition of updatedDefinitions) {
+          Logger.info(`Updating stock price for ${updatedDefinition.ticker}: ${updatedDefinition.currentPrice}`);
+          await dispatch(updateAssetDefinition(updatedDefinition));
         }
 
         Logger.info('Successfully updated stock prices for asset definitions');
@@ -140,6 +159,42 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       Logger.error('Failed to update stock prices for asset definitions' + ' - ' + JSON.stringify(error as Error));
     } finally {
       setIsUpdatingPrices(false);
+    }
+  };
+
+  const handleUpdateHistoricalData = async () => {
+    setIsUpdatingHistoricalData(true);
+    try {
+      Logger.info('Starting historical data update for asset definitions');
+      
+      // Filter AssetDefinitions that have stock type and ticker symbols
+      const stockDefinitions = assetDefinitions.filter((def: AssetDefinition) => 
+        def.type === 'stock' && def.ticker
+      );
+      
+      if (stockDefinitions.length === 0) {
+        Logger.info('No stock definitions found to update historical data');
+        return;
+      }
+      
+      const updatedDefinitions = await StockPriceUpdater.updateStockHistoricalData(stockDefinitions);
+      
+      if (updatedDefinitions.length > 0) {
+        Logger.info(`Dispatching historical data updates for ${updatedDefinitions.length} stock definitions`);
+        
+        // Update each AssetDefinition in the store
+        for (const definition of updatedDefinitions) {
+          await dispatch(updateAssetDefinition(definition));
+        }
+
+        Logger.info('Successfully updated historical data for asset definitions');
+      } else {
+        Logger.info('No stock definitions were updated with historical data');
+      }
+    } catch (error) {
+      Logger.error('Failed to update historical data for asset definitions' + ' - ' + JSON.stringify(error as Error));
+    } finally {
+      setIsUpdatingHistoricalData(false);
     }
   };
 
@@ -171,6 +226,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       isAddingDefinition={isAddingDefinition}
       editingDefinition={editingDefinition}
       isUpdatingPrices={isUpdatingPrices}
+      isUpdatingHistoricalData={isUpdatingHistoricalData}
       isApiEnabled={isApiEnabled}
       getAssetTypeIcon={getAssetTypeIcon}
       onAddDefinition={(data) => handleAddDefinition(data, [])}
@@ -179,6 +235,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       onSetIsAddingDefinition={setIsAddingDefinition}
       onSetEditingDefinition={setEditingDefinition}
       onUpdateStockPrices={handleUpdateStockPrices}
+      onUpdateHistoricalData={handleUpdateHistoricalData}
       onBack={onBack}
       onAddDefinitionWithCategories={handleAddDefinition}
       onUpdateDefinitionWithCategories={handleUpdateDefinition}

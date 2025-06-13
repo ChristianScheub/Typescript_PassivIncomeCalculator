@@ -16,6 +16,7 @@ interface AssetDefinitionsViewProps {
   isAddingDefinition: boolean;
   editingDefinition: AssetDefinition | null;
   isUpdatingPrices: boolean;
+  isUpdatingHistoricalData: boolean;
   isApiEnabled: boolean;
   getAssetTypeIcon: (type: string) => React.ReactNode;
   onAddDefinition: (data: CreateAssetDefinitionData) => void;
@@ -24,6 +25,7 @@ interface AssetDefinitionsViewProps {
   onSetIsAddingDefinition: (isAdding: boolean) => void;
   onSetEditingDefinition: (definition: AssetDefinition | null) => void;
   onUpdateStockPrices: () => void;
+  onUpdateHistoricalData: () => void;
   onBack?: () => void;
   onAddDefinitionWithCategories?: (
     data: CreateAssetDefinitionData,
@@ -41,6 +43,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   isAddingDefinition,
   editingDefinition,
   isUpdatingPrices,
+  isUpdatingHistoricalData,
   isApiEnabled,
   getAssetTypeIcon,
   onAddDefinition,
@@ -49,6 +52,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   onSetIsAddingDefinition,
   onSetEditingDefinition,
   onUpdateStockPrices,
+  onUpdateHistoricalData,
   onBack,
   onAddDefinitionWithCategories,
   onUpdateDefinitionWithCategories,
@@ -82,6 +86,17 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
                   {t("assets.updatePrices")}
+                </button>
+              )}
+              
+              {/* Button for historical data */}
+              {!isUpdatingHistoricalData && isApiEnabled && (
+                <button
+                  onClick={onUpdateHistoricalData}
+                  className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  {t("assets.updateHistoricalData")}
                 </button>
               )}
             </>

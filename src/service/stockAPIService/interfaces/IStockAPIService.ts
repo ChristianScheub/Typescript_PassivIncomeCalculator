@@ -1,39 +1,40 @@
 import { 
-  StockQuote,
-  StockHistoricalData,
-  CompanyProfile,
-  FinancialMetrics,
-  FinancialReport,
-  StockEvents,
-  StockSearchResult,
-  OptionData,
-  StockNews
+  StockExchange,
+  StockPrice,
+  StockHistory
 } from '../types';
 
+/**
+ * Simplified Stock API Service Interface
+ * Provides only essential stock data functionality
+ */
 export interface IStockAPIService {
-  // Current market data
-  getQuote: (symbol: string) => Promise<StockQuote>;
-  getQuotes: (symbols: string[]) => Promise<StockQuote[]>;
+  /**
+   * Get possible stock exchanges (suffixes) for a symbol
+   * @param symbol - Stock symbol (e.g., "AAPL")
+   * @returns Array of exchange information with suffixes
+   */
+  getStockExchanges: (symbol: string) => Promise<StockExchange[]>;
 
-  // Historical data
-  getHistoricalData: (symbol: string, range: string, interval: string) => Promise<StockHistoricalData>;
+  /**
+   * Get current stock price
+   * @param symbol - Stock symbol with exchange suffix (e.g., "AAPL.US")
+   * @returns Current price information
+   */
+  getCurrentStockPrice: (symbol: string) => Promise<StockPrice>;
 
-  // Company information
-  getCompanyProfile: (symbol: string) => Promise<CompanyProfile>;
+  /**
+   * Get historical stock data for specified number of days
+   * @param symbol - Stock symbol with exchange suffix (e.g., "AAPL.US")
+   * @param days - Number of days to retrieve (1-365)
+   * @returns Historical data with open, midday, and close prices
+   */
+  getHistory: (symbol: string, days: number) => Promise<StockHistory>;
 
-  // Financial data
-  getFinancialMetrics: (symbol: string) => Promise<FinancialMetrics>;
-  getFinancialReports: (symbol: string) => Promise<FinancialReport>;
-
-  // Events and calendar
-  getStockEvents: (symbol: string) => Promise<StockEvents>;
-
-  // Search functionality
-  searchStocks: (query: string) => Promise<StockSearchResult[]>;
-
-  // Options data
-  getOptionsData: (symbol: string) => Promise<OptionData>;
-
-  // News
-  getStockNews: (symbol: string) => Promise<StockNews[]>;
+  /**
+   * Get 30 days of historical stock data
+   * @param symbol - Stock symbol with exchange suffix (e.g., "AAPL.US")
+   * @returns 30 days of historical data
+   */
+  getHistory30Days: (symbol: string) => Promise<StockHistory>;
 }

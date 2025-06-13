@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent } from '../../ui/common/Card';
 import { Button } from '../../ui/common/Button';
 import { Download, Upload, Eye, EyeOff, Key, ChevronRight, ChevronDown, Trash } from 'lucide-react';
 import DebugSettings from '../../ui/specialized/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../../config/featureFlags';
+import { StockAPIProvider } from '../../store/slices/apiConfigSlice';
 
 interface SettingsViewProps {
   exportStatus: 'idle' | 'loading' | 'success' | 'error';
@@ -17,7 +18,8 @@ interface SettingsViewProps {
     getSessionDuration: () => number;
     getEventCount: (event?: string) => number;
   };
-  apiKey: string;
+  selectedProvider: StockAPIProvider;
+  apiKeys?: { [K in StockAPIProvider]?: string };
   apiKeyStatus: 'idle' | 'saving' | 'success' | 'error';
   apiKeyError: string | null;
   currency: 'EUR' | 'USD';
@@ -37,8 +39,9 @@ interface SettingsViewProps {
   onExportLogs: () => void;
   onClearLogs: () => void;
   onAutoRefreshChange: (enabled: boolean) => void;
-  onApiKeyChange: (apiKey: string) => void;
-  onApiKeyRemove: () => void;
+  onApiKeyChange: (provider: StockAPIProvider, apiKey: string) => void;
+  onApiKeyRemove: (provider: StockAPIProvider) => void;
+  onProviderChange: (provider: StockAPIProvider) => void;
   onCurrencyChange: (currency: 'EUR' | 'USD') => void;
   onClearPartialData: () => void;
   onClearAllData: () => void;
@@ -54,7 +57,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   showLogs,
   autoRefresh,
   analytics,
-  apiKey,
+  selectedProvider,
+  apiKeys,
   apiKeyStatus,
   apiKeyError,
   currency,
@@ -76,6 +80,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onAutoRefreshChange,
   onApiKeyChange,
   onApiKeyRemove,
+  onProviderChange,
   onCurrencyChange,
   onClearPartialData,
   onClearAllData,
@@ -84,7 +89,54 @@ const SettingsView: React.FC<SettingsViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const [showApiKey, setShowApiKey] = useState(false);
-  const [tempApiKey, setTempApiKey] = useState(apiKey);
+  const [tempApiKeys, setTempApiKeys] = useState<{ [K in StockAPIProvider]?: string }>({
+    finnhub: apiKeys?.finnhub || '',
+    yahoo: apiKeys?.yahoo || '',
+    alpha_vantage: apiKeys?.alpha_vantage || '',
+    iex_cloud: apiKeys?.iex_cloud || ''
+  });
+
+  // Update tempApiKeys when apiKeys prop changes
+  useEffect(() => {
+    setTempApiKeys({
+      finnhub: apiKeys?.finnhub || '',
+      yahoo: apiKeys?.yahoo || '',
+      alpha_vantage: apiKeys?.alpha_vantage || '',
+      iex_cloud: apiKeys?.iex_cloud || ''
+    });
+  }, [apiKeys]);
+
+  // Provider information
+  const providerInfo = {
+    finnhub: {
+      name: 'Finnhub',
+      description: t('settings.finnhubDescription'),
+      keyPlaceholder: t('settings.enterFinnhubApiKey'),
+      website: 'https://finnhub.io',
+      requiresApiKey: true
+    },
+    yahoo: {
+      name: 'Yahoo Finance',
+      description: t('settings.yahooDescription'),
+      keyPlaceholder: t('settings.enterYahooApiKey'),
+      website: 'https://finance.yahoo.com',
+      requiresApiKey: false
+    },
+    alpha_vantage: {
+      name: 'Alpha Vantage',
+      description: t('settings.alphaVantageDescription'),
+      keyPlaceholder: t('settings.enterAlphaVantageApiKey'),
+      website: 'https://www.alphavantage.co',
+      requiresApiKey: true
+    },
+    iex_cloud: {
+      name: 'IEX Cloud',
+      description: t('settings.iexCloudDescription'),
+      keyPlaceholder: t('settings.enterIexCloudApiKey'),
+      website: 'https://iexcloud.io',
+      requiresApiKey: true
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -131,90 +183,139 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               </div>
             </div>
 
-            <div>
-              <h3 className="font-medium">{t('settings.finnhubApiKey')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                {t('settings.getFinnhubKey')}{' '}
-                <a 
-                  href="https://finnhub.io" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:text-blue-600 underline"
-                >
-                  finnhub.io
-                </a>
-                {' '}{t('settings.toEnableStockData')}
-              </p>
-              
-              <div className="space-y-3">
-                <div className="relative">
-                  <input
-                    type={showApiKey ? 'text' : 'password'}
-                    value={tempApiKey}
-                    onChange={(e) => setTempApiKey(e.target.value)}
-                    placeholder={t('settings.enterFinnhubApiKey')}
-                    className={`w-full px-3 py-2 pr-10 border rounded-md ${
-                      isApiEnabled 
-                        ? 'border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100' 
-                        : 'border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500'
-                    }`}
-                    disabled={!isApiEnabled}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${
-                      isApiEnabled 
-                        ? 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300' 
-                        : 'text-gray-300 dark:text-gray-600'
-                    }`}
-                    disabled={!isApiEnabled}
-                  >
-                    {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
+            {/* Provider Selection */}
+            {isApiEnabled && (
+              <div>
+                <h3 className="font-medium">{t('settings.selectProvider')}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  {t('settings.selectProviderDescription')}
+                </p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {(Object.keys(providerInfo) as StockAPIProvider[]).map((provider) => {
+                    const info = providerInfo[provider];
+                    const isSelected = selectedProvider === provider;
+                    // Yahoo Finance doesn't require an API key, so it's always configured
+                    const isConfigured = provider === 'yahoo' ? true : !!(apiKeys?.[provider]);
+                    
+                    return (
+                      <div
+                        key={provider}
+                        onClick={() => onProviderChange(provider)}
+                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                          isSelected
+                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">{info.name}</div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                              {info.description}
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            {isConfigured && (
+                              <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded">
+                                {t('settings.configured')}
+                              </span>
+                            )}
+                            {isSelected && (
+                              <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-1 rounded">
+                                {t('settings.active')}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
-                
-                {apiKeyError && (
-                  <p className="text-sm text-red-500">{apiKeyError}</p>
-                )}
-                
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => onApiKeyChange(tempApiKey)}
-                    disabled={!isApiEnabled || apiKeyStatus === 'saving' || !tempApiKey.trim()}
-                    className="flex items-center space-x-2"
+              </div>
+            )}
+
+            {/* API Key Configuration for Selected Provider */}
+            {isApiEnabled && providerInfo[selectedProvider].requiresApiKey && (
+              <div>
+                <h3 className="font-medium">
+                  {t('settings.apiKeyFor', { provider: providerInfo[selectedProvider].name })}
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  {t('settings.getApiKeyFrom')}{' '}
+                  <a 
+                    href={providerInfo[selectedProvider].website} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-600 underline"
                   >
-                    <span>
-                      {(() => {
-                        if (apiKeyStatus === 'saving') return t('settings.saving');
-                        if (apiKeyStatus === 'success') return t('settings.saved');
-                        return t('settings.saveApiKey');
-                      })()}
-                    </span>
-                  </Button>
-                  
-                  {apiKey && (
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        onApiKeyRemove();
-                        setTempApiKey('');
-                      }}
-                      disabled={!isApiEnabled}
-                      className="text-red-600 hover:text-red-700"
+                    {providerInfo[selectedProvider].name}
+                  </a>
+                  {' '}{t('settings.toEnableStockData')}
+                </p>
+                
+                <div className="space-y-3">
+                  <div className="relative">
+                    <input
+                      type={showApiKey ? 'text' : 'password'}
+                      value={tempApiKeys[selectedProvider] || ''}
+                      onChange={(e) => setTempApiKeys(prev => ({
+                        ...prev,
+                        [selectedProvider]: e.target.value
+                      }))}
+                      placeholder={providerInfo[selectedProvider].keyPlaceholder}
+                      className="w-full px-3 py-2 pr-10 border rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowApiKey(!showApiKey)}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     >
-                      {t('common.remove')}
+                      {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  
+                  {apiKeyError && (
+                    <p className="text-sm text-red-500">{apiKeyError}</p>
+                  )}
+                  
+                  <div className="flex space-x-2">
+                    <Button
+                      onClick={() => onApiKeyChange(selectedProvider, tempApiKeys[selectedProvider] || '')}
+                      disabled={apiKeyStatus === 'saving' || !tempApiKeys[selectedProvider]?.trim()}
+                      className="flex items-center space-x-2"
+                    >
+                      <span>
+                        {(() => {
+                          if (apiKeyStatus === 'saving') return t('settings.saving');
+                          if (apiKeyStatus === 'success') return t('settings.saved');
+                          return t('settings.saveApiKey');
+                        })()}
+                      </span>
                     </Button>
+                    
+                    {apiKeys?.[selectedProvider] && (
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          onApiKeyRemove(selectedProvider);
+                          setTempApiKeys(prev => ({ ...prev, [selectedProvider]: '' }));
+                        }}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        {t('common.remove')}
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {apiKeys?.[selectedProvider] && (
+                    <p className="text-sm text-green-600 dark:text-green-400">
+                      {t('settings.apiKeyConfigured')}
+                    </p>
                   )}
                 </div>
-                
-                {apiKey && (
-                  <p className="text-sm text-green-600 dark:text-green-400">
-                    {t('settings.apiKeyConfigured')}
-                  </p>
-                )}
               </div>
-            </div>
+            )}
             
             <div>
               <h3 className="font-medium">{t('settings.stockMarketCurrency')}</h3>

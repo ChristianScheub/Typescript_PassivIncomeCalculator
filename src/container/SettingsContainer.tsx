@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks/redux";
-import { setApiEnabled, setApiKey } from "../store/slices/apiConfigSlice";
+import { setApiEnabled, setApiKey, setSelectedProvider, StockAPIProvider } from "../store/slices/apiConfigSlice";
 import { clearAllAssets } from "../store/slices/assetsSlice";
 import { clearAllLiabilities } from "../store/slices/liabilitiesSlice";
 import { clearAllExpenses } from "../store/slices/expensesSlice";
@@ -43,13 +43,10 @@ const SettingsContainer: React.FC = () => {
     useState(false);
   const [isClearDataExpanded, setIsClearDataExpanded] = useState(false);
 
-  // Load API key and currency on mount
+  // Load API keys and currency on mount
   useEffect(() => {
-    const storedApiKey = localStorage.getItem("finnhub_api_key");
-    if (storedApiKey) {
-      dispatch(setApiKey(storedApiKey));
-    }
-
+    // API keys are already loaded from localStorage in the initial state
+    // We just need to load the currency
     const storedCurrency = getCurrency();
     setCurrency(storedCurrency);
   }, []);
@@ -223,12 +220,12 @@ const SettingsContainer: React.FC = () => {
     }
   };
 
-  const handleApiKeyChange = async (newApiKey: string) => {
+  const handleApiKeyChange = async (provider: StockAPIProvider, newApiKey: string) => {
     setApiKeyStatus("saving");
     setApiKeyError(null);
 
     try {
-      dispatch(setApiKey(newApiKey));
+      dispatch(setApiKey({ provider, apiKey: newApiKey }));
       dispatch(setApiEnabled(true));
       setApiKeyStatus("success");
       setTimeout(() => setApiKeyStatus("idle"), 2000);
@@ -240,9 +237,22 @@ const SettingsContainer: React.FC = () => {
     }
   };
 
-  const handleApiKeyRemove = () => {
-    dispatch(setApiKey(null));
-    dispatch(setApiEnabled(false));
+  const handleApiKeyRemove = (provider: StockAPIProvider) => {
+    dispatch(setApiKey({ provider, apiKey: null }));
+    
+    // If this was the selected provider and no key remains, disable API or switch provider
+    if (provider === apiConfig.selectedProvider) {
+      const hasOtherConfiguredProvider = Object.entries(apiConfig.apiKeys)
+        .some(([key, value]) => key !== provider && value);
+      
+      if (!hasOtherConfiguredProvider) {
+        dispatch(setApiEnabled(false));
+      }
+    }
+  };
+
+  const handleProviderChange = (provider: StockAPIProvider) => {
+    dispatch(setSelectedProvider(provider));
   };
 
   const handleApiToggle = (enabled: boolean) => {
@@ -350,8 +360,11 @@ const SettingsContainer: React.FC = () => {
       localStorage.clear();
       Logger.infoService("LocalStorage cleared completely");
 
-      // 4. Reset API key state
-      dispatch(setApiKey(null));
+      // 4. Reset API key state - clear all providers
+      const providers: StockAPIProvider[] = ['finnhub', 'yahoo', 'alpha_vantage', 'iex_cloud'];
+      providers.forEach((provider) => {
+        dispatch(setApiKey({ provider, apiKey: null }));
+      });
       dispatch(setApiEnabled(false));
 
       setClearDataStatus("success");
@@ -379,7 +392,8 @@ const SettingsContainer: React.FC = () => {
       showLogs={showLogs}
       autoRefresh={autoRefresh}
       analytics={analytics}
-      apiKey={apiConfig.apiKey || ""}
+      selectedProvider={apiConfig.selectedProvider}
+      apiKeys={apiConfig.apiKeys}
       apiKeyStatus={apiKeyStatus}
       apiKeyError={apiKeyError}
       currency={currency}
@@ -405,6 +419,7 @@ const SettingsContainer: React.FC = () => {
       onAutoRefreshChange={setAutoRefresh}
       onApiKeyChange={handleApiKeyChange}
       onApiKeyRemove={handleApiKeyRemove}
+      onProviderChange={handleProviderChange}
       onCurrencyChange={handleCurrencyChange}
       onClearPartialData={handleClearPartialData}
       onClearAllData={handleClearAllData}

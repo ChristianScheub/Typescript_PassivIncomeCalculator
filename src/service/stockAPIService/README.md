@@ -2,18 +2,19 @@
 
 The `stockAPIService` integrates with external financial APIs (primarily Finnhub) to fetch real-time stock data, company information, and market data. It handles API authentication, currency conversion, and provides a comprehensive interface for all stock-related data needs.
 
+# stockAPIService
+
+The `stockAPIService` provides a simplified interface for essential stock data operations. It integrates with external financial APIs (primarily Finnhub) to fetch real-time stock prices, exchange information, and historical data with automatic currency conversion.
+
 ## Purpose
-- Fetches real-time stock quotes and batch quotes for multiple symbols
-- Retrieves historical stock data with customizable time ranges and intervals
-- Provides company profile information including industry, sector, and description
-- Fetches financial metrics like P/E ratio, dividend yield, and other key indicators
-- Handles stock search functionality for finding symbols by name or ticker
-- Supports currency conversion between USD and EUR via exchange service
+- Fetches possible stock exchange assignments (suffixes) for symbols
+- Retrieves current stock prices with automatic USD to EUR conversion
+- Provides historical stock data with open, midday, and close prices
 - Manages API key configuration and authentication
-- Provides error handling and logging for all API operations
+- Provides comprehensive error handling and logging for all operations
 
 ## Usage
-Import and use the service in containers, Redux slices, or other modules that need market data:
+Import and use the service in containers, Redux slices, or other modules that need stock data:
 
 ```typescript
 import { createStockAPIService } from '../service/stockAPIService';
@@ -21,20 +22,17 @@ import { createStockAPIService } from '../service/stockAPIService';
 // Create service instance
 const stockAPI = createStockAPIService();
 
-// Get real-time stock quote
-const quote = await stockAPI.getQuote('AAPL');
+// Get possible exchange suffixes for a symbol
+const exchanges = await stockAPI.getStockExchanges('AAPL');
 
-// Get multiple quotes at once
-const quotes = await stockAPI.getQuotes(['AAPL', 'MSFT', 'GOOGL']);
+// Get current stock price
+const price = await stockAPI.getCurrentStockPrice('AAPL.US');
 
-// Search for stocks
-const searchResults = await stockAPI.searchStocks('Apple');
+// Get historical data for specified days
+const history = await stockAPI.getHistory('AAPL.US', 30);
 
-// Get company information
-const profile = await stockAPI.getCompanyProfile('AAPL');
-
-// Get historical data
-const historical = await stockAPI.getHistoricalData('AAPL', '1Y', '1D');
+// Get 30 days of historical data (convenience method)
+const history30 = await stockAPI.getHistory30Days('AAPL.US');
 ```
 
 ## Structure
@@ -46,31 +44,29 @@ const historical = await stockAPI.getHistoricalData('AAPL', '1Y', '1D');
 - **Utility Functions**: API key management, symbol formatting, currency conversion
 
 ## Key Methods
-- `getQuote(symbol)` - Get real-time quote for a single stock
-- `getQuotes(symbols)` - Get quotes for multiple stocks in batch
-- `searchStocks(query)` - Search for stocks by name or symbol
-- `getCompanyProfile(symbol)` - Get company information and profile
-- `getHistoricalData(symbol, range, interval)` - Get historical price data
-- `getFinancialMetrics(symbol)` - Get financial ratios and metrics
-- `getStockEvents(symbol)` - Get upcoming events like earnings, dividends
-- `getOptionsData(symbol)` - Get options chain data
-- `getStockNews(symbol)` - Get latest news for a stock
+- `getStockExchanges(symbol)` - Get possible exchange assignments (suffixes) for a symbol
+- `getCurrentStockPrice(symbol)` - Get current stock price with change information
+- `getHistory(symbol, days)` - Get historical data for specified number of days
+- `getHistory30Days(symbol)` - Get 30 days of historical data (convenience method)
 
 ## Example UML Class Diagram
 ```mermaid
 classDiagram
     class StockAPIService {
-      +getCurrentPrice()
-      +getCompanyProfile()
-      +setApiKey()
+      +getStockExchanges(symbol)
+      +getCurrentStockPrice(symbol)
+      +getHistory(symbol, days)
+      +getHistory30Days(symbol)
     }
 ```
 
 ## Example Method Dependency Diagram
 ```mermaid
 flowchart TD
-    A[getCurrentPrice] --> B[fetch API]
-    C[getCompanyProfile] --> B
+    A[getCurrentStockPrice] --> B[Finnhub API]
+    C[getHistory] --> B
+    D[getStockExchanges] --> B
+    E[getHistory30Days] --> C
 ```
 
 ## Example Sequence Diagram (Internal Flow)
@@ -78,11 +74,11 @@ flowchart TD
 sequenceDiagram
     participant UI
     participant StockAPIService
-    UI->>StockAPIService: getCurrentPrice(symbol)
-    StockAPIService->>StockAPIService: fetch API
-    StockAPIService-->>UI: price
+    UI->>StockAPIService: getCurrentStockPrice(symbol)
+    StockAPIService->>StockAPIService: fetch Finnhub API
+    StockAPIService-->>UI: stock price
 ```
 
 ---
 
-The `stockAPIService` is the gateway for all external stock data, enabling real-time financial insights in the application.
+The `stockAPIService` provides a simplified, focused interface for essential stock data operations, enabling real-time financial insights in the application.

@@ -7,7 +7,8 @@ import {
   featureFlag_Debug_Log_Service,
   featureFlag_Debug_Log_Warning,
   featureFlag_Debug_Log_infoRedux,
-  featureFlag_Debug_StoreLogs
+  featureFlag_Debug_StoreLogs,
+  featureFlag_Debug_Log_API
 } from "../../config/featureFlags";
 import { handleFileDownload } from "../helper/downloadFile";
 
@@ -83,6 +84,19 @@ class Logger {
   static infoService(message: string): void {
     if (featureFlag_Debug_Log_Service || featureFlag_Debug_AllLogs) {
       this.log(this.formatMessage(`Service Call Info: ${message}`, "⚙️"));
+    }
+  }
+
+  static infoAPI(message: string, requestData?: any, responseData?: any): void {
+    if (featureFlag_Debug_Log_API || featureFlag_Debug_AllLogs) {
+      let logMessage = `API: ${message}`;
+      if (requestData) {
+        logMessage += `\nRequest: ${JSON.stringify(requestData, null, 2)}`;
+      }
+      if (responseData) {
+        logMessage += `\nResponse: ${JSON.stringify(responseData, null, 2)}`;
+      }
+      this.log(this.formatMessage(logMessage, "🌐"));
     }
   }
 

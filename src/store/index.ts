@@ -1,4 +1,5 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, UnknownAction } from '@reduxjs/toolkit';
+import type { Middleware, ThunkAction } from '@reduxjs/toolkit';
 import assetsReducer from './slices/assetsSlice';
 import assetDefinitionsReducer from './slices/assetDefinitionsSlice';
 import assetCategoriesReducer from './slices/assetCategoriesSlice';
@@ -78,7 +79,16 @@ const loadState = () => {
       },
       dashboard: state.dashboard || {},
       forecast: state.forecast || {},
-      apiConfig: state.apiConfig || {}
+      apiConfig: {
+        isEnabled: state.apiConfig?.isEnabled ?? (localStorage.getItem('stock_api_enabled') === 'true'),
+        selectedProvider: state.apiConfig?.selectedProvider ?? ((localStorage.getItem('selected_stock_api_provider') as StockAPIProvider) || 'finnhub'),
+        apiKeys: state.apiConfig?.apiKeys || {
+          finnhub: localStorage.getItem('finnhub_api_key') || undefined,
+          yahoo: localStorage.getItem('yahoo_api_key') || undefined,
+          alpha_vantage: localStorage.getItem('alpha_vantage_api_key') || undefined,
+          iex_cloud: localStorage.getItem('iex_cloud_api_key') || undefined,
+        }
+      }
     };
   } catch (err) {
     Logger.error('Error loading state from localStorage:'+ JSON.stringify(err));
@@ -88,24 +98,28 @@ const loadState = () => {
 
 const persistedState = loadState();
 
+// Define root reducer type
+const rootReducer = {
+  assets: assetsReducer,
+  assetDefinitions: assetDefinitionsReducer,
+  assetCategories: assetCategoriesReducer,
+  liabilities: liabilitiesReducer,
+  expenses: expensesReducer,
+  income: incomeReducer,
+  dashboard: dashboardReducer,
+  forecast: forecastReducer,
+  apiConfig: apiConfigReducer,
+  customAnalytics: customAnalyticsReducer,
+};
+
 export const store = configureStore({
-  reducer: {
-    assets: assetsReducer,
-    assetDefinitions: assetDefinitionsReducer,
-    assetCategories: assetCategoriesReducer,
-    liabilities: liabilitiesReducer,
-    expenses: expensesReducer,
-    income: incomeReducer,
-    dashboard: dashboardReducer,
-    forecast: forecastReducer,
-    apiConfig: apiConfigReducer,
-    customAnalytics: customAnalyticsReducer,
-  },
+  reducer: rootReducer,
   preloadedState: persistedState,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
+  middleware: (getDefaultMiddleware) => {
+    return getDefaultMiddleware({
       serializableCheck: false, // For storing Date objects in state
-    }).concat(dataChangeMiddleware as any, portfolioCacheMiddleware)
+    }).concat(dataChangeMiddleware as Middleware, portfolioCacheMiddleware as Middleware);
+  },
 });
 
 // Subscribe to store changes and save to localStorage
@@ -174,5 +188,12 @@ store.subscribe(() => {
   }
 });
 
+// Type definitions
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+export type AppThunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  RootState,
+  unknown,
+  UnknownAction
+>;
