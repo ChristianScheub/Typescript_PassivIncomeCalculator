@@ -200,7 +200,6 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
           {featureFlag_Debug_View&& asset.assetDefinition?.priceHistory && asset.assetDefinition.priceHistory.length > 0 && (
             <PriceHistoryView
               priceHistory={asset.assetDefinition.priceHistory}
-              currency={asset.assetDefinition.currency}
               transactions={asset.transactions}
               showSourceIcons={true}
               maxEntries={10}
@@ -211,7 +210,6 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
           {asset.assetDefinition?.priceHistory && asset.assetDefinition.priceHistory.length > 1 && (
             <PriceChart
               priceHistory={asset.assetDefinition.priceHistory}
-              currency={asset.assetDefinition.currency}
               ticker={asset.assetDefinition.ticker}
               transactions={asset.transactions}
             />
@@ -256,17 +254,6 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
                         {asset.assetDefinition.ticker}
-                      </span>
-                    </div>
-                  )}
-
-                  {asset.assetDefinition.currency && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        {t('assets.currency')}:
-                      </span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {asset.assetDefinition.currency}
                       </span>
                     </div>
                   )}

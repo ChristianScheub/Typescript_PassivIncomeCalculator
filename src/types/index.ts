@@ -74,7 +74,6 @@ export interface AssetDefinition extends BaseEntity {
   continent?: string;
   sector?: string; // Legacy single sector for backward compatibility
   sectors?: SectorAllocation[]; // New multi-sector support
-  currency?: string;
   exchange?: string;
   isin?: string;
   wkn?: string;
@@ -92,7 +91,6 @@ export interface AssetDefinition extends BaseEntity {
   dividendInfo?: {
     frequency: DividendFrequency;
     amount: number;
-    currency?: string;
     months?: number[];
     paymentMonths?: number[];
     customAmounts?: Record<number, number>;
@@ -104,7 +102,6 @@ export interface AssetDefinition extends BaseEntity {
   // Real Estate specific
   rentalInfo?: {
     baseRent: number;
-    currency?: string;
     rentGrowthRate?: number; // Jährliche Mietsteigerung in %
     frequency: PaymentFrequency;
     months?: number[];
@@ -116,7 +113,6 @@ export interface AssetDefinition extends BaseEntity {
     interestRate: number;
     maturityDate?: string;
     nominalValue?: number;
-    currency?: string;
   };
   
   // Additional metadata

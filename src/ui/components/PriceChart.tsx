@@ -8,15 +8,12 @@ import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtil
 interface PriceChartProps {
   priceHistory: PriceHistoryEntry[];
   transactions?: Array<Asset | Transaction>;  // Optional transactions for portfolio value calculation
-  currency?: string;
   ticker?: string;
 }
 
 export const PriceChart: React.FC<PriceChartProps> = ({
   priceHistory,
   transactions,
-  // currency parameter is available but not currently used since formatService handles currency automatically
-  currency: _currency,
   ticker
 }) => {
   // If transactions are provided, calculate historical portfolio values

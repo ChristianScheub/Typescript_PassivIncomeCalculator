@@ -10,7 +10,6 @@ interface BasicAssetInformationProps {
   type: AssetType;
   riskLevel?: "low" | "medium" | "high";
   country?: string;
-  currency?: string;
   currentPrice?: number;
   showTicker?: boolean;
   errors: Record<string, any>;
@@ -23,7 +22,6 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
   type,
   riskLevel,
   country,
-  currency,
   currentPrice,
   showTicker = true,
   errors,
@@ -85,14 +83,6 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
         value={country}
         onChange={(value) => onChange("country", value)}
         placeholder={t("assets.countryPlaceholder")}
-      />
-
-      <StandardFormField
-        label={t("assets.currency")}
-        name="currency"
-        value={currency}
-        onChange={(value) => onChange("currency", value)}
-        placeholder="EUR"
       />
 
       <StandardFormField

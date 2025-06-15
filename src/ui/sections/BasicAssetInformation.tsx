@@ -58,14 +58,6 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
           onChange={(value) => setValue("riskLevel", value)}
         />
 
-        <StandardFormField
-          label={t("assets.currency")}
-          name="currency"
-          value={watch("currency")}
-          onChange={(value) => setValue("currency", value)}
-          placeholder="EUR"
-        />
-
         {watch("type") !== "real_estate" && (
           <StandardFormField
             label={t("assets.ticker")}

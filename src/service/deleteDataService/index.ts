@@ -8,20 +8,21 @@ import { clearIncome } from './methods/clearIncome';
 import { clearPartialData } from './methods/clearPartialData';
 import { clearPriceHistory } from './methods/clearPriceHistory';
 
-class DeleteDataServiceImpl implements DeleteDataService {
-    clearAllData = clearAllData;
-    clearAssetDefinitions = clearAssetDefinitions;
-    clearAssetTransactions = clearAssetTransactions;
-    clearDebts = clearDebts;
-    clearExpenses = clearExpenses;
-    clearIncome = clearIncome;
-    clearPartialData = clearPartialData;
-    clearPriceHistory = clearPriceHistory;
-}
+// Create deleteDataService as a functional object
+const deleteDataService: DeleteDataService = {
+    clearAllData,
+    clearAssetDefinitions,
+    clearAssetTransactions,
+    clearDebts,
+    clearExpenses,
+    clearIncome,
+    clearPartialData,
+    clearPriceHistory
+};
 
 // Export the service interface and implementation
 export type { DeleteDataService };
-export const deleteDataService = new DeleteDataServiceImpl();
+export { deleteDataService };
 
 // Export default instance for direct use
 export default deleteDataService;

@@ -8,7 +8,6 @@ import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtil
 interface PriceHistoryViewProps {
   priceHistory: PriceHistoryEntry[];
   transactions?: Array<Asset | Transaction>;  // Optional transactions for portfolio value calculation
-  currency?: string;
   title?: string;
   showSourceIcons?: boolean;
   maxEntries?: number;
@@ -17,7 +16,6 @@ interface PriceHistoryViewProps {
 export const PriceHistoryView: React.FC<PriceHistoryViewProps> = ({
   priceHistory = [],
   transactions,
-  currency = 'EUR',
   title,
   showSourceIcons = true,
   maxEntries = 10

@@ -1,102 +1,22 @@
-import { Asset, AssetDefinition } from '../../types';
-import { 
-  calculatePortfolioPositions, 
-  calculatePortfolioTotals, 
-  PortfolioPosition 
-} from './portfolioCalculations';
-import Logger from '../Logger/logger';
-import { getCurrentQuantity } from '../../utils/transactionCalculations';
+import { IPortfolioService } from './interfaces/IPortfolioService';
+import { calculatePortfolio } from './methods/calculatePortfolio';
+import { getPosition } from './methods/getPosition';
+import { getPositionTransactions } from './methods/getPositionTransactions';
+import { calculateProjectedIncome } from './methods/calculateProjectedIncome';
 
-export class PortfolioService {
-  private static instance: PortfolioService;
-  
-  static getInstance(): PortfolioService {
-    if (!PortfolioService.instance) {
-      PortfolioService.instance = new PortfolioService();
-    }
-    return PortfolioService.instance;
-  }
+// Create portfolioService as a functional object
+const portfolioService: IPortfolioService = {
+  calculatePortfolio,
+  getPosition,
+  getPositionTransactions,
+  calculateProjectedIncome
+};
 
-  /**
-   * Calculate complete portfolio data including positions and totals
-   */
-  calculatePortfolio(
-    assets: Asset[], 
-    assetDefinitions: AssetDefinition[] = [],
-    categories: any[] = [],
-    categoryOptions: any[] = [],
-    categoryAssignments: any[] = []
-  ) {
-    Logger.infoService(`Calculating portfolio with ${assets.length} assets and ${assetDefinitions.length} definitions`);
-    
-    const positions = calculatePortfolioPositions(assets, assetDefinitions, categories, categoryOptions, categoryAssignments);
-    const totals = calculatePortfolioTotals(positions);
-    
-    Logger.infoService(
-      `Portfolio calculated: ${positions.length} positions, total value: ${totals.totalValue}, monthly income: ${totals.monthlyIncome}`
-    );
+// Export the interface
+export type { IPortfolioService };
 
-    return {
-      positions,
-      totals,
-      metadata: {
-        lastCalculated: new Date().toISOString(),
-        assetCount: assets.length,
-        definitionCount: assetDefinitions.length,
-        positionCount: positions.length
-      }
-    };
-  }
+// Export the service
+export { portfolioService };
 
-  /**
-   * Get portfolio position by AssetDefinition ID or transaction identifier
-   */
-  getPosition(
-    assets: Asset[], 
-    assetDefinitions: AssetDefinition[], 
-    positionId: string,
-    categories: any[] = [],
-    categoryOptions: any[] = [],
-    categoryAssignments: any[] = []
-  ): PortfolioPosition | null {
-    const positions = calculatePortfolioPositions(assets, assetDefinitions, categories, categoryOptions, categoryAssignments);
-    return positions.find(pos => pos.id === positionId) || null;
-  }
-
-  /**
-   * Get all transactions for a specific position
-   */
-  getPositionTransactions(assets: Asset[], positionId: string): Asset[] {
-    return assets.filter(asset => {
-      const key = asset.assetDefinitionId || `fallback_${asset.name}_${asset.type}`;
-      return key === positionId;
-    });
-  }
-
-  /**
-   * Calculate what the monthly income would be if dividend info is updated for a position
-   */
-  calculateProjectedIncome(
-    assets: Asset[], 
-    assetDefinitions: AssetDefinition[], 
-    definitionId: string, 
-    newDividendInfo: any
-  ): number {
-    const positionTransactions = assets.filter(asset => asset.assetDefinitionId === definitionId);
-    const totalQuantity = positionTransactions.reduce((sum, t) => {
-      return sum + getCurrentQuantity(t);
-    }, 0);
-
-    if (totalQuantity <= 0 || !newDividendInfo?.frequency || newDividendInfo.frequency === 'none') {
-      return 0;
-    }
-
-    // Import calculation function dynamically to avoid circular dependency
-    const { calculateDividendSchedule } = require('../calculatorService/methods/calculatePayment');
-    const result = calculateDividendSchedule(newDividendInfo, totalQuantity);
-    
-    return isFinite(result.monthlyAmount) ? result.monthlyAmount : 0;
-  }
-}
-
-export default PortfolioService.getInstance();
+// Export default instance for direct use
+export default portfolioService;

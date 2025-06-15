@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, TextField, Grid } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import formatService from '../../service/formatService';
 
 interface CustomAmountsSectionProps {
   frequency: string;
@@ -8,7 +9,6 @@ interface CustomAmountsSectionProps {
   customAmounts: Record<number, number>;
   onAmountChange: (month: number, amount: number) => void;
   title?: string;
-  currency?: string;
 }
 
 export const CustomAmountsSection: React.FC<CustomAmountsSectionProps> = ({
@@ -17,7 +17,6 @@ export const CustomAmountsSection: React.FC<CustomAmountsSectionProps> = ({
   customAmounts,
   onAmountChange,
   title,
-  currency = 'EUR'
 }) => {
   const { t } = useTranslation();
 
@@ -59,8 +58,7 @@ export const CustomAmountsSection: React.FC<CustomAmountsSectionProps> = ({
                 inputProps: { 
                   min: 0, 
                   step: 0.01 
-                },
-                endAdornment: currency
+                }
               }}
               placeholder="0.00"
               size="small"
@@ -84,7 +82,7 @@ export const CustomAmountsSection: React.FC<CustomAmountsSectionProps> = ({
             {t('common.totalAnnualAmount')}:
           </Typography>
           <Typography variant="h6" color="primary">
-            {Object.values(customAmounts).reduce((sum, amount) => sum + (amount || 0), 0).toFixed(2)} {currency}
+            {formatService.formatCurrency(Object.values(customAmounts).reduce((sum, amount) => sum + (amount || 0), 0))}
           </Typography>
         </Box>
       )}

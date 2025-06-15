@@ -1,21 +1,15 @@
 import { getCurrency } from '../../stockAPIService/utils/fetch';
 
-export const formatCurrency = (amount: number, forceCurrency?: 'EUR' | 'USD'): string => {
-  const currency = forceCurrency || getCurrency();
+export const formatCurrency = (amount: number): string => {
+  const currency = getCurrency();
   
-  if (currency === 'USD') {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  } else {
-    return new Intl.NumberFormat('de-DE', {
-      style: 'currency',
-      currency: 'EUR',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  }
+  // Bestimme Locale basierend auf Währung
+  const locale = currency === 'USD' ? 'en-US' : 'de-DE';
+  
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 };

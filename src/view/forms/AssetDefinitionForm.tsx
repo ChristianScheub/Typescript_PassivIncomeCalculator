@@ -44,7 +44,6 @@ const assetDefinitionSchema = z.object({
       })
     )
     .optional(),
-  currency: z.string().optional(),
   exchange: z.string().optional(),
   isin: z.string().optional(),
   wkn: z.string().optional(),
@@ -148,7 +147,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
             editingDefinition.sectors && editingDefinition.sectors.length > 0
           ),
           sectors: editingDefinition.sectors || [],
-          currency: editingDefinition.currency || "EUR",
           exchange: editingDefinition.exchange || "",
           isin: editingDefinition.isin || "",
           wkn: editingDefinition.wkn || "",
@@ -191,7 +189,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         }
       : {
           type: "stock",
-          currency: "EUR",
           riskLevel: "medium" as const,
           dividendFrequency: "quarterly" as DividendFrequency,
           rentalFrequency: "monthly" as PaymentFrequency,
@@ -298,7 +295,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           editingDefinition.sectors && editingDefinition.sectors.length > 0
         ),
         sectors: editingDefinition.sectors || [],
-        currency: editingDefinition.currency || "EUR",
         exchange: editingDefinition.exchange || "",
         isin: editingDefinition.isin || "",
         wkn: editingDefinition.wkn || "",
@@ -344,7 +340,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       setSectors([{ sectorName: "", percentage: 100 }]);
       reset({
         type: "stock",
-        currency: "EUR",
         riskLevel: "medium",
         dividendFrequency: "quarterly",
         rentalFrequency: "monthly",
@@ -376,7 +371,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       sectors: data.useMultipleSectors
         ? data.sectors?.filter((s) => s.sectorName.trim() !== "")
         : undefined, // Only use sectors if multi-sector is enabled
-      currency: data.currency || undefined,
       exchange: data.exchange || undefined,
       isin: data.isin || undefined,
       wkn: data.wkn || undefined,
@@ -444,7 +438,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       dividendInfo: {
         frequency: data.dividendFrequency as DividendFrequency,
         amount: data.dividendAmount,
-        currency: data.currency,
         paymentMonths:
           data.dividendPaymentMonths && data.dividendPaymentMonths.length > 0
             ? data.dividendPaymentMonths
@@ -471,7 +464,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       rentalInfo: {
         baseRent: data.rentalAmount,
         frequency: data.rentalFrequency as PaymentFrequency,
-        currency: data.currency,
         months:
           data.rentalPaymentMonths && data.rentalPaymentMonths.length > 0
             ? data.rentalPaymentMonths
@@ -499,7 +491,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         interestRate: data.interestRate,
         maturityDate: data.maturityDate || undefined,
         nominalValue: data.nominalValue || undefined,
-        currency: data.currency,
       },
     };
   };
@@ -604,7 +595,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                 onPaymentMonthChange={handleDividendMonthChange}
                 customAmounts={dividendCustomAmounts}
                 onCustomAmountChange={handleDividendCustomAmountChange}
-                currency={watch("currency") || "EUR"}
               />
             </FormGrid>
           </OptionalSection>
@@ -626,7 +616,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                 onPaymentMonthChange={handleRentalMonthChange}
                 customAmounts={rentalCustomAmounts}
                 onCustomAmountChange={handleRentalCustomAmountChange}
-                currency={watch("currency") || "EUR"}
               />
             </FormGrid>
           </OptionalSection>

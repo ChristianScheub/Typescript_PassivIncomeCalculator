@@ -7,6 +7,7 @@ import { ViewHeader } from "../../ui/layout/ViewHeader";
 import { Add } from "@mui/icons-material";
 import { Edit, Trash2, Wallet, RefreshCw, History } from "lucide-react";
 import { Tooltip } from "@mui/material";
+import formatService from "../../service/formatService";
 
 /**
  * Type for creating new asset definitions, omits metadata fields like id, createdAt, updatedAt.
@@ -192,17 +193,6 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                         </div>
                       )}
 
-                      {definition.currency && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 dark:text-gray-400">
-                            {t("assets.currency")}:
-                          </span>
-                          <span className="text-gray-900 dark:text-gray-100">
-                            {definition.currency}
-                          </span>
-                        </div>
-                      )}
-
                       {definition.currentPrice && (
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-400">
@@ -210,10 +200,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                           </span>
                           <div className="text-right">
                             <span className="text-gray-900 dark:text-gray-100">
-                              {new Intl.NumberFormat("de-DE", {
-                                style: "currency",
-                                currency: definition.currency || "EUR",
-                              }).format(definition.currentPrice)}
+                              {formatService.formatCurrency(definition.currentPrice)}
                             </span>
                             {definition.priceHistory && definition.priceHistory.length > 1 && (
                               <div className="text-xs text-gray-500 dark:text-gray-400">

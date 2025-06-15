@@ -15,32 +15,33 @@ interface PortfolioHistoryCardProps {
   }>;
 }
 
-const CustomTooltip = ({ active, payload }: any) => {
-  
-  if (!active || !payload?.length) return null;
-  
-  const data = payload[0].payload;
-  const changeColor = data.change >= 0 ? 'text-green-600' : 'text-red-600';
-
-  return (
-    <div className="bg-white dark:bg-gray-800 p-3 shadow-lg rounded border border-gray-200 dark:border-gray-700">
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-        {format(new Date(data.date), 'MMM d, yyyy')}
-      </p>
-      <p className="font-medium">
-        {formatService.formatCurrency(data.value)}
-      </p>
-      <p className={`text-sm font-medium ${changeColor}`}>
-        {data.change >= 0 ? '+' : ''}{formatService.formatCurrency(data.change)}
-        &nbsp;({data.changePercentage >= 0 ? '+' : ''}
-        {data.changePercentage.toFixed(2)}%)
-      </p>
-    </div>
-  );
-};
-
 const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Days }) => {
   const { t } = useTranslation();
+  
+  // Custom tooltip for portfolio history with change information
+  // This needs to be inside the component to access translation and specific data format
+  const PortfolioHistoryTooltip = ({ active, payload }: any) => {
+    if (!active || !payload?.length) return null;
+    
+    const data = payload[0].payload;
+    const changeColor = data.change >= 0 ? 'text-green-600' : 'text-red-600';
+
+    return (
+      <div className="bg-white dark:bg-gray-800 p-3 shadow-lg rounded border border-gray-200 dark:border-gray-700">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+          {format(new Date(data.date), 'MMM d, yyyy')}
+        </p>
+        <p className="font-medium">
+          {formatService.formatCurrency(data.value)}
+        </p>
+        <p className={`text-sm font-medium ${changeColor}`}>
+          {data.change >= 0 ? '+' : ''}{formatService.formatCurrency(data.change)}
+          &nbsp;({data.changePercentage >= 0 ? '+' : ''}
+          {data.changePercentage.toFixed(2)}%)
+        </p>
+      </div>
+    );
+  };
   
   // Find the overall change
   const firstDay = history30Days[0];
@@ -97,7 +98,7 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Da
                   stroke="#6B7280"
                   width={80}
                 />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<PortfolioHistoryTooltip />} />
                 <Area 
                   type="monotone"
                   dataKey="value"

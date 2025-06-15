@@ -14,6 +14,7 @@ import {
   StandardFormField
 } from '../../ui/forms/StandardFormWrapper';
 import { AssetSearchBar, AssetSelectionDropdown, SelectedAssetInfo } from '../../ui/components';
+import formatService from '../../service/formatService';
 
 const assetTransactionSchema = z.object({
   assetDefinitionId: z.string().min(1, 'Please select an asset'),
@@ -181,7 +182,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
   }, [editingAsset, assetDefinitions, reset]);
 
   // Filter asset definitions based on search
-  const filteredDefinitions = assetDefinitions.filter((def: { fullName: string; ticker: string; }) => 
+  const filteredDefinitions = assetDefinitions.filter((def: AssetDefinition) => 
     def.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     def.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -192,7 +193,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
     : (salePrice || 0) * (saleQuantity || 1) - (watch('transactionCosts') || 0);
 
   const handleDefinitionSelect = (definitionId: string) => {
-    const definition = assetDefinitions.find((def: { id: string; }) => def.id === definitionId);
+    const definition = assetDefinitions.find((def: AssetDefinition) => def.id === definitionId);
     if (definition) {
       setSelectedDefinition(definition);
       setValue('assetDefinitionId', definitionId);
@@ -432,10 +433,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   {transactionType === 'buy' ? t('assets.totalInvestment') : t('assets.form.totalSaleValue')}:
                 </span>
                 <span className="text-lg font-bold text-gray-900 dark:text-gray-100">
-                  {new Intl.NumberFormat('de-DE', { 
-                    style: 'currency', 
-                    currency: selectedDefinition?.currency || 'EUR' 
-                  }).format(totalValue)}
+                  {formatService.formatCurrency(totalValue)}
                 </span>
               </div>
             </div>

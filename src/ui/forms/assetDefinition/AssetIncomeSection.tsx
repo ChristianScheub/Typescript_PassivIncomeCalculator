@@ -21,7 +21,6 @@ interface AssetIncomeSectionProps {
   onPaymentMonthChange: (month: number, checked: boolean) => void;
   customAmounts: Record<string, number>;
   onCustomAmountChange: (month: number, amount: number) => void;
-  currency: string | undefined;
 }
 
 export const AssetIncomeSection: React.FC<AssetIncomeSectionProps> = ({
@@ -36,7 +35,6 @@ export const AssetIncomeSection: React.FC<AssetIncomeSectionProps> = ({
   onPaymentMonthChange,
   customAmounts,
   onCustomAmountChange,
-  currency,
 }) => {
   const { t } = useTranslation();
 
@@ -144,7 +142,6 @@ export const AssetIncomeSection: React.FC<AssetIncomeSectionProps> = ({
               customAmounts={customAmounts}
               onAmountChange={onCustomAmountChange}
               title={t(currentTexts.customAmounts)}
-              currency={currency}
             />
           )}
         </Card>

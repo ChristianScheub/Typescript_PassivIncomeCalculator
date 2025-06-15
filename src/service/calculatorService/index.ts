@@ -32,6 +32,10 @@ import { calculateProjections, calculateProjectionsWithCache } from './methods/c
 import { calculatePortfolioAnalytics, calculateIncomeAnalytics } from './methods/calculatePortfolioAnalytics';
 import { getDividendCacheService } from '../dividendCacheService';
 
+/**
+ * Calculator Service that provides all financial calculations
+ * Implementing the functional object pattern for consistency with other services
+ */
 const calculatorService: ICalculatorService = {
   // Payment Schedule calculations
   calculatePaymentSchedule,
@@ -158,4 +162,11 @@ const calculatorService: ICalculatorService = {
   areAssetsCached: (assets) => areAssetsCached(assets),
 };
 
+// Export the service interface
+export type { ICalculatorService };
+
+// Export the service
+export { calculatorService };
+
+// Export default instance for direct use
 export default calculatorService;

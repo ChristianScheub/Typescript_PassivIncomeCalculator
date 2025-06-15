@@ -5,32 +5,27 @@ import { getExchangeRateByDateMethod } from './methods/getExchangeRateByDate';
 import { getAllExchangeRatesMethod } from './methods/getAllExchangeRates';
 import { clearExchangeRatesMethod } from './methods/clearExchangeRates';
 
-class ExchangeService implements IExchangeService {
-  async refreshExchangeRate(): Promise<void> {
-    return refreshExchangeRateMethod();
+// Function to handle overloaded getExchangeRate implementation
+async function getExchangeRate(): Promise<number>;
+async function getExchangeRate(date: string): Promise<number | null>;
+async function getExchangeRate(date?: string): Promise<number | null> {
+  if (date) {
+    return getExchangeRateByDateMethod(date);
   }
-
-  async getExchangeRate(): Promise<number>;
-  async getExchangeRate(date: string): Promise<number | null>;
-  async getExchangeRate(date?: string): Promise<number | null> {
-    if (date) {
-      return getExchangeRateByDateMethod(date);
-    }
-    return getExchangeRateMethod();
-  }
-
-  async getAllExchangeRates(): Promise<ExchangeRate[]> {
-    return getAllExchangeRatesMethod();
-  }
-
-  async clearExchangeRates(): Promise<void> {
-    return clearExchangeRatesMethod();
-  }
+  return getExchangeRateMethod();
 }
 
-// Export singleton instance
-const exchangeService = new ExchangeService();
+// Create exchangeService as a functional object
+const exchangeService: IExchangeService = {
+  refreshExchangeRate: refreshExchangeRateMethod,
+  getExchangeRate,
+  getAllExchangeRates: getAllExchangeRatesMethod,
+  clearExchangeRates: clearExchangeRatesMethod
+};
+
+// Export default instance for direct use
 export default exchangeService;
 
-// Export types for use in other modules
+// Export the service and types for use in other modules
+export { exchangeService };
 export type { IExchangeService, ExchangeRate };

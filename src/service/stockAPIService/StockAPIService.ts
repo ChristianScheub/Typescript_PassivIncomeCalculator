@@ -2,54 +2,58 @@ import { IStockAPIService } from './interfaces/IStockAPIService';
 import { StockAPIProvider } from '../../store/slices/apiConfigSlice';
 import { createStockAPIServiceMethod, getStockAPIServiceMethod } from './methods/createStockAPIService';
 import { getAvailableProvidersMethod } from './methods/getAvailableProviders';
+import { createStockAPIServiceLegacyMethod } from './methods/createStockAPIServiceLegacy';
 
-/**
- * Stock API Service that manages different stock data providers
- */
-class StockAPIService {
+// Definition der Typ-Signatur für den StockAPIService
+interface IStockAPIServiceManager {
   /**
    * Create or update the Stock API Gateway with current configuration
    */
-  createStockAPIService(
+  createStockAPIService: (
     selectedProvider?: StockAPIProvider, 
     apiKeys?: { [K in StockAPIProvider]?: string }
-  ): IStockAPIService {
-    return createStockAPIServiceMethod(selectedProvider, apiKeys);
-  }
+  ) => IStockAPIService;
 
   /**
    * Get the current Stock API Gateway instance
    */
-  getStockAPIService(): IStockAPIService | null {
-    return getStockAPIServiceMethod();
-  }
+  getStockAPIService: () => IStockAPIService | null;
 
   /**
    * Get available API providers with their configuration status
    */
-  getAvailableProviders(): Array<{
+  getAvailableProviders: () => Array<{
     id: StockAPIProvider;
     name: string;
     description: string;
     isConfigured: boolean;
     isImplemented: boolean;
-  }> {
-    return getAvailableProvidersMethod();
-  }
+  }>;
 
   /**
    * Legacy support: Create a Stock API Service using the old interface
    * This maintains backwards compatibility with existing code
    */
-  createStockAPIServiceLegacy(): IStockAPIService {
-    return this.createStockAPIService();
-  }
+  createStockAPIServiceLegacy: () => IStockAPIService;
 }
 
-// Export singleton instance
-const stockAPIService = new StockAPIService();
+/**
+ * Stock API Service that manages different stock data providers
+ * Implementiert als funktionales Objekt anstatt als Klasse
+ */
+const stockAPIService: IStockAPIServiceManager = {
+  createStockAPIService: createStockAPIServiceMethod,
+  getStockAPIService: getStockAPIServiceMethod,
+  getAvailableProviders: getAvailableProvidersMethod,
+  createStockAPIServiceLegacy: createStockAPIServiceLegacyMethod
+};
+
+// Export default instance for direct use
 export default stockAPIService;
 
+// Export the service
+export { stockAPIService };
+
 // Export types for use in other modules
-export type { IStockAPIService };
+export type { IStockAPIService, IStockAPIServiceManager };
 export type { StockAPIProvider };

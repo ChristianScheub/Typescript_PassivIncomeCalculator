@@ -2,9 +2,9 @@ import { IFormatService } from './interfaces/IFormatService';
 import { formatCurrency } from './methods/formatCurrency';
 import { formatPercentage } from './methods/formatPercentage';
 
-class FormatService implements IFormatService {
-  formatCurrency = formatCurrency;
-  formatPercentage = formatPercentage;
-}
+const formatService: IFormatService = {
+  formatCurrency,
+  formatPercentage,
+};
 
-export default new FormatService();
+export default formatService;
