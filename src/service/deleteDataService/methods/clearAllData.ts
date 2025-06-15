@@ -1,0 +1,56 @@
+import { store } from '../../../store';
+import { clearAllAssets } from '../../../store/slices/assetsSlice';
+import { clearAllLiabilities } from '../../../store/slices/liabilitiesSlice';
+import { clearAllExpenses } from '../../../store/slices/expensesSlice';
+import { clearAllIncome } from '../../../store/slices/incomeSlice';
+import { clearAllAssetCategories } from '../../../store/slices/assetCategoriesSlice';
+import { StockAPIProvider } from '../../../store/slices/apiConfigSlice';
+import { setApiKey, setApiEnabled } from '../../../store/slices/apiConfigSlice';
+import { analytics } from '../../analytics';
+import Logger from '../../Logger/logger';
+import { StoreNames } from '../../sqlLiteService';
+import { clearSQLiteStores } from './utils';
+
+export async function clearAllData(): Promise<void> {
+    Logger.infoService("Starting to clear all data");
+
+    // Clear Redux store
+    store.dispatch(clearAllAssets());
+    store.dispatch(clearAllLiabilities());
+    store.dispatch(clearAllExpenses());
+    store.dispatch(clearAllIncome());
+    store.dispatch(clearAllAssetCategories());
+
+    // Clear SQLite data
+    await clearSQLiteStores([
+        "assets",
+        "assetDefinitions",
+        "assetCategories",
+        "assetCategoryOptions",
+        "assetCategoryAssignments",
+        "liabilities",
+        "expenses",
+        "income",
+        "exchangeRates"
+    ] as StoreNames[]);
+
+    // Clear ALL localStorage
+    localStorage.clear();
+    Logger.infoService("LocalStorage cleared completely");
+
+    // Reset API key state
+    const providers: StockAPIProvider[] = ['finnhub', 'yahoo', 'alpha_vantage', 'iex_cloud'];
+    providers.forEach((provider) => {
+        store.dispatch(setApiKey({ provider, apiKey: null }));
+    });
+    store.dispatch(setApiEnabled(false));
+
+    analytics.trackEvent("settings_clear_all_data");
+    Logger.infoService("All data cleared successfully");
+
+    // Reload page to ensure clean state
+    setTimeout(() => {
+        Logger.infoService("Reloading page after data clear");
+        window.location.reload();
+    }, 1500);
+}

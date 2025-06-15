@@ -5,15 +5,15 @@ import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../hooks/redux';
 import { Asset, AssetDefinition } from '../../types';
-import { Search } from 'lucide-react';
-import { Modal } from '../common/Modal';
+import { Modal } from '../../ui/common/Modal';
 import { 
   StandardFormWrapper,
   RequiredSection,
   OptionalSection,
   FormGrid,
   StandardFormField
-} from './StandardFormWrapper';
+} from '../../ui/forms/StandardFormWrapper';
+import { AssetSearchBar, AssetSelectionDropdown, SelectedAssetInfo } from '../../ui/components';
 
 const assetTransactionSchema = z.object({
   assetDefinitionId: z.string().min(1, 'Please select an asset'),
@@ -128,7 +128,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
   useEffect(() => {
     if (editingAsset) {
       // Find the asset definition to get the current price if needed
-      const assetDefinition = assetDefinitions.find(def => def.id === editingAsset.assetDefinitionId);
+      const assetDefinition = assetDefinitions.find((def: AssetDefinition) => def.id === editingAsset.assetDefinitionId);
       
       // Prepare reset data with proper fallbacks
       const resetData = {
@@ -150,7 +150,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
       
       // Set selected definition
       if (editingAsset.assetDefinitionId) {
-        const definition = assetDefinitions.find(def => def.id === editingAsset.assetDefinitionId);
+        const definition = assetDefinitions.find((def: AssetDefinition) => def.id === editingAsset.assetDefinitionId);
         setSelectedDefinition(definition || null);
         
         // If we found the definition, also update the search query to make it visible
@@ -181,7 +181,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
   }, [editingAsset, assetDefinitions, reset]);
 
   // Filter asset definitions based on search
-  const filteredDefinitions = assetDefinitions.filter(def => 
+  const filteredDefinitions = assetDefinitions.filter((def: { fullName: string; ticker: string; }) => 
     def.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
     def.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -192,7 +192,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
     : (salePrice || 0) * (saleQuantity || 1) - (watch('transactionCosts') || 0);
 
   const handleDefinitionSelect = (definitionId: string) => {
-    const definition = assetDefinitions.find(def => def.id === definitionId);
+    const definition = assetDefinitions.find((def: { id: string; }) => def.id === definitionId);
     if (definition) {
       setSelectedDefinition(definition);
       setValue('assetDefinitionId', definitionId);
@@ -278,59 +278,29 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
       >
         <RequiredSection>
           <FormGrid columns={{ xs: '1fr', sm: '1fr' }}>
-            {/* Asset Selection with custom rendering for search */}
+            {/* Asset Selection Section */}
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                 {t('assets.selectAsset')} *
               </label>
               
-              {/* Search Bar */}
-              <div className="relative mb-2">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <input
-                  type="text"
-                  placeholder={t('assets.searchAssets')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                />
-              </div>
+              <AssetSearchBar 
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                placeholder={t('assets.searchAssets')}
+              />
 
-              {/* Asset Selection Dropdown */}
-              <select
-                {...register('assetDefinitionId')}
-                onChange={(e) => handleDefinitionSelect(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                required
-              >
-                <option value="">{t('assets.selectAssetOption')}</option>
-                {filteredDefinitions.map(definition => (
-                  <option key={definition.id} value={definition.id}>
-                    {definition.fullName} {definition.ticker && `(${definition.ticker})`}
-                    {definition.sector && ` - ${definition.sector}`}
-                  </option>
-                ))}
-              </select>
-              {errors.assetDefinitionId && (
-                <p className="mt-1 text-sm text-red-600">{errors.assetDefinitionId.message}</p>
-              )}
+              <AssetSelectionDropdown
+                register={register}
+                handleDefinitionSelect={handleDefinitionSelect}
+                filteredDefinitions={filteredDefinitions}
+                errors={errors}
+              />
 
-              {/* Selected Asset Info */}
               {selectedDefinition && (
-                <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-md">
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div><strong>{t('assets.type')}:</strong> {t(`assets.types.${selectedDefinition.type}`)}</div>
-                    <div><strong>{t('assets.sector')}:</strong> {selectedDefinition.sector || 'N/A'}</div>
-                    <div><strong>{t('assets.country')}:</strong> {selectedDefinition.country || 'N/A'}</div>
-                    <div><strong>{t('assets.currency')}:</strong> {selectedDefinition.currency || 'N/A'}</div>
-                    {selectedDefinition.dividendInfo && (
-                      <>
-                        <div><strong>{t('assets.dividend')}:</strong> {selectedDefinition.dividendInfo.amount}</div>
-                        <div><strong>{t('assets.frequency')}:</strong> {t(`paymentFrequency.${selectedDefinition.dividendInfo.frequency}`)}</div>
-                      </>
-                    )}
-                  </div>
-                </div>
+                <SelectedAssetInfo 
+                  selectedDefinition={selectedDefinition}
+                />
               )}
             </div>
 

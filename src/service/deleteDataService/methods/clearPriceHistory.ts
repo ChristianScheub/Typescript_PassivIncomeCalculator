@@ -1,0 +1,25 @@
+import { store } from '../../../store';
+import { invalidatePortfolioCache } from '../../../store/slices/assetsSlice';
+import { analytics } from '../../analytics';
+import Logger from '../../Logger/logger';
+import sqliteService from '../../sqlLiteService';
+
+export async function clearPriceHistory(): Promise<void> {
+    Logger.infoService("Starting to clear price history");
+
+    // Update asset definitions to remove price history
+    const definitions = await sqliteService.getAll("assetDefinitions");
+    for (const def of definitions) {
+        if (def.id) {
+            def.priceHistory = [];
+            def.currentPrice = undefined;
+            await sqliteService.update("assetDefinitions", def);
+        }
+    }
+
+    // Invalidate cache
+    store.dispatch(invalidatePortfolioCache());
+
+    analytics.trackEvent("settings_clear_price_history");
+    Logger.infoService("Price history cleared successfully");
+}

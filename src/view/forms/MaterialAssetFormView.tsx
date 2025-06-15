@@ -5,45 +5,20 @@ import {
   StandardFormWrapper,
   RequiredSection,
   OptionalSection,
-  FormGrid,
   StandardFormField
 } from '../../ui/forms/StandardFormWrapper';
+import { BasicAssetInformation } from '../../ui/sections';
 import { AssetSpecificFields } from '../../ui/specialized/AssetSpecificFields';
+import { AdditionalInformationSection } from '../../ui/specialized/AdditionalInformationSection';
 import { useTranslation } from 'react-i18next';
-import { getAssetTypeOptions } from '../../constants';
-
-// Define the AssetFormData interface for the form (cleaned up)
-interface AssetFormData {
-  name: string;
-  type: AssetType;
-  value: number;
-  purchaseDate?: string;
-  ticker?: string;
-  quantity?: number;
-  purchasePrice?: number;
-  currentPrice?: number;
-  propertyValue?: number;
-  symbol?: string;
-  acquisitionCost?: number;
-  notes?: string;
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 interface MaterialAssetFormViewProps {
-  // Form state props
   assetType: AssetType;
   quantity?: number;
   currentPrice?: number;
   errors: any;
-  
-  // Form handlers
   watch: (field: string) => any;
-  setValue: UseFormSetValue<AssetFormData>;
+  setValue: UseFormSetValue<any>;
   onFormSubmit: () => void;
-  
-  // Title
   title: string;
 }
 
@@ -60,9 +35,6 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
 
-  // Options arrays (localized)
-  const assetTypeOptions = getAssetTypeOptions(t);
-
   return (
     <StandardFormWrapper
       title={title}
@@ -71,43 +43,27 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
       formRef={formRef}
     >
       <RequiredSection>
-        <FormGrid>
+        <BasicAssetInformation 
+          watch={watch}
+          setValue={setValue}
+          errors={errors}
+          isDefinition={false}
+        />
+        
+        {assetType !== 'stock' && (
           <StandardFormField
-            label={t('common.name')}
-            name="name"
+            label={t('assets.form.value')}
+            name="value"
+            type="number"
             required
-            error={errors.name?.message}
-            value={watch('name')}
-            onChange={(value) => setValue('name', value)}
-            placeholder={t('assets.form.enterAssetName')}
+            error={errors.value?.message}
+            value={watch('value')}
+            onChange={(value) => setValue('value', value)}
+            placeholder={t('common.zeroAmountPlaceholder')}
+            step={0.01}
+            min={0}
           />
-          
-          <StandardFormField
-            label={t('common.type')}
-            name="type"
-            type="select"
-            required
-            options={assetTypeOptions}
-            error={errors.type?.message}
-            value={watch('type')}
-            onChange={(value) => setValue('type', value as AssetType)}
-          />
-          
-          {assetType !== 'stock' && (
-            <StandardFormField
-              label={t('assets.form.value')}
-              name="value"
-              type="number"
-              required
-              error={errors.value?.message}
-              value={watch('value')}
-              onChange={(value) => setValue('value', value)}
-              placeholder={t('common.zeroAmountPlaceholder')}
-              step={0.01}
-              min={0}
-            />
-          )}
-        </FormGrid>
+        )}
       </RequiredSection>
 
       <AssetSpecificFields
@@ -119,24 +75,11 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
       />
 
       <OptionalSection title={t('common.additionalInformation')}>
-        <FormGrid>
-          <StandardFormField
-            label={t('assets.form.purchaseDate')}
-            name="purchaseDate"
-            type="date"
-            value={watch('purchaseDate')}
-            onChange={(value) => setValue('purchaseDate', value)}
-          />
-          
-          <StandardFormField
-            label={t('common.notes')}
-            name="notes"
-            value={watch('notes')}
-            onChange={(value) => setValue('notes', value)}
-            placeholder={t('common.notesPlaceholder')}
-            gridColumn="1 / -1"
-          />
-        </FormGrid>
+        <AdditionalInformationSection
+          watch={watch}
+          setValue={setValue}
+          selectedType={assetType}
+        />
       </OptionalSection>
     </StandardFormWrapper>
   );

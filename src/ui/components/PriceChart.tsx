@@ -1,21 +1,28 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
-import { PriceHistoryEntry } from '../../types';
+import { PriceHistoryEntry, Asset, Transaction } from '../../types';
 import formatService from '../../service/formatService';
+import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtils';
 
 interface PriceChartProps {
   priceHistory: PriceHistoryEntry[];
+  transactions?: Array<Asset | Transaction>;  // Optional transactions for portfolio value calculation
   currency?: string;
   ticker?: string;
 }
 
 export const PriceChart: React.FC<PriceChartProps> = ({
   priceHistory,
+  transactions,
   // currency parameter is available but not currently used since formatService handles currency automatically
   currency: _currency,
   ticker
 }) => {
+  // If transactions are provided, calculate historical portfolio values
+  const displayHistory = transactions 
+    ? calculateHistoricalPortfolioValues(transactions, priceHistory)
+    : priceHistory;
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -25,7 +32,7 @@ export const PriceChart: React.FC<PriceChartProps> = ({
   }
 
   // Sort by date (oldest first for chart)
-  const sortedHistory = [...priceHistory].sort((a, b) => 
+  const sortedHistory = [...displayHistory].sort((a, b) => 
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 

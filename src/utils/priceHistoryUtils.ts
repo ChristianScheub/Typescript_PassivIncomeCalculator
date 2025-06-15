@@ -1,8 +1,33 @@
-import { PriceHistoryEntry, AssetDefinition } from '../types';
+import { PriceHistoryEntry, AssetDefinition, Transaction, Asset } from '../types';
 
 /**
  * Utility functions for managing price history data
  */
+
+/**
+ * Calculate total value for a given point in time based only on buy transactions
+ * that occurred before that date
+ */
+export function calculateHistoricalValue(
+  transactions: Array<Asset | Transaction>,
+  priceAtDate: number,
+  targetDate: string
+): number {
+  let totalValue = 0;
+  
+  // Only consider buy transactions that occurred before or on target date
+  const validTransactions = transactions.filter(t => 
+    t.transactionType === 'buy' && new Date(t.purchaseDate) <= new Date(targetDate)
+  );
+
+  // Sum up value based on quantity from buy transactions and price at that date
+  totalValue = validTransactions.reduce((sum, t) => {
+    const quantity = t.purchaseQuantity || 0;
+    return sum + (quantity * priceAtDate);
+  }, 0);
+
+  return totalValue;
+}
 
 /**
  * Add a new price entry to the history
@@ -182,4 +207,24 @@ export function updateAssetDefinitionPrice(
     ),
     updatedAt: currentDate
   };
+}
+
+/**
+ * Calculate portfolio values for a series of dates based only on buy transactions
+ */
+export function calculateHistoricalPortfolioValues(
+  transactions: Array<Asset | Transaction>,
+  priceHistory: PriceHistoryEntry[]
+): PriceHistoryEntry[] {
+  // Sort price history by date (oldest first)
+  const sortedHistory = [...priceHistory].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  
+  // Calculate portfolio value at each historical date
+  return sortedHistory.map(entry => ({
+    date: entry.date,
+    price: calculateHistoricalValue(transactions, entry.price, entry.date),
+    source: entry.source
+  }));
 }

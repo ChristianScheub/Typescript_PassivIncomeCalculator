@@ -1,11 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { PriceHistoryEntry } from '../../types';
+import { Asset, PriceHistoryEntry, Transaction } from '../../types';
 import { formatCurrency } from '../../service/formatService/methods/formatCurrency';
 import { TrendingUp, TrendingDown, Calendar, Database, Upload } from 'lucide-react';
+import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtils';
 
 interface PriceHistoryViewProps {
   priceHistory: PriceHistoryEntry[];
+  transactions?: Array<Asset | Transaction>;  // Optional transactions for portfolio value calculation
   currency?: string;
   title?: string;
   showSourceIcons?: boolean;
@@ -14,15 +16,20 @@ interface PriceHistoryViewProps {
 
 export const PriceHistoryView: React.FC<PriceHistoryViewProps> = ({
   priceHistory = [],
+  transactions,
   currency = 'EUR',
   title,
   showSourceIcons = true,
   maxEntries = 10
 }) => {
+  // If transactions are provided, calculate historical portfolio values
+  const displayHistory = transactions 
+    ? calculateHistoricalPortfolioValues(transactions, priceHistory)
+    : priceHistory;
   const { t } = useTranslation();
 
   // Sort by date (newest first) and limit entries
-  const sortedHistory = [...priceHistory]
+  const sortedHistory = [...displayHistory]
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
     .slice(0, maxEntries);
 
@@ -94,7 +101,7 @@ export const PriceHistoryView: React.FC<PriceHistoryViewProps> = ({
                 {getSourceIcon(entry.source)}
                 <div>
                   <div className="text-xs font-medium text-gray-900 dark:text-gray-100">
-                    {formatCurrency(entry.price, currency)}
+                    {formatCurrency(entry.price)}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
                     {formatDate(entry.date)}

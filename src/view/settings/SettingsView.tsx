@@ -6,6 +6,23 @@ import { Download, Upload, Eye, EyeOff, Key, ChevronRight, ChevronDown, Trash } 
 import DebugSettings from '../../ui/specialized/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../../config/featureFlags';
 import { StockAPIProvider } from '../../store/slices/apiConfigSlice';
+import { ConfirmationDialog } from '../../ui/dialog/ConfirmationDialog';
+import clsx from 'clsx';
+import { Toggle } from '../../ui/common/Toggle';
+
+type ClearStatus = 'idle' | 'clearing' | 'success';
+
+interface ProviderInfo {
+  name: string;
+  description: string;
+  keyPlaceholder: string;
+  website: string;
+  requiresApiKey: boolean;
+}
+
+interface ProviderInfoMap {
+  [key: string]: ProviderInfo;
+}
 
 interface SettingsViewProps {
   exportStatus: 'idle' | 'loading' | 'success' | 'error';
@@ -23,11 +40,24 @@ interface SettingsViewProps {
   apiKeyStatus: 'idle' | 'saving' | 'success' | 'error';
   apiKeyError: string | null;
   currency: 'EUR' | 'USD';
-  clearDataStatus?: 'idle' | 'clearing' | 'success';
+  clearAssetDefinitionsStatus: ClearStatus;
+  clearPriceHistoryStatus: ClearStatus;
+  clearAssetTransactionsStatus: ClearStatus;
+  clearDebtsStatus: ClearStatus;
+  clearExpensesStatus: ClearStatus;
+  clearIncomeStatus: ClearStatus;
+  clearAllDataStatus: ClearStatus;
   isApiEnabled: boolean;
   isApiExpanded: boolean;
   isDataManagementExpanded: boolean;
   isClearDataExpanded: boolean;
+  confirmDialog: {
+    isOpen: boolean;
+    title: string;
+    description: string;
+    onConfirm: () => void;
+  };
+  onCloseConfirmDialog: () => void;
   onApiToggle: (enabled: boolean) => void;
   onApiExpandedChange: () => void;
   onDataManagementExpandedChange: () => void;
@@ -43,8 +73,13 @@ interface SettingsViewProps {
   onApiKeyRemove: (provider: StockAPIProvider) => void;
   onProviderChange: (provider: StockAPIProvider) => void;
   onCurrencyChange: (currency: 'EUR' | 'USD') => void;
-  onClearPartialData: () => void;
   onClearAllData: () => void;
+  onClearAssetDefinitions: () => void;
+  onClearPriceHistory: () => void;
+  onClearAssetTransactions: () => void;
+  onClearDebts: () => void;
+  onClearExpenses: () => void;
+  onClearIncome: () => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
   getLogLevelColor: (level: string) => string;
 }
@@ -62,7 +97,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   apiKeyStatus,
   apiKeyError,
   currency,
-  clearDataStatus = 'idle',
+  clearAllDataStatus,
+  clearAssetDefinitionsStatus,
+  clearPriceHistoryStatus,
+  clearAssetTransactionsStatus,
+  clearDebtsStatus,
+  clearExpensesStatus,
+  clearIncomeStatus,
   isApiEnabled,
   isApiExpanded,
   isDataManagementExpanded,
@@ -82,10 +123,17 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onApiKeyRemove,
   onProviderChange,
   onCurrencyChange,
-  onClearPartialData,
   onClearAllData,
+  onClearAssetDefinitions,
+  onClearPriceHistory,
+  onClearAssetTransactions,
+  onClearDebts,
+  onClearExpenses,
+  onClearIncome,
   formatLogEntry,
-  getLogLevelColor
+  getLogLevelColor,
+  confirmDialog,
+  onCloseConfirmDialog
 }) => {
   const { t } = useTranslation();
   const [showApiKey, setShowApiKey] = useState(false);
@@ -107,7 +155,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   }, [apiKeys]);
 
   // Provider information
-  const providerInfo = {
+  const providerInfo: ProviderInfoMap = {
     finnhub: {
       name: 'Finnhub',
       description: t('settings.finnhubDescription'),
@@ -138,6 +186,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({
     }
   };
 
+    // Add loading indicator component
+
+  // Add loading indicator component
+  const LoadingSpinner = () => (
+    <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+  );
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t('navigation.settings')}</h1>
@@ -165,22 +220,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   {t('settings.enableStockApiDescription')}
                 </p>
               </div>
-              <div className="relative inline-block w-14 h-8 flex-shrink-0">
-                <input
-                  type="checkbox"
-                  className="peer sr-only"
-                  checked={isApiEnabled}
-                  onChange={(e) => onApiToggle(e.target.checked)}
-                  id="api-toggle"
-                />
-                <label
-                  className="absolute cursor-pointer bg-gray-200 peer-checked:bg-blue-500 rounded-full w-14 h-8 transition-colors duration-300"
-                  htmlFor="api-toggle"
-                >
-                  <span className="sr-only">{t('settings.enableStockApi')}</span>
-                  <span className="absolute bg-white w-6 h-6 left-1 top-1 rounded-full transition-transform duration-300 peer-checked:translate-x-6" />
-                </label>
-              </div>
+              <Toggle
+                checked={isApiEnabled}
+                onChange={onApiToggle}
+                id="api-toggle"
+                label={t('settings.enableStockApi')}
+              />
             </div>
 
             {/* Provider Selection */}
@@ -435,73 +480,219 @@ const SettingsView: React.FC<SettingsViewProps> = ({
       </Card>
 
       {/* Clear Data Section */}
-      <Card className="bg-white dark:bg-gray-800 border-red-200 dark:border-red-800">
+      <Card className="bg-white dark:bg-gray-800">
         <CardHeader 
           className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors" 
           onClick={onClearDataExpandedChange}
         >
-          <CardTitle className="flex items-center justify-between text-red-600 dark:text-red-400">
+          <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Trash size={20} />
-              <span>{t('settings.clearData')}</span>
+              <span>{t("settings.clearData")}</span>
             </div>
             {isClearDataExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
           </CardTitle>
         </CardHeader>
-        {isClearDataExpanded && (
-          <CardContent className="space-y-6">
-            {/* Clear Financial Data */}
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="font-medium">{t('settings.clearPartialData')}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t('settings.clearPartialDataDescription')}
-                </p>
-              </div>
-              {/* For partial data clear button */}
-              <Button
-                onClick={() => {
-                  if (window.confirm(t('settings.confirmClearPartialData'))) {
-                    onClearPartialData();
-                  }
-                }}
-                disabled={clearDataStatus === 'clearing'}
-                variant="destructive"
-                className="flex items-center space-x-2"
-              >
-                {(() => {
-                  if (clearDataStatus === 'clearing') return t('settings.clearingData');
-                  if (clearDataStatus === 'success') return t('settings.dataCleared');
-                  return t('settings.clearPartialData');
-                })()}
-              </Button>
-            </div>
 
-            {/* Clear All Data */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
+        {isClearDataExpanded && (
+          <CardContent>
+            <div className="space-y-4">
+              {/* Asset Management Section */}
               <div>
-                <h3 className="font-medium">{t('settings.clearAllData')}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {t('settings.clearAllDataDescription')}
-                </p>
+                <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                  {t("settings.assetManagement")}
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <Button
+                      variant="outline"
+                      className={clsx("w-full justify-between", {
+                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearAssetDefinitionsStatus === 'success'
+                      })}
+                      onClick={onClearAssetDefinitions}
+                      disabled={clearAssetDefinitionsStatus === "clearing"}
+                    >
+                      <div className="text-left">
+                        <span className="flex items-center mb-1">
+                          {clearAssetDefinitionsStatus === "clearing" ? <LoadingSpinner /> : 
+                           clearAssetDefinitionsStatus === "success" ? 
+                           <span className="text-green-500">✓</span> :
+                           <Trash className="h-4 w-4 mr-2" />}
+                          {t("settings.clearAssetDefinitions")}
+                        </span>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {t("settings.clearAssetDefinitionsDesc")}
+                        </p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                    </Button>
+                  </div>
+                  
+                  <div>
+                    <Button
+                      variant="outline"
+                      className={clsx("w-full justify-between", {
+                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearPriceHistoryStatus === 'success'
+                      })}
+                      onClick={onClearPriceHistory}
+                      disabled={clearPriceHistoryStatus === "clearing"}
+                    >
+                      <div className="text-left">
+                        <span className="flex items-center mb-1">
+                          {clearPriceHistoryStatus === "clearing" ? <LoadingSpinner /> : 
+                           clearPriceHistoryStatus === "success" ? 
+                           <span className="text-green-500">✓</span> :
+                           <Trash className="h-4 w-4 mr-2" />}
+                          {t("settings.clearPriceHistory")}
+                        </span>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {t("settings.clearPriceHistoryDesc")}
+                        </p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button
+                      variant="outline"
+                      className={clsx("w-full justify-between", {
+                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearAssetTransactionsStatus === 'success'
+                      })}
+                      onClick={onClearAssetTransactions}
+                      disabled={clearAssetTransactionsStatus === "clearing"}
+                    >
+                      <div className="text-left">
+                        <span className="flex items-center mb-1">
+                          {clearAssetTransactionsStatus === "clearing" ? <LoadingSpinner /> : 
+                           clearAssetTransactionsStatus === "success" ? 
+                           <span className="text-green-500">✓</span> :
+                           <Trash className="h-4 w-4 mr-2" />}
+                          {t("settings.clearAssetTransactions")}
+                        </span>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {t("settings.clearAssetTransactionsDesc")}
+                        </p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                    </Button>
+                  </div>
+                </div>
               </div>
-              {/* For all data clear button */}
-              <Button
-                onClick={() => {
-                  if (window.confirm(t('settings.confirmClearAllData'))) {
-                    onClearAllData();
-                  }
-                }}
-                disabled={clearDataStatus === 'clearing'}
-                variant="destructive"
-                className="flex items-center space-x-2"
-              >
-                {(() => {
-                  if (clearDataStatus === 'clearing') return t('settings.clearingData');
-                  if (clearDataStatus === 'success') return t('settings.dataCleared');
-                  return t('settings.clearAllData');
-                })()}
-              </Button>
+
+              {/* Financial Management Section */}
+              <div>
+                <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                  {t("settings.financialManagement")}
+                </h3>
+                <div className="space-y-3">
+                  <div>
+                    <Button
+                      variant="outline"
+                      className={clsx("w-full justify-between", {
+                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearDebtsStatus === 'success'
+                      })}
+                      onClick={onClearDebts}
+                      disabled={clearDebtsStatus === "clearing"}
+                    >
+                      <div className="text-left">
+                        <span className="flex items-center mb-1">
+                          {clearDebtsStatus === "clearing" ? <LoadingSpinner /> : 
+                           clearDebtsStatus === "success" ? 
+                           <span className="text-green-500">✓</span> :
+                           <Trash className="h-4 w-4 mr-2" />}
+                          {t("settings.clearDebts")}
+                        </span>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {t("settings.clearDebtsDesc")}
+                        </p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button
+                      variant="outline"
+                      className={clsx("w-full justify-between", {
+                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearExpensesStatus === 'success'
+                      })}
+                      onClick={onClearExpenses}
+                      disabled={clearExpensesStatus === "clearing"}
+                    >
+                      <div className="text-left">
+                        <span className="flex items-center mb-1">
+                          {clearExpensesStatus === "clearing" ? <LoadingSpinner /> : 
+                           clearExpensesStatus === "success" ? 
+                           <span className="text-green-500">✓</span> :
+                           <Trash className="h-4 w-4 mr-2" />}
+                          {t("settings.clearExpenses")}
+                        </span>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {t("settings.clearExpensesDesc")}
+                        </p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                    </Button>
+                  </div>
+
+                  <div>
+                    <Button
+                      variant="outline"
+                      className={clsx("w-full justify-between", {
+                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearIncomeStatus === 'success'
+                      })}
+                      onClick={onClearIncome}
+                      disabled={clearIncomeStatus === "clearing"}
+                    >
+                      <div className="text-left">
+                        <span className="flex items-center mb-1">
+                          {clearIncomeStatus === "clearing" ? <LoadingSpinner /> : 
+                           clearIncomeStatus === "success" ? 
+                           <span className="text-green-500">✓</span> :
+                           <Trash className="h-4 w-4 mr-2" />}
+                          {t("settings.clearIncome")}
+                        </span>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {t("settings.clearIncomeDesc")}
+                        </p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Complete Reset Section */}
+              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+                  {t("settings.completeReset")}
+                </h3>
+                <div className="space-y-3">
+                  <Button
+                    variant="destructive"
+                    className={clsx("w-full justify-between", {
+                      'opacity-50': clearAllDataStatus === "clearing"
+                    })}
+                    onClick={onClearAllData}
+                    disabled={clearAllDataStatus === "clearing"}
+                  >
+                    <div className="text-left">
+                      <span className="flex items-center mb-1">
+                        {clearAllDataStatus === "clearing" ? <LoadingSpinner /> : 
+                         clearAllDataStatus === "success" ? 
+                         <span className="text-white">✓</span> :
+                         <Trash className="h-4 w-4 mr-2" />}
+                        {t("settings.clearAllData")}
+                      </span>
+                      <p className="text-sm text-gray-400">
+                        {t("settings.clearAllDataDesc")}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 flex-shrink-0" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </CardContent>
         )}
@@ -554,6 +745,15 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </CardContent>
       </Card>
+
+      {/* Add Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={confirmDialog.isOpen}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        onConfirm={confirmDialog.onConfirm}
+        onClose={onCloseConfirmDialog}
+      />
     </div>
   );
 };

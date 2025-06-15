@@ -5,8 +5,8 @@ const featureFlag_Debug_StoreLogs: boolean = true; //Store logs in the local sto
 
 
 const featureFlag_Debug_AllLogs: boolean = false; //Show all logs in the console
-const featureFlag_Debug_Log_infoRedux: boolean = false; //Show info logs of the setter in the console
-const featureFlag_Debug_Log_Service: boolean = false; //Show info logs of the setter in the console
+const featureFlag_Debug_Log_infoRedux: boolean = true; //Show info logs of the setter in the console
+const featureFlag_Debug_Log_Service: boolean = true; //Show info logs of the setter in the console
 const featureFlag_Debug_Log_Info: boolean = false; //Show info logs in the console
 const featureFlag_Debug_Log_Warning: boolean = false; //Show warning logs in the console
 const featureFlag_Debug_Log_Error: boolean = true; //Show error logs in the console

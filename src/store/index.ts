@@ -10,6 +10,7 @@ import dashboardReducer from './slices/dashboardSlice';
 import forecastReducer from './slices/forecastSlice';
 import apiConfigReducer from './slices/apiConfigSlice';
 import customAnalyticsReducer from './slices/customAnalyticsSlice';
+import portfolioHistoryReducer from './slices/portfolioHistorySlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
 import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
 import Logger from '../service/Logger/logger';
@@ -110,6 +111,7 @@ const rootReducer = {
   forecast: forecastReducer,
   apiConfig: apiConfigReducer,
   customAnalytics: customAnalyticsReducer,
+  portfolioHistory: portfolioHistoryReducer,
 };
 
 export const store = configureStore({

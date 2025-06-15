@@ -83,6 +83,7 @@ export interface AssetDefinition extends BaseEntity {
   currentPrice?: number;
   lastPriceUpdate?: string;
   autoUpdatePrice?: boolean; // Whether to auto-update price via API (only for stocks)
+  autoUpdateHistoricalPrices?: boolean; // Whether to auto-update historical prices via API (only for stocks)
   
   // Historical price data
   priceHistory?: PriceHistoryEntry[];

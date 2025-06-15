@@ -86,19 +86,28 @@ export const calculatePortfolioPositions = (
       return sum + getCurrentQuantity(t);
     }, 0);
 
-    const totalInvestment = transactions.reduce((sum, t) => {
+    // First calculate total investment from buy transactions only
+    const totalBuyInvestment = transactions.reduce((sum, t) => {
       if (t.transactionType === 'buy') {
         const quantity = t.purchaseQuantity || 0;
         const price = t.purchasePrice || 0;
         return sum + (price * quantity) + (t.transactionCosts || 0);
-      } else if (t.transactionType === 'sell') {
-        // For sells, subtract the sale proceeds (but keep transaction costs as expense)
-        const quantity = t.saleQuantity || 0;
-        const price = t.salePrice || 0;
-        return sum - (price * quantity) + (t.transactionCosts || 0);
       }
       return sum;
     }, 0);
+
+    // Calculate average purchase price from buy transactions
+    const totalBuyQuantity = transactions.reduce((sum, t) => {
+      if (t.transactionType === 'buy') {
+        return sum + (t.purchaseQuantity || 0);
+      }
+      return sum;
+    }, 0);
+
+    const avgPurchasePrice = totalBuyQuantity > 0 ? totalBuyInvestment / totalBuyQuantity : 0;
+
+    // Now calculate final investment based on remaining quantity and average purchase price
+    const totalInvestment = (totalQuantity * avgPurchasePrice) + transactions.reduce((sum, t) => sum + (t.transactionCosts || 0), 0);
 
     const currentValue = totalQuantity > 0 ? (assetDefinition?.currentPrice || 0) * totalQuantity : 0;
 

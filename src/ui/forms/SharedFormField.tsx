@@ -80,7 +80,7 @@ export const SharedFormField: React.FC<SharedFormFieldProps> = ({
       <FormControlLabel
         control={
           <Checkbox
-            checked={Boolean(value)}
+            checked={value === true}
             onChange={(e) => onChange?.(e.target.checked)}
             name={name}
             color="primary"

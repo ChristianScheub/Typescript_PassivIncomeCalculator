@@ -27,6 +27,7 @@ import { createCachedDividends } from '../utils/dividendCacheUtils';
 import AssetDefinitionsContainer from './AssetDefinitionsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
 import { AssetCategoryContainer } from './AssetCategoryContainer';
+import { PortfolioHistoryContainer } from './PortfolioHistoryContainer';
 
 const AssetsContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -55,6 +56,7 @@ const AssetsContainer: React.FC = () => {
   const [isShowingCalendar, setIsShowingCalendar] = useState(false);
   const [isShowingCategories, setIsShowingCategories] = useState(false);
   const [isShowingAnalytics, setIsShowingAnalytics] = useState(false);
+  const [isShowingPortfolioHistory, setIsShowingPortfolioHistory] = useState(false);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -224,11 +226,16 @@ const AssetsContainer: React.FC = () => {
     setIsShowingAnalytics(true);
   };
 
+  const handleNavigateToPortfolioHistory = () => {
+    setIsShowingPortfolioHistory(true);
+  };
+
   const handleBackToAssets = () => {
     setIsShowingDefinitions(false);
     setIsShowingCalendar(false);
     setIsShowingCategories(false);
     setIsShowingAnalytics(false);
+    setIsShowingPortfolioHistory(false);
   };
 
   // If showing definitions, render the definitions container instead
@@ -267,6 +274,19 @@ const AssetsContainer: React.FC = () => {
     );
   }
 
+  // If showing portfolio history, render the portfolio history container instead
+  if (isShowingPortfolioHistory) {
+    return (
+      <PortfolioHistoryContainer 
+        assets={assets}
+        assetDefinitions={assetDefinitions}
+        totalInvestment={portfolioTotals.totalInvestment}
+        currentValue={portfolioTotals.totalValue}
+        onBack={handleBackToAssets}
+      />
+    );
+  }
+
   return (
     <AssetsView
       assets={sortedAssets}
@@ -287,6 +307,7 @@ const AssetsContainer: React.FC = () => {
       onNavigateToCategories={handleNavigateToCategories}
       onNavigateToCalendar={handleNavigateToCalendar}
       onNavigateToAnalytics={handleNavigateToAnalytics}
+      onNavigateToPortfolioHistory={handleNavigateToPortfolioHistory}
     />
   );
 };

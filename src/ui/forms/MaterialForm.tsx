@@ -86,7 +86,7 @@ export const MaterialFormField: React.FC<FormFieldProps> = ({
       <FormControlLabel
         control={
           <Checkbox
-            checked={Boolean(value)}
+            checked={value === true}
             onChange={(e) => onChange?.(e.target.checked)}
             name={name}
             color="primary"

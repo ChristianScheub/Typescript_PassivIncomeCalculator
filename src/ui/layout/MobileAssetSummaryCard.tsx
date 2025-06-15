@@ -16,6 +16,7 @@ interface MobileAssetSummaryCardProps {
   annualAssetIncome: number;
   onNavigateToCalendar: () => void;
   onNavigateToAnalytics?: () => void;
+  onNavigateToPortfolioHistory?: () => void;
 }
 
 export const MobileAssetSummaryCard: React.FC<MobileAssetSummaryCardProps> = ({
@@ -23,7 +24,8 @@ export const MobileAssetSummaryCard: React.FC<MobileAssetSummaryCardProps> = ({
   monthlyAssetIncome,
   annualAssetIncome,
   onNavigateToCalendar,
-  onNavigateToAnalytics
+  onNavigateToAnalytics,
+  onNavigateToPortfolioHistory
 }) => {
   const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -79,7 +81,7 @@ export const MobileAssetSummaryCard: React.FC<MobileAssetSummaryCardProps> = ({
                 className="bg-white dark:bg-gray-900 rounded-xl p-4 border-2 border-blue-200 dark:border-blue-800 shadow-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onNavigateToAnalytics?.();
+                  onNavigateToPortfolioHistory?.();
                 }}
               >
                 <div className="flex items-start gap-3">

@@ -7,24 +7,24 @@ import {
   DividendFrequency,
   PaymentFrequency,
   AssetCategoryAssignment,
-  SectorAllocation,
 } from "../../types";
 import { updateAssetDefinitionPrice } from "../../utils/priceHistoryUtils";
 import {
   StandardFormWrapper,
-  RequiredSection,
   OptionalSection,
   FormGrid,
   StandardFormField,
-} from "./StandardFormWrapper";
-import { Modal } from "../common/Modal";
-import { MonthSelector } from "./MonthSelector";
-import { CustomAmountsSection } from "../specialized/CustomAmountsSection";
-import { AssetCategoryAssignmentSelector } from "../specialized/AssetCategoryAssignmentSelector";
+} from "../../ui/forms/StandardFormWrapper";
+import { Modal } from "../../ui/common/Modal";
+import { Toggle } from "../../ui/common/Toggle";
+import { AssetCategoryAssignmentSelector } from "../../ui/specialized/AssetCategoryAssignmentSelector";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { getAssetTypeOptions } from "../../constants";
 import { useAppSelector } from "../../hooks/redux";
+import { BasicAssetInformation } from "../../ui/sections";
+import { SectorSection } from "../../ui/specialized/SectorSection";
+import { AdditionalInformationSection } from "../../ui/specialized/AdditionalInformationSection";
+import { AssetIncomeSection } from "../../ui/forms/assetDefinition/AssetIncomeSection";
 
 const assetDefinitionSchema = z.object({
   fullName: z.string().min(1, "Name is required"),
@@ -55,6 +55,7 @@ const assetDefinitionSchema = z.object({
   currentPrice: z.number().min(0).optional(),
   lastPriceUpdate: z.string().optional(),
   autoUpdatePrice: z.boolean().optional(),
+  autoUpdateHistoricalPrices: z.boolean().optional(),
 
   // Dividend fields
   hasDividend: z.boolean().optional(),
@@ -125,12 +126,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     (state) => state.apiConfig
   );
 
-  const getRiskLevelOptions = (t: any) => [
-    { value: "low", label: t("assets.riskLevels.low") },
-    { value: "medium", label: t("assets.riskLevels.medium") },
-    { value: "high", label: t("assets.riskLevels.high") },
-  ];
-
   const {
     handleSubmit,
     watch,
@@ -162,7 +157,9 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           currentPrice: editingDefinition.currentPrice || undefined,
           lastPriceUpdate: editingDefinition.lastPriceUpdate || undefined,
           autoUpdatePrice: editingDefinition.autoUpdatePrice || false,
+          autoUpdateHistoricalPrices: editingDefinition.autoUpdateHistoricalPrices || false,
 
+          // Dividend fields
           hasDividend: !!editingDefinition.dividendInfo,
           dividendAmount: editingDefinition.dividendInfo?.amount || 0,
           dividendFrequency:
@@ -211,14 +208,10 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
   const hasDividend = watch("hasDividend");
   const hasRental = watch("hasRental");
   const hasBond = watch("hasBond");
-  const dividendFrequency = watch("dividendFrequency");
-  const rentalFrequency = watch("rentalFrequency");
   const dividendPaymentMonths = watch("dividendPaymentMonths") || [];
   const rentalPaymentMonths = watch("rentalPaymentMonths") || [];
   const dividendCustomAmounts = watch("dividendCustomAmounts") || {};
   const rentalCustomAmounts = watch("rentalCustomAmounts") || {};
-  const useMultipleSectors = watch("useMultipleSectors");
-
   React.useEffect(() => {
     setSelectedType(watchedType as AssetType);
   }, [watchedType]);
@@ -267,19 +260,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     });
   };
 
-  // Handler functions for multiple sectors
-  const addSector = () => {
-    const newSectors = [...sectors, { sectorName: "", percentage: 0 }];
-    setSectors(newSectors);
-    setValue("sectors", newSectors);
-  };
-
-  const removeSector = (index: number) => {
-    const newSectors = sectors.filter((_, i) => i !== index);
-    setSectors(newSectors);
-    setValue("sectors", newSectors);
-  };
-
   const updateSector = (
     index: number,
     field: "sectorName" | "percentage",
@@ -289,13 +269,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     newSectors[index] = { ...newSectors[index], [field]: value };
     setSectors(newSectors);
     setValue("sectors", newSectors);
-  };
-
-  const calculateTotalPercentage = () => {
-    return sectors.reduce(
-      (total, sector) => total + (sector.percentage || 0),
-      0
-    );
   };
 
   // Reset form when editingDefinition changes
@@ -334,6 +307,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         currentPrice: editingDefinition.currentPrice || undefined,
         lastPriceUpdate: editingDefinition.lastPriceUpdate || undefined,
         autoUpdatePrice: editingDefinition.autoUpdatePrice || false,
+        autoUpdateHistoricalPrices: editingDefinition.autoUpdateHistoricalPrices || false,
 
         hasDividend: !!editingDefinition.dividendInfo,
         dividendAmount: editingDefinition.dividendInfo?.amount || 0,
@@ -408,6 +382,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       currentPrice: data.currentPrice || undefined,
       lastPriceUpdate: data.lastPriceUpdate || undefined,
       autoUpdatePrice: data.autoUpdatePrice || false,
+      autoUpdateHistoricalPrices: data.autoUpdateHistoricalPrices || false,
       priceHistory: existingDefinition?.priceHistory || [],
     };
 
@@ -503,372 +478,116 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         }
         onSubmit={handleSubmit(handleFormSubmit)}
       >
-        <RequiredSection>
-          <FormGrid columns={{ xs: "1fr", sm: "1fr" }}>
-            <StandardFormField
-              label={t("assets.fullName")}
-              name="fullName"
-              required
-              error={errors.fullName?.message}
-              value={watch("fullName")}
-              onChange={(value) => setValue("fullName", value)}
-              placeholder={t("assets.fullNamePlaceholder")}
-            />
+        <BasicAssetInformation
+          watch={watch}
+          setValue={setValue}
+          errors={errors}
+          isDefinition={true}
+        />
 
-            {selectedType !== "real_estate" && (
-              <StandardFormField
-                label={t("assets.ticker")}
-                name="ticker"
-                value={watch("ticker")}
-                onChange={(value) => setValue("ticker", value)}
-                placeholder={t("assets.tickerPlaceholder")}
-              />
-            )}
-
-            <StandardFormField
-              label={t("assets.type")}
-              name="type"
-              type="select"
-              required
-              options={getAssetTypeOptions(t)}
-              error={errors.type?.message}
-              value={watch("type")}
-              onChange={(value) => setValue("type", value)}
-            />
-
-            <StandardFormField
-              label={t("assets.riskLevel")}
-              name="riskLevel"
-              type="select"
-              options={getRiskLevelOptions(t)}
-              value={watch("riskLevel")}
-              onChange={(value) => setValue("riskLevel", value)}
-            />
-
-            <StandardFormField
-              label={t("assets.country")}
-              name="country"
-              value={watch("country")}
-              onChange={(value) => setValue("country", value)}
-              placeholder={t("assets.countryPlaceholder")}
-            />
-
-            <StandardFormField
-              label={t("assets.currency")}
-              name="currency"
-              value={watch("currency")}
-              onChange={(value) => setValue("currency", value)}
-              placeholder="EUR"
-            />
-
+        {/* Price Information Section */}
+        <OptionalSection title={t("assets.priceInformation")}>
+          <FormGrid columns={{ xs: "1fr", sm: "1fr 1fr" }}>
             <StandardFormField
               label={t("assets.currentPrice")}
               name="currentPrice"
               type="number"
-              value={watch("currentPrice")}
-              onChange={(value) => setValue("currentPrice", value)}
+              value={watch("currentPrice") || ""}
+              onChange={(value) => setValue("currentPrice", value ? parseFloat(value) : undefined)}
               step={0.01}
               min={0}
-              placeholder={t("assets.currentPricePlaceholder")}
-            />
-
-            {/* Auto Update Price Toggle - only visible for stocks when API is enabled */}
-            {selectedType === "stock" && isApiEnabled && (
-              <StandardFormField
-                label={t("assets.autoUpdatePrice")}
-                name="autoUpdatePrice"
-                type="checkbox"
-                value={watch("autoUpdatePrice")}
-                onChange={(value) => setValue("autoUpdatePrice", value)}
-              />
-            )}
-            {/* Sector Configuration */}
-            {!useMultipleSectors ? (
-              <StandardFormField
-                label={t("assets.sector")}
-                name="sector"
-                value={watch("sector")}
-                onChange={(value) => setValue("sector", value)}
-                placeholder={t("assets.sectorPlaceholder")}
-              />
-            ) : (
-              <OptionalSection title={t("assets.sectors")}>
-                <div className="space-y-4">
-                  {sectors.map((sector, index) => (
-                    <div key={index} className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                          {t("assets.sectorName")} {index + 1}
-                        </label>
-                        <input
-                          type="text"
-                          placeholder={t("assets.sectorPlaceholder")}
-                          value={sector.sectorName}
-                          onChange={(e) =>
-                            updateSector(index, "sectorName", e.target.value)
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                          {t("assets.percentage")} (%)
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            placeholder="0"
-                            value={sector.percentage}
-                            onChange={(e) =>
-                              updateSector(
-                                index,
-                                "percentage",
-                                parseFloat(e.target.value) || 0
-                              )
-                            }
-                            min="0"
-                            max="100"
-                            step="0.1"
-                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                          />
-                          {sectors.length > 1 && (
-                            <button
-                              type="button"
-                              onClick={() => removeSector(index)}
-                              className="px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded border border-red-300 dark:border-red-600"
-                            >
-                              {t("common.remove")}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <button
-                      type="button"
-                      onClick={addSector}
-                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-                    >
-                      {t("assets.addSector")}
-                    </button>
-                    <div className="text-sm">
-                      <span className="text-gray-600 dark:text-gray-400">
-                        {t("assets.total")}:
-                      </span>
-                      <span
-                        className={`ml-1 font-medium ${
-                          Math.abs(calculateTotalPercentage() - 100) < 0.01
-                            ? "text-green-600"
-                            : "text-red-600"
-                        }`}
-                      >
-                        {calculateTotalPercentage().toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </OptionalSection>
-            )}
-            <StandardFormField
-              label={t("assets.useMultipleSectors")}
-              name="useMultipleSectors"
-              type="checkbox"
-              value={watch("useMultipleSectors")}
-              onChange={(value) => {
-                setValue("useMultipleSectors", value);
-                if (
-                  value &&
-                  sectors.length === 1 &&
-                  sectors[0].sectorName === ""
-                ) {
-                  // Initialize with one empty sector when enabling multi-sector
-                  setSectors([{ sectorName: "", percentage: 100 }]);
-                }
-              }}
+              error={errors.currentPrice?.message}
             />
           </FormGrid>
-        </RequiredSection>
+        </OptionalSection>
 
-        {selectedType !== "real_estate" && (
+        {selectedType === "stock" && isApiEnabled && (
+          <>
+          <div className="flex items-center justify-between mb-4">
+                <span className="text-gray-700 dark:text-gray-300">{t("assets.autoUpdatePrice")}</span>
+            <Toggle
+              checked={watch("autoUpdatePrice") || false}
+              onChange={(checked) => setValue("autoUpdatePrice", checked)}
+              id="autoUpdatePrice"
+              label={t("assets.autoUpdatePrice")}
+            />
+          </div>
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-gray-700 dark:text-gray-300">{t("assets.autoUpdateHistoricalPrices")}</span>
+            <Toggle
+              checked={watch("autoUpdateHistoricalPrices") || false}
+              onChange={(checked) => setValue("autoUpdateHistoricalPrices", checked)}
+              id="autoUpdateHistoricalPrices"
+              label={t("assets.autoUpdateHistoricalPrices")}
+            />
+            </div>
+          </>
+        )}
+
+        <SectorSection
+          setValue={setValue}
+          sectors={sectors}
+          setSectors={setSectors}
+          updateSector={updateSector}
+        />
+
+        {/* Dividend Section */}
+        {selectedType === "stock" && (
           <OptionalSection title={t("assets.dividendInformation")}>
             <FormGrid columns={{ xs: "1fr", sm: "1fr" }}>
-              <StandardFormField
-                label={t("assets.hasDividend")}
-                name="hasDividend"
-                type="checkbox"
-                value={watch("hasDividend")}
-                onChange={(value) => setValue("hasDividend", value)}
-              />
-
-              {hasDividend && (
-                <>
-                  <StandardFormField
-                    label={t("assets.dividendAmount")}
-                    name="dividendAmount"
-                    type="number"
-                    value={watch("dividendAmount")}
-                    onChange={(value) => setValue("dividendAmount", value)}
-                    step={0.01}
-                    min={0}
-                  />
-
-                  <StandardFormField
-                    label={t("assets.dividendFrequency")}
-                    name="dividendFrequency"
-                    type="select"
-                    options={[
-                      {
-                        value: "monthly",
-                        label: t("paymentFrequency.monthly"),
-                      },
-                      {
-                        value: "quarterly",
-                        label: t("paymentFrequency.quarterly"),
-                      },
-                      {
-                        value: "annually",
-                        label: t("paymentFrequency.annually"),
-                      },
-                      { value: "custom", label: t("paymentFrequency.custom") },
-                    ]}
-                    value={watch("dividendFrequency")}
-                    onChange={(value) => setValue("dividendFrequency", value)}
-                  />
-                </>
-              )}
-            </FormGrid>
-
-            {/* Dividend Month Selection */}
-            {hasDividend &&
-              dividendFrequency &&
-              (dividendFrequency === "quarterly" ||
-                dividendFrequency === "annually" ||
-                dividendFrequency === "custom") && (
-                <div style={{ marginTop: "16px" }}>
-                  <MonthSelector
-                    selectedMonths={dividendPaymentMonths}
-                    onChange={handleDividendMonthChange}
-                    label={
-                      dividendFrequency === "quarterly"
-                        ? t("assets.selectQuarterlyMonths")
-                        : dividendFrequency === "annually"
-                        ? t("assets.selectAnnualMonth")
-                        : t("assets.selectDividendMonths")
-                    }
-                  />
-                </div>
-              )}
-
-            {/* Custom Dividend Amounts */}
-            {hasDividend && dividendFrequency === "custom" && (
-              <CustomAmountsSection
-                frequency={dividendFrequency}
-                selectedMonths={dividendPaymentMonths}
+              <AssetIncomeSection
+                type="dividend"
+                hasIncome={hasDividend}
+                onHasIncomeChange={(checked) => setValue("hasDividend", checked)}
+                amount={watch("dividendAmount") || 0}
+                onAmountChange={(value) => setValue("dividendAmount", value)}
+                frequency={watch("dividendFrequency") as PaymentFrequency}
+                onFrequencyChange={(value) => setValue("dividendFrequency", value as PaymentFrequency)}
+                paymentMonths={dividendPaymentMonths}
+                onPaymentMonthChange={handleDividendMonthChange}
                 customAmounts={dividendCustomAmounts}
-                onAmountChange={handleDividendCustomAmountChange}
-                title={t("assets.customDividendAmounts")}
+                onCustomAmountChange={handleDividendCustomAmountChange}
                 currency={watch("currency") || "EUR"}
               />
-            )}
+            </FormGrid>
           </OptionalSection>
         )}
 
+        {/* Real Estate Section */}
         {selectedType === "real_estate" && (
           <OptionalSection title={t("assets.rentalInformation")}>
             <FormGrid columns={{ xs: "1fr", sm: "1fr" }}>
-              <StandardFormField
-                label={t("assets.hasRental")}
-                name="hasRental"
-                type="checkbox"
-                value={watch("hasRental")}
-                onChange={(value) => setValue("hasRental", value)}
-              />
-
-              {hasRental && (
-                <>
-                  <StandardFormField
-                    label={t("assets.rentalAmount")}
-                    name="rentalAmount"
-                    type="number"
-                    value={watch("rentalAmount")}
-                    onChange={(value) => setValue("rentalAmount", value)}
-                    step={0.01}
-                    min={0}
-                  />
-
-                  <StandardFormField
-                    label={t("assets.rentalFrequency")}
-                    name="rentalFrequency"
-                    type="select"
-                    options={[
-                      {
-                        value: "monthly",
-                        label: t("paymentFrequency.monthly"),
-                      },
-                      {
-                        value: "quarterly",
-                        label: t("paymentFrequency.quarterly"),
-                      },
-                      {
-                        value: "annually",
-                        label: t("paymentFrequency.annually"),
-                      },
-                      { value: "custom", label: t("paymentFrequency.custom") },
-                    ]}
-                    value={watch("rentalFrequency")}
-                    onChange={(value) => setValue("rentalFrequency", value)}
-                  />
-                </>
-              )}
-            </FormGrid>
-
-            {/* Rental Month Selection */}
-            {hasRental &&
-              rentalFrequency &&
-              (rentalFrequency === "quarterly" ||
-                rentalFrequency === "annually" ||
-                rentalFrequency === "custom") && (
-                <div style={{ marginTop: "16px" }}>
-                  <MonthSelector
-                    selectedMonths={rentalPaymentMonths}
-                    onChange={handleRentalMonthChange}
-                    label={
-                      rentalFrequency === "quarterly"
-                        ? t("assets.selectQuarterlyMonths")
-                        : rentalFrequency === "annually"
-                        ? t("assets.selectAnnualMonth")
-                        : t("assets.selectRentalMonths")
-                    }
-                  />
-                </div>
-              )}
-
-            {/* Custom Rental Amounts */}
-            {hasRental && rentalFrequency === "custom" && (
-              <CustomAmountsSection
-                frequency={rentalFrequency}
-                selectedMonths={rentalPaymentMonths}
+              <AssetIncomeSection
+                type="rental"
+                hasIncome={hasRental}
+                onHasIncomeChange={(checked) => setValue("hasRental", checked)}
+                amount={watch("rentalAmount") || 0}
+                onAmountChange={(value) => setValue("rentalAmount", value)}
+                frequency={watch("rentalFrequency") as PaymentFrequency}
+                onFrequencyChange={(value) => setValue("rentalFrequency", value as PaymentFrequency)}
+                paymentMonths={rentalPaymentMonths}
+                onPaymentMonthChange={handleRentalMonthChange}
                 customAmounts={rentalCustomAmounts}
-                onAmountChange={handleRentalCustomAmountChange}
-                title={t("assets.customRentalAmounts")}
+                onCustomAmountChange={handleRentalCustomAmountChange}
                 currency={watch("currency") || "EUR"}
               />
-            )}
+            </FormGrid>
           </OptionalSection>
         )}
 
+        {/* Bond Section */}
         {selectedType === "bond" && (
           <OptionalSection title={t("assets.bondInformation")}>
             <FormGrid columns={{ xs: "1fr", sm: "1fr" }}>
-              <StandardFormField
-                label={t("assets.hasBondInfo")}
-                name="hasBond"
-                type="checkbox"
-                value={watch("hasBond")}
-                onChange={(value) => setValue("hasBond", value)}
-              />
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-gray-700 dark:text-gray-300">{t("assets.hasBondInfo")}</span>
+                <Toggle
+                  checked={watch("hasBond") || false}
+                  onChange={(checked) => setValue("hasBond", checked)}
+                  id="hasBond"
+                  label={t("assets.hasBondInfo")}
+                />
+              </div>
 
               {hasBond && (
                 <>
@@ -905,48 +624,11 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           </OptionalSection>
         )}
 
-        <OptionalSection title={t("common.additionalInformation")}>
-          <FormGrid columns={{ xs: "1fr", sm: "1fr" }}>
-            {selectedType !== "real_estate" && (
-              <>
-                <StandardFormField
-                  label={t("assets.exchange")}
-                  name="exchange"
-                  value={watch("exchange")}
-                  onChange={(value) => setValue("exchange", value)}
-                  placeholder={t("assets.exchangePlaceholder")}
-                />
-
-                <StandardFormField
-                  label={t("assets.isin")}
-                  name="isin"
-                  value={watch("isin")}
-                  onChange={(value) => setValue("isin", value)}
-                  placeholder={t("assets.isinPlaceholder")}
-                />
-
-                <StandardFormField
-                  label={t("assets.wkn")}
-                  name="wkn"
-                  value={watch("wkn")}
-                  onChange={(value) => setValue("wkn", value)}
-                  placeholder={t("assets.wknPlaceholder")}
-                />
-              </>
-            )}
-
-            <StandardFormField
-              label={t("assets.description")}
-              name="description"
-              type="textarea"
-              value={watch("description")}
-              onChange={(value) => setValue("description", value)}
-              placeholder={t("assets.descriptionPlaceholder")}
-              rows={3}
-              gridColumn="1 / -1"
-            />
-          </FormGrid>
-        </OptionalSection>
+        <AdditionalInformationSection
+          watch={watch}
+          setValue={setValue}
+          selectedType={selectedType}
+        />
 
         {/* Asset Categories Section */}
         <OptionalSection title={t("categories.assetCategories")}>

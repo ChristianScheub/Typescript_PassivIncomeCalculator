@@ -1,11 +1,12 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { AssetDefinition, AssetCategoryAssignment } from "../../types";
-import { AssetDefinitionForm } from "../../ui/forms/AssetDefinitionForm";
+import { AssetDefinitionForm } from "../forms/AssetDefinitionForm";
 import FloatingBtn, { ButtonAlignment } from "../../ui/layout/floatingBtn";
 import { ViewHeader } from "../../ui/layout/ViewHeader";
 import { Add } from "@mui/icons-material";
-import { Edit, Trash2, Wallet, RefreshCw } from "lucide-react";
+import { Edit, Trash2, Wallet, RefreshCw, History } from "lucide-react";
+import { Tooltip } from "@mui/material";
 
 type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt">;
 type CreateCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
@@ -80,24 +81,56 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
             <>
               {/* Hide "Kurse aktualisieren" button when disabled */}
               {!isUpdatingPrices && isApiEnabled && (
-                <button
-                  onClick={onUpdateStockPrices}
-                  className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                <Tooltip 
+                  title={t("assets.updatePrices")} 
+                  arrow 
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        bgcolor: 'rgba(0, 0, 0, 0.8)',
+                        '& .MuiTooltip-arrow': {
+                          color: 'rgba(0, 0, 0, 0.8)',
+                        },
+                        padding: '8px 12px',
+                        fontSize: '0.875rem',
+                      },
+                    },
+                  }}
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  {t("assets.updatePrices")}
-                </button>
+                  <button
+                    onClick={onUpdateStockPrices}
+                    className="flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                  </button>
+                </Tooltip>
               )}
               
               {/* Button for historical data */}
               {!isUpdatingHistoricalData && isApiEnabled && (
-                <button
-                  onClick={onUpdateHistoricalData}
-                  className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+                <Tooltip 
+                  title={t("assets.updateHistoricalData")} 
+                  arrow 
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        bgcolor: 'rgba(0, 0, 0, 0.8)',
+                        '& .MuiTooltip-arrow': {
+                          color: 'rgba(0, 0, 0, 0.8)',
+                        },
+                        padding: '8px 12px',
+                        fontSize: '0.875rem',
+                      },
+                    },
+                  }}
                 >
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  {t("assets.updateHistoricalData")}
-                </button>
+                  <button
+                    onClick={onUpdateHistoricalData}
+                    className="flex items-center p-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 ml-2"
+                  >
+                    <History className="h-4 w-4" />
+                  </button>
+                </Tooltip>
               )}
             </>
           }

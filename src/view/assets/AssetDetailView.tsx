@@ -5,6 +5,7 @@ import { PortfolioPosition } from '../../service/portfolioService/portfolioCalcu
 import formatService from '../../service/formatService';
 import { PriceHistoryView } from '../../ui/components/PriceHistoryView';
 import { PriceChart } from '../../ui/components/PriceChart';
+import { featureFlag_Debug_View } from '../../config/featureFlags';
 
 interface AssetDetailViewProps {
   asset: PortfolioPosition;
@@ -196,10 +197,11 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
           </div>
 
           {/* Price History */}
-          {asset.assetDefinition?.priceHistory && asset.assetDefinition.priceHistory.length > 0 && (
+          {featureFlag_Debug_View&& asset.assetDefinition?.priceHistory && asset.assetDefinition.priceHistory.length > 0 && (
             <PriceHistoryView
               priceHistory={asset.assetDefinition.priceHistory}
               currency={asset.assetDefinition.currency}
+              transactions={asset.transactions}
               showSourceIcons={true}
               maxEntries={10}
             />
@@ -211,6 +213,7 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
               priceHistory={asset.assetDefinition.priceHistory}
               currency={asset.assetDefinition.currency}
               ticker={asset.assetDefinition.ticker}
+              transactions={asset.transactions}
             />
           )}
 

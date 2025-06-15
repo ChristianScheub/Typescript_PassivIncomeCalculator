@@ -54,7 +54,8 @@
     "changePercent": "Veränderung %",
     "goToSettingsToConfigureApiKey": "Zu den Einstellungen, um den API-Schlüssel zu konfigurieren",
     "assets": "Vermögenswerte",
-    "fetchAAPL": "AAPL-Kurs abrufen"
+    "portfolioHistory": "Vermögens Historie",
+    "last30Days": "Die letzten 30 Tage"
   },
   
   "navigation": {
@@ -116,11 +117,19 @@
     "clearPartialData": "Finanzdaten löschen",
     "clearPartialDataDescription": "Löscht alle Finanzdaten (Vermögenswerte, Ausgaben, Verbindlichkeiten, etc.), behält aber Einstellungen wie API-Schlüssel und Wechselkurse",
     "clearAllData": "Alle Daten löschen",
-    "clearAllDataDescription": "Löscht alle Daten einschließlich API-Schlüssel und Einstellungen",
+    "clearAllDataTitle": "Alle Daten löschen",
     "clearingData": "Daten werden gelöscht...",
     "dataCleared": "Daten gelöscht!",
     "confirmClearPartialData": "Sind Sie sicher, dass Sie alle Finanzdaten löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearDebts": "Sind Sie sicher, dass Sie alle Verbindlichkeiten löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearAssets": "Sind Sie sicher, dass Sie alle Vermögenswerte löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearExpenses": "Sind Sie sicher, dass Sie alle Ausgaben löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearIncome": "Sind Sie sicher, dass Sie alle Einkommensquellen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
     "confirmClearAllData": "Sind Sie sicher, dass Sie ALLE Daten einschließlich API-Schlüssel löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearPriceHistory": "Sind Sie sicher, dass Sie den gesamten Preisverlauf löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearAssetDefinitions": "Sind Sie sicher, dass Sie alle Asset-Definitionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearAssetTransactions": "Sind Sie sicher, dass Sie alle Asset-Transaktionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "confirmClearAssetCategories": "Sind Sie sicher, dass Sie alle Asset-Kategorien löschen möchten? Dies kann nicht rückgängig gemacht werden.",
     "stockApiConfig": "Stock-API-Konfiguration",
     "enableStockApi": "Stock-API aktivieren",
     "enableStockApiDescription": "Aktivieren oder deaktivieren Sie die Integration der Stock-API",
@@ -151,7 +160,36 @@
     "usdOriginal": "USD (Original)",
     "currentCurrency": "Aktuell: {{currency}}",
     "appName": "Passive Income Calculator",
-    "version": "Version {{version}}"
+    "version": "Version {{version}}",
+    "assetManagement": "Asset-Verwaltung",
+    "clearAssetDefinitions": "Asset-Definitionen löschen",
+    "clearAssetDefinitionsDesc": "Löscht alle Asset-Definitionen aus dem System",
+    "clearPriceHistory": "Preisverlauf löschen",
+    "clearPriceHistoryDesc": "Löscht den gesamten Preisverlauf aller Assets",
+    "clearAssetTransactions": "Asset-Transaktionen löschen",
+    "clearAssetTransactionsDesc": "Löscht alle Asset-Transaktionen aus dem System",
+    "financialManagement": "Finanzverwaltung",
+    "clearDebts": "Schulden löschen",
+    "clearDebtsDesc": "Löscht alle erfassten Schulden und Verbindlichkeiten",
+    "clearExpenses": "Ausgaben löschen",
+    "clearExpensesDesc": "Löscht alle erfassten Ausgaben",
+    "clearIncome": "Einkommen löschen",
+    "clearIncomeDesc": "Löscht alle erfassten Einkommensquellen",
+    "completeReset": "Vollständiges Zurücksetzen",
+    "clearAssetDefinitionsTitle": "Asset-Definitionen löschen",
+    "clearAssetDefinitionsConfirm": "Sind Sie sicher, dass Sie alle Asset-Definitionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearPriceHistoryTitle": "Preisverlauf löschen",
+    "clearPriceHistoryConfirm": "Sind Sie sicher, dass Sie den gesamten Preisverlauf löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearAssetTransactionsTitle": "Asset-Transaktionen löschen",
+    "clearAssetTransactionsConfirm": "Sind Sie sicher, dass Sie alle Asset-Transaktionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearDebtsTitle": "Schulden löschen",
+    "clearDebtsConfirm": "Sind Sie sicher, dass Sie alle Schulden und Verbindlichkeiten löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearExpensesTitle": "Ausgaben löschen",
+    "clearExpensesConfirm": "Sind Sie sicher, dass Sie alle Ausgaben löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearIncomeTitle": "Einkommen löschen",
+    "clearIncomeConfirm": "Sind Sie sicher, dass Sie alle Einkommensquellen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearAllDataDesc": "Löscht ALLE Daten einschließlich API-Schlüssel und Einstellungen",
+    "clearAllDataConfirm": "Sind Sie sicher, dass Sie ALLE Daten löschen möchten? Dies wird sämtliche Einstellungen und Daten unwiderruflich entfernen."
   },
   
   "pages": {
@@ -327,11 +365,14 @@
   
   "assets": {
     "title": "Assets",
+    "purchase": "Kauf",
     "addTransaction": "Transaktion hinzufügen",
     "editTransaction": "Transaktion bearbeiten",
     "manageDefinitions": "Asset-Definitionen verwalten",
     "updatePrices": "Kurse aktualisieren",
     "updateHistoricalData": "Historische Daten aktualisieren",
+    "autoUpdateHistoricalPrices": "Historische Kurse automatisch aktualisieren",
+    "autoUpdatePrice": "Preis per API aktualisieren",
     "selectAsset": "Asset auswählen",
     "searchAssets": "Assets durchsuchen...",
     "selectAssetOption": "Bitte Asset auswählen...",
@@ -367,7 +408,6 @@
     "totalReturn": "Gesamtrendite",
     "currentPrice": "Aktueller Kurs",
     "currentPricePlaceholder": "z.B. 150.00",
-    "autoUpdatePrice": "Preis per API aktualisieren",
     "purchaseDates": "Kaufdaten",
     "viewTransactions": "Transaktionen anzeigen",
     "currentValue": "Aktueller Wert",
@@ -744,5 +784,19 @@
       "addFirstChart": "Erstes Diagramm hinzufügen",
       "chartTypeNotImplemented": "{{type}}-Diagramm noch nicht implementiert"
     }
+  },
+  "portfolio": {
+    "historyTitle": "Portfolio-Wertverlauf",
+    "value": "Wert",
+    "transactionDay": "Transaktionstag",
+    "noHistoryData": "Keine Verlaufsdaten verfügbar",
+    "noHistoryDataDesc": "Fügen Sie Assets mit historischen Preisen hinzu, um den Portfolio-Wertverlauf zu sehen.",
+    "currentValue": "Aktueller Wert",
+    "totalReturn": "Gesamtrendite",
+    "peakValue": "Höchstwert",
+    "lowestValue": "Niedrigstwert",
+    "valueHistory": "Wertverlauf",
+    "portfolioValue": "Portfolio-Wert",
+    "transactionDays": "Transaktionstage"
   }
 }

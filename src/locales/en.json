@@ -157,6 +157,8 @@
   },
   "assets": {
     "title": "Assets",
+    "purchase": "Purchase",
+    "purchase": "Purchase",
     "updatePrices": "Update Prices",
     "updateHistoricalData": "Update Historical Data",
     "currentPrice": "Current Price",
@@ -277,5 +279,19 @@
     "currentCurrency": "Current: {{currency}}",
     "appName": "Passive Income Calculator",
     "version": "Version {{version}}"
+  },
+  "portfolio": {
+    "historyTitle": "Portfolio Value History",
+    "value": "Value",
+    "transactionDay": "Transaction Day",
+    "noHistoryData": "No history data available",
+    "noHistoryDataDesc": "Add assets with historical prices to see the portfolio value history.",
+    "currentValue": "Current Value",
+    "totalReturn": "Total Return",
+    "peakValue": "Peak Value",
+    "lowestValue": "Lowest Value",
+    "valueHistory": "Value History",
+    "portfolioValue": "Portfolio Value",
+    "transactionDays": "Transaction Days"
   }
 }

@@ -15,6 +15,9 @@ import {
   setCurrency as setGlobalCurrency,
   getCurrency,
 } from "../service/stockAPIService/utils/fetch";
+import deleteDataService from "../service/deleteDataService";
+import { t } from "i18next";
+import { ConfirmationDialogState } from "../ui/dialog/types";
 
 const SettingsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -35,13 +38,42 @@ const SettingsContainer: React.FC = () => {
   >("idle");
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const [currency, setCurrency] = useState<"EUR" | "USD">("EUR");
-  const [clearDataStatus, setClearDataStatus] = useState<
-    "idle" | "clearing" | "success"
-  >("idle");
+
+  // Clear data operation states
+  const [clearAssetDefinitionsStatus, setClearAssetDefinitionsStatus] = useState<"idle" | "clearing" | "success">("idle");
+  const [clearPriceHistoryStatus, setClearPriceHistoryStatus] = useState<"idle" | "clearing" | "success">("idle");
+  const [clearAssetTransactionsStatus, setClearAssetTransactionsStatus] = useState<"idle" | "clearing" | "success">("idle");
+  const [clearDebtsStatus, setClearDebtsStatus] = useState<"idle" | "clearing" | "success">("idle");
+  const [clearExpensesStatus, setClearExpensesStatus] = useState<"idle" | "clearing" | "success">("idle");
+  const [clearIncomeStatus, setClearIncomeStatus] = useState<"idle" | "clearing" | "success">("idle");
+  const [clearAllDataStatus, setClearAllDataStatus] = useState<"idle" | "clearing" | "success">("idle");
+
   const [isApiExpanded, setIsApiExpanded] = useState(false);
   const [isDataManagementExpanded, setIsDataManagementExpanded] =
     useState(false);
   const [isClearDataExpanded, setIsClearDataExpanded] = useState(false);
+
+  // Confirmation Dialog State
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmationDialogState>({
+    isOpen: false,
+    title: '',
+    description: '',
+    onConfirm: () => {}
+  });
+
+  // Helper to show confirmation dialog
+  const showConfirmDialog = (title: string, description: string, onConfirm: () => void) => {
+    setConfirmDialog({
+      isOpen: true,
+      title,
+      description,
+      onConfirm
+    });
+  };
+
+  const closeConfirmDialog = () => {
+    setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
+  };
 
   // Load API keys and currency on mount
   useEffect(() => {
@@ -268,59 +300,10 @@ const SettingsContainer: React.FC = () => {
     });
   };
 
-  // Handle clearing only financial data
-  const handleClearPartialData = async () => {
-    try {
-      setClearDataStatus("clearing");
-      Logger.infoService("Starting to clear financial data");
-
-      // Clear Redux store first
-      dispatch(clearAllAssets());
-      dispatch(clearAllLiabilities());
-      dispatch(clearAllExpenses());
-      dispatch(clearAllIncome());
-
-      // Get all items from each store to delete them from SQLite
-      const stores: StoreNames[] = [
-        "assets",
-        "liabilities",
-        "expenses",
-        "income",
-      ];
-      for (const store of stores) {
-        const items = await sqliteService.getAll(store);
-        for (const item of items) {
-          if (item.id) {
-            await sqliteService.remove(store, item.id.toString());
-          }
-        }
-      }
-
-      // Clear specific localStorage entries related to financial data
-      const currentStorage = localStorage.getItem('passiveIncomeCalculator');
-      if (currentStorage) {
-        const parsed = JSON.parse(currentStorage);
-        parsed.assets = { items: [], status: 'idle', error: null };
-        parsed.liabilities = { items: [], status: 'idle', error: null };
-        parsed.expenses = { items: [], status: 'idle', error: null };
-        parsed.income = { items: [], status: 'idle', error: null };
-        localStorage.setItem('passiveIncomeCalculator', JSON.stringify(parsed));
-      }
-
-      setClearDataStatus("success");
-      Logger.infoService("Financial data cleared successfully");
-      analytics.trackEvent("settings_clear_partial_data");
-      setTimeout(() => setClearDataStatus("idle"), 2000);
-    } catch (error) {
-      Logger.error("Failed to clear financial data" + JSON.stringify(error));
-      setClearDataStatus("idle");
-    }
-  };
-
   // Handle clearing all data
   const handleClearAllData = async () => {
     try {
-      setClearDataStatus("clearing");
+      setClearAllDataStatus("clearing");
       Logger.infoService("Starting to clear all data");
 
       // 1. Clear Redux store first
@@ -367,7 +350,7 @@ const SettingsContainer: React.FC = () => {
       });
       dispatch(setApiEnabled(false));
 
-      setClearDataStatus("success");
+      setClearAllDataStatus("success");
       Logger.infoService("All data cleared successfully");
       analytics.trackEvent("settings_clear_all_data");
       
@@ -379,8 +362,143 @@ const SettingsContainer: React.FC = () => {
       
     } catch (error) {
       Logger.error("Failed to clear all data" + JSON.stringify(error));
-      setClearDataStatus("idle");
+      setClearAllDataStatus("idle");
     }
+  };
+
+  // Handle clearing only asset definitions
+  const handleClearAssetDefinitions = async () => {
+    try {
+      setClearAssetDefinitionsStatus("clearing");
+      await deleteDataService.clearAssetDefinitions();
+      setClearAssetDefinitionsStatus("success");
+      setTimeout(() => setClearAssetDefinitionsStatus("idle"), 2000);
+    } catch (error) {
+      Logger.error("Failed to clear asset definitions" + JSON.stringify(error));
+      setClearAssetDefinitionsStatus("idle");
+    }
+  };
+
+  // Handle clearing only asset price history
+  const handleClearPriceHistory = async () => {
+    try {
+      setClearPriceHistoryStatus("clearing");
+      await deleteDataService.clearPriceHistory();
+      setClearPriceHistoryStatus("success");
+      setTimeout(() => setClearPriceHistoryStatus("idle"), 2000);
+    } catch (error) {
+      Logger.error("Failed to clear price history" + JSON.stringify(error));
+      setClearPriceHistoryStatus("idle");
+    }
+  };
+
+  // Handle clearing only asset transactions
+  const handleClearAssetTransactions = async () => {
+    try {
+      setClearAssetTransactionsStatus("clearing");
+      await deleteDataService.clearAssetTransactions();
+      setClearAssetTransactionsStatus("success");
+      setTimeout(() => setClearAssetTransactionsStatus("idle"), 2000);
+    } catch (error) {
+      Logger.error("Failed to clear asset transactions" + JSON.stringify(error));
+      setClearAssetTransactionsStatus("idle");
+    }
+  };
+
+  // Handle clearing only debts
+  const handleClearDebts = async () => {
+    try {
+      setClearDebtsStatus("clearing");
+      await deleteDataService.clearDebts();
+      setClearDebtsStatus("success");
+      setTimeout(() => setClearDebtsStatus("idle"), 2000);
+    } catch (error) {
+      Logger.error("Failed to clear debts" + JSON.stringify(error));
+      setClearDebtsStatus("idle");
+    }
+  };
+
+  // Handle clearing only expenses
+  const handleClearExpenses = async () => {
+    try {
+      setClearExpensesStatus("clearing");
+      await deleteDataService.clearExpenses();
+      setClearExpensesStatus("success");
+      setTimeout(() => setClearExpensesStatus("idle"), 2000);
+    } catch (error) {
+      Logger.error("Failed to clear expenses" + JSON.stringify(error));
+      setClearExpensesStatus("idle");
+    }
+  };
+
+  // Handle clearing only income
+  const handleClearIncome = async () => {
+    try {
+      setClearIncomeStatus("clearing");
+      await deleteDataService.clearIncome();
+      setClearIncomeStatus("success");
+      setTimeout(() => setClearIncomeStatus("idle"), 2000);
+    } catch (error) {
+      Logger.error("Failed to clear income" + JSON.stringify(error));
+      setClearIncomeStatus("idle");
+    }
+  };
+
+  // Handle clear operations with confirmation dialogs
+  const handleClearAssetDefinitionsWithConfirm = () => {
+    showConfirmDialog(
+      t("settings.clearAssetDefinitionsTitle"),
+      t("settings.clearAssetDefinitionsConfirm"),
+      handleClearAssetDefinitions
+    );
+  };
+
+  const handleClearPriceHistoryWithConfirm = () => {
+    showConfirmDialog(
+      t("settings.clearPriceHistoryTitle"),
+      t("settings.clearPriceHistoryConfirm"),
+      handleClearPriceHistory
+    );
+  };
+
+  const handleClearAssetTransactionsWithConfirm = () => {
+    showConfirmDialog(
+      t("settings.clearAssetTransactionsTitle"),
+      t("settings.clearAssetTransactionsConfirm"),
+      handleClearAssetTransactions
+    );
+  };
+
+  const handleClearDebtsWithConfirm = () => {
+    showConfirmDialog(
+      t("settings.clearDebtsTitle"),
+      t("settings.clearDebtsConfirm"),
+      handleClearDebts
+    );
+  };
+
+  const handleClearExpensesWithConfirm = () => {
+    showConfirmDialog(
+      t("settings.clearExpensesTitle"),
+      t("settings.clearExpensesConfirm"),
+      handleClearExpenses
+    );
+  };
+
+  const handleClearIncomeWithConfirm = () => {
+    showConfirmDialog(
+      t("settings.clearIncomeTitle"),
+      t("settings.clearIncomeConfirm"),
+      handleClearIncome
+    );
+  };
+
+  const handleClearAllDataWithConfirm = () => {
+    showConfirmDialog(
+      t("settings.clearAllDataTitle"),
+      t("settings.clearAllDataConfirm"),
+      handleClearAllData
+    );
   };
 
   return (
@@ -397,7 +515,13 @@ const SettingsContainer: React.FC = () => {
       apiKeyStatus={apiKeyStatus}
       apiKeyError={apiKeyError}
       currency={currency}
-      clearDataStatus={clearDataStatus}
+      clearAssetDefinitionsStatus={clearAssetDefinitionsStatus}
+      clearPriceHistoryStatus={clearPriceHistoryStatus}
+      clearAssetTransactionsStatus={clearAssetTransactionsStatus}
+      clearDebtsStatus={clearDebtsStatus}
+      clearExpensesStatus={clearExpensesStatus}
+      clearIncomeStatus={clearIncomeStatus}
+      clearAllDataStatus={clearAllDataStatus}
       isApiEnabled={apiConfig.isEnabled}
       isApiExpanded={isApiExpanded}
       isDataManagementExpanded={isDataManagementExpanded}
@@ -421,8 +545,15 @@ const SettingsContainer: React.FC = () => {
       onApiKeyRemove={handleApiKeyRemove}
       onProviderChange={handleProviderChange}
       onCurrencyChange={handleCurrencyChange}
-      onClearPartialData={handleClearPartialData}
-      onClearAllData={handleClearAllData}
+      onClearAllData={handleClearAllDataWithConfirm}
+      onClearAssetDefinitions={handleClearAssetDefinitionsWithConfirm}
+      onClearPriceHistory={handleClearPriceHistoryWithConfirm}
+      onClearAssetTransactions={handleClearAssetTransactionsWithConfirm}
+      onClearDebts={handleClearDebtsWithConfirm}
+      onClearExpenses={handleClearExpensesWithConfirm}
+      onClearIncome={handleClearIncomeWithConfirm}
+      confirmDialog={confirmDialog}
+      onCloseConfirmDialog={closeConfirmDialog}
       formatLogEntry={formatLogEntry}
       getLogLevelColor={getLogLevelColor}
     />

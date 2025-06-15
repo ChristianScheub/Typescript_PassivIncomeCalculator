@@ -22,11 +22,11 @@ export class StockPriceUpdater {
       .slice(0, 30);
 
     if (stockDefinitionsToUpdate.length === 0) {
-      Logger.info('No stock definitions with auto-update enabled to update');
+      Logger.infoService('No stock definitions with auto-update enabled to update');
       return [];
     }
     
-    Logger.info(`Updating prices for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`);
+    Logger.infoService(`Updating prices for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`);
     
     try {
       const stockAPI = createStockAPIService();
@@ -43,7 +43,8 @@ export class StockPriceUpdater {
         }
       }
       
-      Logger.info(`Successfully updated ${updatedDefinitions.length} stock definition prices`);
+      Logger.infoService(`Successfully updated ${updatedDefinitions.length} stock definition prices`);
+      Logger.infoService(`StockPriceUpdater: Updated prices for ${updatedDefinitions.length} stock definitions`);
       return updatedDefinitions;
     } catch (error) {
       Logger.error(`Stock API service not available: ${error}`);
@@ -66,8 +67,8 @@ export class StockPriceUpdater {
       priceHistory: cleanupOldPriceHistory(updatedDefinition.priceHistory)
     };
     
-    Logger.info(`Updated price for ${definition.ticker} (${definition.fullName}): ${newPrice}`);
-    Logger.info(`Price history entries: ${finalDefinition.priceHistory?.length || 0}`);
+    Logger.infoService(`Updated price for ${definition.ticker} (${definition.fullName}): ${newPrice}`);
+    Logger.infoService(`Price history entries: ${finalDefinition.priceHistory?.length || 0}`);
     return finalDefinition;
   }
 
@@ -80,16 +81,17 @@ export class StockPriceUpdater {
     const stockDefinitionsToUpdate = definitions
       .filter(definition => 
         definition.type === 'stock' && 
-        definition.ticker
+        definition.ticker && 
+        definition.autoUpdateHistoricalPrices === true  // Only update if auto-update is enabled
       )
       .slice(0, 10); // Limit to prevent API overload
 
     if (stockDefinitionsToUpdate.length === 0) {
-      Logger.info('No stock definitions found for historical data update');
+      Logger.infoService('No stock definitions with auto-update historical prices enabled to update');
       return [];
     }
     
-    Logger.info(`Fetching 30-day historical data for ${stockDefinitionsToUpdate.length} stock definitions`);
+    Logger.infoService(`Fetching 30-day historical data for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`);
     
     try {
       const stockAPI = createStockAPIService();
@@ -126,14 +128,15 @@ export class StockPriceUpdater {
             };
 
             updatedDefinitions.push(finalDefinition);
-            Logger.info(`Updated historical data for ${definition.ticker} (${definition.fullName}): ${historicalData.data.length} entries`);
+            Logger.infoService(`Updated historical data for ${definition.ticker} (${definition.fullName}): ${historicalData.data.length} entries`);
           }
         } catch (error) {
           Logger.error(`Failed to update historical data for ${definition.ticker}: ${error}`);
         }
       }
       
-      Logger.info(`Successfully updated historical data for ${updatedDefinitions.length} stock definitions`);
+      Logger.infoService(`Successfully updated historical data for ${updatedDefinitions.length} stock definitions`);
+      Logger.infoService(`StockPriceUpdater: Updated historical data for ${updatedDefinitions.length} stock definitions`);
       return updatedDefinitions;
     } catch (error) {
       Logger.error(`Stock API service not available for historical data: ${error}`);

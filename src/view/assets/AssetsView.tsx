@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Asset } from "../../types";
 import { PortfolioPosition } from "../../service/portfolioService/portfolioCalculations";
-import { AssetTransactionForm } from "../../ui/forms/AssetTransactionForm";
+import { AssetTransactionForm } from "../forms/AssetTransactionForm";
 import { useDeviceCheck } from "../../service/helper/useDeviceCheck";
 import { MobileAssetSummaryCard } from "../../ui/layout/MobileAssetSummaryCard";
 import { DesktopAssetSummaryCards } from "../../ui/layout/DesktopAssetSummaryCards";
@@ -59,6 +59,7 @@ interface AssetsViewProps {
   onNavigateToCategories?: () => void;
   onNavigateToCalendar: () => void;
   onNavigateToAnalytics: () => void;
+  onNavigateToPortfolioHistory?: () => void;
 }
 
 export const AssetsView: React.FC<AssetsViewProps> = ({
@@ -80,6 +81,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
   onNavigateToCategories,
   onNavigateToCalendar,
   onNavigateToAnalytics,
+  onNavigateToPortfolioHistory,
 }) => {
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
@@ -208,6 +210,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
             annualAssetIncome={annualAssetIncome}
             onNavigateToCalendar={onNavigateToCalendar}
             onNavigateToAnalytics={onNavigateToAnalytics}
+            onNavigateToPortfolioHistory={onNavigateToPortfolioHistory}
           />
           <div className="mb-4">
             <TabSelector
