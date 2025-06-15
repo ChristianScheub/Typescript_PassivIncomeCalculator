@@ -33,8 +33,8 @@ const portfolioHistoryService: IPortfolioHistoryService = {
     PortfolioHistoryTimeRanges.getLastTwoYears(assets, assetDefinitions),
   getLastFiveYears: (assets, assetDefinitions = []) => 
     PortfolioHistoryTimeRanges.getLastFiveYears(assets, assetDefinitions),
-  getCustomDays: (assets, assetDefinitions, days) => 
-    PortfolioHistoryTimeRanges.getCustomDays(assets, assetDefinitions, days),
+  getCustomDays: (assets, days, assetDefinitions = []) => 
+    PortfolioHistoryTimeRanges.getCustomDays(assets, days, assetDefinitions),
 };
 
 export default portfolioHistoryService;

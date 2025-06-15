@@ -1,12 +1,12 @@
 import { Middleware } from '@reduxjs/toolkit';
 import { invalidatePortfolioCache } from '../slices/assetsSlice';
 import Logger from '../../service/Logger/logger';
-import { RootState } from '../index';
+import { StoreState } from '../index';
 
 /**
  * Middleware to automatically invalidate portfolio cache when related data changes
  */
-export const portfolioCacheMiddleware: Middleware<{}, RootState> = (store) => (next) => (action: any) => {
+export const portfolioCacheMiddleware: Middleware<{}, StoreState> = (store) => (next) => (action: any) => {
   const result = next(action);
   
   // Actions that should invalidate the portfolio cache

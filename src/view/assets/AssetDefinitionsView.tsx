@@ -8,7 +8,11 @@ import { Add } from "@mui/icons-material";
 import { Edit, Trash2, Wallet, RefreshCw, History } from "lucide-react";
 import { Tooltip } from "@mui/material";
 
-type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt">;
+/**
+ * Type for creating new asset definitions, omits metadata fields like id, createdAt, updatedAt.
+ * The name field is optional as it's derived from fullName in the adapter function.
+ */
+type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
 type CreateCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
 
 interface AssetDefinitionsViewProps {
@@ -320,11 +324,9 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                 }
               } else {
                 // For new definitions, just pass the form data
-                if (onAddDefinitionWithCategories) {
-                  onAddDefinitionWithCategories(data, categoryAssignments);
-                } else {
-                  onAddDefinition(data);
-                }
+                onAddDefinitionWithCategories 
+                  ? onAddDefinitionWithCategories(data, categoryAssignments)
+                  : onAddDefinition(data);
               }
             }}
             editingDefinition={editingDefinition}

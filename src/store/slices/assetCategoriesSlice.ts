@@ -4,6 +4,7 @@ import Logger from '../../service/Logger/logger';
 import sqliteService from '../../service/sqlLiteService';
 
 type AssetCategoriesStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
+type AssetCategorySystemFields = 'id' | 'createdAt' | 'updatedAt';
 
 interface AssetCategoriesState {
   categories: AssetCategory[];
@@ -39,7 +40,7 @@ export const fetchAssetCategories = createAsyncThunk(
 
 export const addAssetCategory = createAsyncThunk(
   'assetCategories/addAssetCategory',
-  async (categoryData: Omit<AssetCategory, 'id' | 'createdAt' | 'updatedAt'>) => {
+  async (categoryData: Omit<AssetCategory, AssetCategorySystemFields>) => {
     Logger.info(`Adding asset category to database: ${categoryData.name}`);
     
     try {

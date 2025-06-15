@@ -1,5 +1,5 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { RootState } from '..';
+import { StoreState } from '..';
 import { HYDRATE } from '../actions/hydrateAction';
 
 const STORAGE_KEY = 'passiveIncomeCalculator';
@@ -17,7 +17,7 @@ export const localStorageMiddleware: Middleware = store => next => (action: any)
 
   // Speichere den State nur, wenn die Aktion nicht blacklisted ist
   if (!BLACKLISTED_ACTIONS.includes(action.type)) {
-    const state = store.getState() as RootState;
+    const state = store.getState() as StoreState;
     try {
       const stateToSave = {
         assets: { 

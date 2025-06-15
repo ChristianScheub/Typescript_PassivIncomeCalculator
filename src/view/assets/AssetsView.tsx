@@ -382,7 +382,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
       {/* Header with management buttons */}
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
         <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4 lg:mb-0">
-          {t("nav.assets")}
+          {t("navigation.assets")}
         </h1>
         <div className="flex flex-wrap gap-2 lg:gap-3">
           <HeaderButtons

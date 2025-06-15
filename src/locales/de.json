@@ -365,6 +365,7 @@
   
   "assets": {
     "title": "Assets",
+    "priceInformation": "Preis Daten",
     "purchase": "Kauf",
     "addTransaction": "Transaktion hinzufügen",
     "editTransaction": "Transaktion bearbeiten",

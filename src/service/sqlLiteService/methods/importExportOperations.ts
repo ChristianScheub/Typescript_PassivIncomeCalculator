@@ -56,24 +56,26 @@ const importCoreDataStores = async (data: any): Promise<void> => {
   }
 };
 
-// Helper function to import optional data store
-const importOptionalDataStore = async (
+// Helper function to import data store when data exists
+const importExistingDataStore = async (
   data: any,
   storeName: StoreNames,
-  hasData: boolean,
   displayName: string
 ): Promise<void> => {
-  if (hasData) {
-    Logger.infoService(`Importing ${data[storeName].length} ${displayName}`);
-    
-    for (const item of data[storeName]) {
-      await dbOperations.update(storeName, item);
-    }
-    
-    Logger.infoService(`${displayName} import completed successfully`);
-  } else {
-    Logger.infoService(`No ${displayName} found in backup (legacy format)`);
+  Logger.infoService(`Importing ${data[storeName].length} ${displayName}`);
+  
+  for (const item of data[storeName]) {
+    await dbOperations.update(storeName, item);
   }
+  
+  Logger.infoService(`${displayName} import completed successfully`);
+};
+
+// Helper function to log when data is missing (legacy format)
+const logMissingDataStore = (
+  displayName: string
+): void => {
+  Logger.infoService(`No ${displayName} found in backup (legacy format)`);
 };
 
 // Helper function to create export log message
@@ -166,11 +168,35 @@ export const importExportOperations = {
       await importCoreDataStores(data);
 
       // Import optional data stores
-      await importOptionalDataStore(data, 'assetDefinitions', flags.hasAssetDefinitions, 'asset definitions');
-      await importOptionalDataStore(data, 'assetCategories', flags.hasAssetCategories, 'asset categories');
-      await importOptionalDataStore(data, 'assetCategoryOptions', flags.hasAssetCategoryOptions, 'asset category options');
-      await importOptionalDataStore(data, 'assetCategoryAssignments', flags.hasAssetCategoryAssignments, 'asset category assignments');
-      await importOptionalDataStore(data, 'exchangeRates', flags.hasExchangeRates, 'exchange rates');
+      if (flags.hasAssetDefinitions) {
+        await importExistingDataStore(data, 'assetDefinitions', 'asset definitions');
+      } else {
+        logMissingDataStore('asset definitions');
+      }
+
+      if (flags.hasAssetCategories) {
+        await importExistingDataStore(data, 'assetCategories', 'asset categories');
+      } else {
+        logMissingDataStore('asset categories');
+      }
+
+      if (flags.hasAssetCategoryOptions) {
+        await importExistingDataStore(data, 'assetCategoryOptions', 'asset category options');
+      } else {
+        logMissingDataStore('asset category options');
+      }
+
+      if (flags.hasAssetCategoryAssignments) {
+        await importExistingDataStore(data, 'assetCategoryAssignments', 'asset category assignments');
+      } else {
+        logMissingDataStore('asset category assignments');
+      }
+
+      if (flags.hasExchangeRates) {
+        await importExistingDataStore(data, 'exchangeRates', 'exchange rates');
+      } else {
+        logMissingDataStore('exchange rates');
+      }
 
       Logger.infoService('Data import completed successfully');
     } catch (error) {

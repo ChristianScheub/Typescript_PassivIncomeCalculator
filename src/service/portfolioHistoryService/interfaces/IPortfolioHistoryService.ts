@@ -87,5 +87,5 @@ export interface IPortfolioHistoryService {
   getLastYear(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
   getLastTwoYears(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
   getLastFiveYears(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
-  getCustomDays(assets: Asset[], assetDefinitions: AssetDefinition[], days: number): PortfolioHistoryPoint[];
+  getCustomDays(assets: Asset[], days: number, assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
 }

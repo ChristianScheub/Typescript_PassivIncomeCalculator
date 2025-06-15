@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../store';
+import { useDispatch } from 'react-redux';
+import { useAppSelector } from '../../../hooks/redux';
 import calculatorService from '../../../service/calculatorService';
 import { 
   addChart, 
@@ -176,11 +176,11 @@ interface CustomAnalyticsViewProps {
 const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPositions }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { charts, isConfigPanelOpen, editingChartId } = useSelector((state: RootState) => state.customAnalytics);
+  const { charts, isConfigPanelOpen, editingChartId } = useAppSelector(state => state.customAnalytics);
   
   // Get data needed for charts
-  const assetAllocation = useSelector((state: RootState) => state.dashboard.assetAllocation);
-  const portfolioCache = useSelector((state: RootState) => state.assets.portfolioCache);
+  const assetAllocation = useAppSelector(state => state.dashboard.assetAllocation);
+  const portfolioCache = useAppSelector(state => state.assets.portfolioCache);
 
   // Calculate portfolio analytics data from portfolio positions
   const portfolioAnalytics = useMemo(() => {

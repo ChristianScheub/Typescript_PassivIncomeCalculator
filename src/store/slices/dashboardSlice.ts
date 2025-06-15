@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { RootState } from '..';
+import { StoreState } from '..';
 import calculatorService from '../../service/calculatorService';
 import Logger from '../../service/Logger/logger';
 
@@ -44,7 +44,7 @@ export const updateDashboardValues = createAsyncThunk(
   'dashboard/updateValues',
   async (_, { getState }) => {
     Logger.infoRedux('Starting dashboard values update');
-    const state = getState() as RootState;
+    const state = getState() as StoreState;
     const { assets, income, expenses, liabilities } = state;
 
     // Calculate all values

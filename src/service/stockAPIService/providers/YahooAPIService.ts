@@ -14,7 +14,7 @@ import { CapacitorHttp } from '@capacitor/core';
  */
 export class YahooAPIService implements IStockAPIService {
   // Basis-URL für Chart-Daten
-  private static baseUrl = 'https://query2.finance.yahoo.com/v8/finance/chart';
+  private static readonly baseUrl = 'https://query2.finance.yahoo.com/v8/finance/chart';
 
 
   private async fetchChart(symbol: string, interval: string, range: string): Promise<any> {

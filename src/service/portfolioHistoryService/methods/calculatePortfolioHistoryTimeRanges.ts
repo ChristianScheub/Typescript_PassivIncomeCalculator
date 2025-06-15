@@ -104,8 +104,8 @@ export class PortfolioHistoryTimeRanges {
    */
   static getCustomDays(
     assets: Asset[], 
-    assetDefinitions: AssetDefinition[] = [],
-    days: number
+    days: number,
+    assetDefinitions: AssetDefinition[] = []
   ): PortfolioHistoryPoint[] {
     Logger.infoService(`Calculating portfolio history for custom ${days} days`);
     return calculatePortfolioHistoryForDays(assets, assetDefinitions, days);

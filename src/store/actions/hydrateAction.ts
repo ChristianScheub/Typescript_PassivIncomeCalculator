@@ -1,6 +1,6 @@
 import { createAction } from '@reduxjs/toolkit';
-import { RootState } from '..';
+import { StoreState } from '..';
 
-export const HYDRATE = 'persist/HYDRATE';
+export const HYDRATE = 'hydrate/HYDRATE';
 
-export const hydrateStore = createAction<Partial<RootState>>(HYDRATE);
+export const hydrateStore = createAction<Partial<StoreState>>(HYDRATE);

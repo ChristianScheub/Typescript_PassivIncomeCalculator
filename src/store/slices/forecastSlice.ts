@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { MonthlyProjection } from '../../types';
 import calculatorService from '../../service/calculatorService';
-import { RootState } from '..';
+import { StoreState } from '..';
 import Logger from '../../service/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
 import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
@@ -95,7 +95,7 @@ export const updateForecastValues = createAsyncThunk(
   'forecast/updateValues',
   async (_, { getState }) => {
     Logger.infoRedux('Starting forecast values update');
-    const state = getState() as RootState;
+    const state = getState() as StoreState;
     const { assets, income, expenses, liabilities, dashboard } = state;
 
     // Verwende bereits berechnete Dashboard-Werte wenn verfügbar, sonst berechne neu
@@ -154,12 +154,12 @@ export const updateForecastValues = createAsyncThunk(
 export const updateMonthlyAssetIncomeCache = createAsyncThunk<
   { monthlyAssetIncomeCache: Record<number, number> },
   void,
-  { state: RootState }
+  { state: StoreState }
 >(
   'forecast/updateAssetIncomeCache',
   async (_, { getState }) => {
     Logger.infoRedux('Updating monthly asset income cache');
-    const state = getState() as RootState;
+    const state = getState() as StoreState;
     const { assets } = state;
 
     const monthlyAssetIncomeCache: Record<number, number> = {};

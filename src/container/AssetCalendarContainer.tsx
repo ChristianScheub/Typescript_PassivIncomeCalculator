@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { RootState } from '../store';
+import { StoreState } from '../store';
 import { AssetType } from '../types';
 import AssetCalendarView from '../view/assets/AssetCalendarView';
 import Logger from '../service/Logger/logger';
@@ -34,11 +34,11 @@ interface AssetCalendarContainerProps {
 }
 
 const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack }) => {
-  const assets = useSelector((state: RootState) => state.assets.items);
-  const assetDefinitions = useSelector((state: RootState) => state.assetDefinitions.items);
-  const assetCategories = useSelector((state: RootState) => state.assetCategories.categories);
-  const categoryOptions = useSelector((state: RootState) => state.assetCategories.categoryOptions);
-  const categoryAssignments = useSelector((state: RootState) => state.assetCategories.categoryAssignments);
+  const assets = useSelector((state: StoreState) => state.assets.items);
+  const assetDefinitions = useSelector((state: StoreState) => state.assetDefinitions.items);
+  const assetCategories = useSelector((state: StoreState) => state.assetCategories.categories);
+  const categoryOptions = useSelector((state: StoreState) => state.assetCategories.categoryOptions);
+  const categoryAssignments = useSelector((state: StoreState) => state.assetCategories.categoryAssignments);
   
   // Use Redux cache instead of recalculating
   const dispatch = useAppDispatch();
@@ -55,7 +55,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
     if (!portfolioCacheValid && assets.length > 0 && assetDefinitions.length > 0) {
       Logger.info('Portfolio cache invalid, recalculating for asset calendar');
       // Korrektur des TypeScript-Fehlers durch explizite Typzuweisung des Dispatch
-      (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(calculatePortfolioData({ 
+      (dispatch as ThunkDispatch<StoreState, unknown, AnyAction>)(calculatePortfolioData({ 
         assetDefinitions, 
         categoryData: { categories: assetCategories, categoryOptions, categoryAssignments } 
       }));

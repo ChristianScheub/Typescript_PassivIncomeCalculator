@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { RootState } from '..';
+import { StoreState } from '..';
 import Logger from '../../service/Logger/logger';
 import { getPriceHistoryForRange } from '../../utils/priceHistoryUtils';
 
@@ -27,7 +27,7 @@ const initialState: PortfolioHistoryState = {
 export const calculate30DayHistory = createAsyncThunk(
   'portfolioHistory/calculate30Days',
   async (_, { getState }) => {
-    const state = getState() as RootState;
+    const state = getState() as StoreState;
     const { assets } = state;
     Logger.infoRedux('Calculating 30-day portfolio history using portfolio system');
     
@@ -114,7 +114,8 @@ const calculateHistoryFromPortfolio = (portfolioCache: any) => {
       change,
       changePercentage
     });
-
+    
+    // Save current value to use as previous value in next iteration
     previousValue = totalValue;
   }
 

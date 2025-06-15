@@ -197,11 +197,13 @@ export type StoreState = {
   [K in keyof typeof rootReducer]: ReturnType<typeof rootReducer[K]>;
 };
 
+// Export RootState as an alias for StoreState for compatibility
 export type RootState = StoreState;
+
 export type AppDispatch = typeof store.dispatch;
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
-  RootState,
+  StoreState,
   unknown,
   AnyAction
 >;

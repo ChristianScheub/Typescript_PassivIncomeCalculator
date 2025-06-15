@@ -42,7 +42,7 @@ export const SectorSection: React.FC<SectorSectionProps> = ({
     <OptionalSection title={t("assets.sectors")}>
       <div className="space-y-4">
         {sectors.map((sector: SectorAllocation, index: number) => (
-          <div key={index} className="space-y-3">
+          <div key={`sector-${sector.sectorName}-${index}`} className="space-y-3">
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                 {t("assets.sectorName")} {index + 1}

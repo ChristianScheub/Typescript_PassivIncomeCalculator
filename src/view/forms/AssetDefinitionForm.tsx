@@ -84,19 +84,21 @@ const assetDefinitionSchema = z.object({
   nominalValue: z.number().min(0).optional(),
 });
 
+// Type alias for form data from schema
 type AssetDefinitionFormData = z.infer<typeof assetDefinitionSchema>;
+
+// Type aliases for better maintainability 
+type CategoryAssignmentFormData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
+type OptionalAssetDefinition = AssetDefinition | null;
 
 interface AssetDefinitionFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: Omit<AssetDefinition, "id" | "createdAt" | "updatedAt">,
-    categoryAssignments: Omit<
-      AssetCategoryAssignment,
-      "id" | "createdAt" | "updatedAt"
-    >[]
+    data: AssetDefinitionFormData,
+    categoryAssignments: CategoryAssignmentFormData[]
   ) => void;
-  editingDefinition?: AssetDefinition | null;
+  editingDefinition?: OptionalAssetDefinition;
 }
 
 export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({

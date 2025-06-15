@@ -83,7 +83,7 @@ function updatePositionsWithTransactions(
     // Find the corresponding asset for this transaction
     const asset = findAssetForTransaction(assets, normalizedDate, transaction);
     
-    if (!asset || !asset.assetDefinitionId) {
+    if (!asset?.assetDefinitionId) {
       Logger.warn(
         `No matching asset found for transaction: ${transaction.type} ${transaction.amount} at €${transaction.price}`
       );

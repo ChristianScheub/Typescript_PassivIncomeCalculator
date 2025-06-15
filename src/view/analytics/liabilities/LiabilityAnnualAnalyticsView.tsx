@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, TooltipProps } from 'recharts';
 import formatService from '../../../service/formatService';
 
 interface LiabilityAnnualAnalyticsViewProps {
@@ -9,6 +9,27 @@ interface LiabilityAnnualAnalyticsViewProps {
   individualLiabilities: Array<{ name: string; amount: number; category: string; percentage: number }>;
   paymentScheduleData: Array<{ month: string; amount: number; breakdown: Array<{ name: string; amount: number }> }>;
 }
+
+// Custom tooltip component for the bar chart
+interface CustomTooltipProps extends TooltipProps<number, string> {
+  active?: boolean;
+  payload?: Array<any>;
+  label?: string;
+}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label }) => {
+  if (active && payload?.length) {
+    return (
+      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
+        <p className="font-medium text-gray-900 dark:text-gray-100">{`${label}`}</p>
+        <p className="text-blue-600 dark:text-blue-400">
+          {`Gesamtzahlung: ${formatService.formatCurrency(payload[0].value)}`}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
 const LiabilityAnnualAnalyticsView: React.FC<LiabilityAnnualAnalyticsViewProps> = ({
   categoryBreakdown,
@@ -30,21 +51,6 @@ const LiabilityAnnualAnalyticsView: React.FC<LiabilityAnnualAnalyticsViewProps> 
     value: item.amount,
     percentage: item.percentage
   }));
-
-  // Custom tooltip for the bar chart
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-          <p className="font-medium text-gray-900 dark:text-gray-100">{`${label}`}</p>
-          <p className="text-blue-600 dark:text-blue-400">
-            {`Gesamtzahlung: ${formatService.formatCurrency(payload[0].value)}`}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   return (
     <div className="space-y-8">
