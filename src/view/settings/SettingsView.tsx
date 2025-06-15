@@ -30,10 +30,6 @@ interface SettingsViewProps {
   logs: string[];
   showLogs: boolean;
   autoRefresh: boolean;
-  analytics: {
-    getSessionDuration: () => number;
-    getEventCount: (event?: string) => number;
-  };
   selectedProvider: StockAPIProvider;
   apiKeys?: { [K in StockAPIProvider]?: string };
   apiKeyStatus: 'idle' | 'saving' | 'success' | 'error';
@@ -90,7 +86,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   logs,
   showLogs,
   autoRefresh,
-  analytics,
   selectedProvider,
   apiKeys,
   apiKeyStatus,
@@ -575,7 +570,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           logs={logs}
           showLogs={showLogs}
           autoRefresh={autoRefresh}
-          analytics={analytics}
           onToggleLogs={onToggleLogs}
           onRefreshLogs={onRefreshLogs}
           onExportLogs={onExportLogs}

@@ -1,6 +1,5 @@
 import { store } from '../../../store';
 import { clearAllExpenses } from '../../../store/slices/expensesSlice';
-import { analytics } from '../../analytics';
 import Logger from '../../Logger/logger';
 import { StoreNames } from '../../sqlLiteService';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';
@@ -16,7 +15,5 @@ export async function clearExpenses(): Promise<void> {
 
     // Clear localStorage
     clearLocalStorageData(['expenses']);
-
-    analytics.trackEvent("settings_clear_expenses");
     Logger.infoService("Expenses cleared successfully");
 }

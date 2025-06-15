@@ -7,10 +7,6 @@ interface DebugSettingsProps {
   logs: string[];
   showLogs: boolean;
   autoRefresh: boolean;
-  analytics: {
-    getSessionDuration: () => number;
-    getEventCount: (event?: string) => number;
-  };
   onToggleLogs: () => void;
   onRefreshLogs: () => void;
   onExportLogs: () => void;
@@ -24,7 +20,6 @@ const DebugSettings: React.FC<DebugSettingsProps> = ({
   logs,
   showLogs,
   autoRefresh,
-  analytics,
   onToggleLogs,
   onRefreshLogs,
   onExportLogs,
@@ -33,6 +28,9 @@ const DebugSettings: React.FC<DebugSettingsProps> = ({
   formatLogEntry,
   getLogLevelColor
 }) => {
+  // Calculate total events from logs length
+  const totalEvents = logs.length;
+
   return (
     <Card className="bg-white dark:bg-gray-800 border-2 border-yellow-200 dark:border-yellow-700">
       <CardHeader>
@@ -135,11 +133,8 @@ const DebugSettings: React.FC<DebugSettingsProps> = ({
         <div className="bg-gray-50 dark:bg-gray-900 p-3 rounded-md">
           <h4 className="font-medium text-sm mb-2">Session Analytics</h4>
           <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-            <p>Session Duration: {Math.round(analytics.getSessionDuration() / 1000)}s</p>
-            <p>Total Events: {analytics.getEventCount()}</p>
-            <p>Asset Events: {analytics.getEventCount('asset_add') + analytics.getEventCount('asset_update') + analytics.getEventCount('asset_delete')}</p>
-            <p>Expense Events: {analytics.getEventCount('expense_add') + analytics.getEventCount('expense_update') + analytics.getEventCount('expense_delete')}</p>
-          </div>
+            <p>Total Events: {totalEvents}</p>
+           </div>
         </div>
       </CardContent>
     </Card>

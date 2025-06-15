@@ -1,6 +1,5 @@
 import { store } from '../../../store';
 import { invalidatePortfolioCache } from '../../../store/slices/assetsSlice';
-import { analytics } from '../../analytics';
 import Logger from '../../Logger/logger';
 import sqliteService from '../../sqlLiteService';
 
@@ -20,6 +19,5 @@ export async function clearPriceHistory(): Promise<void> {
     // Invalidate cache
     store.dispatch(invalidatePortfolioCache());
 
-    analytics.trackEvent("settings_clear_price_history");
     Logger.infoService("Price history cleared successfully");
 }

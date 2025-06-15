@@ -1,6 +1,5 @@
 import { store } from '../../../store';
 import { clearAllAssets, invalidatePortfolioCache, invalidateAllDividendCaches } from '../../../store/slices/assetsSlice';
-import { analytics } from '../../analytics';
 import Logger from '../../Logger/logger';
 import { StoreNames } from '../../sqlLiteService';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';
@@ -21,6 +20,5 @@ export async function clearAssetTransactions(): Promise<void> {
     store.dispatch(invalidatePortfolioCache());
     store.dispatch(invalidateAllDividendCaches());
 
-    analytics.trackEvent("settings_clear_asset_transactions");
     Logger.infoService("Asset transactions cleared successfully");
 }

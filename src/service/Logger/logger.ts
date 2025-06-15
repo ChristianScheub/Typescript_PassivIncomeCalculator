@@ -118,6 +118,15 @@ class Logger {
     }
   }
 
+  static getLogsCount(): number {
+    const logs = this.getLogsFromLocalStorage();
+    return logs.length;
+  }
+
+  static getLogs(): string[] {
+    return this.getLogsFromLocalStorage();
+  }
+
   static exportLogs(): void {
     if (featureFlag_Debug_StoreLogs) {
       const logs = this.getLogsFromLocalStorage();

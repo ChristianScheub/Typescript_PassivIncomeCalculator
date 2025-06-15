@@ -5,7 +5,6 @@ import { clearAllExpenses } from '../../../store/slices/expensesSlice';
 import { clearAllIncome } from '../../../store/slices/incomeSlice';
 import { clearAllAssetCategories } from '../../../store/slices/assetCategoriesSlice';
 import { setApiKey, StockAPIProvider, setApiEnabled } from '../../../store/slices/apiConfigSlice';
-import { analytics } from '../../analytics';
 import Logger from '../../Logger/logger';
 import { StoreNames } from '../../sqlLiteService';
 import { clearSQLiteStores } from './utils';
@@ -48,7 +47,6 @@ export async function clearAllData(): Promise<void> {
     });
     store.dispatch(setApiEnabled(false));
 
-    analytics.trackEvent("settings_clear_all_data");
     Logger.infoService("All data cleared successfully");
 
     // Reload page to ensure clean state

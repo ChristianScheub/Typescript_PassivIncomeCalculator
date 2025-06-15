@@ -13,7 +13,6 @@ import {
 import { AssetDefinitionsView } from '../view/assets/AssetDefinitionsView';
 import { AssetDefinition, AssetType, AssetCategoryAssignment } from '../types';
 import Logger from '../service/Logger/logger';
-import { analytics } from '../service/analytics';
 import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { StockPriceUpdater } from '../service/helper/stockPriceUpdater';
@@ -53,7 +52,6 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
   const handleAddDefinition = async (data: any, categoryAssignments: Omit<AssetCategoryAssignment, 'id' | 'createdAt' | 'updatedAt'>[]) => {
     try {
       Logger.info('Adding new asset definition' + " - " + JSON.stringify(data));
-      analytics.trackEvent('asset_definition_add');
       const action = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetDefinition(data));
       const newDefinition = addAssetDefinition.fulfilled.match(action) ? action.payload : null;
       
@@ -79,7 +77,6 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     if (!editingDefinition) return;
     try {
       Logger.info('Updating asset definition' + " - " + JSON.stringify({ id: editingDefinition.id, data }));
-      analytics.trackEvent('asset_definition_update', { id: editingDefinition.id });
       // Merge the partial data with the existing definition to ensure all required fields are present
       const updatedDefinition = { ...editingDefinition, ...data };
       await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(updatedDefinition));
@@ -110,7 +107,6 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     if (window.confirm(t('common.deleteConfirm'))) {
       try {
         Logger.info('Deleting asset definition' + " - " + JSON.stringify({ id }));
-        analytics.trackEvent('asset_definition_delete', { id });
         
         // Delete category assignments first
         const deleteAssignmentsAction = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(deleteAssetCategoryAssignmentsByAssetId(id));

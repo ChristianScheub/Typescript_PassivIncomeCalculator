@@ -1,7 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
-import { analytics } from '../service/analytics';
 import Logger from '../service/Logger/logger';
 import DashboardView from '../view/dashboard/DashboardView';
 // Removed dividend cache service import
@@ -39,15 +38,6 @@ const DashboardContainer: React.FC = () => {
 
   const handleSettingsClick = () => {
     Logger.info('Settings button clicked');
-    analytics.trackEvent('settings_click', { 
-      page: 'dashboard',
-      netWorth,
-      totalAssets,
-      totalLiabilities,
-      monthlyIncome,
-      monthlyExpenses,
-      monthlyCashFlow,
-    });
     // Navigate to settings page or open settings modal
     navigate('/settings');
   };
@@ -56,15 +46,6 @@ const DashboardContainer: React.FC = () => {
   // Track page view
   React.useEffect(() => {
     Logger.info('Dashboard mounted');
-    analytics.trackEvent('page_view', { 
-      page: 'dashboard',
-      netWorth,
-      totalAssets,
-      totalLiabilities,
-      monthlyIncome,
-      monthlyExpenses,
-      monthlyCashFlow,
-    });
   }, []);
 
   return (

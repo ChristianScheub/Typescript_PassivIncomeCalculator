@@ -20,7 +20,6 @@ import { Asset } from '../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../service/Logger/logger';
 import PortfolioAnalyticsContainer from './PortfolioAnalyticsContainer';
-import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 // Removed dividend cache service import
 import { createCachedDividends } from '../utils/dividendCacheUtils';
@@ -107,7 +106,6 @@ const AssetsContainer: React.FC = () => {
   const handleAddAsset = async (data: any) => {
     try {
       Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
-      analytics.trackEvent('asset_add', { type: data.type, hasDefinitionId: !!data.assetDefinitionId });
       
       // Ensure transactionType is set, default to 'buy'
       const transactionData = {
@@ -140,7 +138,6 @@ const AssetsContainer: React.FC = () => {
     if (!editingAsset) return;
     try {
       Logger.info('Updating asset transaction' + " - " + JSON.stringify({ id: editingAsset.id, data }));
-      analytics.trackEvent('asset_update', { id: editingAsset.id, type: data.type });
       
       // Ensure transactionType is preserved, default to 'buy'
       const transactionData = {
@@ -160,7 +157,6 @@ const AssetsContainer: React.FC = () => {
     if (window.confirm(t('common.deleteConfirm'))) {
       try {
         Logger.info('Deleting asset' + " - " + JSON.stringify({ id }));
-        analytics.trackEvent('asset_delete', { id });
         await dispatch(deleteAsset(id));
       } catch (error) {
         Logger.error('Failed to delete asset' + " - " + JSON.stringify(error as Error));
@@ -210,26 +206,32 @@ const AssetsContainer: React.FC = () => {
 
 
   const handleNavigateToDefinitions = () => {
+    Logger.info('Navigating to asset definitions');
     setIsShowingDefinitions(true);
   };
 
   const handleNavigateToCalendar = () => {
+    Logger.info('Navigating to asset calendar');
     setIsShowingCalendar(true);
   };
 
   const handleNavigateToCategories = () => {
+    Logger.info('Navigating to asset categories');
     setIsShowingCategories(true);
   };
 
   const handleNavigateToAnalytics = () => {
+    Logger.info('Navigating to portfolio analytics');
     setIsShowingAnalytics(true);
   };
 
   const handleNavigateToPortfolioHistory = () => {
+    Logger.info('Navigating to portfolio history');
     setIsShowingPortfolioHistory(true);
   };
 
   const handleBackToAssets = () => {
+    Logger.info('Returning to assets main view');
     setIsShowingDefinitions(false);
     setIsShowingCalendar(false);
     setIsShowingCategories(false);

@@ -17,7 +17,6 @@ import {
 } from '../store/slices/assetCategoriesSlice';
 import { AssetCategory, AssetCategoryOption } from '../types';
 import Logger from '../service/Logger/logger';
-import { analytics } from '../service/analytics';
 
 // Type aliases for complex union types
 type NewAssetCategory = Omit<AssetCategory, 'id' | 'createdAt' | 'updatedAt'>;
@@ -195,7 +194,6 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   const handleAddCategory = async (data: NewAssetCategory) => {
     try {
       Logger.info('Adding new asset category: ' + JSON.stringify(data));
-      analytics.trackEvent('asset_category_add');
       await dispatch(addAssetCategory(data));
     } catch (error) {
       Logger.error('Failed to add asset category: ' + JSON.stringify(error as Error));
@@ -208,7 +206,6 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   ) => {
     try {
       Logger.info('Adding new asset category with options: ' + JSON.stringify({ category: categoryData, optionsCount: options.length }));
-      analytics.trackEvent('asset_category_add_with_options', { optionsCount: options.length });
       
       // First add the category
       const result = await dispatch(addAssetCategory(categoryData));
@@ -232,7 +229,6 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   const handleUpdateCategory = async (data: AssetCategory) => {
     try {
       Logger.info('Updating asset category: ' + JSON.stringify({ id: data.id, name: data.name }));
-      analytics.trackEvent('asset_category_update', { id: data.id });
       await dispatch(updateAssetCategory(data));
     } catch (error) {
       Logger.error('Failed to update asset category: ' + JSON.stringify(error as Error));
@@ -242,7 +238,6 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   const handleDeleteCategory = async (id: string) => {
     try {
       Logger.info('Deleting asset category: ' + JSON.stringify({ id }));
-      analytics.trackEvent('asset_category_delete', { id });
       await dispatch(deleteAssetCategory(id));
     } catch (error) {
       Logger.error('Failed to delete asset category: ' + JSON.stringify(error as Error));
@@ -252,7 +247,6 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   const handleAddCategoryOption = async (data: NewAssetCategoryOptionWithCategory) => {
     try {
       Logger.info('Adding new category option: ' + JSON.stringify(data));
-      analytics.trackEvent('asset_category_option_add');
       await dispatch(addAssetCategoryOption(data));
     } catch (error) {
       Logger.error('Failed to add category option: ' + JSON.stringify(error as Error));
@@ -262,7 +256,6 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   const handleUpdateCategoryOption = async (data: AssetCategoryOption) => {
     try {
       Logger.info('Updating category option: ' + JSON.stringify({ id: data.id, name: data.name }));
-      analytics.trackEvent('asset_category_option_update', { id: data.id });
       await dispatch(updateAssetCategoryOption(data));
     } catch (error) {
       Logger.error('Failed to update category option: ' + JSON.stringify(error as Error));
@@ -272,7 +265,6 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
   const handleDeleteCategoryOption = async (id: string) => {
     try {
       Logger.info('Deleting category option: ' + JSON.stringify({ id }));
-      analytics.trackEvent('asset_category_option_delete', { id });
       await dispatch(deleteAssetCategoryOption(id));
     } catch (error) {
       Logger.error('Failed to delete category option: ' + JSON.stringify(error as Error));

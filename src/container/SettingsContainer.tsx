@@ -7,7 +7,6 @@ import { clearAllExpenses } from "../store/slices/expensesSlice";
 import { clearAllIncome } from "../store/slices/incomeSlice";
 import { clearAllAssetCategories } from "../store/slices/assetCategoriesSlice";
 import sqliteService, { StoreNames } from "../service/sqlLiteService";
-import { analytics } from "../service/analytics";
 import Logger from "../service/Logger/logger";
 import SettingsView from "../view/settings/SettingsView";
 import { handleFileDownload } from "../service/helper/downloadFile";
@@ -111,10 +110,8 @@ const SettingsContainer: React.FC = () => {
       setExportStatus("success");
       setTimeout(() => setExportStatus("idle"), 2000);
       Logger.info("Data export completed successfully");
-      analytics.trackEvent("settings_export_success");
     } catch (error) {
       Logger.error("Export failed" + " - " + JSON.stringify(error as Error));
-      analytics.trackEvent("settings_export_error");
       setExportStatus("error");
       setTimeout(() => setExportStatus("idle"), 2000);
     }
@@ -131,7 +128,6 @@ const SettingsContainer: React.FC = () => {
 
     try {
       Logger.info("Starting data import");
-      analytics.trackEvent("settings_import_start");
 
       const reader = new FileReader();
 
@@ -168,7 +164,6 @@ const SettingsContainer: React.FC = () => {
           setTimeout(() => setImportStatus("idle"), 2000);
 
           Logger.info("Data import completed successfully");
-          analytics.trackEvent("settings_import_success");
 
           // Refresh the page to reload all data
           Logger.info("Refreshing page to reload imported data");
@@ -179,10 +174,6 @@ const SettingsContainer: React.FC = () => {
           const errorMessage =
             error instanceof Error ? error.message : "Unknown error occurred";
           Logger.error(`Import failed: ${errorMessage}`);
-          analytics.trackEvent("settings_import_error", {
-            error: "import_failed",
-            message: errorMessage,
-          });
           setImportStatus("error");
           setImportError(`Failed to import: ${errorMessage}`);
           setTimeout(() => setImportStatus("idle"), 5000);
@@ -192,7 +183,6 @@ const SettingsContainer: React.FC = () => {
       reader.onerror = (error) => {
         const errorMessage = "Failed to read the file";
         Logger.error(`FileReader error: ${JSON.stringify(error)}`);
-        analytics.trackEvent("settings_import_error", { error: "file_read" });
         setImportStatus("error");
         setImportError(errorMessage);
         setTimeout(() => setImportStatus("idle"), 3000);
@@ -203,7 +193,6 @@ const SettingsContainer: React.FC = () => {
       const errorMessage =
         error instanceof Error ? error.message : "Failed to read the file";
       Logger.error(`Reading file failed: ${errorMessage}`);
-      analytics.trackEvent("settings_import_error", { error: "file_read" });
       setImportStatus("error");
       setImportError(errorMessage);
       setTimeout(() => setImportStatus("idle"), 3000);
@@ -294,9 +283,6 @@ const SettingsContainer: React.FC = () => {
     setGlobalCurrency(newCurrency);
     setCurrency(newCurrency);
     Logger.info(`Currency changed to ${newCurrency}`);
-    analytics.trackEvent("settings_currency_changed", {
-      currency: newCurrency,
-    });
   };
 
   // Handle clearing all data
@@ -355,7 +341,6 @@ const SettingsContainer: React.FC = () => {
 
       setClearAllDataStatus("success");
       Logger.infoService("All data cleared successfully");
-      analytics.trackEvent("settings_clear_all_data");
       
       // 5. Wait a bit and then reload the page to ensure clean state
       setTimeout(() => {
@@ -512,7 +497,6 @@ const SettingsContainer: React.FC = () => {
       logs={logs}
       showLogs={showLogs}
       autoRefresh={autoRefresh}
-      analytics={analytics}
       selectedProvider={apiConfig.selectedProvider}
       apiKeys={apiConfig.apiKeys}
       apiKeyStatus={apiKeyStatus}

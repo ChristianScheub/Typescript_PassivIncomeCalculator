@@ -4,7 +4,6 @@ import { fetchExpenses, addExpense, updateExpense, deleteExpense } from '../stor
 import { Expense } from '../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../service/Logger/logger';
-import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import ExpensesView from '../view/expenses/ExpensesView';
 import ExpenseAnalyticsContainer from './ExpenseAnalyticsContainer';
@@ -35,7 +34,6 @@ const ExpensesContainer: React.FC = () => {
   const handleAddExpense = async (data: any) => {
     try {
       Logger.info('Adding new expense' + " - " + JSON.stringify(data));
-      analytics.trackEvent('expense_add', { category: data.category });
       await dispatch(addExpense(data));
       setIsAddingExpense(false);
     } catch (error) {
@@ -46,12 +44,11 @@ const ExpensesContainer: React.FC = () => {
   const handleUpdateExpense = async (data: any) => {
     if (editingExpense) {
       try {
-        Logger.info('Updating expense' + " - " + JSON.stringify({ id: editingExpense.id, data }));
-        analytics.trackEvent('expense_update', { id: editingExpense.id, category: data.category });
+        Logger.info('Updating expense: ' + JSON.stringify({ id: editingExpense.id, data }));
         await dispatch(updateExpense({ ...data, id: editingExpense.id }));
         setEditingExpense(null);
       } catch (error) {
-        Logger.error('Failed to update expense' + " - " + JSON.stringify(error as Error));
+        Logger.error('Failed to update expense: ' + JSON.stringify(error as Error));
       }
     }
   };
@@ -59,18 +56,16 @@ const ExpensesContainer: React.FC = () => {
   const handleDeleteExpense = async (id: string) => {
     if (window.confirm(t('common.deleteConfirm'))) {
       try {
-        Logger.info('Deleting expense' + " - " + JSON.stringify({ id }));
-        analytics.trackEvent('expense_delete', { id });
+        Logger.info('Deleting expense: ' + JSON.stringify({ id }));
         await dispatch(deleteExpense(id));
       } catch (error) {
-        Logger.error('Failed to delete expense' + " - " + JSON.stringify(error as Error));
+        Logger.error('Failed to delete expense: ' + JSON.stringify(error as Error));
       }
     }
   };
 
   const handleNavigateToAnalytics = () => {
     Logger.info('Navigating to expense analytics');
-    analytics.trackEvent('expense_analytics_open');
     setIsShowingAnalytics(true);
   };
 

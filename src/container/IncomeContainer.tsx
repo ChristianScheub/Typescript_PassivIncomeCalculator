@@ -4,7 +4,6 @@ import { fetchIncome, addIncome, updateIncome, deleteIncome } from '../store/sli
 import { Income } from '../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../service/Logger/logger';
-import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import IncomeView from '../view/income/IncomeView';
 import IncomeAnalyticsContainer from './IncomeAnalyticsContainer';
@@ -43,7 +42,6 @@ const IncomeContainer: React.FC = () => {
   const handleAddIncome = async (data: any) => {
     try {
       Logger.info('Adding new income' + " - " + JSON.stringify(data));
-      analytics.trackEvent('income_add', { type: data.type });
       await dispatch(addIncome(data));
       setIsAddingIncome(false); // Close the form after successful addition
     } catch (error) {
@@ -54,7 +52,6 @@ const IncomeContainer: React.FC = () => {
   const handleUpdateIncome = async (data: any) => {
     try {
       Logger.info('Updating income' + " - " + JSON.stringify(data));
-      analytics.trackEvent('income_update', { id: data.id });
       await dispatch(updateIncome(data));
       setEditingIncome(null);
     } catch (error) {
@@ -66,7 +63,6 @@ const IncomeContainer: React.FC = () => {
     if (window.confirm(t('common.deleteConfirmation'))) {
       try {
         Logger.info('Deleting income' + " - " + id);
-        analytics.trackEvent('income_delete', { id });
         await dispatch(deleteIncome(id));
       } catch (error) {
         Logger.error('Failed to delete income' + " - " + JSON.stringify(error as Error));

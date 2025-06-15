@@ -280,7 +280,7 @@ flowchart TD
     
     B --> E[Asset Module]
     B --> F[Income Module]
-    B --> G[Analytics Module]
+    B --> G[Logger Module]
     B --> H[Cache Module]
     
     E --> I[Logger]
@@ -294,7 +294,7 @@ flowchart TD
     L[ExchangeService] --> D
     L --> I
     
-    M[AnalyticsService] --> I
+    M[Logger] --> I
     
     style A fill:#e1f5fe
     style B fill:#f3e5f5

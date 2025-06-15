@@ -4,7 +4,6 @@ import { fetchLiabilities, addLiability, updateLiability, deleteLiability } from
 import { Liability } from '../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../service/Logger/logger';
-import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
 import LiabilitiesView from '../view/liabilities/LiabilitiesView';
 import LiabilityAnalyticsContainer from './LiabilityAnalyticsContainer';
@@ -36,7 +35,6 @@ const LiabilitiesContainer: React.FC = () => {
   const handleAddLiability = async (data: any) => {
     try {
       Logger.info('Adding new liability' + " - " + JSON.stringify(data));
-      analytics.trackEvent('liability_add', { type: data.type });
       await dispatch(addLiability(data));
       setIsAddingLiability(false);
     } catch (error) {
@@ -47,12 +45,11 @@ const LiabilitiesContainer: React.FC = () => {
   const handleUpdateLiability = async (data: any) => {
     if (editingLiability) {
       try {
-        Logger.info('Updating liability' + " - " + JSON.stringify({ id: editingLiability.id, data }));
-        analytics.trackEvent('liability_update', { id: editingLiability.id, type: data.type });
+        Logger.info('Updating liability: ' + JSON.stringify({ id: editingLiability.id, data }));
         await dispatch(updateLiability({ ...data, id: editingLiability.id }));
         setEditingLiability(null);
       } catch (error) {
-        Logger.error('Failed to update liability' + " - " + JSON.stringify(error as Error));
+        Logger.error('Failed to update liability: ' + JSON.stringify(error as Error));
       }
     }
   };
@@ -60,18 +57,16 @@ const LiabilitiesContainer: React.FC = () => {
   const handleDeleteLiability = async (id: string) => {
     if (window.confirm(t('common.deleteConfirm'))) {
       try {
-        Logger.info('Deleting liability' + " - " + JSON.stringify({ id }));
-        analytics.trackEvent('liability_delete', { id });
+        Logger.info('Deleting liability: ' + JSON.stringify({ id }));
         await dispatch(deleteLiability(id));
       } catch (error) {
-        Logger.error('Failed to delete liability' + " - " + JSON.stringify(error as Error));
+        Logger.error('Failed to delete liability: ' + JSON.stringify(error as Error));
       }
     }
   };
 
   const handleShowAnalytics = () => {
     Logger.info('Navigating to liability analytics');
-    analytics.trackEvent('liability_analytics_view');
     setShowAnalytics(true);
   };
 
