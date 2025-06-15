@@ -1,4 +1,4 @@
-import { DividendSchedule, PaymentSchedule } from '../../../types';
+import { DividendSchedule, PaymentSchedule } from '../../../../types';
 
 export const calculateMonthlyAmountFromFrequency = (
   amount: number,

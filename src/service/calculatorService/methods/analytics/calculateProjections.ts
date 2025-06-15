@@ -1,9 +1,9 @@
-import { Income, Expense, Liability, MonthlyProjection, Asset } from '../../../types';
-import Logger from '../../Logger/logger';
-import { calculateTotalMonthlyExpenses } from './calculateExpenses';
-import { calculateTotalMonthlyLiabilityPayments } from './calculateLiabilities';
-import { calculatePassiveIncome,calculateTotalMonthlyIncome } from './calculateIncome';
-import { calculateTotalAssetIncomeForMonth } from './calculateAssetIncome';
+import { Income, Expense, Liability, MonthlyProjection, Asset } from '../../../../types';
+import Logger from '../../../Logger/logger';
+import { calculateTotalMonthlyExpenses } from '../expense/calculateExpenses';
+import { calculateTotalMonthlyLiabilityPayments } from '../liability/calculateLiabilities';
+import { calculatePassiveIncome,calculateTotalMonthlyIncome } from '../income/calculateIncome';
+import { calculateTotalAssetIncomeForMonth } from '../asset/calculateAssetIncome';
 
 export const calculateProjections = (
   income: Income[],

@@ -5,32 +5,34 @@ import {
   calculateTotalAssetIncomeForMonth,
   calculateTotalMonthlyAssetIncomeFromCache,
   calculateTotalAssetIncomeForMonthFromCache,
-  areAssetsCached
-} from './methods/calculateAssetIncome';
+  calculateTotalMonthlyAssetIncomeWithCache,
+  calculateTotalAssetIncomeForMonthWithCache,
+  areAssetsCached,
+  calculateAssetMonthlyIncomeWithCache
+} from './methods/asset/calculateAssetIncome';
 import { 
   calculateMonthlyIncome, 
   calculateTotalMonthlyIncome, 
   calculatePassiveIncome, 
   calculateAnnualIncome 
-} from './methods/calculateIncome';
-import { calculatePaymentSchedule, calculateDividendSchedule, calculateDividendForMonth } from './methods/calculatePayment';
+} from './methods/income/calculateIncome';
+import { calculatePaymentSchedule, calculateDividendSchedule, calculateDividendForMonth } from './methods/income/calculatePayment';
 import { 
   calculateTotalDebt,
   calculateTotalMonthlyLiabilityPayments,
   calculateLiabilityMonthlyPayment 
-} from './methods/calculateLiabilities';
+} from './methods/liability/calculateLiabilities';
 import {
   calculateMonthlyExpense,
   calculateTotalMonthlyExpenses,
   calculateAnnualExpenses
-} from './methods/calculateExpenses';
-import { calculateNetWorth } from './methods/calculateNetWorth';
-import { calculateMonthlyCashFlow } from './methods/calculateCashFlow';
-import { calculateAssetAllocation, calculateIncomeAllocation, calculatePortfolioAssetAllocation } from './methods/calculateAllocations';
-import { calculateExpenseBreakdown } from './methods/calculateExpenseBreakdown';
-import { calculateProjections, calculateProjectionsWithCache } from './methods/calculateProjections';
-import { calculatePortfolioAnalytics, calculateIncomeAnalytics } from './methods/calculatePortfolioAnalytics';
-import { getDividendCacheService } from '../dividendCacheService';
+} from './methods/expense/calculateExpenses';
+import { calculateNetWorth } from './methods/common/calculateNetWorth';
+import { calculateMonthlyCashFlow } from './methods/common/calculateCashFlow';
+import { calculateAssetAllocation, calculateIncomeAllocation, calculatePortfolioAssetAllocation } from './methods/asset/calculateAllocations';
+import { calculateExpenseBreakdown } from './methods/expense/calculateExpenseBreakdown';
+import { calculateProjections, calculateProjectionsWithCache } from './methods/analytics/calculateProjections';
+import { calculatePortfolioAnalytics, calculateIncomeAnalytics } from './methods/analytics/calculatePortfolioAnalytics';
 
 /**
  * Calculator Service that provides all financial calculations
@@ -70,59 +72,9 @@ const calculatorService: ICalculatorService = {
   calculateAnnualAssetIncome: (monthlyIncome) => monthlyIncome * 12,
 
   // Cached asset calculations
-  calculateAssetMonthlyIncomeWithCache: (asset) => {
-    const cacheService = getDividendCacheService();
-    if (cacheService) {
-      const result = cacheService.calculateAssetIncomeWithCache(asset);
-      if (result) return result;
-    }
-    // Fallback to non-cached calculation
-    const monthlyAmount = calculateAssetMonthlyIncome(asset);
-    return {
-      monthlyAmount,
-      annualAmount: monthlyAmount * 12,
-      monthlyBreakdown: {},
-      cacheHit: false,
-      cacheDataToUpdate: {
-        monthlyAmount,
-        annualAmount: monthlyAmount * 12,
-        monthlyBreakdown: {},
-      },
-    };
-  },
-   calculateTotalMonthlyAssetIncomeWithCache: (assets) => {
-    // First try pure cache approach for best performance
-    const cachedTotal = calculateTotalMonthlyAssetIncomeFromCache(assets);
-    if (cachedTotal !== null) {
-      return cachedTotal;
-    }
-    
-    // Fallback to cache service if available
-    const cacheService = getDividendCacheService();
-    if (cacheService) {
-      return cacheService.calculateTotalMonthlyAssetIncomeWithCache(assets);
-    }
-    
-    // Final fallback to non-cached calculation
-    return assets.reduce((sum, asset) => sum + calculateAssetMonthlyIncome(asset), 0);
-  },
-
-  calculateTotalAssetIncomeForMonthWithCache: (assets, monthNumber) => {
-    // First try pure cache approach for best performance
-    const cachedTotal = calculateTotalAssetIncomeForMonthFromCache(assets, monthNumber);
-    if (cachedTotal !== null) {
-      return cachedTotal;
-    }
-    
-    // Fallback to cache service if available
-    const cacheService = getDividendCacheService();
-    if (cacheService) {
-      return cacheService.calculateTotalAssetIncomeForMonthWithCache(assets, monthNumber);
-    }
-    
-    // Final fallback to non-cached calculation
-    return calculateTotalAssetIncomeForMonth(assets, monthNumber);
-  },
+  calculateAssetMonthlyIncomeWithCache,
+  calculateTotalMonthlyAssetIncomeWithCache,
+  calculateTotalAssetIncomeForMonthWithCache,
 
   // Income calculations
   calculateMonthlyIncome,

@@ -1,5 +1,5 @@
-import { PortfolioPosition } from '../../portfolioService/portfolioCalculations';
-import Logger from '../../Logger/logger';
+import { PortfolioPosition } from '../../../portfolioService/portfolioCalculations';
+import Logger from '../../../Logger/logger';
 
 export interface AllocationData {
   name: string;

@@ -22,7 +22,7 @@ import Logger from '../service/Logger/logger';
 import PortfolioAnalyticsContainer from './PortfolioAnalyticsContainer';
 import { analytics } from '../service/analytics';
 import calculatorService from '../service/calculatorService';
-import { createDividendCacheService } from '../service/dividendCacheService';
+// Removed dividend cache service import
 import { createCachedDividends } from '../utils/dividendCacheUtils';
 import AssetDefinitionsContainer from './AssetDefinitionsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
@@ -67,8 +67,7 @@ const AssetsContainer: React.FC = () => {
     // Also fetch asset definitions
     dispatch(fetchAssetDefinitions());
     
-    // Initialize dividend cache service
-    createDividendCacheService(dispatch);
+    // Dividend cache service initialization removed (now integrated in calculatorService)
   }, [dispatch, status]);
 
   // Calculate portfolio data when needed (with caching)

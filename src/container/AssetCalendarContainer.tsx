@@ -6,10 +6,9 @@ import { AssetType } from '../types';
 import AssetCalendarView from '../view/assets/AssetCalendarView';
 import Logger from '../service/Logger/logger';
 import { PortfolioPosition } from '../service/portfolioService/portfolioCalculations';
-import { calculateDividendForMonth } from '../service/calculatorService/methods/calculatePayment';
+import { calculatorService } from '../service/calculatorService';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../store/slices/assetsSlice';
-// Import Action types für TypeScript-Korrektur
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 
 interface MonthData {
@@ -139,7 +138,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
     }
     
     try {
-      const dividendForMonth = calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
+      const dividendForMonth = calculatorService.calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
       Logger.cache(`Dividend for ${position.name} month ${month}: ${dividendForMonth}`);
       return isFinite(dividendForMonth) ? dividendForMonth : 0;
     } catch (error) {

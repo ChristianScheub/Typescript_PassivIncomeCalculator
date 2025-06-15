@@ -5,7 +5,6 @@ import { StoreState } from '..';
 import Logger from '../../service/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
 import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
-import { calculateDividendForMonth } from '../../service/calculatorService/methods/calculatePayment';
 
 // Helper functions to calculate income for different asset types
 const calculateStockDividendIncome = (position: PortfolioPosition, month: number): number => {
@@ -18,7 +17,7 @@ const calculateStockDividendIncome = (position: PortfolioPosition, month: number
   if (totalQuantity <= 0) return 0;
   
   try {
-    const dividendForMonth = calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
+    const dividendForMonth = calculatorService.calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
     return isFinite(dividendForMonth) ? dividendForMonth : 0;
   } catch (error) {
     Logger.cache(`Error calculating dividend for ${name}: ${error}`);

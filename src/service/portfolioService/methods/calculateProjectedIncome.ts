@@ -1,5 +1,6 @@
 import { Asset, AssetDefinition } from '../../../types';
 import { getCurrentQuantity } from '../../../utils/transactionCalculations';
+import { calculatorService } from '../../calculatorService';
 
 export function calculateProjectedIncome(
   assets: Asset[], 
@@ -16,9 +17,8 @@ export function calculateProjectedIncome(
     return 0;
   }
 
-  // Import calculation function dynamically to avoid circular dependency
-  const { calculateDividendSchedule } = require('../../calculatorService/methods/calculatePayment');
-  const result = calculateDividendSchedule(newDividendInfo, totalQuantity);
+  // Use calculatorService instead of direct import to avoid circular dependency
+  const result = calculatorService.calculateDividendSchedule(newDividendInfo, totalQuantity);
   
   return isFinite(result.monthlyAmount) ? result.monthlyAmount : 0;
 }

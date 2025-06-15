@@ -1,5 +1,5 @@
-import { Expense, ExpenseBreakdown, ExpenseCategory } from '../../../types';
-import Logger from '../../Logger/logger';
+import { Expense, ExpenseBreakdown, ExpenseCategory } from '../../../../types';
+import Logger from '../../../Logger/logger';
 import { calculateMonthlyExpense } from './calculateExpenses';
 
 export const calculateExpenseBreakdown = (expenses: Expense[]): ExpenseBreakdown[] => {

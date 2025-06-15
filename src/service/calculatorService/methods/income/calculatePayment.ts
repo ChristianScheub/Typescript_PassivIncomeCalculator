@@ -1,5 +1,5 @@
-import { DividendSchedule, PaymentSchedule, PaymentFrequency } from '../../../types';
-import Logger from '../../Logger/logger';
+import { DividendSchedule, PaymentSchedule, PaymentFrequency } from '../../../../types';
+import Logger from '../../../Logger/logger';
 import {
   calculateMonthlyAmountFromFrequency,
   calculateAmountForPaymentMonth,

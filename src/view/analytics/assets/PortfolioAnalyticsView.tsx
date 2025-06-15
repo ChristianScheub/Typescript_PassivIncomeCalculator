@@ -6,7 +6,7 @@ import IncomeDistributionView from './IncomeDistributionView';
 import CustomAnalyticsView from './CustomAnalyticsView';
 import { ViewHeader } from '../../../ui/layout/ViewHeader';
 import { AssetTypeFilterCard } from '../../../ui/specialized/AssetTypeFilterCard';
-import { AllocationData } from '../../../service/calculatorService/methods/calculatePortfolioAnalytics';
+import { AllocationData } from '../../../service/calculatorService/methods/analytics/calculatePortfolioAnalytics';
 import { AssetType } from '../../../types';
 import { getAssetTypeOptions } from '../../../constants';
 

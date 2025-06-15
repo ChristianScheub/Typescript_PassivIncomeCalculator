@@ -4,7 +4,7 @@ import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { analytics } from '../service/analytics';
 import Logger from '../service/Logger/logger';
 import DashboardView from '../view/dashboard/DashboardView';
-import { createDividendCacheService } from '../service/dividendCacheService';
+// Removed dividend cache service import
 import { updateDashboardValues } from '../store/slices/dashboardSlice';
 
 const DashboardContainer: React.FC = () => {
@@ -30,10 +30,7 @@ const DashboardContainer: React.FC = () => {
     monthlyCashFlow,
   } = useAppSelector(state => state.dashboard);
 
-  // Initialize dividend cache service
-  React.useEffect(() => {
-    createDividendCacheService(dispatch);
-  }, [dispatch]);
+  // Dividend cache service initialization removed (now integrated in calculatorService)
 
   // Update dashboard values whenever the underlying data changes
   React.useEffect(() => {

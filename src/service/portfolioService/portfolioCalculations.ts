@@ -1,6 +1,6 @@
 import { Asset, AssetDefinition, AssetCategory, AssetCategoryOption } from '../../types';
 import Logger from '../Logger/logger';
-import { calculateDividendSchedule } from '../calculatorService/methods/calculatePayment';
+import { calculatorService } from '../calculatorService';
 import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
 import { formatCurrency } from '../formatService/methods/formatCurrency';
 import { formatPercentage } from '../formatService/methods/formatPercentage';
@@ -158,7 +158,6 @@ export const calculatePortfolioPositions = (
       type: assetDefinition?.type || firstTransaction.type,
       sector: assetDefinition?.sector,
       country: assetDefinition?.country,
-      currency: assetDefinition?.currency || 'EUR',
       
       totalQuantity,
       averagePurchasePrice,
@@ -213,7 +212,7 @@ const calculatePositionMonthlyIncome = (
       return 0;
     }
     
-    const dividendResult = calculateDividendSchedule(dividendInfo, totalQuantity);
+    const dividendResult = calculatorService.calculateDividendSchedule(dividendInfo, totalQuantity);
     Logger.infoService(
       `Stock dividend calculation: amount=${dividendInfo.amount}, frequency=${dividendInfo.frequency}, quantity=${totalQuantity}, result=${dividendResult.monthlyAmount}`
     );

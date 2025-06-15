@@ -1,7 +1,7 @@
-import { Asset, Income, AssetAllocation, IncomeAllocation, IncomeType, AssetType } from '../../../types';
-import { PortfolioPosition } from '../../portfolioService/portfolioCalculations';
-import Logger from '../../Logger/logger';
-import { calculateMonthlyIncome } from './calculateIncome';
+import { Asset, Income, AssetAllocation, IncomeAllocation, IncomeType, AssetType } from '../../../../types';
+import { PortfolioPosition } from '../../../portfolioService/portfolioCalculations';
+import Logger from '../../../Logger/logger';
+import { calculateMonthlyIncome } from '../income/calculateIncome';
 import { calculateAssetMonthlyIncome } from './calculateAssetIncome';
 
 export const calculateIncomeAllocation = (income: Income[], assets: Asset[]): IncomeAllocation[] => {
