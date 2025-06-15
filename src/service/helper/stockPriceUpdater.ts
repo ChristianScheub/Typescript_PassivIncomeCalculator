@@ -1,6 +1,6 @@
 import { AssetDefinition } from '../../types';
 import Logger from '../Logger/logger';
-import { createStockAPIService } from '../stockAPIService';
+import stockAPIService from '../stockAPIService';
 import { updateAssetDefinitionPrice, cleanupOldPriceHistory } from '../../utils/priceHistoryUtils';
 
 /**
@@ -29,7 +29,7 @@ export class StockPriceUpdater {
     Logger.infoService(`Updating prices for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`);
     
     try {
-      const stockAPI = createStockAPIService();
+      const stockAPI = stockAPIService.createStockAPIService();
       const updatedDefinitions: AssetDefinition[] = [];
 
       for (const definition of stockDefinitionsToUpdate) {
@@ -94,7 +94,7 @@ export class StockPriceUpdater {
     Logger.infoService(`Fetching 30-day historical data for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`);
     
     try {
-      const stockAPI = createStockAPIService();
+      const stockAPI = stockAPIService.createStockAPIService();
       const updatedDefinitions: AssetDefinition[] = [];
 
       for (const definition of stockDefinitionsToUpdate) {
@@ -103,7 +103,7 @@ export class StockPriceUpdater {
           
           if (historicalData?.data && historicalData.data.length > 0) {
             // Convert historical data to price history format and update definition
-            const priceHistory = historicalData.data.map(entry => ({
+            const priceHistory = historicalData.data.map((entry: any) => ({
               date: entry.date,
               price: entry.close,
               source: 'api' as const

@@ -7,10 +7,9 @@ import DebugSettings from '../../ui/specialized/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../../config/featureFlags';
 import { StockAPIProvider } from '../../store/slices/apiConfigSlice';
 import { ConfirmationDialog } from '../../ui/dialog/ConfirmationDialog';
+import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '../../ui/common/ClearButton';
 import clsx from 'clsx';
 import { Toggle } from '../../ui/common/Toggle';
-
-type ClearStatus = 'idle' | 'clearing' | 'success';
 
 interface ProviderInfo {
   name: string;
@@ -186,12 +185,10 @@ const SettingsView: React.FC<SettingsViewProps> = ({
     }
   };
 
-    // Add loading indicator component
-
-  // Add loading indicator component
-  const LoadingSpinner = () => (
-    <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
-  );
+  // Extract button text helpers for reduced complexity
+  const exportButtonText = getButtonText(exportStatus, t, 'settings.exporting', 'settings.exported', 'settings.export');
+  const importButtonText = getButtonText(importStatus, t, 'settings.importing', 'settings.imported', 'settings.import');
+  const apiKeyButtonText = getButtonText(apiKeyStatus, t, 'settings.saving', 'settings.saved', 'settings.saveApiKey');
 
   return (
     <div className="space-y-6">
@@ -243,15 +240,16 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                     // Yahoo Finance doesn't require an API key, so it's always configured
                     const isConfigured = provider === 'yahoo' ? true : !!(apiKeys?.[provider]);
                     
+                    // Extract className logic for provider selection
+                    const providerClassName = isSelected
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600';
+                    
                     return (
                       <div
                         key={provider}
                         onClick={() => onProviderChange(provider)}
-                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                          isSelected
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
-                        }`}
+                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${providerClassName}`}
                       >
                         <div className="flex items-center justify-between">
                           <div>
@@ -330,13 +328,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                       disabled={apiKeyStatus === 'saving' || !tempApiKeys[selectedProvider]?.trim()}
                       className="flex items-center space-x-2"
                     >
-                      <span>
-                        {(() => {
-                          if (apiKeyStatus === 'saving') return t('settings.saving');
-                          if (apiKeyStatus === 'success') return t('settings.saved');
-                          return t('settings.saveApiKey');
-                        })()}
-                      </span>
+                      <span>{apiKeyButtonText}</span>
                     </Button>
                     
                     {apiKeys?.[selectedProvider] && (
@@ -368,28 +360,33 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 {t('settings.stockMarketCurrencyDescription')}
               </p>
               
-              <div className="flex space-x-3">
-                <button
-                  onClick={() => onCurrencyChange('EUR')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    currency === 'EUR'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  {t('settings.eurAutoConverted')}
-                </button>
-                <button
-                  onClick={() => onCurrencyChange('USD')}
-                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                    currency === 'USD'
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                  }`}
-                >
-                  {t('settings.usdOriginal')}
-                </button>
-              </div>
+              {(() => {
+                // Extract className logic for currency buttons to avoid nested ternary
+                const eurButtonClassName = currency === 'EUR'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+                
+                const usdButtonClassName = currency === 'USD'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600';
+                
+                return (
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => onCurrencyChange('EUR')}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${eurButtonClassName}`}
+                    >
+                      {t('settings.eurAutoConverted')}
+                    </button>
+                    <button
+                      onClick={() => onCurrencyChange('USD')}
+                      className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${usdButtonClassName}`}
+                    >
+                      {t('settings.usdOriginal')}
+                    </button>
+                  </div>
+                );
+              })()}
               
               <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                 {t('settings.currentCurrency', {
@@ -431,13 +428,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 className="flex items-center space-x-2"
               >
                 <Download size={16} />
-                <span>
-                  {(() => {
-                    if (exportStatus === 'loading') return t('settings.exporting');
-                    if (exportStatus === 'success') return t('settings.exported');
-                    return t('settings.export');
-                  })()}
-                </span>
+                <span>{exportButtonText}</span>
               </Button>
             </div>
 
@@ -465,13 +456,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   className="flex items-center space-x-2"
                 >
                   <Upload size={16} />
-                  <span>
-                    {(() => {
-                      if (importStatus === 'loading') return t('settings.importing');
-                      if (importStatus === 'success') return t('settings.imported');
-                      return t('settings.import');
-                    })()}
-                  </span>
+                  <span>{importButtonText}</span>
                 </Button>
               </div>
             </div>
@@ -503,80 +488,29 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   {t("settings.assetManagement")}
                 </h3>
                 <div className="space-y-3">
-                  <div>
-                    <Button
-                      variant="outline"
-                      className={clsx("w-full justify-between", {
-                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearAssetDefinitionsStatus === 'success'
-                      })}
-                      onClick={onClearAssetDefinitions}
-                      disabled={clearAssetDefinitionsStatus === "clearing"}
-                    >
-                      <div className="text-left">
-                        <span className="flex items-center mb-1">
-                          {clearAssetDefinitionsStatus === "clearing" ? <LoadingSpinner /> : 
-                           clearAssetDefinitionsStatus === "success" ? 
-                           <span className="text-green-500">✓</span> :
-                           <Trash className="h-4 w-4 mr-2" />}
-                          {t("settings.clearAssetDefinitions")}
-                        </span>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t("settings.clearAssetDefinitionsDesc")}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
-                    </Button>
-                  </div>
+                  <ClearButton
+                    status={clearAssetDefinitionsStatus}
+                    onClick={onClearAssetDefinitions}
+                    titleKey="settings.clearAssetDefinitions"
+                    descKey="settings.clearAssetDefinitionsDesc"
+                    t={t}
+                  />
                   
-                  <div>
-                    <Button
-                      variant="outline"
-                      className={clsx("w-full justify-between", {
-                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearPriceHistoryStatus === 'success'
-                      })}
-                      onClick={onClearPriceHistory}
-                      disabled={clearPriceHistoryStatus === "clearing"}
-                    >
-                      <div className="text-left">
-                        <span className="flex items-center mb-1">
-                          {clearPriceHistoryStatus === "clearing" ? <LoadingSpinner /> : 
-                           clearPriceHistoryStatus === "success" ? 
-                           <span className="text-green-500">✓</span> :
-                           <Trash className="h-4 w-4 mr-2" />}
-                          {t("settings.clearPriceHistory")}
-                        </span>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t("settings.clearPriceHistoryDesc")}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
-                    </Button>
-                  </div>
+                  <ClearButton
+                    status={clearPriceHistoryStatus}
+                    onClick={onClearPriceHistory}
+                    titleKey="settings.clearPriceHistory"
+                    descKey="settings.clearPriceHistoryDesc"
+                    t={t}
+                  />
 
-                  <div>
-                    <Button
-                      variant="outline"
-                      className={clsx("w-full justify-between", {
-                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearAssetTransactionsStatus === 'success'
-                      })}
-                      onClick={onClearAssetTransactions}
-                      disabled={clearAssetTransactionsStatus === "clearing"}
-                    >
-                      <div className="text-left">
-                        <span className="flex items-center mb-1">
-                          {clearAssetTransactionsStatus === "clearing" ? <LoadingSpinner /> : 
-                           clearAssetTransactionsStatus === "success" ? 
-                           <span className="text-green-500">✓</span> :
-                           <Trash className="h-4 w-4 mr-2" />}
-                          {t("settings.clearAssetTransactions")}
-                        </span>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t("settings.clearAssetTransactionsDesc")}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
-                    </Button>
-                  </div>
+                  <ClearButton
+                    status={clearAssetTransactionsStatus}
+                    onClick={onClearAssetTransactions}
+                    titleKey="settings.clearAssetTransactions"
+                    descKey="settings.clearAssetTransactionsDesc"
+                    t={t}
+                  />
                 </div>
               </div>
 
@@ -586,80 +520,29 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   {t("settings.financialManagement")}
                 </h3>
                 <div className="space-y-3">
-                  <div>
-                    <Button
-                      variant="outline"
-                      className={clsx("w-full justify-between", {
-                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearDebtsStatus === 'success'
-                      })}
-                      onClick={onClearDebts}
-                      disabled={clearDebtsStatus === "clearing"}
-                    >
-                      <div className="text-left">
-                        <span className="flex items-center mb-1">
-                          {clearDebtsStatus === "clearing" ? <LoadingSpinner /> : 
-                           clearDebtsStatus === "success" ? 
-                           <span className="text-green-500">✓</span> :
-                           <Trash className="h-4 w-4 mr-2" />}
-                          {t("settings.clearDebts")}
-                        </span>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t("settings.clearDebtsDesc")}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
-                    </Button>
-                  </div>
+                  <ClearButton
+                    status={clearDebtsStatus}
+                    onClick={onClearDebts}
+                    titleKey="settings.clearDebts"
+                    descKey="settings.clearDebtsDesc"
+                    t={t}
+                  />
 
-                  <div>
-                    <Button
-                      variant="outline"
-                      className={clsx("w-full justify-between", {
-                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearExpensesStatus === 'success'
-                      })}
-                      onClick={onClearExpenses}
-                      disabled={clearExpensesStatus === "clearing"}
-                    >
-                      <div className="text-left">
-                        <span className="flex items-center mb-1">
-                          {clearExpensesStatus === "clearing" ? <LoadingSpinner /> : 
-                           clearExpensesStatus === "success" ? 
-                           <span className="text-green-500">✓</span> :
-                           <Trash className="h-4 w-4 mr-2" />}
-                          {t("settings.clearExpenses")}
-                        </span>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t("settings.clearExpensesDesc")}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
-                    </Button>
-                  </div>
+                  <ClearButton
+                    status={clearExpensesStatus}
+                    onClick={onClearExpenses}
+                    titleKey="settings.clearExpenses"
+                    descKey="settings.clearExpensesDesc"
+                    t={t}
+                  />
 
-                  <div>
-                    <Button
-                      variant="outline"
-                      className={clsx("w-full justify-between", {
-                        'bg-green-50 dark:bg-green-900/20 border-green-500': clearIncomeStatus === 'success'
-                      })}
-                      onClick={onClearIncome}
-                      disabled={clearIncomeStatus === "clearing"}
-                    >
-                      <div className="text-left">
-                        <span className="flex items-center mb-1">
-                          {clearIncomeStatus === "clearing" ? <LoadingSpinner /> : 
-                           clearIncomeStatus === "success" ? 
-                           <span className="text-green-500">✓</span> :
-                           <Trash className="h-4 w-4 mr-2" />}
-                          {t("settings.clearIncome")}
-                        </span>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          {t("settings.clearIncomeDesc")}
-                        </p>
-                      </div>
-                      <ChevronRight className="h-4 w-4 flex-shrink-0" />
-                    </Button>
-                  </div>
+                  <ClearButton
+                    status={clearIncomeStatus}
+                    onClick={onClearIncome}
+                    titleKey="settings.clearIncome"
+                    descKey="settings.clearIncomeDesc"
+                    t={t}
+                  />
                 </div>
               </div>
 
@@ -679,10 +562,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   >
                     <div className="text-left">
                       <span className="flex items-center mb-1">
-                        {clearAllDataStatus === "clearing" ? <LoadingSpinner /> : 
-                         clearAllDataStatus === "success" ? 
-                         <span className="text-white">✓</span> :
-                         <Trash className="h-4 w-4 mr-2" />}
+                        {getClearButtonIcon(clearAllDataStatus)}
                         {t("settings.clearAllData")}
                       </span>
                       <p className="text-sm text-gray-400">

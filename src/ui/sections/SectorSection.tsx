@@ -71,56 +71,63 @@ export const SectorSection: React.FC<SectorSectionProps> = ({
   return (
     <OptionalSection title={t("assets.sectors")}>
       <div className="space-y-4">
-        {sectors.map((sector, index) => (
-          <div key={index} className="space-y-3">
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                {t("assets.sectorName")} {index + 1}
-              </label>
-              <input
-                type="text"
-                placeholder={t("assets.sectorPlaceholder")}
-                value={sector.sectorName}
-                onChange={(e) =>
-                  updateSector(index, "sectorName", e.target.value)
-                }
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                {t("assets.percentage")} (%)
-              </label>
-              <div className="flex items-center gap-2">
+        {sectors.map((sector, index) => {
+          // Generate stable key using sector name when available, fallback to index
+          const stableKey = sector.sectorName.trim() 
+            ? `sector-${sector.sectorName.trim()}-${index}` 
+            : `sector-empty-${index}`;
+          
+          return (
+            <div key={stableKey} className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                  {t("assets.sectorName")} {index + 1}
+                </label>
                 <input
-                  type="number"
-                  placeholder="0"
-                  value={sector.percentage}
+                  type="text"
+                  placeholder={t("assets.sectorPlaceholder")}
+                  value={sector.sectorName}
                   onChange={(e) =>
-                    updateSector(
-                      index,
-                      "percentage",
-                      parseFloat(e.target.value) || 0
-                    )
+                    updateSector(index, "sectorName", e.target.value)
                   }
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
-                {sectors.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeSector(index)}
-                    className="px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded border border-red-300 dark:border-red-600"
-                  >
-                    {t("common.remove")}
-                  </button>
-                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                  {t("assets.percentage")} (%)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    placeholder="0"
+                    value={sector.percentage}
+                    onChange={(e) =>
+                      updateSector(
+                        index,
+                        "percentage",
+                        parseFloat(e.target.value) || 0
+                      )
+                    }
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                  {sectors.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSector(index)}
+                      className="px-3 py-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded border border-red-300 dark:border-red-600"
+                    >
+                      {t("common.remove")}
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
           <button

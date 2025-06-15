@@ -70,7 +70,7 @@ export const AssetIncomeSection: React.FC<AssetIncomeSectionProps> = ({
           {t(currentTexts.has)}
         </span>
         <Toggle
-          checked={hasIncome}
+          checked={hasIncome ?? false}
           onChange={onHasIncomeChange}
           id={`has${type}`}
           label={t(currentTexts.has)}
@@ -78,76 +78,76 @@ export const AssetIncomeSection: React.FC<AssetIncomeSectionProps> = ({
       </div>
 
       {hasIncome && (
-        <>
-          <Card className="p-6">
-            <div className="space-y-6">
-              <StandardFormField
-                label={t(currentTexts.amount)}
-                name={`${type}Amount`}
-                type="number"
-                value={amount}
-                onChange={onAmountChange}
-                step={0.01}
-                min={0}
-              />
+        <Card className="p-6">
+          <div className="space-y-6">
+            <StandardFormField
+              label={t(currentTexts.amount)}
+              name={`${type}Amount`}
+              type="number"
+              value={amount}
+              onChange={onAmountChange}
+              step={0.01}
+              min={0}
+            />
 
-              <StandardFormField
-                label={t(currentTexts.frequency)}
-                name={`${type}Frequency`}
-                type="select"
-                options={[
-                  {
-                    value: "monthly",
-                    label: t("paymentFrequency.monthly"),
-                  },
-                  {
-                    value: "quarterly",
-                    label: t("paymentFrequency.quarterly"),
-                  },
-                  {
-                    value: "annually",
-                    label: t("paymentFrequency.annually"),
-                  },
-                  { value: "custom", label: t("paymentFrequency.custom") },
-                ]}
-                value={frequency}
-                onChange={onFrequencyChange}
-              />
-            </div>
+            <StandardFormField
+              label={t(currentTexts.frequency)}
+              name={`${type}Frequency`}
+              type="select"
+              options={[
+                {
+                  value: "monthly",
+                  label: t("paymentFrequency.monthly"),
+                },
+                {
+                  value: "quarterly",
+                  label: t("paymentFrequency.quarterly"),
+                },
+                {
+                  value: "annually",
+                  label: t("paymentFrequency.annually"),
+                },
+                { value: "custom", label: t("paymentFrequency.custom") },
+              ]}
+              value={frequency}
+              onChange={onFrequencyChange}
+            />
+          </div>
 
-            {/* Payment Month Selection */}
-            {frequency &&
-              (frequency === "quarterly" ||
-                frequency === "annually" ||
-                frequency === "custom") && (
-                <div className="mt-6">
-                  <MonthSelector
-                    selectedMonths={paymentMonths}
-                    onChange={onPaymentMonthChange}
-                    label={
-                      frequency === "quarterly"
-                        ? t(currentTexts.selectQuarterly)
-                        : frequency === "annually"
-                        ? t(currentTexts.selectAnnual)
-                        : t(currentTexts.selectMonths)
+          {/* Payment Month Selection */}
+          {frequency &&
+            (frequency === "quarterly" ||
+              frequency === "annually" ||
+              frequency === "custom") && (
+              <div className="mt-6">
+                <MonthSelector
+                  selectedMonths={paymentMonths}
+                  onChange={onPaymentMonthChange}
+                  label={(() => {
+                    if (frequency === "quarterly") {
+                      return t(currentTexts.selectQuarterly);
                     }
-                  />
-                </div>
-              )}
-
-            {/* Custom Payment Amounts */}
-            {frequency === "custom" && (
-              <CustomAmountsSection
-                frequency={frequency}
-                selectedMonths={paymentMonths}
-                customAmounts={customAmounts}
-                onAmountChange={onCustomAmountChange}
-                title={t(currentTexts.customAmounts)}
-                currency={currency}
-              />
+                    if (frequency === "annually") {
+                      return t(currentTexts.selectAnnual);
+                    }
+                    return t(currentTexts.selectMonths);
+                  })()}
+                />
+              </div>
             )}
-          </Card>
-        </>
+
+          {/* Custom Payment Amounts */}
+          {frequency === "custom" && (
+            <CustomAmountsSection
+              frequency={frequency}
+              selectedMonths={paymentMonths}
+              customAmounts={customAmounts}
+              onAmountChange={onCustomAmountChange}
+              title={t(currentTexts.customAmounts)}
+              currency={currency}
+            />
+          )}
+        </Card>
       )}
     </div>
   );
