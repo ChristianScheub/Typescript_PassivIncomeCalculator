@@ -1,6 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-export type StockAPIProvider = 'finnhub' | 'yahoo' | 'alpha_vantage' | 'iex_cloud';
+export enum StockAPIProvider {
+  FINNHUB = 'finnhub',
+  YAHOO = 'yahoo',
+  ALPHA_VANTAGE = 'alpha_vantage'
+}
+
+// Type alias for backward compatibility
+export type StockAPIProviderType = StockAPIProvider;
 
 interface ApiConfigState {
   isEnabled: boolean;
@@ -12,12 +19,11 @@ interface ApiConfigState {
 
 const initialState: ApiConfigState = {
   isEnabled: localStorage.getItem('stock_api_enabled') === 'true',
-  selectedProvider: (localStorage.getItem('selected_stock_api_provider') as StockAPIProvider) || 'finnhub',
+  selectedProvider: (localStorage.getItem('selected_stock_api_provider') as StockAPIProvider) || StockAPIProvider.FINNHUB,
   apiKeys: {
-    finnhub: localStorage.getItem('finnhub_api_key') || undefined,
-    yahoo: localStorage.getItem('yahoo_api_key') || undefined,
-    alpha_vantage: localStorage.getItem('alpha_vantage_api_key') || undefined,
-    iex_cloud: localStorage.getItem('iex_cloud_api_key') || undefined,
+    [StockAPIProvider.FINNHUB]: localStorage.getItem('finnhub_api_key') || undefined,
+    [StockAPIProvider.YAHOO]: localStorage.getItem('yahoo_api_key') || undefined,
+    [StockAPIProvider.ALPHA_VANTAGE]: localStorage.getItem('alpha_vantage_api_key') || undefined,
   }
 };
 
@@ -50,10 +56,10 @@ const apiConfigSlice = createSlice({
     setApiKeyLegacy: (state, action: PayloadAction<string | null>) => {
       const apiKey = action.payload;
       if (apiKey) {
-        state.apiKeys.finnhub = apiKey;
+        state.apiKeys[StockAPIProvider.FINNHUB] = apiKey;
         localStorage.setItem('finnhub_api_key', apiKey);
       } else {
-        delete state.apiKeys.finnhub;
+        delete state.apiKeys[StockAPIProvider.FINNHUB];
         localStorage.removeItem('finnhub_api_key');
       }
     }

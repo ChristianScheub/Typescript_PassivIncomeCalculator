@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react';
 import { Asset, AssetDefinition } from '../types';
-import { PortfolioHistoryService, PortfolioHistoryPoint } from '../service/portfolioHistoryService';
+import { PortfolioHistoryPoint } from '../service/portfolioHistoryService';
+import portfolioHistoryService from '../service/portfolioHistoryService';
 import { PortfolioHistoryView } from '../view/portfolio/PortfolioHistoryView';
 import { ViewHeader } from '../ui/layout/ViewHeader';
 import { useDeviceCheck } from '../service/helper/useDeviceCheck';
@@ -34,7 +34,7 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
     }
     
     try {
-      return PortfolioHistoryService.calculatePortfolioHistory(assets, assetDefinitions);
+      return portfolioHistoryService.calculatePortfolioHistory(assets, assetDefinitions);
     } catch (error) {
       console.error('Error calculating portfolio history:', error);
       return [];
@@ -58,15 +58,7 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
       <ViewHeader
         title={t('portfolio.historyTitle')}
         isMobile={!isDesktop}
-        leftContent={
-          <button
-            onClick={onBack}
-            className="flex items-center px-3 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-          >
-            <ArrowLeft className="h-5 w-5 mr-2" />
-            {isDesktop && t('common.back')}
-          </button>
-        }
+        onBack={onBack}
       />
 
       <PortfolioHistoryView

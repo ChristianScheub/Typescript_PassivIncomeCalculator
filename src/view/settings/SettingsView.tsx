@@ -137,50 +137,41 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   const { t } = useTranslation();
   const [showApiKey, setShowApiKey] = useState(false);
   const [tempApiKeys, setTempApiKeys] = useState<{ [K in StockAPIProvider]?: string }>({
-    finnhub: apiKeys?.finnhub || '',
-    yahoo: apiKeys?.yahoo || '',
-    alpha_vantage: apiKeys?.alpha_vantage || '',
-    iex_cloud: apiKeys?.iex_cloud || ''
+    [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] || '',
+    [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] || '',
+    [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] || '',
   });
 
   // Update tempApiKeys when apiKeys prop changes
   useEffect(() => {
     setTempApiKeys({
-      finnhub: apiKeys?.finnhub || '',
-      yahoo: apiKeys?.yahoo || '',
-      alpha_vantage: apiKeys?.alpha_vantage || '',
-      iex_cloud: apiKeys?.iex_cloud || ''
+      [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] || '',
+      [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] || '',
+      [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] || '',
     });
   }, [apiKeys]);
 
   // Provider information
   const providerInfo: ProviderInfoMap = {
-    finnhub: {
+    [StockAPIProvider.FINNHUB]: {
       name: 'Finnhub',
       description: t('settings.finnhubDescription'),
       keyPlaceholder: t('settings.enterFinnhubApiKey'),
       website: 'https://finnhub.io',
       requiresApiKey: true
     },
-    yahoo: {
+    [StockAPIProvider.YAHOO]: {
       name: 'Yahoo Finance',
       description: t('settings.yahooDescription'),
       keyPlaceholder: t('settings.enterYahooApiKey'),
       website: 'https://finance.yahoo.com',
       requiresApiKey: false
     },
-    alpha_vantage: {
+    [StockAPIProvider.ALPHA_VANTAGE]: {
       name: 'Alpha Vantage',
       description: t('settings.alphaVantageDescription'),
       keyPlaceholder: t('settings.enterAlphaVantageApiKey'),
       website: 'https://www.alphavantage.co',
-      requiresApiKey: true
-    },
-    iex_cloud: {
-      name: 'IEX Cloud',
-      description: t('settings.iexCloudDescription'),
-      keyPlaceholder: t('settings.enterIexCloudApiKey'),
-      website: 'https://iexcloud.io',
       requiresApiKey: true
     }
   };
@@ -234,11 +225,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 </p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {(Object.keys(providerInfo) as StockAPIProvider[]).map((provider) => {
+                  {Object.values(StockAPIProvider).map((provider) => {
                     const info = providerInfo[provider];
                     const isSelected = selectedProvider === provider;
                     // Yahoo Finance doesn't require an API key, so it's always configured
-                    const isConfigured = provider === 'yahoo' ? true : !!(apiKeys?.[provider]);
+                    const isConfigured = provider === StockAPIProvider.YAHOO ? true : !!(apiKeys?.[provider]);
                     
                     // Extract className logic for provider selection
                     const providerClassName = isSelected

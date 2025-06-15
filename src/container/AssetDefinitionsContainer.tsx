@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { RootState } from '../store';
 import { fetchAssetDefinitions, addAssetDefinition, updateAssetDefinition, deleteAssetDefinition } from '../store/slices/assetDefinitionsSlice';
 import { 
   fetchAssetCategories, 
@@ -35,10 +37,10 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       Logger.info('Fetching asset definitions and categories');
       try {
         await Promise.all([
-          dispatch(fetchAssetDefinitions()).unwrap(),
-          dispatch(fetchAssetCategories()).unwrap(),
-          dispatch(fetchAssetCategoryOptions()).unwrap(),
-          dispatch(fetchAssetCategoryAssignments()).unwrap()
+          (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(fetchAssetDefinitions()).unwrap(),
+          (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(fetchAssetCategories()).unwrap(),
+          (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(fetchAssetCategoryOptions()).unwrap(),
+          (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(fetchAssetCategoryAssignments()).unwrap()
         ]);
       } catch (error) {
         Logger.error('Error fetching data: ' + JSON.stringify(error));
@@ -52,7 +54,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     try {
       Logger.info('Adding new asset definition' + " - " + JSON.stringify(data));
       analytics.trackEvent('asset_definition_add');
-      const action = await dispatch(addAssetDefinition(data));
+      const action = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetDefinition(data));
       const newDefinition = addAssetDefinition.fulfilled.match(action) ? action.payload : null;
       
       // Add category assignments if any
@@ -63,7 +65,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         }));
         
         for (const assignment of assignmentsWithAssetId) {
-          await dispatch(addAssetCategoryAssignment(assignment));
+          await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetCategoryAssignment(assignment));
         }
       }
       
@@ -78,11 +80,13 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     try {
       Logger.info('Updating asset definition' + " - " + JSON.stringify({ id: editingDefinition.id, data }));
       analytics.trackEvent('asset_definition_update', { id: editingDefinition.id });
-      const action = await dispatch(updateAssetDefinition({ ...data, id: editingDefinition.id }));
+      // Merge the partial data with the existing definition to ensure all required fields are present
+      const updatedDefinition = { ...editingDefinition, ...data };
+      await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(updatedDefinition));
       
       // Update category assignments
       // First delete existing assignments
-      await dispatch(deleteAssetCategoryAssignmentsByAssetId(editingDefinition.id));
+      await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(deleteAssetCategoryAssignmentsByAssetId(editingDefinition.id));
       
       // Then add new assignments
       if (categoryAssignments.length > 0) {
@@ -92,7 +96,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         }));
         
         for (const assignment of assignmentsWithAssetId) {
-          await dispatch(addAssetCategoryAssignment(assignment));
+          await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetCategoryAssignment(assignment));
         }
       }
       
@@ -109,13 +113,13 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         analytics.trackEvent('asset_definition_delete', { id });
         
         // Delete category assignments first
-        const deleteAssignmentsAction = await dispatch(deleteAssetCategoryAssignmentsByAssetId(id));
+        const deleteAssignmentsAction = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(deleteAssetCategoryAssignmentsByAssetId(id));
         if (!deleteAssetCategoryAssignmentsByAssetId.fulfilled.match(deleteAssignmentsAction)) {
           throw new Error('Failed to delete category assignments');
         }
         
         // Then delete the definition
-        const deleteDefinitionAction = await dispatch(deleteAssetDefinition(id));
+        const deleteDefinitionAction = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(deleteAssetDefinition(id));
         if (!deleteAssetDefinition.fulfilled.match(deleteDefinitionAction)) {
           throw new Error('Failed to delete asset definition');
         }
@@ -148,7 +152,12 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         // Update each AssetDefinition in the store
         for (const updatedDefinition of updatedDefinitions) {
           Logger.info(`Updating stock price for ${updatedDefinition.ticker}: ${updatedDefinition.currentPrice}`);
-          await dispatch(updateAssetDefinition(updatedDefinition));
+          // Make sure we have all required fields before dispatching
+          if (updatedDefinition.fullName) {
+            await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(updatedDefinition));
+          } else {
+            Logger.error(`Missing required fields for updating ${updatedDefinition.ticker}`);
+          }
         }
 
         Logger.info('Successfully updated stock prices for asset definitions');
@@ -184,7 +193,12 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         
         // Update each AssetDefinition in the store
         for (const definition of updatedDefinitions) {
-          await dispatch(updateAssetDefinition(definition));
+          // Make sure we have all required fields before dispatching
+          if (definition.fullName) {
+            await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(definition));
+          } else {
+            Logger.error(`Missing required fields for updating historical data for ${definition.ticker}`);
+          }
         }
 
         Logger.info('Successfully updated historical data for asset definitions');

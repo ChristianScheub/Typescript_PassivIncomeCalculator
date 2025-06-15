@@ -1,7 +1,6 @@
 import { IStockAPIService } from './interfaces/IStockAPIService';
 import { StockAPIProvider } from '../../store/slices/apiConfigSlice';
 import { createStockAPIServiceMethod, getStockAPIServiceMethod } from './methods/createStockAPIService';
-import { isAnyAPIProviderConfiguredMethod } from './methods/isAnyAPIProviderConfigured';
 import { getAvailableProvidersMethod } from './methods/getAvailableProviders';
 
 /**
@@ -23,13 +22,6 @@ class StockAPIService {
    */
   getStockAPIService(): IStockAPIService | null {
     return getStockAPIServiceMethod();
-  }
-
-  /**
-   * Check if any API provider is configured and has an API key
-   */
-  isAnyAPIProviderConfigured(): boolean {
-    return isAnyAPIProviderConfiguredMethod();
   }
 
   /**

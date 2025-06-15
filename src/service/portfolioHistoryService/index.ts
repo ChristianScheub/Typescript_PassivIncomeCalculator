@@ -52,6 +52,3 @@ export {
 
 // Export interfaces and types
 export * from './interfaces/IPortfolioHistoryService';
-
-// Export legacy class for backward compatibility
-export { PortfolioHistoryService } from './PortfolioHistoryService';

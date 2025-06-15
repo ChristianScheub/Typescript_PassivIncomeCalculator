@@ -4,8 +4,7 @@ import { clearAllLiabilities } from '../../../store/slices/liabilitiesSlice';
 import { clearAllExpenses } from '../../../store/slices/expensesSlice';
 import { clearAllIncome } from '../../../store/slices/incomeSlice';
 import { clearAllAssetCategories } from '../../../store/slices/assetCategoriesSlice';
-import { StockAPIProvider } from '../../../store/slices/apiConfigSlice';
-import { setApiKey, setApiEnabled } from '../../../store/slices/apiConfigSlice';
+import { setApiKey, StockAPIProvider, setApiEnabled } from '../../../store/slices/apiConfigSlice';
 import { analytics } from '../../analytics';
 import Logger from '../../Logger/logger';
 import { StoreNames } from '../../sqlLiteService';
@@ -39,7 +38,7 @@ export async function clearAllData(): Promise<void> {
     Logger.infoService("LocalStorage cleared completely");
 
     // Reset API key state
-    const providers: StockAPIProvider[] = ['finnhub', 'yahoo', 'alpha_vantage', 'iex_cloud'];
+    const providers: StockAPIProvider[] = ['finnhub', 'yahoo', 'alpha_vantage'];
     providers.forEach((provider) => {
         store.dispatch(setApiKey({ provider, apiKey: null }));
     });

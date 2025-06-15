@@ -6,7 +6,6 @@ import Logger from '../../Logger/logger';
 import { FinnhubAPIService } from '../providers/FinnhubAPIService';
 import { YahooAPIService } from '../providers/YahooAPIService';
 import { AlphaVantageAPIService } from '../providers/AlphaVantageAPIService';
-import { IEXCloudAPIService } from '../providers/IEXCloudAPIService';
 
 /**
  * API Gateway that routes requests to the appropriate stock API provider
@@ -44,27 +43,21 @@ export class StockAPIGateway implements IStockAPIService {
     const apiKey = this.apiKeys[provider];
     
     switch (provider) {
-      case 'finnhub':
+      case StockAPIProvider.FINNHUB:
         if (!apiKey) {
           throw new Error(`No API key configured for provider: ${provider}`);
         }
         return new FinnhubAPIService(apiKey);
       
-      case 'yahoo':
+      case StockAPIProvider.YAHOO:
         // Yahoo Finance doesn't require an API key
         return new YahooAPIService();
       
-      case 'alpha_vantage':
+      case StockAPIProvider.ALPHA_VANTAGE:
         if (!apiKey) {
           throw new Error(`No API key configured for provider: ${provider}`);
         }
         return new AlphaVantageAPIService(apiKey);
-      
-      case 'iex_cloud':
-        if (!apiKey) {
-          throw new Error(`No API key configured for provider: ${provider}`);
-        }
-        return new IEXCloudAPIService(apiKey);
       
       default:
         throw new Error(`Unknown API provider: ${provider}`);

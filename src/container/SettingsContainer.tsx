@@ -19,34 +19,33 @@ import deleteDataService from "../service/deleteDataService";
 import { t } from "i18next";
 import { ConfirmationDialogState } from "../ui/dialog/types";
 
+// Type aliases for operation statuses
+type ClearOperationStatus = "idle" | "clearing" | "success";
+type AsyncOperationStatus = "idle" | "loading" | "success" | "error";
+type ApiKeyStatus = "idle" | "saving" | "success" | "error";
+
 const SettingsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
   const apiConfig = useAppSelector((state) => state.apiConfig);
 
-  const [exportStatus, setExportStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
-  const [importStatus, setImportStatus] = useState<
-    "idle" | "loading" | "success" | "error"
-  >("idle");
+  const [exportStatus, setExportStatus] = useState<AsyncOperationStatus>("idle");
+  const [importStatus, setImportStatus] = useState<AsyncOperationStatus>("idle");
   const [importError, setImportError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const [apiKeyStatus, setApiKeyStatus] = useState<
-    "idle" | "saving" | "success" | "error"
-  >("idle");
+  const [apiKeyStatus, setApiKeyStatus] = useState<ApiKeyStatus>("idle");
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const [currency, setCurrency] = useState<"EUR" | "USD">("EUR");
 
   // Clear data operation states
-  const [clearAssetDefinitionsStatus, setClearAssetDefinitionsStatus] = useState<"idle" | "clearing" | "success">("idle");
-  const [clearPriceHistoryStatus, setClearPriceHistoryStatus] = useState<"idle" | "clearing" | "success">("idle");
-  const [clearAssetTransactionsStatus, setClearAssetTransactionsStatus] = useState<"idle" | "clearing" | "success">("idle");
-  const [clearDebtsStatus, setClearDebtsStatus] = useState<"idle" | "clearing" | "success">("idle");
-  const [clearExpensesStatus, setClearExpensesStatus] = useState<"idle" | "clearing" | "success">("idle");
-  const [clearIncomeStatus, setClearIncomeStatus] = useState<"idle" | "clearing" | "success">("idle");
-  const [clearAllDataStatus, setClearAllDataStatus] = useState<"idle" | "clearing" | "success">("idle");
+  const [clearAssetDefinitionsStatus, setClearAssetDefinitionsStatus] = useState<ClearOperationStatus>("idle");
+  const [clearPriceHistoryStatus, setClearPriceHistoryStatus] = useState<ClearOperationStatus>("idle");
+  const [clearAssetTransactionsStatus, setClearAssetTransactionsStatus] = useState<ClearOperationStatus>("idle");
+  const [clearDebtsStatus, setClearDebtsStatus] = useState<ClearOperationStatus>("idle");
+  const [clearExpensesStatus, setClearExpensesStatus] = useState<ClearOperationStatus>("idle");
+  const [clearIncomeStatus, setClearIncomeStatus] = useState<ClearOperationStatus>("idle");
+  const [clearAllDataStatus, setClearAllDataStatus] = useState<ClearOperationStatus>("idle");
 
   const [isApiExpanded, setIsApiExpanded] = useState(false);
   const [isDataManagementExpanded, setIsDataManagementExpanded] =
@@ -344,7 +343,11 @@ const SettingsContainer: React.FC = () => {
       Logger.infoService("LocalStorage cleared completely");
 
       // 4. Reset API key state - clear all providers
-      const providers: StockAPIProvider[] = ['finnhub', 'yahoo', 'alpha_vantage', 'iex_cloud'];
+      const providers: StockAPIProvider[] = [
+        StockAPIProvider.FINNHUB, 
+        StockAPIProvider.YAHOO, 
+        StockAPIProvider.ALPHA_VANTAGE
+      ];
       providers.forEach((provider) => {
         dispatch(setApiKey({ provider, apiKey: null }));
       });

@@ -87,7 +87,6 @@ const loadState = () => {
           finnhub: localStorage.getItem('finnhub_api_key') || undefined,
           yahoo: localStorage.getItem('yahoo_api_key') || undefined,
           alpha_vantage: localStorage.getItem('alpha_vantage_api_key') || undefined,
-          iex_cloud: localStorage.getItem('iex_cloud_api_key') || undefined,
         }
       }
     };

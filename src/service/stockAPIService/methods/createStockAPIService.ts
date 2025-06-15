@@ -14,12 +14,11 @@ export const createStockAPIServiceMethod = (
 ): IStockAPIService => {
   // Get configuration from Redux store or localStorage if not provided
   if (!selectedProvider || !apiKeys) {
-    const storedProvider = localStorage.getItem('selected_stock_api_provider') as StockAPIProvider || 'finnhub';
+    const storedProvider = localStorage.getItem('selected_stock_api_provider') as StockAPIProvider || StockAPIProvider.FINNHUB;
     const storedApiKeys = {
-      finnhub: localStorage.getItem('finnhub_api_key') || undefined,
-      yahoo: localStorage.getItem('yahoo_api_key') || undefined,
-      alpha_vantage: localStorage.getItem('alpha_vantage_api_key') || undefined,
-      iex_cloud: localStorage.getItem('iex_cloud_api_key') || undefined,
+      [StockAPIProvider.FINNHUB]: localStorage.getItem('finnhub_api_key') || undefined,
+      [StockAPIProvider.YAHOO]: localStorage.getItem('yahoo_api_key') || undefined,
+      [StockAPIProvider.ALPHA_VANTAGE]: localStorage.getItem('alpha_vantage_api_key') || undefined,
     };
     
     selectedProvider = selectedProvider || storedProvider;

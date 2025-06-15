@@ -9,6 +9,8 @@ import { PortfolioPosition } from '../service/portfolioService/portfolioCalculat
 import { calculateDividendForMonth } from '../service/calculatorService/methods/calculatePayment';
 import { useAppDispatch, useAppSelector } from '../hooks/redux';
 import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../store/slices/assetsSlice';
+// Import Action types für TypeScript-Korrektur
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 
 interface MonthData {
   month: number;
@@ -52,7 +54,8 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
   useEffect(() => {
     if (!portfolioCacheValid && assets.length > 0 && assetDefinitions.length > 0) {
       Logger.info('Portfolio cache invalid, recalculating for asset calendar');
-      dispatch(calculatePortfolioData({ 
+      // Korrektur des TypeScript-Fehlers durch explizite Typzuweisung des Dispatch
+      (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(calculatePortfolioData({ 
         assetDefinitions, 
         categoryData: { categories: assetCategories, categoryOptions, categoryAssignments } 
       }));
@@ -122,62 +125,77 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
       : portfolioData.positions.filter(position => position.type === selectedAssetType);
   }, [portfolioData.positions, selectedAssetType]);
 
-  // Helper function to calculate position income for a specific month
+  // Helper functions for income calculation by asset type
+  const calculateStockIncome = useCallback((position: PortfolioPosition, month: number): number => {
+    const assetDefinition = position.assetDefinition;
+    if (!assetDefinition) return 0;
+    
+    const totalQuantity = position.totalQuantity;
+    
+    if (!assetDefinition.dividendInfo?.frequency || 
+        assetDefinition.dividendInfo.frequency === 'none' ||
+        totalQuantity <= 0) {
+      return 0;
+    }
+    
+    try {
+      const dividendForMonth = calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
+      Logger.cache(`Dividend for ${position.name} month ${month}: ${dividendForMonth}`);
+      return isFinite(dividendForMonth) ? dividendForMonth : 0;
+    } catch (error) {
+      Logger.cache(`Error calculating dividend for ${position.name}: ${error}`);
+      return 0;
+    }
+  }, []);
+  
+  const calculateInterestIncome = useCallback((position: PortfolioPosition): number => {
+    const assetDefinition = position.assetDefinition;
+    if (!assetDefinition?.bondInfo?.interestRate) return 0;
+    
+    const interestRate = assetDefinition.bondInfo.interestRate;
+    const currentValue = position.currentValue;
+    const annualInterest = (interestRate * currentValue) / 100;
+    const monthlyInterest = annualInterest / 12;
+    
+    return isFinite(monthlyInterest) ? monthlyInterest : 0;
+  }, []);
+  
+  const calculateRentalIncome = useCallback((position: PortfolioPosition): number => {
+    const baseRent = position.assetDefinition?.rentalInfo?.baseRent;
+    if (baseRent === undefined) return 0;
+    
+    return isFinite(baseRent) ? baseRent : 0;
+  }, []);
+
+  // Main position income calculator
   const calculatePositionIncomeForMonth = useCallback((position: PortfolioPosition, month: number): number => {
     if (!position.assetDefinition) {
-      Logger.cache(`Position ${position.name} has no asset definition, skipping`);
       return 0;
     }
 
-    const assetDefinition = position.assetDefinition;
-    const totalQuantity = position.totalQuantity;
-
     Logger.cache(`=== Calculating income for position ${position.name} (${position.type}) month ${month} ===`);
-    Logger.cache(`Position details - Type: ${position.type}, Quantity: ${totalQuantity}`);
-
-    // Stock dividends
-    if (position.type === 'stock' && assetDefinition.dividendInfo?.frequency && assetDefinition.dividendInfo.frequency !== 'none') {
-      if (totalQuantity <= 0) {
-        Logger.cache(`Stock position ${position.name} has no valid quantity (${totalQuantity}), skipping dividend calculation`);
-        return 0;
-      }
-      
-      try {
-        const dividendForMonth = calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
-        Logger.cache(`Dividend for ${position.name} month ${month}: ${dividendForMonth}`);
-        return isFinite(dividendForMonth) ? dividendForMonth : 0;
-      } catch (error) {
-        Logger.cache(`Error calculating dividend for ${position.name}: ${error}`);
-        return 0;
-      }
-    }
-
-    // Bond/Cash interest
-    if ((position.type === 'bond' || position.type === 'cash') && assetDefinition.bondInfo?.interestRate !== undefined) {
-      const interestRate = assetDefinition.bondInfo.interestRate;
-      const currentValue = position.currentValue;
-      const annualInterest = (interestRate * currentValue) / 100;
-      const monthlyInterest = annualInterest / 12;
-      Logger.cache(`Interest for ${position.name} month ${month}: ${monthlyInterest}`);
-      return isFinite(monthlyInterest) ? monthlyInterest : 0;
-    }
-
-    // Real estate rental
-    if (position.type === 'real_estate' && assetDefinition.rentalInfo?.baseRent !== undefined) {
-      const monthlyRent = assetDefinition.rentalInfo.baseRent;
-      Logger.cache(`Rental for ${position.name} month ${month}: ${monthlyRent}`);
-      return isFinite(monthlyRent) ? monthlyRent : 0;
-    }
-
-    Logger.cache(`No income calculation available for position ${position.name} type ${position.type}`);
-    return 0;
-  }, []);
-
-  // Memoize months data calculation with portfolio positions
-  const monthsData = useMemo(() => {
-    Logger.info(`Calculating months data for ${filteredPositions.length} portfolio positions`);
     
-    // Log position details for debugging
+    // Calculate income based on asset type
+    switch (position.type) {
+      case 'stock':
+        return calculateStockIncome(position, month);
+      case 'bond':
+      case 'cash':
+        return calculateInterestIncome(position);
+      case 'real_estate':
+        return calculateRentalIncome(position);
+      default:
+        return 0;
+    }
+  }, [calculateStockIncome, calculateInterestIncome, calculateRentalIncome]);
+
+  // Log positions details for debugging
+  useEffect(() => {
+    // Skip if no positions to log
+    if (filteredPositions.length === 0) return;
+    
+    Logger.info(`Logging details for ${filteredPositions.length} portfolio positions`);
+    
     filteredPositions.forEach(position => {
       Logger.info(`Position: ${position.name} (${position.type}) - Value: ${position.currentValue}`);
       
@@ -200,6 +218,11 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
         Logger.info(`  Rental Income: ${amount}`);
       }
     });
+  }, [filteredPositions]);
+  
+  // Memoize months data calculation with portfolio positions
+  const monthsData = useMemo(() => {
+    Logger.info(`Calculating months data for ${filteredPositions.length} portfolio positions`);
     
     const data: MonthData[] = [];
     
@@ -265,16 +288,21 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
 
   // Handle bar click for month selection with memoized callback
   const handleBarClick = useCallback((data: any) => {
-    const clickedMonthName = data?.activePayload?.[0]?.payload?.month;
-    if (clickedMonthName) {
-      const shortMonthsObj = t('dates.shortMonths', { returnObjects: true }) as Record<string, string>;
-      const shortMonths = Object.values(shortMonthsObj);
-      const monthIndex = shortMonths.findIndex(shortName => shortName === clickedMonthName);
-      if (monthIndex !== -1) {
-        const newSelectedMonth = monthIndex + 1;
-        Logger.info(`Month clicked: ${clickedMonthName} (index: ${monthIndex + 1})`);
-        setSelectedMonth(newSelectedMonth);
-      }
+    // Early exit if no valid click data
+    if (!data?.activePayload?.[0]?.payload?.month) {
+      return;
+    }
+    
+    const clickedMonthName = data.activePayload[0].payload.month;
+    const shortMonthsObj = t('dates.shortMonths', { returnObjects: true }) as Record<string, string>;
+    const shortMonths = Object.values(shortMonthsObj);
+    const monthIndex = shortMonths.findIndex(shortName => shortName === clickedMonthName);
+    
+    // Only update if we found a valid month
+    if (monthIndex !== -1) {
+      const newSelectedMonth = monthIndex + 1;
+      Logger.info(`Month clicked: ${clickedMonthName} (month: ${newSelectedMonth})`);
+      setSelectedMonth(newSelectedMonth);
     }
   }, [t]);
 

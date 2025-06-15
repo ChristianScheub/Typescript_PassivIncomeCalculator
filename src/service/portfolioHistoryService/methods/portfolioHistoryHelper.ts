@@ -13,10 +13,10 @@ import Logger from '../../Logger/logger';
  */
 export class PortfolioHistoryHelper {
   // Cache für berechnete Werte
-  private static transactionsCache = new Map<string, PortfolioTransaction[]>();
-  private static portfolioValueCache = new Map<string, number>();
-  private static datesCache = new Map<string, string[]>();
-  private static assetDefMapCache = new Map<string, Map<string, AssetDefinition>>();
+  private static readonly transactionsCache = new Map<string, PortfolioTransaction[]>();
+  private static readonly portfolioValueCache = new Map<string, number>();
+  private static readonly datesCache = new Map<string, string[]>();
+  private static readonly assetDefMapCache = new Map<string, Map<string, AssetDefinition>>();
 
   /**
    * Löscht alle Caches
@@ -81,10 +81,16 @@ export class PortfolioHistoryHelper {
       const isValid = hasValidDate && hasValidQuantity && hasValidDefinition;
       
       if (!isValid) {
-        const reason = !hasValidDate ? 'no purchase date' : 
-                      !hasValidQuantity ? `invalid quantity (${quantity})` :
-                      !hasValidDefinition ? `missing asset definition ID ${asset.assetDefinitionId}` :
-                      'unknown reason';
+        let reason: string;
+        if (!hasValidDate) {
+          reason = 'no purchase date';
+        } else if (!hasValidQuantity) {
+          reason = `invalid quantity (${quantity})`;
+        } else if (!hasValidDefinition) {
+          reason = `missing asset definition ID ${asset.assetDefinitionId}`;
+        } else {
+          reason = 'unknown reason';
+        }
         Logger.warn(`Skipping invalid asset: ${asset.name} - ${reason}`);
       }
       
