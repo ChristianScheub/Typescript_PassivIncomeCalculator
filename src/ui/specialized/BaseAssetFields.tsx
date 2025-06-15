@@ -95,7 +95,6 @@ export const BaseAssetFields: React.FC<BaseAssetFieldsProps> = ({
   );
 
   const renderRealEstateFields = () => (
-    <>
       <StandardFormField
         label={t('assets.form.propertyValue')}
         name="propertyValue"
@@ -106,7 +105,6 @@ export const BaseAssetFields: React.FC<BaseAssetFieldsProps> = ({
         step={0.01}
         min={0}
       />
-    </>
   );
 
   const renderBondFields = () => (

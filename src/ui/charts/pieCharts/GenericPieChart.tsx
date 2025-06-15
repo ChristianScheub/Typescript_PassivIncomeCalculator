@@ -5,6 +5,7 @@ import { Card } from '../../common/Card';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import formatService from '../../../service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
+import { ChartTooltip } from '../../charts/ChartTooltips';
 
 interface GenericPieChartData {
   name: string;
@@ -40,29 +41,7 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
   // Use theme-aware colors
   const colors = theme === 'dark' ? COLORS_DARK : COLORS_LIGHT;
 
-  // Custom tooltip component
-  const CustomTooltip: React.FC<{
-    active?: boolean;
-    payload?: any[];
-  }> = ({ active, payload }) => {
-    if (!active || !payload?.length) return null;
-    
-    const data = payload?.[0]?.payload;
-    if (!data) return null;
-    
-    // Use translation if key is provided and showDirectLabels is false
-    const displayName = !showDirectLabels && translationKey 
-      ? t(`${translationKey}.${data[nameKey]}`)
-      : data[nameKey];
-        
-    return (
-      <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
-        <p className="text-sm font-medium">{displayName}</p>
-        <p className="text-sm">{formatService.formatCurrency(data[valueKey])}</p>
-        <p className="text-sm">({data.percentage ? `${data.percentage.toFixed(1)}%` : formatService.formatPercentage(data.percentage || 0)})</p>
-      </div>
-    );
-  };
+  // Use ChartTooltip from the shared components
 
   return (
     <Card title={title}>
@@ -92,18 +71,26 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
                     fill="#8884d8"
                     dataKey={valueKey}
                   >
-                    {data.map((item, index) => (
-                      <Cell key={item[nameKey]} fill={colors[index % colors.length]} />
+                    {data.map((item: GenericPieChartData, index: number) => (
+                      <Cell key={`cell-${item[nameKey]}`} fill={colors[index % colors.length]} />
                     ))}
                   </Pie>
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<ChartTooltip 
+                    chartType="pie"
+                    formatCurrency={formatService.formatCurrency}
+                    formatPercentage={(value: number) => `${value.toFixed(1)}%`}
+                    nameKey={nameKey}
+                    valueKey={valueKey}
+                    translationPrefix={translationKey}
+                    // showDirectLabels is not used in ChartTooltip
+                  />} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
 
             {/* Legend - Single column layout for better readability */}
             <div className="mt-6 space-y-3 px-4 max-h-48 overflow-y-auto">
-              {data.map((item, index) => {
+              {data.map((item: GenericPieChartData, index: number) => {
                 // Use translation if key is provided and showDirectLabels is false
                 const displayName = !showDirectLabels && translationKey 
                   ? t(`${translationKey}.${item[nameKey]}`)

@@ -38,7 +38,11 @@ export async function clearAllData(): Promise<void> {
     Logger.infoService("LocalStorage cleared completely");
 
     // Reset API key state
-    const providers: StockAPIProvider[] = ['finnhub', 'yahoo', 'alpha_vantage'];
+    const providers: StockAPIProvider[] = [
+        StockAPIProvider.FINNHUB,
+        StockAPIProvider.YAHOO,
+        StockAPIProvider.ALPHA_VANTAGE
+    ];
     providers.forEach((provider) => {
         store.dispatch(setApiKey({ provider, apiKey: null }));
     });

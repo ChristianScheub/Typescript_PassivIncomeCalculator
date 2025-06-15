@@ -1,5 +1,5 @@
-import { configureStore, UnknownAction } from '@reduxjs/toolkit';
-import type { Middleware, ThunkAction } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
+import type { AnyAction, ThunkAction } from '@reduxjs/toolkit';
 import assetsReducer from './slices/assetsSlice';
 import assetDefinitionsReducer from './slices/assetDefinitionsSlice';
 import assetCategoriesReducer from './slices/assetCategoriesSlice';
@@ -8,7 +8,7 @@ import expensesReducer from './slices/expensesSlice';
 import incomeReducer from './slices/incomeSlice';
 import dashboardReducer from './slices/dashboardSlice';
 import forecastReducer from './slices/forecastSlice';
-import apiConfigReducer from './slices/apiConfigSlice';
+import apiConfigReducer, { StockAPIProvider } from './slices/apiConfigSlice';
 import customAnalyticsReducer from './slices/customAnalyticsSlice';
 import portfolioHistoryReducer from './slices/portfolioHistorySlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
@@ -16,6 +16,7 @@ import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
 import Logger from '../service/Logger/logger';
 import { validatePortfolioCache } from '../utils/portfolioCacheUtils';
 
+// Define types for our application state
 type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
 
 // Versuche den gespeicherten State zu laden
@@ -99,6 +100,8 @@ const loadState = () => {
 const persistedState = loadState();
 
 // Define root reducer type
+// Define the root reducer object with explicit type
+// Define the reducer object
 const rootReducer = {
   assets: assetsReducer,
   assetDefinitions: assetDefinitionsReducer,
@@ -113,14 +116,14 @@ const rootReducer = {
   portfolioHistory: portfolioHistoryReducer,
 };
 
+// Create the store 
 export const store = configureStore({
   reducer: rootReducer,
   preloadedState: persistedState,
-  middleware: (getDefaultMiddleware) => {
-    return getDefaultMiddleware({
+  middleware: (getDefaultMiddleware) => 
+    getDefaultMiddleware({
       serializableCheck: false, // For storing Date objects in state
-    }).concat(dataChangeMiddleware as Middleware, portfolioCacheMiddleware as Middleware);
-  },
+    }).concat(dataChangeMiddleware, portfolioCacheMiddleware)
 });
 
 // Subscribe to store changes and save to localStorage
@@ -189,12 +192,16 @@ store.subscribe(() => {
   }
 });
 
-// Type definitions
-export type RootState = ReturnType<typeof store.getState>;
+// Type definitions using typeof rootReducer to avoid circular references
+export type StoreState = {
+  [K in keyof typeof rootReducer]: ReturnType<typeof rootReducer[K]>;
+};
+
+export type RootState = StoreState;
 export type AppDispatch = typeof store.dispatch;
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
   RootState,
   unknown,
-  UnknownAction
+  AnyAction
 >;

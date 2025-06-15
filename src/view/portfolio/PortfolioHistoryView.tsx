@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { TrendingUp, TrendingDown, DollarSign, BarChart3 } from 'lucide-react';
 import { PortfolioHistoryPoint } from '../../service/portfolioHistoryService';
 import { formatCurrency } from '../../service/formatService/methods/formatCurrency';
+import { ChartTooltip } from '../../ui/charts/ChartTooltips';
 
 interface PortfolioHistoryViewProps {
   historyData: PortfolioHistoryPoint[];
@@ -103,28 +104,6 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
     { key: '1J', label: '1J' },
     { key: 'Max', label: 'Max' }
   ];
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
-          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-            {data.formattedDate}
-          </p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            {t('portfolio.value')}: {formatCurrency(payload[0].value)}
-          </p>
-          {data.hasTransactions && (
-            <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
-              {t('portfolio.transactionDay')}
-            </p>
-          )}
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (isLoading) {
     return (
@@ -259,7 +238,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
                 className="text-gray-600 dark:text-gray-400"
                 tickFormatter={(value) => formatCurrency(value)}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<ChartTooltip chartType="bar" t={t} useCustomFormatting={true} showTransactions={true} />} />
               <Line 
                 type="monotone" 
                 dataKey="value" 

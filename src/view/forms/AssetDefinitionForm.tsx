@@ -352,14 +352,18 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     }
   }, [editingDefinition, reset]);
 
-  const handleFormSubmit = (data: AssetDefinitionFormData) => {
-    // Get existing definition if editing to preserve price history
-    const existingDefinition = editingDefinition || null;
+  // Define type alias for the asset definition data structure
+  type AssetDefinitionDataType = Omit<
+    AssetDefinition,
+    "id" | "createdAt" | "updatedAt"
+  >;
 
-    let definitionData: Omit<
-      AssetDefinition,
-      "id" | "createdAt" | "updatedAt"
-    > = {
+  // Helper functions to reduce cognitive complexity
+  const createBaseDefinitionData = (
+    data: AssetDefinitionFormData,
+    existingDefinition: AssetDefinition | null
+  ): AssetDefinitionDataType => {
+    return {
       name: data.fullName, // Use fullName as name
       fullName: data.fullName,
       ticker: data.ticker || undefined,
@@ -385,37 +389,57 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       autoUpdateHistoricalPrices: data.autoUpdateHistoricalPrices || false,
       priceHistory: existingDefinition?.priceHistory || [],
     };
+  };
 
-    // If current price has changed, use utility function to update price and history
+  const updatePriceHistoryIfNeeded = (
+    definitionData: AssetDefinitionDataType,
+    data: AssetDefinitionFormData,
+    existingDefinition: AssetDefinition | null
+  ): AssetDefinitionDataType => {
+    // Check if price has changed
     if (
-      data.currentPrice &&
-      (!existingDefinition?.currentPrice ||
-        data.currentPrice !== existingDefinition.currentPrice)
+      !data.currentPrice ||
+      (existingDefinition?.currentPrice &&
+        data.currentPrice === existingDefinition.currentPrice)
     ) {
-      // Create a temporary definition object for the utility function
-      const tempDefinition: AssetDefinition = {
-        ...definitionData,
-        id: existingDefinition?.id || "",
-        createdAt: existingDefinition?.createdAt || new Date().toISOString(),
-        updatedAt: existingDefinition?.updatedAt || new Date().toISOString(),
-      };
-
-      // Use utility function to properly manage price history
-      const updatedDefinition = updateAssetDefinitionPrice(
-        tempDefinition,
-        data.currentPrice,
-        "manual"
-      );
-
-      // Update our definition data with the new price and history
-      definitionData.currentPrice = updatedDefinition.currentPrice;
-      definitionData.lastPriceUpdate = updatedDefinition.lastPriceUpdate;
-      definitionData.priceHistory = updatedDefinition.priceHistory;
+      return definitionData;
     }
 
-    // Add dividend info if enabled
-    if (data.hasDividend && data.dividendAmount && data.dividendAmount > 0) {
-      definitionData.dividendInfo = {
+    // Create a temporary definition object for the utility function
+    const tempDefinition: AssetDefinition = {
+      ...definitionData,
+      id: existingDefinition?.id || "",
+      createdAt: existingDefinition?.createdAt || new Date().toISOString(),
+      updatedAt: existingDefinition?.updatedAt || new Date().toISOString(),
+    };
+
+    // Use utility function to properly manage price history
+    const updatedDefinition = updateAssetDefinitionPrice(
+      tempDefinition,
+      data.currentPrice,
+      "manual"
+    );
+
+    // Return updated definition data
+    return {
+      ...definitionData,
+      currentPrice: updatedDefinition.currentPrice,
+      lastPriceUpdate: updatedDefinition.lastPriceUpdate,
+      priceHistory: updatedDefinition.priceHistory,
+    };
+  };
+
+  const addDividendInfoIfNeeded = (
+    definitionData: AssetDefinitionDataType,
+    data: AssetDefinitionFormData
+  ): AssetDefinitionDataType => {
+    if (!data.hasDividend || !data.dividendAmount || data.dividendAmount <= 0) {
+      return definitionData;
+    }
+
+    return {
+      ...definitionData,
+      dividendInfo: {
         frequency: data.dividendFrequency as DividendFrequency,
         amount: data.dividendAmount,
         currency: data.currency,
@@ -428,12 +452,21 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           Object.keys(data.dividendCustomAmounts).length > 0
             ? data.dividendCustomAmounts
             : undefined,
-      };
+      },
+    };
+  };
+
+  const addRentalInfoIfNeeded = (
+    definitionData: AssetDefinitionDataType,
+    data: AssetDefinitionFormData
+  ): AssetDefinitionDataType => {
+    if (!data.hasRental || !data.rentalAmount || data.rentalAmount <= 0) {
+      return definitionData;
     }
 
-    // Add rental info if enabled
-    if (data.hasRental && data.rentalAmount && data.rentalAmount > 0) {
-      definitionData.rentalInfo = {
+    return {
+      ...definitionData,
+      rentalInfo: {
         baseRent: data.rentalAmount,
         frequency: data.rentalFrequency as PaymentFrequency,
         currency: data.currency,
@@ -446,20 +479,42 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           Object.keys(data.rentalCustomAmounts).length > 0
             ? data.rentalCustomAmounts
             : undefined,
-      };
+      },
+    };
+  };
+
+  const addBondInfoIfNeeded = (
+    definitionData: AssetDefinitionDataType,
+    data: AssetDefinitionFormData
+  ): AssetDefinitionDataType => {
+    if (!data.hasBond || !data.interestRate || data.interestRate <= 0) {
+      return definitionData;
     }
 
-    // Add bond info if enabled
-    if (data.hasBond && data.interestRate && data.interestRate > 0) {
-      definitionData.bondInfo = {
+    return {
+      ...definitionData,
+      bondInfo: {
         interestRate: data.interestRate,
         maturityDate: data.maturityDate || undefined,
         nominalValue: data.nominalValue || undefined,
         currency: data.currency,
-      };
-    }
+      },
+    };
+  };
 
-    onSubmit(definitionData, categoryAssignments);
+  const handleFormSubmit = (data: AssetDefinitionFormData) => {
+    // Get existing definition if editing to preserve price history
+    const existingDefinition = editingDefinition || null;
+
+    // Build the definition data step by step to reduce complexity
+    let finalDefinitionData = createBaseDefinitionData(data, existingDefinition);
+    finalDefinitionData = updatePriceHistoryIfNeeded(finalDefinitionData, data, existingDefinition);
+    finalDefinitionData = addDividendInfoIfNeeded(finalDefinitionData, data);
+    finalDefinitionData = addRentalInfoIfNeeded(finalDefinitionData, data);
+    finalDefinitionData = addBondInfoIfNeeded(finalDefinitionData, data);
+
+    // Submit the form and reset state
+    onSubmit(finalDefinitionData, categoryAssignments);
     reset();
     setSectors([{ sectorName: "", percentage: 100 }]);
     setCategoryAssignments([]);

@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../../common/Card';
 import { Button } from '../../common/Button';
-import { CustomPieTooltip } from '../CustomPieTooltip';
+import { ChartTooltip } from '../ChartTooltips';
 import { AssetAllocation } from '../../../types';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import { LineChart } from 'lucide-react';
@@ -63,7 +63,7 @@ const AssetAllocationChart: React.FC<AssetAllocationChartProps> = ({
                       <Cell key={item.name} fill={colors[assetAllocation.findIndex(a => a.name === item.name) % colors.length]} />
                     ))}
                   </Pie>
-                  <Tooltip content={<CustomPieTooltip formatCurrency={formatService.formatCurrency} formatPercentage={(value) => `${(value).toFixed(1)}%`} />} />
+                  <Tooltip content={<ChartTooltip chartType="pie" formatCurrency={formatService.formatCurrency} formatPercentage={(value: number) => `${(value).toFixed(1)}%`} />} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
