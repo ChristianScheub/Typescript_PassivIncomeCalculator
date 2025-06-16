@@ -1,6 +1,6 @@
 # Service Layer
 
-The service layer encapsulates the business logic and external integrations of the application. It provides reusable functions and classes that are used by containers, views, and other components.
+The service layer encapsulates the comprehensive financial calculation and business logic of the Passive Income Calculator application. It provides reusable functions and classes for complete financial health management including assets, liabilities, income, expenses, forecasting, and milestone tracking.
 
 ## Architecture & Design Patterns
 
@@ -12,7 +12,9 @@ Our services implement the **Functional Object Pattern** - a hybrid approach tha
 const calculatorService: ICalculatorService = {
   calculateAssetMonthlyIncome: (asset) => { /* pure function logic */ },
   calculateNetWorth: (assets, liabilities) => { /* pure function logic */ },
-  // ... more methods
+  calculateDebtAnalytics: (liabilities) => { /* comprehensive debt analysis */ },
+  calculateFinancialHealth: (portfolio) => { /* holistic health scoring */ },
+  // ... more methods for complete financial management
 };
 ```
 
@@ -21,17 +23,19 @@ const calculatorService: ICalculatorService = {
 - **Testable**: Easy to mock and unit test
 - **Maintainable**: Clear separation of concerns
 - **Type-safe**: Full TypeScript interface compliance
+- **Holistic**: Comprehensive financial calculations across all domains
 
 ### **Modular Architecture**
 - Each service is organized in its own subfolder with specialized modules
 - Services are loosely coupled and can be tested and extended independently
 - **Folder-based organization** for large services (like calculatorService)
-- Typical responsibilities: data calculations, API communication, formatting, logging, database operations
+- Comprehensive responsibilities: portfolio management, debt analysis, cash flow forecasting, expense tracking, income optimization, milestone tracking, and financial health assessment
 
 ### **Performance-First Design**
 - **Integrated caching** eliminates redundant service layers
 - **Optimized calculations** with cache-first approaches
 - **Batch operations** for expensive computations
+- **Cross-domain analytics** with efficient data sharing
 
 ## Usage
 Services are imported and used in containers, slices, or directly in UI components. Example:
@@ -39,6 +43,8 @@ Services are imported and used in containers, slices, or directly in UI componen
 ```typescript
 import calculatorService from './calculatorService';
 const income = calculatorService.calculateTotalMonthlyIncome(incomes);
+const debtAnalysis = calculatorService.calculateLiabilityAnalytics(liabilities);
+const milestoneProgress = calculatorService.calculateMilestoneProgress(portfolio);
 ```
 
 ## Core Services Overview
@@ -46,18 +52,18 @@ const income = calculatorService.calculateTotalMonthlyIncome(incomes);
 ### **calculatorService** 🎯
 **Architecture:** Modular folder-based organization with specialized calculation modules
 
-The comprehensive financial calculation engine with **integrated caching** and optimized performance:
+The comprehensive financial calculation engine with **integrated caching** and optimized performance for complete financial health management:
 
 **Folder Structure:**
 ```
 calculatorService/
   methods/
-    asset/          - Asset income calculations, allocations
-    income/         - Income and payment schedule calculations  
-    expense/        - Expense calculations and breakdowns
-    liability/      - Liability and debt calculations
-    analytics/      - Financial projections and analytics
-    common/         - General calculations (cash flow, net worth)
+    asset/          - Portfolio income calculations, allocations, performance analysis
+    income/         - Income streams and payment schedule calculations  
+    expense/        - Expense tracking, categorization, and budget analysis
+    liability/      - Debt management, payoff strategies, interest optimization
+    analytics/      - Cross-domain projections, forecasting, and health metrics
+    common/         - General calculations (cash flow, net worth, milestones)
   interfaces/       - TypeScript interfaces and contracts
 ```
 
@@ -66,74 +72,94 @@ calculatorService/
 - **Modular design**: Each calculation type in dedicated modules (<150 lines each)
 - **Performance optimized**: Cache-first approaches for expensive calculations
 - **Type-safe**: Full TypeScript interface compliance
+- **Comprehensive analytics**: Cross-domain financial health assessment
+- **Milestone tracking**: Goal progress and achievement calculations
+- **Debt optimization**: Advanced payoff strategies and interest analysis
 
 **Core Methods:**
-- Asset income calculations with caching support
-- Financial projections and forecasting  
-- Asset and income allocation analysis
-- Net worth and cash flow calculations
-- Payment schedule management (dividends, recurring payments)
+- Portfolio income calculations with dividend scheduling and caching support
+- Comprehensive debt analytics including payoff strategies and interest optimization
+- Financial projections and forecasting across all financial domains
+- Asset and income allocation analysis with risk assessment
+- Net worth and cash flow calculations with trend analysis
+- Payment schedule management (dividends, debt payments, recurring expenses)
+- Milestone progress tracking and goal achievement calculations
+- Financial health scoring and recommendation generation
 
 **Example Usage:**
 ```typescript
 import calculatorService from './calculatorService';
 
-// Basic calculations
+// Portfolio management
 const monthlyIncome = calculatorService.calculateAssetMonthlyIncome(asset);
+const allocation = calculatorService.calculateAssetAllocation(assets);
+
+// Debt management
+const debtAnalysis = calculatorService.calculateLiabilityAnalytics(liabilities);
+const payoffStrategy = calculatorService.calculateDebtPayoffStrategy(debts);
+
+// Comprehensive analysis
 const netWorth = calculatorService.calculateNetWorth(assets, liabilities);
+const financialHealth = calculatorService.calculateFinancialHealthScore(portfolio);
+
+// Forecasting and milestones
+const projections = calculatorService.calculateProjectionsWithCache(baseValues, cache);
+const milestoneProgress = calculatorService.calculateMilestoneProgress(data);
 
 // Cache-optimized calculations
 const cachedResult = calculatorService.calculateAssetMonthlyIncomeWithCache(asset);
-const projections = calculatorService.calculateProjectionsWithCache(baseValues, cache);
-
-// Analytics
-const allocation = calculatorService.calculateAssetAllocation(assets);
-const analytics = calculatorService.calculatePortfolioAnalytics(positions);
 ```
 
 ### **formatService**
-Provides comprehensive formatting utilities with localization support:
-- Currency formatting with locale-specific rules
-- Percentage formatting with customizable precision
-- Number formatting with various display options
-- Date and time formatting utilities
+Provides comprehensive formatting utilities with localization support for financial data:
+- Currency formatting with locale-specific rules and multi-currency support
+- Percentage formatting with customizable precision for returns and ratios
+- Number formatting with various display options for large financial figures
+- Date and time formatting utilities for transaction and milestone tracking
+- Financial ratio formatting (debt-to-income, expense ratios, etc.)
 
 ### **exchangeService**
-Manages currency exchange rates and conversions:
-- Fetches and caches real-time exchange rates
-- Provides historical exchange rate data
-- Supports date-specific rate queries
-- Manages exchange rate persistence in local storage
+Manages multi-currency exchange rates and conversions for global portfolio management:
+- Fetches and caches real-time exchange rates for portfolio valuation
+- Provides historical exchange rate data for performance analysis
+- Supports date-specific rate queries for accurate historical calculations
+- Manages exchange rate persistence in local storage for offline functionality
+- Currency conversion utilities for multi-currency portfolio management
 
 ### **stockAPIService** 
-Integrates with Yahoo Finance API for comprehensive market data:
-- Real-time stock quotes (single and batch requests)
-- Historical price data with customizable timeframes
-- Company profiles and fundamental metrics
-- Stock events, news, and market data
-- Advanced search functionality and options data
+Integrates with financial APIs for comprehensive market data and portfolio management:
+- Real-time stock quotes (single and batch requests) for portfolio valuation
+- Historical price data with customizable timeframes for performance analysis
+- Company profiles and fundamental metrics for investment research
+- Stock events, dividends, and earnings data for income forecasting
+- Advanced search functionality and market data for portfolio expansion
+- Price alerts and monitoring for active portfolio management
 
 ### **sqlLiteService**
-Handles local data persistence with SQLite database:
-- Type-safe CRUD operations for all data entities
-- Data import/export functionality with validation
-- Database schema management and migrations
-- Transaction support for data integrity
-- Optimized queries for performance
+Handles local data persistence with SQLite database for comprehensive financial data:
+- Type-safe CRUD operations for all financial entities (assets, liabilities, income, expenses)
+- Data import/export functionality with validation for backup and migration
+- Database schema management and migrations for data integrity
+- Transaction support for multi-table financial operations
+- Optimized queries for performance with financial data relationships
+- Audit trail and versioning for financial data compliance
 
 ### **Logger**
-Centralized logging system with configurable output:
-- Multiple log levels (info, error, warning, cache, service)
+Centralized logging system with configurable output optimized for financial applications:
+- Multiple log levels (info, error, warning, cache, service, financial)
 - Platform-aware logging (mobile vs web optimizations)
-- Log storage, filtering, and export capabilities
-- Performance tracking and debugging support
-- Feature flags for development vs production
+- Log storage, filtering, and export capabilities for debugging and compliance
+- Performance tracking and debugging support for financial calculations
+- Feature flags for development vs production environments
+- Security-aware logging for sensitive financial data handling
 
 ### **Helper Services**
-- **stockPriceUpdater**: Intelligent batch updates with API rate limiting
-- **downloadFile**: Cross-platform file download utilities
-- **useDeviceCheck**: Device detection and platform-specific features
-- **analytics**: Event tracking, session management, and user analytics
+- **stockPriceUpdater**: Intelligent batch updates with API rate limiting for portfolio management
+- **downloadFile**: Cross-platform file download utilities for financial reports and exports
+- **useDeviceCheck**: Device detection and platform-specific features for mobile financial apps
+- **analytics**: Event tracking, session management, and user analytics for financial app usage
+- **milestoneTracker**: Goal progress monitoring and achievement notifications
+- **debtOptimizer**: Advanced debt payoff strategy calculations and recommendations
 
 ---
 
@@ -141,16 +167,25 @@ Centralized logging system with configurable output:
 
 ### **1. Functional Object Pattern**
 ```typescript
-// Implementation example
+// Implementation example for comprehensive financial calculations
 const calculatorService: ICalculatorService = {
-  // Pure functions with predictable inputs/outputs
+  // Portfolio management functions
   calculateNetWorth: (assets, liabilities) => assets.total - liabilities.total,
+  calculateAssetAllocation: (assets) => groupByType(assets),
+  
+  // Debt management functions
+  calculateDebtPayoffStrategy: (debts) => optimizePayoffOrder(debts),
+  calculateInterestSavings: (strategy) => calculateSavings(strategy),
   
   // Complex calculations with integrated caching
   calculateAssetMonthlyIncomeWithCache: (asset) => {
     const cached = getCachedResult(asset);
     return cached || calculateAndCache(asset);
-  }
+  },
+  
+  // Cross-domain analytics
+  calculateFinancialHealthScore: (portfolio) => assessFinancialHealth(portfolio),
+  calculateMilestoneProgress: (goals, current) => trackProgress(goals, current)
 };
 ```
 
