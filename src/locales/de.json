@@ -55,7 +55,40 @@
     "goToSettingsToConfigureApiKey": "Zu den Einstellungen, um den API-Schlüssel zu konfigurieren",
     "assets": "Vermögenswerte",
     "portfolioHistory": "Vermögens Historie",
-    "last30Days": "Die letzten 30 Tage"
+    "last30Days": "Die letzten 30 Tage",
+    "quickActions": "Schnellaktionen",
+    "addIncome": "Einkommen hinzufügen",
+    "addExpense": "Ausgabe hinzufügen", 
+    "recordTransaction": "Transaktion erfassen",
+    "payDebt": "Schuld bezahlen",
+    "activeMilestones": "Aktive Meilensteine",
+    "miniAnalytics": "Schnellübersicht",
+    "alertsRecommendations": "Hinweise & Empfehlungen",
+    "passiveRatio": "Passive Quote",
+    "expenseCoverage": "Ausgabendeckung",
+    "debtRatio": "Schuldenquote", 
+    "savingsRate": "Sparquote",
+    "milestone": {
+      "expenseCoverage": "Ausgabendeckung durch passives Einkommen",
+      "passiveIncome": "Anteil passives Einkommen",
+      "debtFreedom": "Schuldenfreiheit"
+    },
+    "alert": {
+      "negativeCashFlow": "Negativer Cashflow",
+      "negativeCashFlowDesc": "Ihre monatlichen Ausgaben übersteigen Ihr Einkommen.",
+      "reviewExpenses": "Ausgaben überprüfen",
+      "highDebtRatio": "Hohe Schuldenquote",
+      "highDebtRatioDesc": "Ihre Schulden betragen mehr als 50% Ihres Vermögens.",
+      "manageDebt": "Schulden verwalten",
+      "lookingGood": "Gute Finanzlage!",
+      "lookingGoodDesc": "Ihre Finanzen sind auf einem guten Weg.",
+      "viewForecast": "Prognose anzeigen"
+    },
+    "recommendations": {
+      "increasePassive": "Passives Einkommen erhöhen",
+      "increasePassiveDesc": "Erwägen Sie Investitionen in ertragsgenerierende Assets.",
+      "addAssets": "Assets hinzufügen"
+    }
   },
   
   "navigation": {
@@ -655,44 +688,10 @@
       }
     },
   "customAnalytics": {
-    "title": "Benutzerdefinierte Analysen",
-    "createChart": "Diagramm erstellen",
-    "chartConfiguration": "Diagramm-Konfiguration",
-    "chartType": "Diagramm-Typ",
-    "dataSource": "Datenquelle",
-    "groupBy": "Gruppieren nach",
-    "chartTitle": "Diagramm-Titel",
-    "chartTitlePlaceholder": "Diagramm-Titel eingeben...",
-    "addChart": "Diagramm hinzufügen",
-    "removeChart": "Diagramm entfernen",
-    "noChartsCreated": "Noch keine Diagramme erstellt",
-    "createFirstChart": "Erstellen Sie Ihr erstes benutzerdefiniertes Diagramm zur Portfolio-Analyse",
-    "chartTypes": {
-      "pie": "Tortendiagramm",
-      "bar": "Balkendiagramm",
-      "line": "Liniendiagramm"
-    },
-    "dataSources": {
-      "assetValue": "Asset-Wert",
-      "income": "Einkommen",
-      "growth": "Wachstum"
-    },
-    "groupingOptions": {
-      "assetType": "Asset-Typ",
-      "sector": "Sektor",
-      "country": "Land",
-      "categoryOptions": "Kategorie-Optionen",
-      "specificCategory": "Spezifische Kategorie",
-      "assetDefinition": "Einzelne Assets"
-    },
-    "categorySelection": {
-      "selectCategory": "Kategorie auswählen",
-      "selectCategoryPlaceholder": "Bitte eine Kategorie wählen...",
       "selectOption": "Option auswählen",
       "selectOptionPlaceholder": "Bitte eine Option wählen...",
       "optionalFilterByOption": "Optional: Nach Option filtern"
-    }
-  },
+    },
   "analytics": {
     "portfolioAnalytics": "Portfolio-Analysen",
     "assetDistribution": "Vermögen",

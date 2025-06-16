@@ -1,72 +1,108 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { CiSettings } from "react-icons/ci";
-import { useNavigate } from "react-router-dom";
 import formatService from '../../service/formatService';
 import {
   TrendingUp,
   TrendingDown,
+  Target,
+  AlertTriangle,
+  BarChart3
 } from "lucide-react";
 import TotalExpenseCoverage from "../../ui/milestones/TotalExpenseCoverage";
 import PortfolioHistoryCard from "./PortfolioHistoryCard";
 import MonthlyBreakdownCard from "./MonthlyBreakdownCard";
-import { useAppSelector, useAppDispatch } from "../../hooks/redux";
-import { calculate30DayHistory } from "../../store/slices/portfolioHistorySlice";
+import { CollapsibleSection } from "../../ui/common/CollapsibleSection";
+import { QuickActionsCard } from "../../ui/dashboard/QuickActionsCard";
+import { MiniAnalyticsCard } from "../../ui/dashboard/MiniAnalyticsCard";
+import { MilestoneCard } from "../../ui/dashboard/MilestoneCard";
+import { AlertsCard } from "../../ui/dashboard/AlertsCard";
+import { FinancialSummary } from "../../service/analyticsService/interfaces/IAnalyticsService";
+import { UIAlert } from "../../service/alertsService/interfaces/IAlertsService";
+
+interface QuickAction {
+  id: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  translationKey: string;
+  onClick: () => void;
+}
+
+interface MiniAnalytic {
+  id: string;
+  titleKey: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+  colorClass: string;
+  onClick: () => void;
+}
+
+interface Milestone {
+  id: string;
+  titleKey: string;
+  progress: number;
+  target: number;
+  color: string;
+  icon: React.ComponentType<{ className?: string }>;
+  onClick: () => void;
+}
+
+interface NavigationHandlers {
+  onNavigateToIncome: () => void;
+  onNavigateToExpenses: () => void;
+  onNavigateToAssets: () => void;
+  onNavigateToLiabilities: () => void;
+  onNavigateToForecast: () => void;
+  onNavigateToSettings: () => void;
+}
 
 interface DashboardViewProps {
-  netWorth: number;
-  totalAssets: number;
-  totalLiabilities: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  monthlyLiabilityPayments: number;
-  monthlyAssetIncome: number;
-  passiveIncome: number;
-  monthlyCashFlow: number;
-  handleSettingsClick: () => void;
+  financialSummary: FinancialSummary;
+  quickActions: QuickAction[];
+  miniAnalytics: MiniAnalytic[];
+  milestones: Milestone[];
+  alerts: UIAlert[];
+  history30Days: any[];
+  navigationHandlers: NavigationHandlers;
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({
-  netWorth,
-  totalAssets,
-  totalLiabilities,
-  monthlyIncome,
-  monthlyExpenses,
-  monthlyLiabilityPayments,
-  monthlyAssetIncome,
-  passiveIncome,
-  monthlyCashFlow,
-  handleSettingsClick,
+  financialSummary,
+  quickActions,
+  miniAnalytics,
+  milestones,
+  alerts,
+  history30Days,
+  navigationHandlers,
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const { history30Days = [], status } = useAppSelector((state: any) => state.portfolioHistory || {});
 
-  // Calculate history only when component mounts
-  useEffect(() => {
-    const calculateHistory = async () => {
-      if (status === 'idle') {
-        await dispatch(calculate30DayHistory());
-      }
-    };
-    calculateHistory();
-  }, [dispatch, status]);
-
+  const {
+    netWorth,
+    totalAssets,
+    totalLiabilities,
+    monthlyIncome,
+    monthlyExpenses,
+    monthlyLiabilityPayments,
+    monthlyAssetIncome,
+    passiveIncome,
+    monthlyCashFlow
+  } = financialSummary;
 
   return (
     <div className="space-y-6 pb-8 overflow-x-hidden">
       <div style={{ height: "10vw" }}> </div>
-      {/* Net Worth Summary */}
+      
+      {/* Net Worth Snapshot */}
       <div className="relative bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-3xl p-4 sm:p-6 text-white overflow-hidden">
         <div
           className="absolute inset-0 w-3/4 cursor-pointer z-10"
-          onClick={() => navigate("/forecast")}
+          onClick={navigationHandlers.onNavigateToForecast}
         />
 
         <div
           className="absolute inset-y-0 right-0 w-1/4 cursor-pointer z-10"
-          onClick={handleSettingsClick}
+          onClick={navigationHandlers.onNavigateToSettings}
         />
 
         <div className="relative z-0">
@@ -94,18 +130,54 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
         </div>
 
-        {/* Settings Button */}
         <button className="absolute top-4 right-4 p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition-all z-20 pointer-events-none">
           <CiSettings className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Monthly Overview */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700 overflow-x-hidden">
-        <h3 className="text-lg font-semibold mb-4">
-          {t("dashboard.monthlyOverview")}
-        </h3>
+      {/* Quick Actions */}
+      <QuickActionsCard actions={quickActions} />
 
+      {/* Mini Analytics */}
+      <CollapsibleSection
+        title={t('dashboard.miniAnalytics')}
+        icon={<TrendingUp className="h-5 w-5 text-purple-500" />}
+        defaultExpanded={true}
+      >
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {miniAnalytics.map((analytic) => (
+            <MiniAnalyticsCard
+              key={analytic.id}
+              title={t(analytic.titleKey)}
+              value={analytic.value}
+              icon={<analytic.icon className={`h-4 w-4 ${analytic.colorClass}`} />}
+              color={analytic.colorClass}
+              onClick={analytic.onClick}
+            />
+          ))}
+        </div>
+      </CollapsibleSection>
+
+      {/* Milestones */}
+      <MilestoneCard
+        title={t('dashboard.activeMilestones')}
+        milestones={milestones.map(milestone => ({
+          title: t(milestone.titleKey),
+          progress: milestone.progress,
+          target: milestone.target,
+          color: milestone.color,
+          icon: milestone.icon,
+          onClick: milestone.onClick
+        }))}
+        icon={<Target className="h-5 w-5 text-green-500" />}
+      />
+
+      {/* Monthly Breakdown */}
+      <CollapsibleSection
+        title={t("dashboard.monthlyOverview")}
+        icon={<BarChart3 className="h-5 w-5 text-blue-500" />}
+        defaultExpanded={true}
+      >
         <MonthlyBreakdownCard
           monthlyIncome={monthlyIncome}
           monthlyExpenses={monthlyExpenses}
@@ -114,23 +186,38 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           passiveIncome={passiveIncome}
           monthlyCashFlow={monthlyCashFlow}
         />
-      </div>
-      
+      </CollapsibleSection>
+
       {/* Portfolio History */}
       {history30Days.length > 0 && (
-        <div className="mt-6">
+        <CollapsibleSection
+          title={t('dashboard.portfolioHistory')}
+          icon={<BarChart3 className="h-5 w-5 text-indigo-500" />}
+          defaultExpanded={false}
+        >
           <PortfolioHistoryCard history30Days={history30Days} />
-        </div>
+        </CollapsibleSection>
       )}
 
+      {/* Alerts & Recommendations */}
+      <AlertsCard
+        title={t('dashboard.alertsRecommendations')}
+        alerts={alerts}
+        icon={<AlertTriangle className="h-5 w-5 text-yellow-500" />}
+      />
+
       {/* Total Expense Coverage */}
-      <div className="mt-6">
+      <CollapsibleSection
+        title={t('forecast.milestones.totalExpenseCoverage.title')}
+        icon={<Target className="h-5 w-5 text-green-500" />}
+        defaultExpanded={false}
+      >
         <TotalExpenseCoverage
           monthlyPassiveIncome={passiveIncome + monthlyAssetIncome}
           monthlyExpenses={monthlyExpenses}
           monthlyLiabilityPayments={monthlyLiabilityPayments}
         />
-      </div>
+      </CollapsibleSection>
     </div>
   );
 };
