@@ -10,7 +10,7 @@ import {
   addAssetCategoryAssignment,
   deleteAssetCategoryAssignmentsByAssetId
 } from '../../store/slices/assetCategoriesSlice';
-import { AssetDefinitionsView } from '../../view/assets/AssetDefinitionsView';
+import { AssetDefinitionsView } from '../../view/portfolio-hub/assets/AssetDefinitionsView';
 import { AssetDefinition, AssetType, AssetCategoryAssignment } from '../../types';
 import Logger from '../../service/Logger/logger';
 import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';

@@ -5,6 +5,7 @@ import { Card } from '../../common/Card';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import formatService from '../../../service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
+import { ChartEmptyState } from '../../feedback/EnhancedEmptyState';
 
 interface GenericLineChartProps {
   title: string;
@@ -93,11 +94,10 @@ const GenericLineChart: React.FC<GenericLineChartProps> = ({
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-full flex items-center justify-center">
-            <p className="text-gray-500 dark:text-gray-400">
-              {emptyStateMessage || t('analytics.customAnalytics.noData')}
-            </p>
-          </div>
+          <ChartEmptyState
+            description={emptyStateMessage || t('emptyStates.charts.noData')}
+            variant="minimal"
+          />
         )}
       </div>
     </Card>

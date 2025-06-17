@@ -1,21 +1,12 @@
 import React from 'react';
 import {
-  TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  FormHelperText,
   Box,
   Typography,
   Paper,
-  Checkbox,
-  FormControlLabel,
   useTheme,
   alpha
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { FormFieldProps } from '../types/FormFieldProps';
 
 // Styled components for better Material Design look
 const StyledPaper = styled(Paper)(({ theme }) => ({
@@ -45,152 +36,6 @@ const OptionalFieldsSection = styled(Box)(({ theme }) => ({
   paddingTop: theme.spacing(3),
   borderTop: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
 }));
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: theme.spacing(1),
-    '&:hover .MuiOutlinedInput-notchedOutline': {
-      borderColor: theme.palette.primary.main,
-    },
-  },
-}));
-
-export const MaterialFormField: React.FC<FormFieldProps> = ({
-  label,
-  name,
-  type = 'text',
-  required = false,
-  error,
-  value,
-  onChange,
-  options = [],
-  placeholder,
-  min,
-  max,
-  step,
-  rows = 3,
-  helperText,
-  disabled = false,
-  fullWidth = true,
-  multiline = false,
-}) => {
-  const theme = useTheme();
-
-  const handleChange = (event: any) => {
-    const newValue = type === 'number' ? parseFloat(event.target.value) || 0 : event.target.value;
-    onChange?.(newValue);
-  };
-
-  if (type === 'checkbox') {
-    return (
-      <FormControlLabel
-        control={
-          <Checkbox
-            checked={value === true}
-            onChange={(e) => onChange?.(e.target.checked)}
-            name={name}
-            color="primary"
-            disabled={disabled}
-          />
-        }
-        label={label}
-        sx={{ 
-          '& .MuiFormControlLabel-label': { 
-            fontWeight: required ? 600 : 400,
-            color: theme.palette.text.primary
-          } 
-        }}
-      />
-    );
-  }
-
-  if (type === 'select') {
-    return (
-      <FormControl 
-        fullWidth={fullWidth} 
-        error={Boolean(error)}
-        disabled={disabled}
-        variant="outlined"
-      >
-        <InputLabel id={`${name}-label`}>
-          {label} {required && '*'}
-        </InputLabel>
-        <Select
-          labelId={`${name}-label`}
-          value={value || ''}
-          onChange={handleChange}
-          label={`${label} ${required ? '*' : ''}`}
-          sx={{
-            borderRadius: 1,
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: theme.palette.grey[300],
-            },
-          }}
-        >
-          {options.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
-              {option.label}
-            </MenuItem>
-          ))}
-        </Select>
-        {(error || helperText) && (
-          <FormHelperText>{error || helperText}</FormHelperText>
-        )}
-      </FormControl>
-    );
-  }
-
-  if (type === 'textarea') {
-    return (
-      <Box>
-        <Typography 
-          variant="body2" 
-          sx={{ 
-            mb: 1, 
-            fontWeight: required ? 600 : 400,
-            color: theme.palette.text.primary
-          }}
-        >
-          {label} {required && '*'}
-        </Typography>
-        <StyledTextField
-          fullWidth={fullWidth}
-          multiline
-          rows={rows}
-          value={value || ''}
-          onChange={handleChange}
-          placeholder={placeholder}
-          error={Boolean(error)}
-          helperText={error || helperText}
-          disabled={disabled}
-          variant="outlined"
-        />
-      </Box>
-    );
-  }
-
-  return (
-    <StyledTextField
-      fullWidth={fullWidth}
-      label={`${label} ${required ? '*' : ''}`}
-      type={type}
-      value={value || ''}
-      onChange={handleChange}
-      placeholder={placeholder}
-      error={Boolean(error)}
-      helperText={error || helperText}
-      inputProps={{
-        min: type === 'number' ? min : undefined,
-        max: type === 'number' ? max : undefined,
-        step: type === 'number' ? step : undefined,
-      }}
-      disabled={disabled}
-      variant="outlined"
-      multiline={multiline}
-      rows={multiline ? rows : undefined}
-    />
-  );
-};
 
 export interface MaterialFormProps {
   title: string;

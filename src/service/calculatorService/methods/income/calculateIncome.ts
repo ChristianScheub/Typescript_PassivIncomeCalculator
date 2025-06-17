@@ -37,3 +37,50 @@ export const calculatePassiveIncome = (incomes: Income[]): number => {
         .filter(income => income.isPassive)
         .reduce((total, income) => total + calculateMonthlyIncome(income), 0);
 };
+
+/**
+ * Berechnet das nächste Zahlungsdatum für ein Einkommen basierend auf dem dayOfMonth
+ * @param income Das Einkommensobjekt
+ * @param fromDate Das Startdatum für die Berechnung (optional, default: heute)
+ * @returns Das nächste Zahlungsdatum
+ */
+export const calculateNextPaymentDate = (income: Income, fromDate?: Date): Date => {
+    const baseDate = fromDate || new Date();
+    const paymentDay = income.paymentSchedule.dayOfMonth || 1;
+    
+    let nextPayment = new Date(baseDate);
+    nextPayment.setDate(paymentDay);
+    
+    // Wenn der Zahlungstag in diesem Monat bereits vorbei ist, nehme den nächsten Monat
+    if (nextPayment <= baseDate) {
+        nextPayment.setMonth(nextPayment.getMonth() + 1);
+        nextPayment.setDate(paymentDay);
+    }
+    
+    // Behandle den Fall, dass der gewünschte Tag im Monat nicht existiert (z.B. 31. Februar)
+    if (nextPayment.getDate() !== paymentDay) {
+        // Setze auf den letzten Tag des Monats
+        nextPayment.setDate(0);
+    }
+    
+    return nextPayment;
+};
+
+/**
+ * Überprüft, ob eine Zahlung an einem bestimmten Datum fällig ist
+ * @param income Das Einkommensobjekt 
+ * @param date Das zu prüfende Datum
+ * @returns true wenn eine Zahlung fällig ist
+ */
+export const isPaymentDue = (income: Income, date: Date): boolean => {
+    const paymentDay = income.paymentSchedule.dayOfMonth || 1;
+    const currentDay = date.getDate();
+    
+    // Für monatliche Zahlungen: prüfe ob es der richtige Tag ist
+    if (income.paymentSchedule.frequency === 'monthly') {
+        return currentDay === paymentDay;
+    }
+    
+    // Für andere Frequenzen: zusätzliche Logik könnte hier implementiert werden
+    return false;
+};

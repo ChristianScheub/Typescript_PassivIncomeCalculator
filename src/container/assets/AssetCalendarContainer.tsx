@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { StoreState } from '../../store';
 import { AssetType } from '../../types';
-import AssetCalendarView from '../../view/assets/AssetCalendarView';
+import AssetCalendarView from '../../view/portfolio-hub/assets/AssetCalendarView';
 import Logger from '../../service/Logger/logger';
 import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
 import { calculatorService } from '../../service/calculatorService';

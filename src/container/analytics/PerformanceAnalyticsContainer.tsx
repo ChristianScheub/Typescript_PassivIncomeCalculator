@@ -1,17 +1,31 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import Logger from '../../service/Logger/logger';
-import PerformanceAnalyticsView from '../../view/analytics/performance/PerformanceAnalyticsView';
+import PerformanceAnalyticsView from '../../view/analytics-hub/performance/PerformanceAnalyticsView';
 import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
 
 interface PerformanceAnalyticsContainerProps {
+  selectedTab?: 'portfolio' | 'returns' | 'historical';
   onBack?: () => void;
 }
 
-const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps> = ({ onBack }) => {
-  const [selectedTab, setSelectedTab] = useState<'portfolio' | 'returns' | 'historical'>('portfolio');
+const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps> = ({ 
+  selectedTab: initialTab = 'portfolio', 
+  onBack 
+}) => {
+  const [selectedTab, setSelectedTab] = useState<'portfolio' | 'returns' | 'historical'>(initialTab);
   
   const { items: assets, portfolioCache } = useAppSelector(state => state.assets);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
+
+  // Update selected tab when initialTab prop changes
+  useEffect(() => {
+    setSelectedTab(initialTab);
+  }, [initialTab]);
 
   // Calculate performance metrics from portfolio cache
   const performanceData = useMemo(() => {
@@ -23,7 +37,11 @@ const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps
         peakValue: portfolioCache?.totals?.totalValue || 0,
         lowestValue: portfolioCache?.totals?.totalValue || 0,
         volatility: 0,
-        hasHistoricalData: false
+        hasHistoricalData: false,
+        dailyReturn: 0,
+        monthlyReturn: 0,
+        annualizedReturn: 0,
+        sharpeRatio: 0
       };
     }
 
@@ -49,6 +67,15 @@ const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps
       volatility = Math.sqrt(variance);
     }
 
+    // Calculate additional performance metrics
+    const dailyReturn = totalReturnPercent / 365; // Simple approximation
+    const monthlyReturn = totalReturnPercent / 12; // Simple approximation
+    const annualizedReturn = totalReturnPercent; // Already annualized in most cases
+    
+    // Calculate Sharpe Ratio (simplified - assuming risk-free rate of 2%)
+    const riskFreeRate = 2.0;
+    const sharpeRatio = volatility > 0 ? (annualizedReturn - riskFreeRate) / volatility : 0;
+
     return {
       currentValue,
       totalReturn,
@@ -56,7 +83,11 @@ const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps
       peakValue,
       lowestValue,
       volatility: isNaN(volatility) ? 0 : volatility,
-      hasHistoricalData: portfolioCache.positions.length > 0
+      hasHistoricalData: portfolioCache.positions.length > 0,
+      dailyReturn: isNaN(dailyReturn) ? 0 : dailyReturn,
+      monthlyReturn: isNaN(monthlyReturn) ? 0 : monthlyReturn,
+      annualizedReturn: isNaN(annualizedReturn) ? 0 : annualizedReturn,
+      sharpeRatio: isNaN(sharpeRatio) ? 0 : sharpeRatio
     };
   }, [portfolioCache]);
 
@@ -70,9 +101,12 @@ const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps
       const gainPercent = purchaseValue > 0 ? (gain / purchaseValue) * 100 : 0;
 
       return {
-        ...asset,
+        id: asset.id,
+        name: asset.name,
+        symbol: asset.symbol,
         currentValue,
         purchaseValue,
+        invested: purchaseValue,
         gain,
         gainPercent
       };

@@ -68,6 +68,9 @@
     "expenseCoverage": "Ausgabendeckung",
     "debtRatio": "Schuldenquote", 
     "savingsRate": "Sparquote",
+    "refreshing": "Cache wird aktualisiert...",
+    "pullToRefresh": "Zum Aktualisieren ziehen",
+    "releaseToRefresh": "Loslassen zum Aktualisieren",
     "milestone": {
       "expenseCoverage": "Ausgabendeckung durch passives Einkommen",
       "passiveIncome": "Anteil passives Einkommen",
@@ -91,9 +94,105 @@
     }
   },
   
+  "alerts": {
+    "cashflow": {
+      "negative": {
+        "title": "Negativer Cashflow",
+        "description": "Ihre monatlichen Ausgaben übersteigen Ihr Einkommen. Überprüfen Sie Ihre Ausgaben oder erhöhen Sie Ihr Einkommen.",
+        "action": "Ausgaben überprüfen"
+      },
+      "lowSavings": {
+        "title": "Niedrige Sparquote",
+        "description": "Ihre Sparquote ist sehr niedrig. Versuchen Sie, mehr Geld zu sparen, um Ihre finanzielle Sicherheit zu erhöhen.",
+        "action": "Ausgaben reduzieren"
+      },
+      "lowIncome": {
+        "title": "Niedriges Einkommen",
+        "description": "Ihr monatliches Einkommen ist sehr niedrig. Erwägen Sie zusätzliche Einkommensquellen oder passive Investitionen.",
+        "action": "Einkommen erhöhen"
+      }
+    },
+    "debt": {
+      "highRatio": {
+        "title": "Hohe Verschuldungsquote",
+        "description": "Ihr Verhältnis von Schulden zu Vermögen ist zu hoch. Erwägen Sie eine Schuldentilgung oder den Aufbau von Vermögen.",
+        "action": "Schulden reduzieren"
+      },
+      "highServiceRatio": {
+        "title": "Hohe Schuldentilgungsrate",
+        "description": "Ihre monatlichen Schuldenzahlungen sind sehr hoch im Verhältnis zu Ihrem Einkommen. Erwägen Sie eine Umschuldung oder Erhöhung Ihres Einkommens.",
+        "action": "Schulden umschulden"
+      },
+      "lowAssetCoverage": {
+        "title": "Unzureichende Vermögensdeckung",
+        "description": "Ihre Schulden sind höher als Ihre Vermögenswerte. Bauen Sie Vermögen auf, um Ihre finanzielle Stabilität zu verbessern.",
+        "action": "Vermögen aufbauen"
+      }
+    },
+    "emergencyFund": {
+      "insufficient": {
+        "title": "Unzureichender Notgroschen",
+        "description": "Ihr Notgroschen reicht nicht aus, um Ihre Ausgaben für mehrere Monate zu decken. Bauen Sie einen Puffer auf.",
+        "action": "Notgroschen aufbauen"
+      },
+      "excellent": {
+        "title": "Exzellenter Notgroschen",
+        "description": "Ihr Notgroschen ist ausgezeichnet. Sie können überschüssige Mittel in Investitionen umleiten.",
+        "action": "Investitionen prüfen"
+      }
+    },
+    "passiveIncome": {
+      "lowRatio": {
+        "title": "Niedriger Anteil passiver Einkommen",
+        "description": "Ihr passives Einkommen ist zu niedrig. Erwägen Sie Investitionen in dividendenstarke Anlagen.",
+        "action": "Passive Anlagen prüfen"
+      },
+      "goodProgress": {
+        "title": "Guter Fortschritt bei passiven Einkommen",
+        "description": "Sie machen gute Fortschritte beim Aufbau passiver Einkommen. Setzen Sie Ihre Strategie fort.",
+        "action": "Prognose anzeigen"
+      },
+      "none": {
+        "title": "Keine passiven Einkommen",
+        "description": "Sie haben noch keine passiven Einkommen. Beginnen Sie mit kleinen Investitionen in Dividendenaktien.",
+        "action": "Mit Investitionen beginnen"
+      }
+    },
+    "savings": {
+      "excellent": {
+        "title": "Exzellente Sparquote",
+        "description": "Ihre Sparquote ist hervorragend. Sie sind auf dem besten Weg zur finanziellen Unabhängigkeit.",
+        "action": "Zukunft planen"
+      },
+      "good": {
+        "title": "Gute Sparquote",
+        "description": "Sie haben eine gute Sparquote. Nutzen Sie diese für strategische Investitionen.",
+        "action": "Investitionen optimieren"
+      }
+    },
+    "general": {
+      "noAssets": {
+        "title": "Keine Vermögenswerte",
+        "description": "Sie haben noch keine Vermögenswerte erfasst. Beginnen Sie mit dem Aufbau Ihres Portfolios.",
+        "action": "Erstes Asset hinzufügen"
+      },
+      "negativeNetWorth": {
+        "title": "Negatives Nettovermögen",
+        "description": "Ihr Nettovermögen ist negativ. Fokussieren Sie sich auf die Reduzierung von Schulden.",
+        "action": "Schulden abbauen"
+      },
+      "strongPosition": {
+        "title": "Starke Finanzposition",
+        "description": "Sie haben eine ausgezeichnete Finanzposition. Optimieren Sie Ihre Strategie für die Zukunft.",
+        "action": "Strategie optimieren"
+      }
+    }
+  },
+  
   "navigation": {
     "home": "Start",
     "dashboard": "Dashboard",
+    "portfolio": "Portfolio",
     "assets": "Vermögen",
     "liabilities": "Verbindlichkeiten",
     "debts": "Schulden",
@@ -281,6 +380,7 @@
         "description": "Verfolge den Prozentsatz deiner monatlichen Gesamtausgaben, der durch passives Einkommen gedeckt wird. Dies umfasst alle Ausgaben, einschließlich Fixkosten, variable Kosten und Schuldenrückzahlungen.",
         "noExpenses": "Noch keine Ausgaben erfasst. Füge deine Ausgaben hinzu, um die Gesamtausgabendeckung zu überwachen.",
         "percentCovered": "{{percent}}% der Ausgaben gedeckt",
+        "passiveIncome": "Passives Einkommen: {{income}}/Monat",
         "totalMonthlyExpenses": "Gesamte monatliche Ausgaben: {{amount}}/Monat",
         "breakdownTitle": "Aufschlüsselung:",
         "regularExpenses": "• Monatliche Ausgaben: {{expenses}}/Monat",
@@ -450,6 +550,10 @@
     "purchasePrice": "Kaufpreis",
     "purchaseDate": "Kaufdatum",
     "transactionCosts": "Transaktionskosten",
+    "totalVolume": "Gesamtvolumen",
+    "buy": "Kauf",
+    "sell": "Verkauf",
+    "sale": "Verkauf",
     "notes": "Notizen",
     "notesPlaceholder": "Zusätzliche Notizen zu dieser Transaktion...",
     "frequency": "Häufigkeit",
@@ -534,7 +638,6 @@
     "investmentDetails": "Investitionsdetails",
     "assetInformation": "Asset-Informationen",
     "transactionHistory": "Transaktionshistorie",
-    "sale": "Verkauf",
     "useMultipleSectors": "Mehrere Sektoren verwenden",
     "sectors": "Sektoren",
     "sectorName": "Sektorname",
@@ -586,7 +689,9 @@
     "optionalFields": "Optionale Felder",
     "notes": "Notizen",
     "noData": "Keine Daten verfügbar",
-    "all": "Alle"
+    "all": "Alle",
+    "income": "Einkommen",
+    "expenses": "Ausgaben"
   },
   "expenses": {
     "title": "Ausgaben",
@@ -598,10 +703,16 @@
       "category": "Kategorie",
       "paymentFrequency": "Zahlungshäufigkeit",
       "paymentAmount": "Zahlungsbetrag",
+      "dayOfMonth": "Tag des Monats",
+      "dayOfMonthPlaceholder": "z.B. 15 (für den 15. des Monats)",
       "paymentMonths": "Zahlungsmonate",
       "required": "erforderlich",
       "nameRequired": "Name ist erforderlich",
-      "paymentAmountPositive": "Zahlungsbetrag muss positiv sein"
+      "paymentAmountPositive": "Zahlungsbetrag muss positiv sein",
+      "enterExpenseName": "Ausgabenname eingeben",
+      "selectCategory": "Kategorie auswählen",
+      "selectFrequency": "Häufigkeit auswählen",
+      "amount": "Betrag"
     },
     "categories": {
       "housing": "Wohnen",
@@ -673,11 +784,16 @@
         "paymentFrequency": "Zahlungshäufigkeit",
         "paymentAmount": "Zahlungsbetrag",
         "paymentDay": "Zahltag",
+        "dayOfMonth": "Tag des Monats",
+        "dayOfMonthPlaceholder": "z.B. 15 (für den 15. des Monats)",
         "passiveIncome": "Passives Einkommen",
         "sourceAsset": "Quelle Vermögenswert",
         "selectAsset": "Vermögenswert auswählen",
         "paymentMonths": "Zahlungsmonate",
-        "income": "Einkommen"
+        "income": "Einkommen",
+        "enterIncomeName": "Einkommensname eingeben",
+        "selectIncomeType": "Einkommenstyp auswählen",
+        "selectFrequency": "Häufigkeit auswählen"
       },
       "types": {
         "salary": "Gehalt",
@@ -708,6 +824,33 @@
         "expenseCategories": "Ausgabenkategorien",
         "liabilitiesCount": "Verbindlichkeiten"
       },
+      "activities": {
+        "overview": "Analytics-Übersicht angesehen",
+        "forecasting": "Prognose angesehen",
+        "milestones": "Meilensteine angesehen",
+        "distributions": "Verteilungen angesehen",
+        "performance": "Performance angesehen",
+        "custom": "Benutzerdefinierte Analytics angesehen",
+        "overview.dashboard": "Analytics Dashboard angesehen",
+        "overview.summary": "Analytics Zusammenfassung angesehen",
+        "forecasting.cashflow": "Cashflow-Prognose angesehen",
+        "forecasting.portfolio": "Portfolio-Prognose angesehen",
+        "forecasting.scenarios": "Szenario-Analyse angesehen",
+        "milestones.fire": "FIRE-Fortschritt angesehen",
+        "milestones.debt": "Schulden-Meilensteine angesehen",
+        "milestones.savings": "Spar-Meilensteine angesehen",
+        "milestones.customMilestones": "Benutzerdefinierte Meilensteine angesehen",
+        "distributions.assets": "Asset-Verteilung angesehen",
+        "distributions.income": "Einkommens-Verteilung angesehen",
+        "distributions.expenses": "Ausgaben-Verteilung angesehen",
+        "distributions.geographic": "Geografische Verteilung angesehen",
+        "performance.portfolioPerformance": "Portfolio-Performance angesehen",
+        "performance.returns": "Rendite-Analyse angesehen",
+        "performance.historical": "Historische Performance angesehen",
+        "custom.calendar": "Asset-Kalender angesehen",
+        "custom.history": "Historie-Analytics angesehen",
+        "custom.timeline": "Timeline-Analytics angesehen"
+      },
       "recent": {
         "portfolioDistribution": "Portfolio-Verteilung",
         "viewedRecently": "Kürzlich angesehen",
@@ -716,7 +859,7 @@
         "incomeAnalysis": "Einkommens-Analyse",
         "monthlyBreakdown": "Monatliche Aufschlüsselung"
       },
-      "recommendations": {
+      "recommendationItems": {
         "expenseReview": "Ausgaben überprüfen",
         "expenseReviewDesc": "Ihre Ausgaben sind gestiegen. Zeit für eine Überprüfung.",
         "diversification": "Portfolio diversifizieren",
@@ -771,24 +914,64 @@
           "geographicDesc": "Regionale Asset-Verteilung"
         },
         "performance": {
-          "title": "Performance & Entwicklung",
+          "title": "Performance-Analysen",
+          "subtitle": "Verfolgen Sie Ihre Portfolio-Performance und Renditen",
           "description": "Performance-Tracking und historische Analysen",
           "portfolio": "Portfolio-Performance",
           "portfolioDesc": "Portfolio-Wertentwicklung verfolgen",
           "returns": "Rendite-Analysen",
           "returnsDesc": "Rendite-Berechnungen und Vergleiche",
           "historical": "Historische Analysen",
-          "historicalDesc": "Langzeit-Trends und Entwicklungen"
+          "historicalDesc": "Langzeit-Trends und Entwicklungen",
+          "currentValue": "Aktueller Wert",
+          "totalReturn": "Gesamtrendite",
+          "peakValue": "Höchstwert",
+          "lowestValue": "Tiefstwert",
+          "volatility": "Volatilität",
+          "topPerformers": "Top-Performer",
+          "dailyReturn": "Tagesrendite",
+          "monthlyReturn": "Monatsrendite",
+          "annualizedReturn": "Jahresrendite",
+          "sharpeRatio": "Sharpe-Ratio",
+          "assetReturns": "Rendite nach Asset",
+          "riskMetrics": "Risikokennzahlen",
+          "invested": "Investiert",
+          "return": "Rendite",
+          "performanceTimeline": "Performance-Verlauf",
+          "bestDay": "Bester Tag",
+          "highestGain": "Höchster Tagesgewinn",
+          "bestMonth": "Bester Monat",
+          "highestMonthlyGain": "Höchster Monatsgewinn",
+          "annualizedPerformance": "Annualisierte Performance",
+          "yearOverYearReturn": "Jahr-zu-Jahr-Rendite",
+          "assetHistoricalPerformance": "Historische Asset-Performance",
+          "noHistoricalDataTitle": "Keine historischen Daten verfügbar",
+          "returnsAnalysis": "Rendite-Analyse",
+          "returnsComingSoon": "Detaillierte Rendite-Analyse folgt bald",
+          "historicalAnalysis": "Historische Analyse",
+          "historicalComingSoon": "Historische Analyse-Charts folgen bald",
+          "noData": "Keine Performance-Daten verfügbar",
+          "noHistoricalData": "Fügen Sie Assets mit Preishistorie hinzu, um die Performance über Zeit zu sehen. Historische Analysen helfen dabei, langfristige Performance-Trends Ihres Portfolios zu verfolgen."
         },
         "custom": {
-          "title": "Individuelle Analysen",
-          "description": "Erstellen Sie maßgeschneiderte Analysen",
+          "title": "Asset-Kalender",
+          "description": "Verwalten und verfolgen Sie Ihre Asset-Ereignisse",
           "builder": "Chart-Builder",
           "builderDesc": "Erstellen Sie eigene Diagramme",
           "saved": "Gespeicherte Analysen",
-          "savedDesc": "Ihre gespeicherten Chart-Konfigurationen",
+          "savedDesc": "Ihre gespeicherte Chart-Konfigurationen",
           "templates": "Analyse-Vorlagen",
           "templatesDesc": "Vorgefertigte Analyse-Templates"
+        },
+        "assetCalendar": {
+          "title": "Asset-Kalender",
+          "description": "Verwalten und verfolgen Sie Ihre Asset-Ereignisse und -termine",
+          "calendar": "Asset-Kalender",
+          "calendarDesc": "Überblick über alle Asset-Termine und -ereignisse",
+          "history": "Asset-Historie",
+          "historyDesc": "Historische Entwicklung Ihrer Assets",
+          "timeline": "Asset-Timeline",
+          "timelineDesc": "Chronologische Darstellung Ihrer Asset-Aktivitäten"
         }
       }
     },
@@ -932,7 +1115,88 @@
     "lowestValue": "Niedrigstwert",
     "valueHistory": "Wertverlauf",
     "portfolioValue": "Portfolio-Wert",
-    "transactionDays": "Transaktionstage"
+    "transactionDays": "Transaktionstage",
+    "available": "Verfügbar",
+    "unified": "Vereint",
+    "totalValue": "Gesamtwert",
+    "positions": "Positionen",
+    "view": "Ansicht",
+    "calendar": "Kalender",
+    "monthlyIncome": "Monatliches Einkommen",
+    "categories": {
+      "income": "Einkommensverwaltung"
+    },
+    "debtRatio": "Schuldenquote",
+    "analyze": "Analysieren",
+    "recentActivity": "Letzte Aktivitäten",
+    "totalAssets": "Gesamtvermögen",
+    "upcomingEvents": "Anstehende Ereignisse",
+    "assetEvents": "Asset-Ereignisse & Termine",
+    "lastUpdated": "Zuletzt aktualisiert",
+    "noEvents": "Keine Ereignisse geplant",
+    "addAssetsForEvents": "Fügen Sie Assets hinzu, um deren Termine und Ereignisse hier zu sehen",
+    "historyFeature": "Asset-Historie Funktion",
+    "historyComingSoon": "Detaillierte Asset-Historie-Verfolgung folgt bald. Dies wird den kompletten Lebenszyklus Ihrer Assets zeigen.",
+    "timelineFeature": "Asset-Timeline Funktion",
+    "timelineComingSoon": "Interaktive Timeline-Visualisierung folgt bald. Dies bietet eine chronologische Ansicht aller Ihrer Asset-Aktivitäten.",
+    "hub": {
+      "title": "Portfolio Hub", 
+      "subtitle": "Verwalten Sie Ihr komplettes finanzielles Portfolio",
+      "recentActivities": "Letzte Portfolio-Aktivitäten",
+      "recommendations": "Empfehlungen",
+      "recent": {
+        "assetManagement": "Asset-Management",
+        "incomeManagement": "Einkommensverwaltung",
+        "expenseTracking": "Ausgabenverfolgung", 
+        "viewedRecently": "Kürzlich angesehen"
+      },
+      "insights": {
+        "assetsCount": "Assets",
+        "incomeSourcesCount": "Einkommensquellen"
+      },
+      "activities": {
+        "overview": "Portfolio-Übersicht",
+        "assets": "Assets-Bereich angesehen",
+        "liabilities": "Verbindlichkeiten-Bereich angesehen",
+        "income": "Einkommens-Bereich angesehen",
+        "expenses": "Ausgaben-Bereich angesehen",
+        "transactions": "Transaktionen-Bereich angesehen",
+        "assets.portfolio": "Asset-Portfolio angesehen",
+        "assets.definitions": "Asset-Definitionen angesehen",
+        "assets.categories": "Asset-Kategorien angesehen",
+        "assets.calendar": "Asset-Kalender angesehen",
+        "assets.history": "Asset-Historie angesehen",
+        "liabilities.debts": "Schulden angesehen",
+        "liabilities.payments": "Zahlungen angesehen",
+        "liabilities.projections": "Projektionen angesehen",
+        "income.sources": "Einkommensquellen angesehen",
+        "income.streams": "Einkommensströme angesehen",
+        "expenses.budgets": "Budgets angesehen",
+        "expenses.tracking": "Ausgabenverfolgung angesehen",
+        "expenses.categories": "Ausgabenkategorien angesehen",
+        "transactions.recent": "Letzte Transaktionen angesehen",
+        "transactions.import": "Transaktionen importiert",
+        "transactions.export": "Transaktionen exportiert"
+      },
+      "hubRecommendations": {
+        "debtReduction": "Schuldenlast reduzieren",
+        "debtReductionDesc": "Ihr Schulden-zu-Asset-Verhältnis ist hoch. Erwägen Sie Schuldenabbau zur Verbesserung Ihrer finanziellen Gesundheit.",
+        "improveIncome": "Cashflow verbessern", 
+        "improveIncomeDesc": "Ihre Ausgaben übersteigen das Einkommen. Erwägen Sie Einkommenssteigerung oder Ausgabenreduzierung.",
+        "diversifyIncome": "Einkommensströme diversifizieren",
+        "diversifyIncomeDesc": "Fügen Sie mehr Einkommensquellen hinzu, um finanzielle Risiken zu reduzieren und Stabilität zu verbessern.",
+        "trackExpenses": "Ausgaben verfolgen",
+        "trackExpensesDesc": "Überwachen und kategorisieren Sie Ihre Ausgaben, um Sparmöglichkeiten zu identifizieren.",
+        "portfolioAnalysis": "Portfolio analysieren",
+        "portfolioAnalysisDesc": "Überprüfen Sie Ihre Asset-Allokation und Performance zur Optimierung der Renditen."
+      },
+      "quickActions": {
+        "addTransaction": "Transaktion hinzufügen",
+        "addIncome": "Einkommen hinzufügen",
+        "addExpense": "Ausgabe hinzufügen",
+        "addLiability": "Schuld hinzufügen"
+      }
+    }
   },
   "milestones": {
     "title": "Finanzielle Meilensteine",
@@ -942,5 +1206,215 @@
     "debtProgress": "Schuldenfortschritt",
     "monthsBuffer": "Monate Puffer",
     "fixedCosts": "Fixkostendeckung"
+  },
+  
+  "emptyStates": {
+    "assets": {
+      "title": "Beginnen Sie Ihre Investitionsreise!",
+      "description": "Assets sind der Grundstein für Ihr Vermögen. Fügen Sie Ihre erste Investition hinzu und starten Sie den Weg zur finanziellen Unabhängigkeit.",
+      "motivationalText": "Jede erfolgreiche Investitionsreise beginnt mit dem ersten Asset!",
+      "primaryAction": "Erstes Asset hinzufügen",
+      "secondaryAction": "Leitfaden ansehen",
+      "tips": [
+        "Starten Sie mit einem Asset, das Sie bereits besitzen",
+        "Diversifikation reduziert Risiken",
+        "Regelmäßige Investitionen zahlen sich langfristig aus"
+      ]
+    },
+    "income": {
+      "title": "Erfassen Sie Ihre Einkommensquellen!",
+      "description": "Einkommen ist der Motor Ihres Vermögensaufbaus. Dokumentieren Sie alle Einkommensquellen, um Ihren finanziellen Überblick zu verbessern.",
+      "motivationalText": "Mehrere Einkommensquellen schaffen finanzielle Sicherheit!",
+      "primaryAction": "Einkommen hinzufügen",
+      "secondaryAction": "Kategorien verstehen",
+      "tips": [
+        "Erfassen Sie auch passive Einkommensquellen",
+        "Unterscheiden Sie zwischen aktivem und passivem Einkommen",
+        "Planen Sie Ihr zukünftiges Einkommen"
+      ]
+    },
+    "expenses": {
+      "title": "Behalten Sie Ihre Ausgaben im Blick!",
+      "description": "Ausgaben zu kontrollieren ist der erste Schritt zu finanzieller Freiheit. Erfassen Sie Ihre wiederkehrenden Kosten für eine bessere Budgetplanung.",
+      "motivationalText": "Wer seine Ausgaben kennt, kann sie optimieren!",
+      "primaryAction": "Ausgabe hinzufügen",
+      "secondaryAction": "Budget planen",
+      "tips": [
+        "Beginnen Sie mit Ihren größten Ausgabenposten",
+        "Unterscheiden Sie zwischen Bedürfnissen und Wünschen",
+        "Kleine Einsparungen addieren sich zu großen Summen"
+      ]
+    },
+    "liabilities": {
+      "title": "Schulden strategisch abbauen!",
+      "description": "Der Abbau von Verbindlichkeiten ist ein wichtiger Schritt zur finanziellen Unabhängigkeit. Dokumentieren Sie Ihre Schulden, um sie systematisch zu reduzieren.",
+      "motivationalText": "Jede getilgte Schuld bringt Sie der Freiheit näher!",
+      "primaryAction": "Verbindlichkeit hinzufügen",
+      "secondaryAction": "Tilgungsplan erstellen",
+      "tips": [
+        "Priorisieren Sie Schulden mit hohen Zinsen",
+        "Kleine Zusatzzahlungen verkürzen die Laufzeit erheblich",
+        "Visualisieren Sie Ihren Fortschritt"
+      ]
+    },
+    "portfolio": {
+      "title": "Ihr Portfolio wartet auf Sie!",
+      "description": "Ein diversifiziertes Portfolio ist der Schlüssel zu langfristigem Erfolg. Fügen Sie Assets hinzu, um Ihr Portfolio zu verfolgen.",
+      "motivationalText": "Diversifikation ist der einzige kostenlose Gewinn in der Finanzwelt!",
+      "actionLabel": "Portfolio aufbauen"
+    },
+    "analytics": {
+      "noData": "Noch keine Daten für die Analyse verfügbar",
+      "addDataFirst": "Fügen Sie zuerst Assets, Einkommen oder Ausgaben hinzu, um aussagekräftige Analysen zu erhalten.",
+      "startAnalyzing": "Daten hinzufügen"
+    },
+    "charts": {
+      "noData": "Keine Daten für die Darstellung verfügbar",
+      "addDataToSeeChart": "Fügen Sie Daten hinzu, um dieses Diagramm zu sehen",
+      "comingSoon": "Diese Ansicht wird verfügbar, sobald Sie relevante Daten hinzugefügt haben"
+    },
+    "forecast": {
+      "title": "Planen Sie Ihre finanzielle Zukunft!",
+      "description": "Prognosen helfen Ihnen, fundierte finanzielle Entscheidungen zu treffen. Fügen Sie Assets und Einkommen hinzu, um Ihre Zukunft zu projizieren.",
+      "motivationalText": "Die beste Zeit zu investieren war vor 20 Jahren. Die zweitbeste Zeit ist jetzt!",
+      "actionLabel": "Daten für Prognose hinzufügen"
+    }
+  },
+  "recommendations": {
+    "assets": {
+      "sectorDiversification": {
+        "title": "Sektor-Diversifikation verbessern",
+        "description": "Ihr Portfolio ist in bestimmten Sektoren konzentriert. Erwägen Sie eine Streuung über verschiedene Sektoren."
+      },
+      "geographicalDiversification": {
+        "title": "Geografische Diversifikation hinzufügen",
+        "description": "Ihre Assets sind geografisch konzentriert. Erwägen Sie internationale Diversifikation zur Risikominderung."
+      },
+      "assetTypeDiversification": {
+        "title": "Asset-Typen diversifizieren",
+        "description": "Ihr Portfolio könnte von Diversifikation über verschiedene Anlageklassen profitieren (Aktien, Anleihen, Immobilien)."
+      },
+      "undervaluedAssets": {
+        "title": "Unterbewertete Assets überprüfen",
+        "description": "Einige Ihrer Assets könnten unterbewertet sein. Überlegen Sie, ob es Zeit für Rebalancing oder Aufstockung ist."
+      },
+      "portfolioRebalancing": {
+        "title": "Portfolio rebalancieren",
+        "description": "Ihre Portfolio-Allokation ist von den Zielen abgewichen. Erwägen Sie Rebalancing für das gewünschte Risikoprofil."
+      },
+      "lossPositions": {
+        "title": "Verlustpositionen überprüfen",
+        "description": "Sie haben Assets in Verlustpositionen. Erwägen Sie Tax-Loss-Harvesting oder das Reduzieren underperformender Investments."
+      },
+      "updateAssetPrices": {
+        "title": "Asset-Preise aktualisieren",
+        "description": "Einige Asset-Preise könnten veraltet sein. Aktualisieren Sie Preise für genaue Portfolio-Bewertungen."
+      },
+      "assetCategories": {
+        "title": "Asset-Kategorien vervollständigen",
+        "description": "Einigen Assets fehlen vollständige Kategorisierungen. Fügen Sie Sektor- und Länderinformationen für bessere Analysen hinzu."
+      }
+    },
+    "income": {
+      "increasePassiveIncome": {
+        "title": "Passives Einkommen steigern",
+        "description": "Ihr passives Einkommen ist niedrig im Verhältnis zu den Ausgaben. Erwägen Sie Dividenden-Aktien oder REITs."
+      },
+      "addDividendAssets": {
+        "title": "Dividenden-Assets hinzufügen",
+        "description": "Sie haben wenige dividendenzahlende Assets. Erwägen Sie Dividenden-Aktien oder -Fonds für regelmäßiges Einkommen."
+      },
+      "optimizeRentalIncome": {
+        "title": "Mieteinnahmen optimieren",
+        "description": "Ihre Mietobjekte könnten mehr Einkommen generieren. Erwägen Sie Verbesserungen oder Mietoptimierung."
+      },
+      "diversifyIncomeSources": {
+        "title": "Einkommensquellen diversifizieren",
+        "description": "Sie sind stark von einzelnen Einkommensquellen abhängig. Fügen Sie diversifizierte Streams hinzu, um Einkommensrisiko zu reduzieren."
+      },
+      "addInterestIncome": {
+        "title": "Zinseinkommen hinzufügen",
+        "description": "Erwägen Sie festverzinsliche Investments wie Anleihen oder CDs für stabiles Zinseinkommen."
+      },
+      "planIncomeGrowth": {
+        "title": "Einkommenswachstum planen",
+        "description": "Ihre aktuelle Einkommenswachstumstrajektorie könnte verbessert werden. Erwägen Sie Karriereförderung oder Kompetenzentwicklung."
+      },
+      "developSideHustle": {
+        "title": "Nebeneinkommen entwickeln",
+        "description": "Ein Nebenbusiness oder Freelance-Arbeit könnte zusätzliche Einkommensströme bieten."
+      },
+      "optimizeIncomeTiming": {
+        "title": "Einkommens-Timing optimieren",
+        "description": "Erwägen Sie das Timing der Einkommensrealisierung für Steueroptimierung und Cashflow-Management."
+      }
+    },
+    "expenses": {
+      "completeExpenseCategories": {
+        "title": "Ausgabenkategorien vervollständigen",
+        "description": "Fügen Sie detailliertere Ausgabenkategorien für besseres Budget-Tracking und Analysen hinzu."
+      },
+      "reduceHighExpenses": {
+        "title": "Hohe Ausgaben reduzieren",
+        "description": "Einige Ausgabenkategorien sind ungewöhnlich hoch. Überprüfen Sie und erwägen Sie Kostensenkungsmöglichkeiten."
+      },
+      "auditSubscriptions": {
+        "title": "Abonnements prüfen",
+        "description": "Überprüfen Sie wiederkehrende Abonnements und kündigen Sie ungenutzte Services zur Reduzierung monatlicher Ausgaben."
+      },
+      "budgetControl": {
+        "title": "Budget-Kontrolle verbessern",
+        "description": "Ihre Ausgaben überschreiten gesunde Budget-Verhältnisse. Erwägen Sie strengere Budget-Kontrollen."
+      },
+      "planSeasonalExpenses": {
+        "title": "Saisonale Ausgaben planen",
+        "description": "Bereiten Sie sich auf saisonale Ausgabenschwankungen vor, indem Sie das ganze Jahr über Gelder beiseitelegen."
+      },
+      "createEmergencyBuffer": {
+        "title": "Notfall-Ausgabenpuffer schaffen",
+        "description": "Bauen Sie einen Puffer für unerwartete Ausgaben auf, um nicht in Investments eingreifen zu müssen."
+      }
+    },
+    "liabilities": {
+      "reduceHighInterestDebt": {
+        "title": "Hochzinsschulden angehen",
+        "description": "Sie haben hochverzinsliche Schulden. Priorisieren Sie die Tilgung der höchstverzinslichen Schulden zuerst."
+      },
+      "accelerateDebtRepayment": {
+        "title": "Schuldentilgung beschleunigen",
+        "description": "Erwägen Sie zusätzliche Zahlungen, um Schulden schneller zu reduzieren und Zinsen zu sparen."
+      },
+      "considerDebtConsolidation": {
+        "title": "Schuldenkonsolidierung erwägen",
+        "description": "Mehrere hochverzinsliche Schulden könnten von Konsolidierung zu einem niedrigeren Zinssatz profitieren."
+      },
+      "reduceDebtRatio": {
+        "title": "Schulden-Asset-Verhältnis reduzieren",
+        "description": "Ihr Schulden-Asset-Verhältnis ist hoch. Fokussieren Sie sich auf Schuldentilgung oder Asset-Aufbau."
+      }
+    },
+    "planning": {
+      "buildEmergencyFund": {
+        "title": "Notfallfonds aufbauen",
+        "description": "Bauen Sie einen Notfallfonds auf, der 3-6 Monate Ausgaben abdeckt, für finanzielle Sicherheit."
+      },
+      "improveCashflow": {
+        "title": "Cashflow verbessern",
+        "description": "Ihr monatlicher Cashflow könnte verbessert werden. Fokussieren Sie sich auf Einkommenserhöhung oder Ausgabenreduzierung."
+      },
+      "increaseRetirementSavings": {
+        "title": "Alterssparen erhöhen",
+        "description": "Ihre aktuelle Sparrate könnte für Rentenziele nicht ausreichen. Erwägen Sie höhere Beiträge."
+      },
+      "workTowardFinancialIndependence": {
+        "title": "Auf finanzielle Unabhängigkeit hinarbeiten",
+        "description": "Sie machen gute Fortschritte. Fokussieren Sie sich auf die Optimierung Ihres Wegs zur finanziellen Unabhängigkeit."
+      }
+    }
+  },
+  "hubRecommendations": {
+    "title": "Intelligente Empfehlungen",
+    "noRecommendations": "Derzeit keine Empfehlungen verfügbar. Fügen Sie mehr Finanzdaten hinzu, um personalisierte Einblicke zu erhalten.",
+    "totalRecommendations": "{{count}} Empfehlungen werden angezeigt"
   }
 }

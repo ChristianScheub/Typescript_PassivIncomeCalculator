@@ -5,17 +5,22 @@ import { Liability } from '../../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import calculatorService from '../../service/calculatorService';
-import LiabilitiesView from '../../view/liabilities/LiabilitiesView';
-import LiabilityAnalyticsContainer from '../analytics/LiabilityAnalyticsContainer';
+import LiabilitiesView from '../../view/portfolio-hub/liabilities/LiabilitiesView';
 import { sortLiabilitiesByPayment, SortOrder } from '../../utils/sortingUtils';
 
-const LiabilitiesContainer: React.FC = () => {
+const LiabilitiesContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { items: liabilities, status } = useAppSelector(state => state.liabilities);
   const [isAddingLiability, setIsAddingLiability] = useState(false);
   const [editingLiability, setEditingLiability] = useState<Liability | null>(null);
-  const [showAnalytics, setShowAnalytics] = useState(false);
+
+  // Handle initial action to open forms directly
+  useEffect(() => {
+    if (initialAction === 'addDebt') {
+      setIsAddingLiability(true);
+    }
+  }, [initialAction]);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -65,23 +70,6 @@ const LiabilitiesContainer: React.FC = () => {
     }
   };
 
-  const handleShowAnalytics = () => {
-    Logger.info('Navigating to liability analytics');
-    setShowAnalytics(true);
-  };
-
-  const handleBackFromAnalytics = () => {
-    Logger.info('Returning from liability analytics to main view');
-    setShowAnalytics(false);
-  };
-
-  // Show analytics view if requested
-  if (showAnalytics) {
-    return (
-      <LiabilityAnalyticsContainer onBack={handleBackFromAnalytics} />
-    );
-  }
-
   return (
     <LiabilitiesView
       liabilities={sortedLiabilities}
@@ -95,7 +83,7 @@ const LiabilitiesContainer: React.FC = () => {
       onDeleteLiability={handleDeleteLiability}
       onSetIsAddingLiability={setIsAddingLiability}
       onSetEditingLiability={setEditingLiability}
-      onShowAnalytics={handleShowAnalytics}
+      onBack={onBack}
     />
   );
 };

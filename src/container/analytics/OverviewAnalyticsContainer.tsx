@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import Logger from '../../service/Logger/logger';
-import OverviewAnalyticsView from '../../view/analytics/overview/OverviewAnalyticsView';
+import OverviewAnalyticsView from '../../view/analytics-hub/overview/OverviewAnalyticsView';
 
 interface OverviewAnalyticsContainerProps {
   onBack?: () => void;
@@ -14,6 +14,11 @@ const OverviewAnalyticsContainer: React.FC<OverviewAnalyticsContainerProps> = ({
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: income } = useAppSelector(state => state.income);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // Calculate comprehensive overview metrics
   const overviewData = useMemo(() => {

@@ -1,4 +1,4 @@
-import { Asset, Liability, Expense, Income } from '../../../types';
+import { Asset, Liability, Expense, Income, AssetDefinition } from '../../../types';
 
 export interface FinancialSummary {
   netWorth: number;
@@ -22,13 +22,36 @@ export interface FinancialRatios {
   savingsRate: number;
 }
 
+export type RecommendationPriority = 'high' | 'medium' | 'low';
+export type RecommendationCategory = 'assets' | 'income' | 'expenses' | 'liabilities' | 'planning';
+
+export interface PortfolioRecommendation {
+  id: string;
+  category: RecommendationCategory;
+  priority: RecommendationPriority;
+  titleKey: string;
+  descriptionKey: string;
+  actionCategory?: string; // Portfolio category for navigation
+  actionSubCategory?: string; // Portfolio subcategory for navigation
+  metadata?: Record<string, any>; // Additional data for the recommendation
+}
+
 export interface IAnalyticsService {
   calculateFinancialSummary: (
     assets: Asset[],
     liabilities: Liability[],
     expenses: Expense[],
-    income: Income[]
+    income: Income[],
+    assetDefinitions?: AssetDefinition[]
   ) => FinancialSummary;
 
   calculateRatios: (summary: FinancialSummary) => FinancialRatios;
+
+  generateRecommendations: (
+    assets: Asset[],
+    liabilities: Liability[],
+    expenses: Expense[],
+    income: Income[],
+    assetDefinitions?: AssetDefinition[]
+  ) => PortfolioRecommendation[];
 }

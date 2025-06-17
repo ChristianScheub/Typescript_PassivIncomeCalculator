@@ -1,4 +1,4 @@
-import { Liability } from '../../../types';
+import { Liability } from '../../../../types';
 
 export const calculateLiabilityMonthlyPayment = (liability: Liability): number => {
     if (!liability.paymentSchedule) {
@@ -14,7 +14,8 @@ export const calculateLiabilityMonthlyPayment = (liability: Liability): number =
             return liability.paymentSchedule.amount / 12;
         case 'custom':
             if (liability.paymentSchedule.customAmounts) {
-                const totalYearlyAmount = Object.values(liability.paymentSchedule.customAmounts).reduce((sum, amount) => sum + amount, 0);
+                const totalYearlyAmount = Object.values(liability.paymentSchedule.customAmounts)
+                    .reduce((sum: number, amount: number) => sum + amount, 0);
                 return totalYearlyAmount / 12;
             }
             return 0;

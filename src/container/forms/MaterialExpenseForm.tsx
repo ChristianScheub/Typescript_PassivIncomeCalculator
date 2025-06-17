@@ -5,7 +5,7 @@ import { createValidationSchema, createPaymentScheduleSchema } from '../../utils
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import { z } from 'zod';
-import { MaterialExpenseFormView } from '../../view/forms/MaterialExpenseFormView';
+import { MaterialExpenseFormView } from '../../view/shared/forms/MaterialExpenseFormView';
 
 // Create expense schema using shared schema utilities
 const expenseSchema = createValidationSchema({
@@ -43,11 +43,18 @@ export const MaterialExpenseForm = ({ initialData, onSubmit }: ExpenseFormProps)
         paymentSchedule: {
           frequency: 'monthly' as PaymentFrequency,
           amount: 0,
+          dayOfMonth: 1 // Standard: erster Tag des Monats
         },
         startDate: new Date().toISOString().split('T')[0]
       };
     }
-    return initialData;
+    return {
+      ...initialData,
+      paymentSchedule: {
+        ...initialData.paymentSchedule,
+        dayOfMonth: initialData.paymentSchedule.dayOfMonth || 1
+      }
+    };
   };
   
   const { fields: paymentFields, handleMonthChange } = usePaymentSchedule(initialData?.paymentSchedule);

@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { AssetCategoryManagerView } from '../../view/assets/AssetCategoryManagerView';
+import { AssetCategoryManagerView } from '../../view/portfolio-hub/assets/AssetCategoryManagerView';
 import {
   fetchAssetCategories,
   fetchAssetCategoryOptions,

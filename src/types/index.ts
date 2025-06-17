@@ -40,6 +40,7 @@ export interface PaymentSchedule {
   amount: number;
   months?: number[];
   customAmounts?: Record<number, number>;
+  dayOfMonth?: number; // Tag des Monats (1-31) an dem die Zahlung erfolgt
 }
 
 export interface DividendSchedule {
@@ -48,6 +49,7 @@ export interface DividendSchedule {
   months?: number[];
   paymentMonths?: number[];
   customAmounts?: Record<number, number>;
+  dayOfMonth?: number; // Tag des Monats (1-31) an dem die Dividende ausgezahlt wird
 }
 
 export interface CachedDividends {
@@ -241,6 +243,7 @@ export interface IncomeFormData {
   amount: number;
   isPassive: boolean;
   customSchedule?: number[];
+  dayOfMonth?: number; // Tag des Monats für die Zahlung
   startDate: string;
   endDate?: string;
   notes?: string;

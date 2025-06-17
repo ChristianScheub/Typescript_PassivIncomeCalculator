@@ -1,12 +1,14 @@
-import { Asset, Liability, Expense, Income } from '../../../types';
+import { Asset, Liability, Expense, Income, AssetDefinition } from '../../../types';
 import { FinancialSummary } from '../interfaces/IAnalyticsService';
 import calculatorService from '../../calculatorService';
+import { calculatePortfolioPositions } from '../../portfolioService/portfolioCalculations';
 
 export const calculateFinancialSummary = (
   assets: Asset[],
   liabilities: Liability[],
   expenses: Expense[],
-  income: Income[]
+  income: Income[],
+  assetDefinitions: AssetDefinition[] = []
 ): FinancialSummary => {
   const totalAssets = calculatorService.calculateTotalAssetValue(assets);
   const totalLiabilities = calculatorService.calculateTotalDebt(liabilities);
@@ -14,7 +16,9 @@ export const calculateFinancialSummary = (
   const monthlyIncome = calculatorService.calculateTotalMonthlyIncome(income);
   const monthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
   const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
-  const monthlyAssetIncome = calculatorService.calculateTotalMonthlyAssetIncome(assets);
+  const portfolioPositions = calculatePortfolioPositions(assets, assetDefinitions);
+  const monthlyAssetIncome = portfolioPositions.reduce((sum, pos) => sum + pos.monthlyIncome, 0);
+  
   const passiveIncome = calculatorService.calculatePassiveIncome(income);
   
   const totalMonthlyIncome = monthlyIncome + monthlyAssetIncome;

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { updateForecastValues } from '../../store/slices/forecastSlice';
 import Logger from '../../service/Logger/logger';
-import ForecastView from '../../view/components/ForecastView';
+import ForecastView from '../../view/shared/components/ForecastView';
 
 interface ForecastContainerProps {
   onBack?: () => void;
@@ -18,6 +18,11 @@ const ForecastContainer: React.FC<ForecastContainerProps> = ({ onBack }) => {
 
   // Check if any of the underlying data is loading
   const isDataLoading = [assetsStatus, incomeStatus, expensesStatus, liabilitiesStatus].includes('loading');
+  
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
   
   // Trigger forecast update when underlying data changes
   useEffect(() => {

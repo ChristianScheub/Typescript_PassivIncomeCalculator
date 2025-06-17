@@ -4,7 +4,7 @@ import { useSharedForm } from '../../hooks/useSharedForm';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import { createAssetSchema } from '../../utils/validationSchemas';
-import { MaterialAssetFormView } from '../../view/forms/MaterialAssetFormView';
+import { MaterialAssetFormView } from '../../view/shared/forms/MaterialAssetFormView';
 import { getCurrentQuantity } from '../../utils/transactionCalculations';
 
 interface AssetFormData {

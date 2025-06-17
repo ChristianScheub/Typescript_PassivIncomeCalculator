@@ -15,7 +15,7 @@ import {
   selectSortedAssets
 } from '../../store/slices/assetsSlice';
 import { fetchAssetDefinitions } from '../../store/slices/assetDefinitionsSlice';
-import { AssetsView } from '../../view/assets/AssetsView';
+import { AssetsView } from '../../view/portfolio-hub/assets/AssetsView';
 import { Asset } from '../../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
@@ -28,7 +28,7 @@ import AssetCalendarContainer from './AssetCalendarContainer';
 import { AssetCategoryContainer } from './AssetCategoryContainer';
 import { PortfolioHistoryContainer } from './PortfolioHistoryContainer';
 
-const AssetsContainer: React.FC = () => {
+const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   
@@ -56,6 +56,13 @@ const AssetsContainer: React.FC = () => {
   const [isShowingCategories, setIsShowingCategories] = useState(false);
   const [isShowingAnalytics, setIsShowingAnalytics] = useState(false);
   const [isShowingPortfolioHistory, setIsShowingPortfolioHistory] = useState(false);
+
+  // Handle initial action to open forms directly
+  useEffect(() => {
+    if (initialAction === 'addTransaction') {
+      setIsAddingAsset(true);
+    }
+  }, [initialAction]);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -309,6 +316,7 @@ const AssetsContainer: React.FC = () => {
       onNavigateToCalendar={handleNavigateToCalendar}
       onNavigateToAnalytics={handleNavigateToAnalytics}
       onNavigateToPortfolioHistory={handleNavigateToPortfolioHistory}
+      onBack={onBack}
     />
   );
 };

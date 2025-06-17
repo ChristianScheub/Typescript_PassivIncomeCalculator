@@ -6,6 +6,7 @@ import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import formatService from '../../../service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
 import { ChartTooltip } from '../../charts/ChartTooltips';
+import { ChartEmptyState } from '../../feedback/EnhancedEmptyState';
 
 interface GenericPieChartData {
   name: string;
@@ -117,11 +118,10 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
             </div>
           </div>
         ) : (
-          <div className="h-64 flex items-center justify-center">
-            <p className="text-gray-500 dark:text-gray-400">
-              {emptyStateMessage || t('common.noData')}
-            </p>
-          </div>
+          <ChartEmptyState
+            description={emptyStateMessage || t('emptyStates.charts.noData')}
+            variant="minimal"
+          />
         )}
       </div>
     </Card>

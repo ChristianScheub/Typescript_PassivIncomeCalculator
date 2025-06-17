@@ -72,6 +72,11 @@ const TotalExpenseCoverage: React.FC<TotalExpenseCoverageProps> = ({
               <p className="font-semibold text-emerald-600 dark:text-emerald-400">
                 {t('forecast.milestones.totalExpenseCoverage.percentCovered', { percent: percentage.toFixed(1) })}
               </p>
+              
+              <p className="text-gray-700 dark:text-gray-300 font-medium">
+                {t('forecast.milestones.totalExpenseCoverage.passiveIncome', { income: formatService.formatCurrency(monthlyPassiveIncome) })}
+              </p>
+              
               <p className="text-gray-500 dark:text-gray-400">
                 {t('forecast.milestones.totalExpenseCoverage.totalMonthlyExpenses', { amount: formatService.formatCurrency(totalMonthlyExpenses) })}
               </p>

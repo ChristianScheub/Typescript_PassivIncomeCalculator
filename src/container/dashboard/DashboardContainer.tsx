@@ -1,12 +1,14 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { calculate30DayHistory } from '../../store/slices/portfolioHistorySlice';
-import DashboardView from '../../view/dashboard/DashboardView';
+import DashboardView from '../../view/finance-hub/overview/DashboardView';
 import analyticsService from '../../service/analyticsService';
 import alertsService from '../../service/alertsService';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
+import cacheRefreshService from '../../service/cacheRefreshService';
+import Logger from '../../service/Logger/logger';
 
 const DashboardContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -15,6 +17,7 @@ const DashboardContainer: React.FC = () => {
 
   // Redux state
   const { items: assets } = useAppSelector(state => state.assets);
+  const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: income } = useAppSelector(state => state.income);
@@ -22,8 +25,8 @@ const DashboardContainer: React.FC = () => {
 
   // Financial calculations using analyticsService
   const financialSummary = useMemo(() => 
-    analyticsService.calculateFinancialSummary(assets, liabilities, expenses, income),
-    [assets, liabilities, expenses, income]
+    analyticsService.calculateFinancialSummary(assets, liabilities, expenses, income, assetDefinitions),
+    [assets, liabilities, expenses, income, assetDefinitions]
   );
 
   const ratios = useMemo(() => 
@@ -66,6 +69,26 @@ const DashboardContainer: React.FC = () => {
     }
   }, [dispatch, status]);
 
+  // Pull to refresh handler - only works when user is at the top of the page
+  const handleRefresh = useCallback(async () => {
+    // Check if user is at the top of the page (with small tolerance for mobile)
+    const isAtTop = window.scrollY <= 10; // Allow 10px tolerance
+    
+    if (!isAtTop) {
+      Logger.infoService("Dashboard pull-to-refresh ignored - user not at top of page (scrollY: " + window.scrollY + ")");
+      return; // Don't trigger refresh if not at top
+    }
+
+    Logger.infoService("Dashboard pull-to-refresh triggered - user at top of page");
+    try {
+      await cacheRefreshService.refreshAllCaches();
+      Logger.infoService("Dashboard cache refresh completed successfully");
+    } catch (error) {
+      Logger.error("Dashboard cache refresh failed: " + JSON.stringify(error));
+      throw error; // Re-throw to let the UI handle the error state
+    }
+  }, []);
+
   return (
     <DashboardView
       financialSummary={financialSummary}
@@ -75,6 +98,7 @@ const DashboardContainer: React.FC = () => {
       alerts={alerts}
       history30Days={history30Days}
       navigationHandlers={navigationHandlers}
+      onRefresh={handleRefresh}
     />
   );
 };

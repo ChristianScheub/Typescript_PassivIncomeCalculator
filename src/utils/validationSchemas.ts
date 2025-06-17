@@ -10,6 +10,7 @@ export const createPaymentScheduleSchema = () => z.object({
   months: z.array(z.number().min(1).max(12)).optional(),
   customAmounts: z.record(z.number()).optional(),
   paymentMonths: z.array(z.number().min(1).max(12)).optional(),
+  dayOfMonth: z.number().min(1).max(31).optional(), // Tag des Monats für die Zahlung
 });
 
 // Base Entity Schema
@@ -154,7 +155,7 @@ export const createLiabilitySchema = () => baseEntitySchema.extend({
 
 // Income Schema
 export const createIncomeSchema = () => baseEntitySchema.extend({
-  type: z.enum(['salary', 'interest', 'side_hustle', 'other'] as const),
+  type: z.enum(['salary', 'interest', 'dividend', 'rental', 'side_hustle', 'other'] as const),
   paymentSchedule: createPaymentScheduleSchema(),
   isPassive: z.boolean(),
   sourceId: z.string().optional(),

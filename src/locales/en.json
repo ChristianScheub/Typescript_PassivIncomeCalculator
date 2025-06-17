@@ -60,7 +60,103 @@
     "customAmounts": "Custom Amounts",
     "totalAnnualAmount": "Total Annual Amount",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "income": "Income",
+    "expenses": "Expenses"
+  },
+  "alerts": {
+    "cashflow": {
+      "negative": {
+        "title": "Negative Cash Flow",
+        "description": "Your monthly expenses exceed your income. Review your expenses or increase your income.",
+        "action": "Review Expenses"
+      },
+      "lowSavings": {
+        "title": "Low Savings Rate",
+        "description": "Your savings rate is very low. Try to save more money to increase your financial security.",
+        "action": "Reduce Expenses"
+      },
+      "lowIncome": {
+        "title": "Low Income",
+        "description": "Your monthly income is very low. Consider additional income sources or passive investments.",
+        "action": "Increase Income"
+      }
+    },
+    "debt": {
+      "highRatio": {
+        "title": "High Debt Ratio",
+        "description": "Your debt-to-asset ratio is too high. Consider debt reduction or building assets.",
+        "action": "Reduce Debt"
+      },
+      "highServiceRatio": {
+        "title": "High Debt Service Ratio",
+        "description": "Your monthly debt payments are very high relative to your income. Consider refinancing or increasing income.",
+        "action": "Refinance Debt"
+      },
+      "lowAssetCoverage": {
+        "title": "Insufficient Asset Coverage",
+        "description": "Your debts are higher than your assets. Build wealth to improve your financial stability.",
+        "action": "Build Assets"
+      }
+    },
+    "emergencyFund": {
+      "insufficient": {
+        "title": "Insufficient Emergency Fund",
+        "description": "Your emergency fund is not sufficient to cover your expenses for several months. Build a buffer.",
+        "action": "Build Emergency Fund"
+      },
+      "excellent": {
+        "title": "Excellent Emergency Fund",
+        "description": "Your emergency fund is excellent. You can redirect excess funds to investments.",
+        "action": "Review Investments"
+      }
+    },
+    "passiveIncome": {
+      "lowRatio": {
+        "title": "Low Passive Income Ratio",
+        "description": "Your passive income is too low. Consider investments in dividend-paying assets.",
+        "action": "Review Passive Assets"
+      },
+      "goodProgress": {
+        "title": "Good Progress on Passive Income",
+        "description": "You're making good progress building passive income. Continue your strategy.",
+        "action": "View Forecast"
+      },
+      "none": {
+        "title": "No Passive Income",
+        "description": "You don't have any passive income yet. Start with small investments in dividend stocks.",
+        "action": "Start Investing"
+      }
+    },
+    "savings": {
+      "excellent": {
+        "title": "Excellent Savings Rate",
+        "description": "Your savings rate is outstanding. You're on the best path to financial independence.",
+        "action": "Plan Future"
+      },
+      "good": {
+        "title": "Good Savings Rate",
+        "description": "You have a good savings rate. Use this for strategic investments.",
+        "action": "Optimize Investments"
+      }
+    },
+    "general": {
+      "noAssets": {
+        "title": "No Assets",
+        "description": "You haven't recorded any assets yet. Start building your portfolio.",
+        "action": "Add First Asset"
+      },
+      "negativeNetWorth": {
+        "title": "Negative Net Worth",
+        "description": "Your net worth is negative. Focus on reducing debt.",
+        "action": "Pay Down Debt"
+      },
+      "strongPosition": {
+        "title": "Strong Financial Position",
+        "description": "You have an excellent financial position. Optimize your strategy for the future.",
+        "action": "Optimize Strategy"
+      }
+    }
   },
   "customAnalytics": {
     "title": "Custom Analytics",
@@ -111,6 +207,33 @@
         "incomeSourcesCount": "Income Sources",
         "expenseCategories": "Expense Categories",
         "liabilitiesCount": "Liabilities"
+      },
+      "activities": {
+        "overview": "Viewed Analytics Overview",
+        "forecasting": "Viewed Forecasting",
+        "milestones": "Viewed Milestones",
+        "distributions": "Viewed Distributions",
+        "performance": "Viewed Performance",
+        "custom": "Viewed Custom Analytics",
+        "overview.dashboard": "Viewed Analytics Dashboard",
+        "overview.summary": "Viewed Analytics Summary",
+        "forecasting.cashflow": "Viewed Cash Flow Forecast",
+        "forecasting.portfolio": "Viewed Portfolio Forecast",
+        "forecasting.scenarios": "Viewed Scenario Analysis",
+        "milestones.fire": "Viewed FIRE Progress",
+        "milestones.debt": "Viewed Debt Milestones",
+        "milestones.savings": "Viewed Savings Milestones",
+        "milestones.customMilestones": "Viewed Custom Milestones",
+        "distributions.assets": "Viewed Asset Distribution",
+        "distributions.income": "Viewed Income Distribution",
+        "distributions.expenses": "Viewed Expense Distribution",
+        "distributions.geographic": "Viewed Geographic Distribution",
+        "performance.portfolioPerformance": "Viewed Portfolio Performance",
+        "performance.returns": "Viewed Returns Analysis",
+        "performance.historical": "Viewed Historical Performance",
+        "custom.calendar": "Viewed Asset Calendar",
+        "custom.history": "Viewed History Analytics",
+        "custom.timeline": "Viewed Timeline Analytics"
       },
       "recent": {
         "portfolioDistribution": "Portfolio Distribution",
@@ -268,14 +391,32 @@
       "currentValue": "Current Value",
       "totalReturn": "Total Return",
       "peakValue": "Peak Value",
+      "lowestValue": "Lowest Value",
       "volatility": "Volatility",
       "topPerformers": "Top Performers",
+      "dailyReturn": "Daily Return",
+      "monthlyReturn": "Monthly Return",
+      "annualizedReturn": "Annualized Return",
+      "sharpeRatio": "Sharpe Ratio",
+      "assetReturns": "Returns by Asset",
+      "riskMetrics": "Risk Metrics",
+      "invested": "Invested",
+      "return": "Return",
+      "performanceTimeline": "Performance Timeline",
+      "bestDay": "Best Single Day",
+      "highestGain": "Highest daily gain",
+      "bestMonth": "Best Month",
+      "highestMonthlyGain": "Highest monthly gain",
+      "annualizedPerformance": "Annualized Performance",
+      "yearOverYearReturn": "Year-over-year return",
+      "assetHistoricalPerformance": "Asset Historical Performance",
+      "noHistoricalDataTitle": "No Historical Data Available",
       "returnsAnalysis": "Returns Analysis",
       "returnsComingSoon": "Detailed returns analysis coming soon",
       "historicalAnalysis": "Historical Analysis",
       "historicalComingSoon": "Historical analysis charts coming soon",
       "noData": "No performance data available",
-      "noHistoricalData": "No historical data available. Add assets with price history to see performance over time."
+      "noHistoricalData": "Add assets with price history to see performance over time. Historical analysis helps track your portfolio's long-term performance trends."
     },
     "overview": {
       "title": "Financial Overview",
@@ -314,8 +455,8 @@
       "monthlyTrends": "Monthly Trends"
     },
     "custom": {
-      "title": "Custom Analytics",
-      "description": "Create custom charts and analyze your data",
+      "title": "Asset Calendar",
+      "description": "Manage and track your asset events and schedules",
       "builder": "Chart Builder",
       "saved": "Saved Charts",
       "templates": "Templates",
@@ -339,7 +480,7 @@
       "getStarted": "Create your first custom chart to analyze your data",
       "addFirstChart": "Create First Chart",
       "useTemplate": "Use Template",
-      "templates": {
+      "chartTemplates": {
         "assetAllocation": "Asset Allocation",
         "assetAllocationDesc": "Portfolio distribution by asset type",
         "incomeBreakdown": "Income Breakdown",
@@ -347,6 +488,16 @@
         "expenseTrends": "Expense Trends",
         "expenseTrendsDesc": "Monthly expenses by category"
       }
+    },
+    "assetCalendar": {
+      "title": "Asset Calendar",
+      "description": "Manage and track your asset events and schedules",
+      "calendar": "Asset Calendar",
+      "calendarDesc": "Overview of all asset events and schedules",
+      "history": "Asset History",
+      "historyDesc": "Historical development of your assets",
+      "timeline": "Asset Timeline",
+      "timelineDesc": "Chronological view of your asset activities"
     },
     "distributions": {
       "aboutTitle": "About Distribution Analytics",
@@ -363,7 +514,6 @@
   },
   "assets": {
     "title": "Assets",
-    "purchase": "Purchase",
     "purchase": "Purchase",
     "updatePrices": "Update Prices",
     "updateHistoricalData": "Update Historical Data",
@@ -391,9 +541,203 @@
       "latestPrice": "Latest Price"
     }
   },
+  "dashboard": {
+    "monthlyBreakdown": "Monthly Breakdown",
+    "monthlyOverview": "Monthly Overview",
+    "title": "Dashboard",
+    "settings": "Settings",
+    "income": "Income",
+    "passive": "passive",
+    "assetIncome": "Asset Income",
+    "fromDividends": "From Dividends",
+    "fromDividendsAndRental": "From Dividends and Rental",
+    "expenses": "Expenses",
+    "liabilities": "Liability Payments",
+    "liabilityPayments": "Liability Payments",
+    "monthlyCashFlow": "Monthly Cash Flow",
+    "netWorth": "Net Worth",
+    "totalAssets": "Total Assets",
+    "totalLiabilities": "Total Liabilities",
+    "assetCalendar": "Asset Calendar",
+    "refreshing": "Refreshing cache...",
+    "pullToRefresh": "Pull to refresh",
+    "releaseToRefresh": "Release to refresh",
+    "symbol": "Symbol",
+    "currentPrice": "Current Price",
+    "change": "Change",
+    "changePercent": "Change %",
+    "goToSettingsToConfigureApiKey": "Go to settings to configure API key",
+    "assets": "Assets",
+    "portfolioHistory": "Portfolio History",
+    "last30Days": "Last 30 Days",
+    "quickActions": "Quick Actions",
+    "addIncome": "Add Income",
+    "addExpense": "Add Expense",
+    "recordTransaction": "Record Transaction",
+    "payDebt": "Pay Debt",
+    "activeMilestones": "Active Milestones",
+    "miniAnalytics": "Quick Overview",
+    "alertsRecommendations": "Alerts & Recommendations",
+    "passiveRatio": "Passive Ratio",
+    "expenseCoverage": "Expense Coverage",
+    "debtRatio": "Debt Ratio",
+    "savingsRate": "Savings Rate",
+    "milestone": {
+      "expenseCoverage": "Expense coverage through passive income",
+      "passiveIncome": "Passive income ratio",
+      "debtFreedom": "Debt freedom"
+    },
+    "alert": {
+      "negativeCashFlow": "Negative Cash Flow",
+      "negativeCashFlowDesc": "Your monthly expenses exceed your income.",
+      "reviewExpenses": "Review Expenses",
+      "highDebtRatio": "High Debt Ratio",
+      "highDebtRatioDesc": "Your debts represent more than 50% of your assets.",
+      "manageDebt": "Manage Debt",
+      "lookingGood": "Looking Good!",
+      "lookingGoodDesc": "Your finances are on a good track.",
+      "viewForecast": "View Forecast"
+    },
+    "recommendations": {
+      "increasePassive": "Increase Passive Income",
+      "increasePassiveDesc": "Consider investments in income-generating assets.",
+      "addAssets": "Add Assets",
+      "assets": {
+        "sectorDiversification": {
+          "title": "Diversify Sectors",
+          "description": "Your portfolio is concentrated in one sector. Consider diversifying across multiple sectors."
+        },
+        "geographicalDiversification": {
+          "title": "Diversify Geographically",
+          "description": "Your investments are concentrated in one region. Consider global diversification."
+        },
+        "assetTypeBalance": {
+          "title": "Balance Asset Types",
+          "description": "Your portfolio is heavily weighted in one asset type. Consider balancing across different asset classes."
+        },
+        "smallPortfolio": {
+          "title": "Grow Your Portfolio",
+          "description": "Your portfolio is quite small. Consider regular investments to build wealth over time."
+        },
+        "addDividendStocks": {
+          "title": "Add Dividend Stocks",
+          "description": "Consider adding dividend-paying stocks to generate regular passive income."
+        },
+        "rebalancePortfolio": {
+          "title": "Rebalance Portfolio",
+          "description": "Your asset allocation has drifted. Consider rebalancing to maintain your target allocation."
+        },
+        "lowYieldPortfolio": {
+          "title": "Increase Portfolio Yield",
+          "description": "Your portfolio yield is low. Consider higher-yielding investments for better income generation."
+        },
+        "addREITs": {
+          "title": "Consider REITs",
+          "description": "Real Estate Investment Trusts can provide diversification and regular income."
+        }
+      },
+      "income": {
+        "diversifyIncomeSources": {
+          "title": "Diversify Income Sources",
+          "description": "You rely on a single income source. Consider creating additional income streams."
+        },
+        "increasePassiveIncome": {
+          "title": "Increase Passive Income",
+          "description": "Your passive income is low relative to expenses. Focus on income-generating investments."
+        },
+        "irregularIncome": {
+          "title": "Stabilize Income",
+          "description": "Your income is irregular. Consider building emergency funds and stable income sources."
+        },
+        "lowIncomeGrowth": {
+          "title": "Focus on Income Growth",
+          "description": "Your income growth is stagnant. Consider skill development or career advancement."
+        },
+        "sideHustle": {
+          "title": "Start a Side Business",
+          "description": "A side business could provide additional income and long-term wealth building."
+        },
+        "skillDevelopment": {
+          "title": "Invest in Skills",
+          "description": "Developing new skills can lead to higher earning potential and career growth."
+        },
+        "freelancing": {
+          "title": "Consider Freelancing",
+          "description": "Freelancing can provide flexible additional income and skill development."
+        },
+        "negotiateSalary": {
+          "title": "Negotiate Your Salary",
+          "description": "Regular salary negotiations can significantly impact long-term wealth accumulation."
+        }
+      },
+      "expenses": {
+        "highExpenseRatio": {
+          "title": "Reduce Expense Ratio",
+          "description": "Your expenses are high relative to income. Focus on cutting unnecessary costs."
+        },
+        "trackExpenses": {
+          "title": "Track Your Expenses",
+          "description": "Detailed expense tracking helps identify areas for potential savings."
+        },
+        "budgetCreation": {
+          "title": "Create a Budget",
+          "description": "A well-planned budget can help optimize your spending and increase savings."
+        },
+        "subscriptionAudit": {
+          "title": "Audit Subscriptions",
+          "description": "Review and cancel unused subscriptions to reduce recurring expenses."
+        },
+        "expenseCategories": {
+          "title": "Categorize Expenses",
+          "description": "Organizing expenses by category helps identify spending patterns and optimization opportunities."
+        },
+        "automateExpenses": {
+          "title": "Automate Fixed Expenses",
+          "description": "Automating bill payments can help avoid late fees and improve cash flow management."
+        }
+      },
+      "liabilities": {
+        "highDebtRatio": {
+          "title": "Reduce Debt Load",
+          "description": "Your debt-to-asset ratio is high. Focus on debt reduction strategies."
+        },
+        "highInterestDebt": {
+          "title": "Pay High-Interest Debt",
+          "description": "Prioritize paying off high-interest debt to save on interest payments."
+        },
+        "debtConsolidation": {
+          "title": "Consider Debt Consolidation",
+          "description": "Consolidating debt could reduce interest rates and simplify payments."
+        },
+        "createDebtPayoffPlan": {
+          "title": "Create Debt Payoff Plan",
+          "description": "A structured debt payoff plan can accelerate your path to financial freedom."
+        }
+      },
+      "planning": {
+        "emergencyFund": {
+          "title": "Build Emergency Fund",
+          "description": "An emergency fund covering 3-6 months of expenses provides financial security."
+        },
+        "retirementPlanning": {
+          "title": "Plan for Retirement",
+          "description": "Start or increase retirement contributions to secure your financial future."
+        },
+        "setFinancialGoals": {
+          "title": "Set Financial Goals",
+          "description": "Clear financial goals provide direction and motivation for your money management."
+        },
+        "reviewInsurance": {
+          "title": "Review Insurance Coverage",
+          "description": "Adequate insurance protects your wealth from unexpected events."
+        }
+      }
+    }
+  },
   "navigation": {
     "home": "Home",
     "dashboard": "Dashboard",
+    "portfolio": "Portfolio",
     "assets": "Assets",
     "liabilities": "Liabilities",
     "debts": "Debts",
@@ -496,6 +840,90 @@
     "monthsBuffer": "Months Buffer",
     "fixedCosts": "Fixed Cost Coverage"
   },
+  "portfolio": {
+    "available": "Available",
+    "unified": "Unified View",
+    "totalValue": "Total Value",
+    "positions": "Positions",
+    "view": "View",
+    "calendar": "Calendar",
+    "monthlyIncome": "Monthly Income",
+    "categories": {
+      "income": "Income Management"
+    },
+    "debtRatio": "Debt Ratio",
+    "analyze": "Analyze",
+    "recentActivity": "Recent Activity",
+    "totalAssets": "Total Assets",
+    "upcomingEvents": "Upcoming Events",
+    "assetEvents": "Asset Events & Schedules",
+    "currentValue": "Current Value",
+    "lastUpdated": "Last Updated",
+    "noEvents": "No Events Scheduled",
+    "addAssetsForEvents": "Add assets to see their schedules and events here",
+    "historyFeature": "Asset History Feature",
+    "historyComingSoon": "Detailed asset history tracking is coming soon. This will show the complete lifecycle of your assets.",
+    "timelineFeature": "Asset Timeline Feature",
+    "timelineComingSoon": "Interactive timeline visualization is coming soon. This will provide a chronological view of all your asset activities.",
+    "hub": {
+      "title": "Portfolio Hub",
+      "subtitle": "Manage your complete financial portfolio",
+      "recentActivities": "Recent Portfolio Activities",
+      "recommendations": "Recommendations",
+      "recent": {
+        "assetManagement": "Asset Management",
+        "incomeManagement": "Income Management", 
+        "expenseTracking": "Expense Tracking",
+        "viewedRecently": "Viewed recently"
+      },
+      "insights": {
+        "assetsCount": "assets",
+        "incomeSourcesCount": "income sources"
+      },
+      "activities": {
+        "overview": "Portfolio Overview",
+        "assets": "Viewed Assets Section",
+        "liabilities": "Viewed Liabilities Section",
+        "income": "Viewed Income Section",
+        "expenses": "Viewed Expenses Section",
+        "transactions": "Viewed Transactions Section",
+        "assets.portfolio": "Viewed Asset Portfolio",
+        "assets.definitions": "Viewed Asset Definitions",
+        "assets.categories": "Viewed Asset Categories",
+        "assets.calendar": "Viewed Asset Calendar",
+        "assets.history": "Viewed Asset History",
+        "liabilities.debts": "Viewed Debts",
+        "liabilities.payments": "Viewed Payments",
+        "liabilities.projections": "Viewed Projections",
+        "income.sources": "Viewed Income Sources",
+        "income.streams": "Viewed Income Streams",
+        "expenses.budgets": "Viewed Budgets",
+        "expenses.tracking": "Viewed Expense Tracking",
+        "expenses.categories": "Viewed Expense Categories",
+        "transactions.recent": "Viewed Recent Transactions",
+        "transactions.import": "Imported Transactions",
+        "transactions.export": "Exported Transactions"
+      },
+      "hubRecommendations": {
+        "debtReduction": "Reduce Debt Burden",
+        "debtReductionDesc": "Your debt-to-asset ratio is high. Consider paying down debts to improve financial health.",
+        "improveIncome": "Improve Cash Flow",
+        "improveIncomeDesc": "Your expenses exceed income. Consider increasing income or reducing expenses.",
+        "diversifyIncome": "Diversify Income Streams",
+        "diversifyIncomeDesc": "Add more income sources to reduce financial risk and improve stability.",
+        "trackExpenses": "Track Your Expenses",
+        "trackExpensesDesc": "Monitor and categorize your expenses to identify saving opportunities.",
+        "portfolioAnalysis": "Analyze Your Portfolio",
+        "portfolioAnalysisDesc": "Review your asset allocation and performance to optimize returns."
+      },
+      "quickActions": {
+        "addTransaction": "Add Transaction",
+        "addIncome": "Add Income",
+        "addExpense": "Add Expense",
+        "addLiability": "Add Debt"
+      }
+    }
+  },
   "forecast": {
     "title": "Financial Forecast",
     "subtitle": "Project your financial future",
@@ -509,6 +937,232 @@
     "insights": "Insights You'll Gain",
     "insight1": "Future financial independence timeline",
     "insight2": "Expense coverage predictions",
-    "insight3": "Portfolio growth projections"
+    "insight3": "Portfolio growth projections",
+    "milestones": {
+      "totalExpenseCoverage": {
+        "title": "Total Expense Coverage",
+        "description": "Track the percentage of your monthly total expenses covered by passive income. This includes all expenses, including fixed costs, variable costs, and debt payments.",
+        "noExpenses": "No expenses recorded yet. Add your expenses to monitor total expense coverage.",
+        "percentCovered": "{{percent}}% of expenses covered",
+        "passiveIncome": "Passive Income: {{income}}/month",
+        "totalMonthlyExpenses": "Total Monthly Expenses: {{amount}}/month",
+        "breakdownTitle": "Breakdown:",
+        "regularExpenses": "• Monthly Expenses: {{expenses}}/month",
+        "liabilityPayments": "• Monthly Debt Payments: {{debts}}/month",
+        "milestone25": "25% of total expenses covered by passive income!",
+        "milestone50": "Halfway there! 50% of expenses covered by passive income",
+        "milestone75": "Almost there! 75% of expenses covered by passive income",
+        "milestone100": "Complete financial freedom achieved! All expenses covered by passive income 🎉"
+      }
+    }
+  },
+  "emptyStates": {
+    "assets": {
+      "title": "Start Your Investment Journey!",
+      "description": "Assets are the foundation of your wealth. Add your first investment and begin your path to financial independence.",
+      "motivationalText": "Every successful investment journey starts with the first asset!",
+      "primaryAction": "Add First Asset",
+      "secondaryAction": "View Guide",
+      "tips": [
+        "Start with an asset you already own",
+        "Diversification reduces risks",
+        "Regular investments pay off in the long run"
+      ]
+    },
+    "income": {
+      "title": "Track Your Income Sources!",
+      "description": "Income is the engine of your wealth building. Document all income sources to improve your financial overview.",
+      "motivationalText": "Multiple income sources create financial security!",
+      "primaryAction": "Add Income",
+      "secondaryAction": "Understand Categories",
+      "tips": [
+        "Also track passive income sources",
+        "Distinguish between active and passive income",
+        "Plan your future income"
+      ]
+    },
+    "expenses": {
+      "title": "Keep Track of Your Expenses!",
+      "description": "Controlling expenses is the first step to financial freedom. Track your recurring costs for better budget planning.",
+      "motivationalText": "Those who know their expenses can optimize them!",
+      "primaryAction": "Add Expense",
+      "secondaryAction": "Plan Budget",
+      "tips": [
+        "Start with your largest expense items",
+        "Distinguish between needs and wants",
+        "Small savings add up to big amounts"
+      ]
+    },
+    "liabilities": {
+      "title": "Strategically Reduce Debt!",
+      "description": "Reducing liabilities is an important step toward financial independence. Document your debts to systematically reduce them.",
+      "motivationalText": "Every paid-off debt brings you closer to freedom!",
+      "primaryAction": "Add Liability",
+      "secondaryAction": "Create Payment Plan",
+      "tips": [
+        "Prioritize debts with high interest rates",
+        "Small additional payments significantly shorten the term",
+        "Visualize your progress"
+      ]
+    },
+    "portfolio": {
+      "title": "Your Portfolio Awaits You!",
+      "description": "A diversified portfolio is the key to long-term success. Add assets to track your portfolio.",
+      "motivationalText": "Diversification is the only free lunch in finance!",
+      "actionLabel": "Build Portfolio"
+    },
+    "analytics": {
+      "noData": "No data available for analysis yet",
+      "addDataFirst": "Add assets, income, or expenses first to get meaningful analytics.",
+      "startAnalyzing": "Add Data"
+    },
+    "charts": {
+      "noData": "No data available for display",
+      "addDataToSeeChart": "Add data to see this chart",
+      "comingSoon": "This view will be available once you add relevant data"
+    },
+    "forecast": {
+      "title": "Plan Your Financial Future!",
+      "description": "Forecasts help you make informed financial decisions. Add assets and income to project your future.",
+      "motivationalText": "The best time to invest was 20 years ago. The second best time is now!",
+      "actionLabel": "Add Data for Forecast"
+    }
+  },
+  "recommendations": {
+    "assets": {
+      "sectorDiversification": {
+        "title": "Improve Sector Diversification",
+        "description": "Your portfolio is concentrated in specific sectors. Consider spreading investments across different sectors."
+      },
+      "geographicalDiversification": {
+        "title": "Add Geographic Diversification",
+        "description": "Your assets are geographically concentrated. Consider international diversification to reduce regional risk."
+      },
+      "assetTypeDiversification": {
+        "title": "Diversify Asset Types",
+        "description": "Your portfolio could benefit from diversification across different asset classes (stocks, bonds, real estate)."
+      },
+      "undervaluedAssets": {
+        "title": "Review Undervalued Assets",
+        "description": "Some of your assets may be undervalued. Consider whether it's time to rebalance or add to these positions."
+      },
+      "portfolioRebalancing": {
+        "title": "Rebalance Portfolio",
+        "description": "Your portfolio allocation has drifted from targets. Consider rebalancing to maintain desired risk profile."
+      },
+      "lossPositions": {
+        "title": "Review Loss Positions",
+        "description": "You have assets in loss positions. Consider tax-loss harvesting or cutting losses on underperforming investments."
+      },
+      "updateAssetPrices": {
+        "title": "Update Asset Prices",
+        "description": "Some asset prices may be outdated. Update prices to get accurate portfolio valuations."
+      },
+      "assetCategories": {
+        "title": "Complete Asset Categories",
+        "description": "Some assets lack complete categorization. Add sector and country information for better analysis."
+      }
+    },
+    "income": {
+      "increasePassiveIncome": {
+        "title": "Boost Passive Income",
+        "description": "Your passive income is low relative to expenses. Consider dividend-paying stocks or REITs."
+      },
+      "addDividendAssets": {
+        "title": "Add Dividend Assets",
+        "description": "You have few dividend-paying assets. Consider adding dividend stocks or funds for regular income."
+      },
+      "optimizeRentalIncome": {
+        "title": "Optimize Rental Income",
+        "description": "Your rental properties could generate more income. Consider improvements or rent optimization."
+      },
+      "diversifyIncomeSources": {
+        "title": "Diversify Income Sources",
+        "description": "You rely heavily on single income sources. Add diversified streams to reduce income risk."
+      },
+      "addInterestIncome": {
+        "title": "Add Interest Income",
+        "description": "Consider fixed-income investments like bonds or CDs for stable interest income."
+      },
+      "planIncomeGrowth": {
+        "title": "Plan Income Growth",
+        "description": "Your current income growth trajectory could be improved. Consider career advancement or skill development."
+      },
+      "developSideHustle": {
+        "title": "Develop Side Income",
+        "description": "A side business or freelance work could provide additional income streams."
+      },
+      "optimizeIncomeTiming": {
+        "title": "Optimize Income Timing",
+        "description": "Consider timing of income recognition for tax optimization and cash flow management."
+      }
+    },
+    "expenses": {
+      "completeExpenseCategories": {
+        "title": "Complete Expense Categories",
+        "description": "Add more detailed expense categories for better budget tracking and analysis."
+      },
+      "reduceHighExpenses": {
+        "title": "Reduce High Expenses",
+        "description": "Some expense categories are unusually high. Review and consider cost-cutting opportunities."
+      },
+      "auditSubscriptions": {
+        "title": "Audit Subscriptions",
+        "description": "Review recurring subscriptions and cancel unused services to reduce monthly expenses."
+      },
+      "budgetControl": {
+        "title": "Improve Budget Control",
+        "description": "Your expenses exceed healthy budget ratios. Consider stricter budget controls."
+      },
+      "planSeasonalExpenses": {
+        "title": "Plan Seasonal Expenses",
+        "description": "Prepare for seasonal expense variations by setting aside funds throughout the year."
+      },
+      "createEmergencyBuffer": {
+        "title": "Create Emergency Expense Buffer",
+        "description": "Build a buffer for unexpected expenses to avoid dipping into investments."
+      }
+    },
+    "liabilities": {
+      "reduceHighInterestDebt": {
+        "title": "Tackle High-Interest Debt",
+        "description": "You have high-interest debt. Prioritize paying off the highest rate debts first."
+      },
+      "accelerateDebtRepayment": {
+        "title": "Accelerate Debt Repayment",
+        "description": "Consider making extra payments to reduce debt faster and save on interest."
+      },
+      "considerDebtConsolidation": {
+        "title": "Consider Debt Consolidation",
+        "description": "Multiple high-interest debts might benefit from consolidation at a lower rate."
+      },
+      "reduceDebtRatio": {
+        "title": "Reduce Debt-to-Asset Ratio",
+        "description": "Your debt-to-asset ratio is high. Focus on paying down debt or building assets."
+      }
+    },
+    "planning": {
+      "buildEmergencyFund": {
+        "title": "Build Emergency Fund",
+        "description": "Build an emergency fund covering 3-6 months of expenses for financial security."
+      },
+      "improveCashflow": {
+        "title": "Improve Cash Flow",
+        "description": "Your monthly cash flow could be improved. Focus on increasing income or reducing expenses."
+      },
+      "increaseRetirementSavings": {
+        "title": "Increase Retirement Savings",
+        "description": "Your current savings rate may not be sufficient for retirement goals. Consider increasing contributions."
+      },
+      "workTowardFinancialIndependence": {
+        "title": "Work Toward Financial Independence",
+        "description": "You're making good progress. Focus on optimizing your path to financial independence."
+      }
+    }
+  },
+  "hubRecommendations": {
+    "title": "Smart Recommendations",
+    "noRecommendations": "No recommendations available at this time. Add more financial data to receive personalized insights.",
+    "totalRecommendations": "Showing {{count}} recommendations"
   }
 }

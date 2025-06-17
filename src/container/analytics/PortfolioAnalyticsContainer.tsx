@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import PortfolioAnalyticsView from '../../view/analytics/assets/PortfolioAnalyticsView';
+import PortfolioAnalyticsView from '../../view/analytics-hub/assets/PortfolioAnalyticsView';
 import calculatorService from '../../service/calculatorService';
 import { AssetType } from '../../types';
 import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/assetsSlice';

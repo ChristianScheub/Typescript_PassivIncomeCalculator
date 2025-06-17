@@ -1,49 +1,17 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import Logger from '../../service/Logger/logger';
-import analyticsHistoryService from '../../service/analyticsHistoryService';
+import recentActivityService, { AnalyticsCategory, AnalyticsSubCategory } from '../../service/recentActivityService';
 import DistributionsAnalyticsContainer from './DistributionsAnalyticsContainer';
 import MilestonesContainer from '../forecast/MilestonesContainer';
 import ForecastContainer from '../forecast/ForecastContainer';
 import PerformanceAnalyticsContainer from './PerformanceAnalyticsContainer';
-import CustomAnalyticsContainer from './CustomAnalyticsContainer';
+import AssetCalendarContainer from './AssetCalendarContainer';
 import OverviewAnalyticsContainer from './OverviewAnalyticsContainer';
-import AnalyticsHubView from '../../view/analytics/AnalyticsHubView';
+import AnalyticsHubView from '../../view/analytics-hub/AnalyticsHubView';
 
-export type AnalyticsCategory = 
-  | 'overview' 
-  | 'forecasting' 
-  | 'milestones' 
-  | 'distributions' 
-  | 'performance' 
-  | 'custom';
-
-export type AnalyticsSubCategory = 
-  // Overview
-  | 'dashboard' 
-  | 'summary'
-  // Forecasting  
-  | 'cashflow' 
-  | 'portfolio' 
-  | 'scenarios'
-  // Milestones
-  | 'fire' 
-  | 'debt' 
-  | 'savings' 
-  | 'customMilestones'
-  // Distributions
-  | 'assets' 
-  | 'income' 
-  | 'expenses' 
-  | 'geographic'
-  // Performance
-  | 'portfolioPerformance' 
-  | 'returns' 
-  | 'historical'
-  // Custom
-  | 'builder' 
-  | 'saved' 
-  | 'templates';
+// Re-export types for external use
+export type { AnalyticsCategory, AnalyticsSubCategory };
 
 interface AnalyticsHubContainerProps {
   onBack?: () => void;
@@ -58,7 +26,7 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
     milestones: 'fire',
     distributions: 'assets',
     performance: 'portfolioPerformance',
-    custom: 'builder'
+    custom: 'calendar'
   };
   
   // Analytics navigation state
@@ -72,6 +40,16 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: income } = useAppSelector(state => state.income);
   const { portfolioCache } = useAppSelector(state => state.assets);
+
+  // Scroll to top when category changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [selectedCategory]);
+
+  // Also scroll to top when subcategory changes (for container switching)
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [selectedSubCategory]);
 
   // Calculate quick insights for overview
   const quickInsights = useMemo(() => {
@@ -112,10 +90,9 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
     // Track analytics history if not going to hub dashboard
     if (!(category === 'overview' && (!subCategory || subCategory === 'dashboard'))) {
       const finalSubCategory = subCategory || defaultSubCategories[category];
-      const currentLanguage = localStorage.getItem('i18nextLng') || 'en';
-      const title = analyticsHistoryService.getAnalyticsTitle(category, finalSubCategory, currentLanguage);
-      const icon = analyticsHistoryService.getAnalyticsIcon(category, finalSubCategory);
-      analyticsHistoryService.addToHistory(category, finalSubCategory, title, icon);
+      
+      // Add analytics activity using the new service
+      recentActivityService.addAnalyticsActivity(category, finalSubCategory);
     }
   };
 
@@ -130,6 +107,9 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
       setSelectedCategory('overview');
       setSelectedSubCategory('dashboard');
     }
+    
+    // Scroll to top when navigating back
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Check if we should render a specific analytics container
@@ -168,21 +148,26 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
       case 'performance':
         switch (selectedSubCategory) {
           case 'portfolioPerformance':
+            return <PerformanceAnalyticsContainer selectedTab="portfolio" onBack={handleBackToHub} />;
           case 'returns':
+            return <PerformanceAnalyticsContainer selectedTab="returns" onBack={handleBackToHub} />;
           case 'historical':
-            return <PerformanceAnalyticsContainer onBack={handleBackToHub} />;
+            return <PerformanceAnalyticsContainer selectedTab="historical" onBack={handleBackToHub} />;
           default:
-            return <PerformanceAnalyticsContainer onBack={handleBackToHub} />;
+            return <PerformanceAnalyticsContainer selectedTab="portfolio" onBack={handleBackToHub} />;
         }
         
       case 'custom':
+        // Asset Calendar
         switch (selectedSubCategory) {
-          case 'builder':
-          case 'saved':
-          case 'templates':
-            return <CustomAnalyticsContainer onBack={handleBackToHub} />;
+          case 'calendar':
+            return <AssetCalendarContainer selectedTab="calendar" onBack={handleBackToHub} />;
+          case 'history':
+            return <AssetCalendarContainer selectedTab="history" onBack={handleBackToHub} />;
+          case 'timeline':
+            return <AssetCalendarContainer selectedTab="timeline" onBack={handleBackToHub} />;
           default:
-            return <CustomAnalyticsContainer onBack={handleBackToHub} />;
+            return <AssetCalendarContainer selectedTab="calendar" onBack={handleBackToHub} />;
         }
         
       default:

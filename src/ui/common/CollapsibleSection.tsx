@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Card, CardContent, CardHeader } from './Card';
+import { IconButton } from './IconButton';
 
 interface CollapsibleSectionProps {
   title: string;
@@ -30,13 +31,12 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
             {icon}
             <h3 className="text-lg font-semibold">{title}</h3>
           </div>
-          <button className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
-          </button>
+          <IconButton
+            icon={isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            aria-label={isExpanded ? "Collapse section" : "Expand section"}
+            variant="ghost"
+            size="iconSm"
+          />
         </div>
       </CardHeader>
       

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import calculatorService from '../../service/calculatorService';
-import MilestonesView from '../../view/milestones/MilestonesView';
+import MilestonesView from '../../view/analytics-hub/milestones/MilestonesView';
 import { Expense, Liability } from '../../types';
 
 interface MilestonesContainerProps {
@@ -14,6 +14,11 @@ const MilestonesContainer: React.FC<MilestonesContainerProps> = ({ onBack }) => 
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: income } = useAppSelector(state => state.income);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   // Calculate values needed for the milestones
   const normalIncome = calculatorService.calculatePassiveIncome(income);

@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, Wallet, Landmark, ReceiptText, CreditCard, LineChart, BarChart3, Settings, Sun, Moon } from 'lucide-react';
+import { NavLinkItem } from '../ui/navigation/NavLinkItem';
+import { Home, Briefcase, BarChart3, Settings, Sun, Moon } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';
 
@@ -24,56 +25,9 @@ const DesktopLayout: React.FC<DesktopLayoutProps> = ({ children }) => {
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-            <NavLink 
-              to="/" 
-              className={({isActive}) => `flex items-center px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${isActive ? 'bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-              end
-            >
-              <Home className="w-5 h-5 mr-3" />
-              {t('navigation.dashboard')}
-            </NavLink>
-            <NavLink 
-              to="/assets" 
-              className={({isActive}) => `flex items-center px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${isActive ? 'bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-            >
-              <Wallet className="w-5 h-5 mr-3" />
-              {t('navigation.assets')}
-            </NavLink>
-            <NavLink 
-              to="/liabilities" 
-              className={({isActive}) => `flex items-center px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${isActive ? 'bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-            >
-              <Landmark className="w-5 h-5 mr-3" />
-              {t('navigation.liabilities')}
-            </NavLink>
-            <NavLink 
-              to="/expenses" 
-              className={({isActive}) => `flex items-center px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${isActive ? 'bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-            >
-              <ReceiptText className="w-5 h-5 mr-3" />
-              {t('navigation.expenses')}
-            </NavLink>
-            <NavLink 
-              to="/income" 
-              className={({isActive}) => `flex items-center px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${isActive ? 'bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-            >
-              <CreditCard className="w-5 h-5 mr-3" />
-              {t('navigation.income')}
-            </NavLink>
-            <NavLink 
-              to="/forecast" 
-              className={({isActive}) => `flex items-center px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${isActive ? 'bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-            >
-              <LineChart className="w-5 h-5 mr-3" />
-              {t('navigation.forecast')}
-            </NavLink>
-            <NavLink 
-              to="/analytics" 
-              className={({isActive}) => `flex items-center px-2 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 ${isActive ? 'bg-blue-50 dark:bg-gray-700 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
-            >
-              <BarChart3 className="w-5 h-5 mr-3" />
-              {t('navigation.analytics')}
-            </NavLink>
+            <NavLinkItem to="/" icon={Home} label={t('navigation.dashboard')} variant="desktop" end />
+            <NavLinkItem to="/portfolio" icon={Briefcase} label={t('navigation.portfolio')} variant="desktop" />
+            <NavLinkItem to="/analytics" icon={BarChart3} label={t('navigation.analytics')} variant="desktop" />
           </nav>
           
           {/* Footer */}

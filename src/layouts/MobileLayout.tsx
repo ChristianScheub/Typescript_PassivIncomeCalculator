@@ -1,6 +1,7 @@
 import React from 'react';
-import { Home, Wallet, Landmark, ReceiptText, CreditCard, BarChart3 } from 'lucide-react';
+import { Home, Briefcase, BarChart3 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
+import { NavLinkItem } from '../ui/navigation/NavLinkItem';
 import { useTranslation } from 'react-i18next';
 
 interface MobileLayoutProps {
@@ -21,31 +22,10 @@ const MobileLayout: React.FC<MobileLayoutProps> = ({ children }) => {
       
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 shadow-lg z-10">
-        <div className="grid grid-cols-6 h-16">
-          <NavLink to="/" className={({isActive}) => `flex flex-col items-center justify-center ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
-            <Home size={18} />
-            <span className="text-xs mt-1">{t('navigation.home')}</span>
-          </NavLink>
-          <NavLink to="/assets" className={({isActive}) => `flex flex-col items-center justify-center ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
-            <Wallet size={18} />
-            <span className="text-xs mt-1">{t('navigation.assets')}</span>
-          </NavLink>
-          <NavLink to="/liabilities" className={({isActive}) => `flex flex-col items-center justify-center ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
-            <Landmark size={18} />
-            <span className="text-xs mt-1">{t('navigation.debts')}</span>
-          </NavLink>
-          <NavLink to="/expenses" className={({isActive}) => `flex flex-col items-center justify-center ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
-            <ReceiptText size={18} />
-            <span className="text-xs mt-1">{t('navigation.expenses')}</span>
-          </NavLink>
-          <NavLink to="/income" className={({isActive}) => `flex flex-col items-center justify-center ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
-            <CreditCard size={18} />
-            <span className="text-xs mt-1">{t('navigation.income')}</span>
-          </NavLink>
-          <NavLink to="/analytics" className={({isActive}) => `flex flex-col items-center justify-center ${isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}>
-            <BarChart3 size={18} />
-            <span className="text-xs mt-1">{t('navigation.analytics')}</span>
-          </NavLink>
+        <div className="grid grid-cols-3 h-16">
+          <NavLinkItem to="/" icon={Home} label={t('navigation.home')} variant="mobile" />
+          <NavLinkItem to="/portfolio" icon={Briefcase} label={t('navigation.portfolio')} variant="mobile" />
+          <NavLinkItem to="/analytics" icon={BarChart3} label={t('navigation.analytics')} variant="mobile" />
         </div>
       </nav>
     </div>

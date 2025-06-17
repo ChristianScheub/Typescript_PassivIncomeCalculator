@@ -5,7 +5,7 @@ import { useSharedForm } from '../../hooks/useSharedForm';
 import { createIncomeSchema } from '../../utils/validationSchemas';
 import Logger from '../../service/Logger/logger';
 import { z } from 'zod';
-import { MaterialIncomeFormView } from '../../view/forms/MaterialIncomeFormView';
+import { MaterialIncomeFormView } from '../../view/shared/forms/MaterialIncomeFormView';
 
 const incomeSchema = createIncomeSchema();
 
@@ -26,7 +26,8 @@ export const MaterialIncomeForm: React.FC<IncomeFormProps> = ({ initialData, onS
         type: 'salary' as IncomeType,
         paymentSchedule: {
           frequency: 'monthly' as PaymentFrequency,
-          amount: 0
+          amount: 0,
+          dayOfMonth: 1 // Standard: erster Tag des Monats
         },
         isPassive: false,
         startDate: today
@@ -39,6 +40,7 @@ export const MaterialIncomeForm: React.FC<IncomeFormProps> = ({ initialData, onS
         frequency: initialData.paymentSchedule.frequency,
         amount: initialData.paymentSchedule.amount,
         months: initialData.paymentSchedule.months,
+        dayOfMonth: initialData.paymentSchedule.dayOfMonth || 1
       },
       isPassive: initialData.isPassive,
       startDate: initialData.startDate,

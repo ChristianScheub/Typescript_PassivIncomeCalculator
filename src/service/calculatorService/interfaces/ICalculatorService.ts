@@ -11,7 +11,7 @@ import {
   MonthlyProjection 
 } from '../../../types';
 import { PortfolioPosition } from '../../portfolioService/portfolioCalculations';
-import { PortfolioAnalyticsData, IncomeAnalyticsData } from '../methods/calculatePortfolioAnalytics';
+import { PortfolioAnalyticsData, IncomeAnalyticsData } from '../methods/analytics/calculatePortfolioAnalytics';
 
 export interface ICalculatorService {
   // Payment Schedule calculations
@@ -92,6 +92,8 @@ export interface ICalculatorService {
     monthlyAssetIncomeCache: Record<number, number>,
     months?: number
   ) => MonthlyProjection[];
+
+  // Portfolio Analytics
   calculatePortfolioAnalytics: (positions: PortfolioPosition[]) => PortfolioAnalyticsData;
   calculateIncomeAnalytics: (positions: PortfolioPosition[]) => IncomeAnalyticsData;
 

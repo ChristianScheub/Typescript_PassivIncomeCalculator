@@ -1,5 +1,5 @@
-import React from 'react';
-import DistributionsAnalyticsView from '../../view/analytics/distributions/DistributionsAnalyticsView';
+import React, { useEffect } from 'react';
+import DistributionsAnalyticsView from '../../view/analytics-hub/distributions/DistributionsAnalyticsView';
 import PortfolioAnalyticsContainer from './PortfolioAnalyticsContainer';
 import IncomeAnalyticsContainer from './IncomeAnalyticsContainer';
 import ExpenseAnalyticsContainer from './ExpenseAnalyticsContainer';
@@ -13,6 +13,11 @@ interface DistributionsAnalyticsContainerProps {
 
 const DistributionsAnalyticsContainer: React.FC<DistributionsAnalyticsContainerProps> = ({ onBack }) => {
   const [selectedCategory, setSelectedCategory] = React.useState<DistributionCategory>('overview');
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, []);
 
   const handleCategoryChange = (category: DistributionCategory) => {
     setSelectedCategory(category);

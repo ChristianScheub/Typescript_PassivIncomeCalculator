@@ -8,7 +8,7 @@ import { clearAllIncome } from "../../store/slices/incomeSlice";
 import { clearAllAssetCategories } from "../../store/slices/assetCategoriesSlice";
 import sqliteService, { StoreNames } from "../../service/sqlLiteService";
 import Logger from "../../service/Logger/logger";
-import SettingsView from "../../view/settings/SettingsView";
+import SettingsView from "../../view/settings/general/SettingsView";
 import { handleFileDownload } from "../../service/helper/downloadFile";
 import {
   setCurrency as setGlobalCurrency,

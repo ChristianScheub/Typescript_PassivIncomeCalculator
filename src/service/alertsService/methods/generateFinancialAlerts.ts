@@ -1,5 +1,4 @@
 import { FinancialMetrics, FinancialAlert, AlertGenerationOptions } from '../interfaces/IAlertsService';
-import { v4 as uuidv4 } from '../../../utils/uuid';
 import { generateCashflowAlerts } from './generateCashflowAlerts';
 import { generateDebtAlerts } from './generateDebtAlerts';
 import { generatePassiveIncomeAlerts } from './generatePassiveIncomeAlerts';

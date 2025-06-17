@@ -5,17 +5,22 @@ import { Income } from '../../types';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import calculatorService from '../../service/calculatorService';
-import IncomeView from '../../view/income/IncomeView';
-import IncomeAnalyticsContainer from '../analytics/IncomeAnalyticsContainer';
+import IncomeView from '../../view/portfolio-hub/income/IncomeView';
 import { sortIncome, SortOrder } from '../../utils/sortingUtils';
 
-const IncomeContainer: React.FC = () => {
+const IncomeContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const { items: incomeItems, status } = useAppSelector(state => state.income);
   const [isAddingIncome, setIsAddingIncome] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Income | null>(null);
-  const [isShowingAnalytics, setIsShowingAnalytics] = useState(false);
+
+  // Handle initial action to open forms directly
+  useEffect(() => {
+    if (initialAction === 'addIncome') {
+      setIsAddingIncome(true);
+    }
+  }, [initialAction]);
 
   useEffect(() => {
     if (status === 'idle') {
@@ -70,23 +75,8 @@ const IncomeContainer: React.FC = () => {
     }
   };
 
-  const handleNavigateToAnalytics = () => {
-    Logger.info('Navigating to income analytics');
-    setIsShowingAnalytics(true);
-  };
-
-  const handleBackToIncome = () => {
-    Logger.info('Navigating back to income view');
-    setIsShowingAnalytics(false);
-  };
-
   // Calculate annual income
   const annualIncome = totalMonthlyIncome * 12;
-
-  // Show analytics if requested
-  if (isShowingAnalytics) {
-    return <IncomeAnalyticsContainer onBack={handleBackToIncome} />;
-  }
 
   return (
     <IncomeView
@@ -103,7 +93,7 @@ const IncomeContainer: React.FC = () => {
       onDeleteIncome={handleDeleteIncome}
       onSetIsAddingIncome={setIsAddingIncome}
       onSetEditingIncome={setEditingIncome}
-      onNavigateToAnalytics={handleNavigateToAnalytics}
+      onBack={onBack}
     />
   );
 };

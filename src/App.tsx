@@ -8,14 +8,9 @@ import DesktopLayout from './layouts/DesktopLayout';
 
 // Pages
 import DashboardContainer from './container/dashboard/DashboardContainer';
-import AssetsContainer from './container/assets/AssetsContainer';
-import LiabilitiesContainer from './container/finance/LiabilitiesContainer';
-import ExpensesContainer from './container/finance/ExpensesContainer';
-import IncomeContainer from './container/finance/IncomeContainer';
-import ForecastContainer from './container/forecast/ForecastContainer';
-import SettingsContainer from './container/settings/SettingsContainer';
-import AssetCalendarContainer from './container/assets/AssetCalendarContainer';
+import PortfolioHubContainer from './container/portfolio/PortfolioHubContainer';
 import AnalyticsHubContainer from './container/analytics/AnalyticsHubContainer';
+import SettingsContainer from './container/settings/SettingsContainer';
 
 // Context
 import { AppProvider } from './context/AppContext';
@@ -35,15 +30,10 @@ function App() {
             <Layout>
               <Routes>
                 <Route path="/" element={<DashboardContainer />} />
-                <Route path="/assets" element={<AssetsContainer />} />
-                <Route path="/liabilities" element={<LiabilitiesContainer />} />
-                <Route path="/expenses" element={<ExpensesContainer />} />
-                <Route path="/income" element={<IncomeContainer />} />
-                <Route path="/forecast" element={<ForecastContainer />} />
+                <Route path="/portfolio" element={<PortfolioHubContainer />} />
                 <Route path="/analytics" element={<AnalyticsHubContainer />} />
                 <Route path="/settings" element={<SettingsContainer />} />
-                <Route path="/asset-calendar" element={<AssetCalendarContainer />} />
-                <Route path="*" element={<Navigate to="/\" replace />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Layout>
           </Router>

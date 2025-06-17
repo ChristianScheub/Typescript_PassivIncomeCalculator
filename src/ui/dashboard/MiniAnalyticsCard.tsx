@@ -4,7 +4,7 @@ import { Card, CardContent } from '../common/Card';
 interface MiniAnalyticsCardProps {
   title: string;
   value: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   color: string;
   onClick?: () => void;
 }
@@ -29,9 +29,11 @@ export const MiniAnalyticsCard: React.FC<MiniAnalyticsCardProps> = ({
               {value}
             </p>
           </div>
-          <div className={`bg-${color.split('-')[1]}-100 dark:bg-${color.split('-')[1]}-900 p-2 rounded-full`}>
-            {icon}
-          </div>
+          {icon && (
+            <div className={`bg-${color.split('-')[1]}-100 dark:bg-${color.split('-')[1]}-900 p-2 rounded-full`}>
+              {icon}
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
