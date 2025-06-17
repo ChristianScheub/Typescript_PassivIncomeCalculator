@@ -7,14 +7,15 @@ import MobileLayout from './layouts/MobileLayout';
 import DesktopLayout from './layouts/DesktopLayout';
 
 // Pages
-import DashboardContainer from './container/DashboardContainer';
-import AssetsContainer from './container/AssetsContainer';
-import LiabilitiesContainer from './container/LiabilitiesContainer';
-import ExpensesContainer from './container/ExpensesContainer';
-import IncomeContainer from './container/IncomeContainer';
-import ForecastContainer from './container/ForecastContainer';
-import SettingsContainer from './container/SettingsContainer';
-import AssetCalendarContainer from './container/AssetCalendarContainer';
+import DashboardContainer from './container/dashboard/DashboardContainer';
+import AssetsContainer from './container/assets/AssetsContainer';
+import LiabilitiesContainer from './container/finance/LiabilitiesContainer';
+import ExpensesContainer from './container/finance/ExpensesContainer';
+import IncomeContainer from './container/finance/IncomeContainer';
+import ForecastContainer from './container/forecast/ForecastContainer';
+import SettingsContainer from './container/settings/SettingsContainer';
+import AssetCalendarContainer from './container/assets/AssetCalendarContainer';
+import AnalyticsHubContainer from './container/analytics/AnalyticsHubContainer';
 
 // Context
 import { AppProvider } from './context/AppContext';
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/expenses" element={<ExpensesContainer />} />
                 <Route path="/income" element={<IncomeContainer />} />
                 <Route path="/forecast" element={<ForecastContainer />} />
+                <Route path="/analytics" element={<AnalyticsHubContainer />} />
                 <Route path="/settings" element={<SettingsContainer />} />
                 <Route path="/asset-calendar" element={<AssetCalendarContainer />} />
                 <Route path="*" element={<Navigate to="/\" replace />} />

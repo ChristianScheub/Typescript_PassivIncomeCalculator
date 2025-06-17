@@ -1,22 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../hooks/redux";
-import { setApiEnabled, setApiKey, setSelectedProvider, StockAPIProvider } from "../store/slices/apiConfigSlice";
-import { clearAllAssets } from "../store/slices/assetsSlice";
-import { clearAllLiabilities } from "../store/slices/liabilitiesSlice";
-import { clearAllExpenses } from "../store/slices/expensesSlice";
-import { clearAllIncome } from "../store/slices/incomeSlice";
-import { clearAllAssetCategories } from "../store/slices/assetCategoriesSlice";
-import sqliteService, { StoreNames } from "../service/sqlLiteService";
-import Logger from "../service/Logger/logger";
-import SettingsView from "../view/settings/SettingsView";
-import { handleFileDownload } from "../service/helper/downloadFile";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { setApiEnabled, setApiKey, setSelectedProvider, StockAPIProvider } from "../../store/slices/apiConfigSlice";
+import { clearAllAssets } from "../../store/slices/assetsSlice";
+import { clearAllLiabilities } from "../../store/slices/liabilitiesSlice";
+import { clearAllExpenses } from "../../store/slices/expensesSlice";
+import { clearAllIncome } from "../../store/slices/incomeSlice";
+import { clearAllAssetCategories } from "../../store/slices/assetCategoriesSlice";
+import sqliteService, { StoreNames } from "../../service/sqlLiteService";
+import Logger from "../../service/Logger/logger";
+import SettingsView from "../../view/settings/SettingsView";
+import { handleFileDownload } from "../../service/helper/downloadFile";
 import {
   setCurrency as setGlobalCurrency,
   getCurrency,
-} from "../service/stockAPIService/utils/fetch";
-import deleteDataService from "../service/deleteDataService";
+} from "../../service/stockAPIService/utils/fetch";
+import deleteDataService from "../../service/deleteDataService";
 import { t } from "i18next";
-import { ConfirmationDialogState } from "../ui/dialog/types";
+import { ConfirmationDialogState } from "../../ui/dialog/types";
 
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";

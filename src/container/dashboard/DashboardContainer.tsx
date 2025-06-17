@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector, useAppDispatch } from '../hooks/redux';
-import { calculate30DayHistory } from '../store/slices/portfolioHistorySlice';
-import DashboardView from '../view/dashboard/DashboardView';
-import analyticsService from '../service/analyticsService';
-import alertsService from '../service/alertsService';
-import { useDashboardConfig } from '../hooks/useDashboardConfig';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux';
+import { calculate30DayHistory } from '../../store/slices/portfolioHistorySlice';
+import DashboardView from '../../view/dashboard/DashboardView';
+import analyticsService from '../../service/analyticsService';
+import alertsService from '../../service/alertsService';
+import { useDashboardConfig } from '../../hooks/useDashboardConfig';
 
 const DashboardContainer: React.FC = () => {
   const { t } = useTranslation();

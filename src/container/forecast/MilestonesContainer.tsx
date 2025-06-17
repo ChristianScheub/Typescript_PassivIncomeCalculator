@@ -1,10 +1,14 @@
 import React from 'react';
-import { useAppSelector } from '../hooks/redux';
-import calculatorService from '../service/calculatorService';
-import MilestonesView from '../view/milestones/MilestonesView';
-import { Expense, Liability } from '../types';
+import { useAppSelector } from '../../hooks/redux';
+import calculatorService from '../../service/calculatorService';
+import MilestonesView from '../../view/milestones/MilestonesView';
+import { Expense, Liability } from '../../types';
 
-const MilestonesContainer: React.FC = () => {
+interface MilestonesContainerProps {
+  onBack?: () => void;
+}
+
+const MilestonesContainer: React.FC<MilestonesContainerProps> = ({ onBack }) => {
   // Get necessary data from the store
   const { portfolioCache } = useAppSelector(state => state.assets);
   const { items: expenses } = useAppSelector(state => state.expenses);
@@ -84,6 +88,7 @@ const MilestonesContainer: React.FC = () => {
       monthlyPassiveIncome={monthlyPassiveIncome}
       monthlyFixedCosts={monthlyFixedCosts}
       monthlyLeisureExpenses={monthlyLeisureExpenses}
+      onBack={onBack}
     />
   );
 };

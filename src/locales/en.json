@@ -93,10 +93,115 @@
     }
   },
   "analytics": {
+    "hub": {
+      "title": "Analytics Hub",
+      "subtitle": "Central overview of all analytics and insights",
+      "quickInsights": "Quick Insights",
+      "recentAnalytics": "Recently Viewed",
+      "recommendations": "Recommendations",
+      "analyticsCategories": "Analytics Categories",
+      "availableAnalytics": "Available Analytics",
+      "moreOptions": "more options",
+      "insights": {
+        "netWorth": "Net Worth",
+        "monthlyCashFlow": "Monthly Cash Flow",
+        "totalAssets": "Total Assets",
+        "monthlyIncome": "Monthly Income",
+        "assetsCount": "Assets Count",
+        "incomeSourcesCount": "Income Sources",
+        "expenseCategories": "Expense Categories",
+        "liabilitiesCount": "Liabilities"
+      },
+      "recent": {
+        "portfolioDistribution": "Portfolio Distribution",
+        "viewedRecently": "Recently Viewed",
+        "fireProgress": "FIRE Progress",
+        "milestoneTracking": "Milestone Tracking",
+        "incomeAnalysis": "Income Analysis",
+        "monthlyBreakdown": "Monthly Breakdown"
+      },
+      "hubRecommendations": {
+        "expenseReview": "Review Expenses",
+        "expenseReviewDesc": "Your expenses have increased. Time for a review.",
+        "diversification": "Diversify Portfolio",
+        "diversificationDesc": "Consider broader asset allocation.",
+        "goalSetting": "Set Goals",
+        "goalSettingDesc": "Define specific financial milestones."
+      },
+      "priority": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      },
+      "categories": {
+        "overview": {
+          "title": "Overview",
+          "description": "General financial overview and summaries",
+          "dashboard": "Dashboard",
+          "dashboardDesc": "Central financial overview",
+          "summary": "Summary",
+          "summaryDesc": "Detailed financial summaries"
+        },
+        "forecasting": {
+          "title": "Forecasting & Projections",
+          "description": "Future-oriented financial analysis and projections",
+          "cashflow": "Cash Flow Forecasts",
+          "cashflowDesc": "Monthly cash flow projections",
+          "portfolio": "Portfolio Forecasts",
+          "portfolioDesc": "Portfolio growth projections",
+          "scenarios": "Scenario Planning",
+          "scenariosDesc": "What-if analysis"
+        },
+        "milestones": {
+          "title": "Milestones & Goals",
+          "description": "Track financial goals and milestones",
+          "fire": "FIRE Milestones",
+          "fireDesc": "Financial Independence Retire Early progress",
+          "debt": "Debt Milestones",
+          "debtDesc": "Track debt payoff progress",
+          "savings": "Savings Milestones",
+          "savingsDesc": "Savings goals and emergency fund"
+        },
+        "distributions": {
+          "title": "Distributions & Breakdowns",
+          "description": "Detailed breakdowns of your finances",
+          "assets": "Asset Distributions",
+          "assetsDesc": "Portfolio composition and diversification",
+          "income": "Income Breakdown",
+          "incomeDesc": "Income sources and distribution",
+          "expenses": "Expense Analysis",
+          "expensesDesc": "Expense categories and trends",
+          "liabilities": "Liability Analysis",
+          "liabilitiesDesc": "Debt and payment obligations",
+          "geographic": "Geographic Distribution",
+          "geographicDesc": "Regional asset distribution"
+        },
+        "performance": {
+          "title": "Performance & Trends",
+          "description": "Performance tracking and historical analysis",
+          "portfolio": "Portfolio Performance",
+          "portfolioDesc": "Track portfolio performance",
+          "returns": "Return Analysis",
+          "returnsDesc": "Return calculations and comparisons",
+          "historical": "Historical Analysis",
+          "historicalDesc": "Long-term trends and developments"
+        },
+        "custom": {
+          "title": "Custom Analytics",
+          "description": "Create tailored analysis",
+          "builder": "Chart Builder",
+          "builderDesc": "Create custom charts",
+          "saved": "Saved Analytics",
+          "savedDesc": "Your saved chart configurations",
+          "templates": "Analysis Templates",
+          "templatesDesc": "Pre-built analysis templates"
+        }
+      }
+    },
     "portfolioAnalytics": "Portfolio Analytics",
     "assetDistribution": "Assets",
     "incomeDistribution": "Income",
-    "custom": "More",
+    "customAnalytics": "More",
     "assetTypeDistribution": "Asset Type Distribution",
     "sectorDistribution": "Sector Distribution",
     "countryDistribution": "Country Distribution",
@@ -153,6 +258,107 @@
       "noInterestData": "No interest data available",
       "noInterestRateData": "No interest rate data available",
       "noProjectionData": "No projection data available"
+    },
+    "performance": {
+      "title": "Performance Analytics",
+      "subtitle": "Track your portfolio performance and returns",
+      "portfolio": "Portfolio Performance",
+      "returns": "Return Analysis",
+      "historical": "Historical Data",
+      "currentValue": "Current Value",
+      "totalReturn": "Total Return",
+      "peakValue": "Peak Value",
+      "volatility": "Volatility",
+      "topPerformers": "Top Performers",
+      "returnsAnalysis": "Returns Analysis",
+      "returnsComingSoon": "Detailed returns analysis coming soon",
+      "historicalAnalysis": "Historical Analysis",
+      "historicalComingSoon": "Historical analysis charts coming soon",
+      "noData": "No performance data available",
+      "noHistoricalData": "No historical data available. Add assets with price history to see performance over time."
+    },
+    "overview": {
+      "title": "Financial Overview",
+      "subtitle": "Complete overview of your financial situation",
+      "keyMetrics": "Key Financial Metrics",
+      "netWorth": "Net Worth",
+      "monthlyCashFlow": "Monthly Cash Flow",
+      "totalAssets": "Total Assets",
+      "totalLiabilities": "Total Liabilities",
+      "incomeExpenses": "Income & Expenses",
+      "monthlyIncome": "Monthly Income",
+      "monthlyExpenses": "Monthly Expenses",
+      "portfolioCounts": "Portfolio Overview",
+      "assetsCount": "Assets",
+      "incomeSourcesCount": "Income Sources",
+      "expenseCategories": "Expense Categories",
+      "liabilitiesCount": "Liabilities",
+      "financialHealth": "Financial Health Summary",
+      "assetToLiabilityRatio": "Asset-to-Liability Ratio",
+      "savingsRate": "Savings Rate",
+      "expenseRatio": "Expense Ratio",
+      "tabs": {
+        "summary": "Summary",
+        "insights": "Insights",
+        "trends": "Trends"
+      },
+      "financialInsights": "Financial Insights",
+      "netWorthAnalysis": "Net Worth Analysis",
+      "positiveNetWorth": "Your net worth is positive, indicating good financial health.",
+      "negativeNetWorth": "Your net worth is negative. Consider reducing liabilities or increasing assets.",
+      "cashFlowAnalysis": "Cash Flow Analysis",
+      "positiveCashFlow": "You have positive monthly cash flow, which is excellent for building wealth.",
+      "negativeCashFlow": "Your monthly expenses exceed income. Consider reducing expenses or increasing income.",
+      "diversificationTip": "Portfolio Diversification",
+      "diversificationAdvice": "Consider diversifying your assets across different categories to reduce risk.",
+      "monthlyTrends": "Monthly Trends"
+    },
+    "custom": {
+      "title": "Custom Analytics",
+      "description": "Create custom charts and analyze your data",
+      "builder": "Chart Builder",
+      "saved": "Saved Charts",
+      "templates": "Templates",
+      "buildChart": "Build New Chart",
+      "chartTitle": "Chart Title",
+      "enterTitle": "Enter chart title",
+      "chartType": "Chart Type",
+      "dataSource": "Data Source",
+      "selectDataSource": "Select data source",
+      "groupBy": "Group By",
+      "selectGroupBy": "Select grouping field",
+      "createChart": "Create Chart",
+      "addChart": "Add Chart",
+      "pieChart": "Pie Chart",
+      "barChart": "Bar Chart",
+      "lineChart": "Line Chart",
+      "assets": "Assets",
+      "income": "Income",
+      "expenses": "Expenses",
+      "noChartsYet": "No charts saved yet",
+      "getStarted": "Create your first custom chart to analyze your data",
+      "addFirstChart": "Create First Chart",
+      "useTemplate": "Use Template",
+      "templates": {
+        "assetAllocation": "Asset Allocation",
+        "assetAllocationDesc": "Portfolio distribution by asset type",
+        "incomeBreakdown": "Income Breakdown",
+        "incomeBreakdownDesc": "Income sources by type",
+        "expenseTrends": "Expense Trends",
+        "expenseTrendsDesc": "Monthly expenses by category"
+      }
+    },
+    "distributions": {
+      "aboutTitle": "About Distribution Analytics",
+      "aboutDescription": "Distribution analytics provide detailed insights into how your finances are allocated across different categories and types.",
+      "features": "Key Features",
+      "feature1": "Visual breakdowns and charts",
+      "feature2": "Category-wise analysis",
+      "feature3": "Trend identification",
+      "insights": "Insights You'll Gain",
+      "insight1": "Asset allocation patterns",
+      "insight2": "Income source diversity",
+      "insight3": "Expense category trends"
     }
   },
   "assets": {
@@ -194,6 +400,7 @@
     "expenses": "Expenses",
     "income": "Income",
     "forecast": "Forecast",
+    "analytics": "Analytics",
     "settings": "Settings"
   },
   "settings": {
@@ -280,18 +487,28 @@
     "appName": "Passive Income Calculator",
     "version": "Version {{version}}"
   },
-  "portfolio": {
-    "historyTitle": "Portfolio Value History",
-    "value": "Value",
-    "transactionDay": "Transaction Day",
-    "noHistoryData": "No history data available",
-    "noHistoryDataDesc": "Add assets with historical prices to see the portfolio value history.",
-    "currentValue": "Current Value",
-    "totalReturn": "Total Return",
-    "peakValue": "Peak Value",
-    "lowestValue": "Lowest Value",
-    "valueHistory": "Value History",
-    "portfolioValue": "Portfolio Value",
-    "transactionDays": "Transaction Days"
+  "milestones": {
+    "title": "Financial Milestones",
+    "subtitle": "Track your progress towards financial independence",
+    "progressOverview": "Progress Overview",
+    "expenseCoverage": "Expense Coverage",
+    "debtProgress": "Debt Progress",
+    "monthsBuffer": "Months Buffer",
+    "fixedCosts": "Fixed Cost Coverage"
+  },
+  "forecast": {
+    "title": "Financial Forecast",
+    "subtitle": "Project your financial future",
+    "loading": "Loading forecast data...",
+    "aboutTitle": "About Financial Forecasting",
+    "aboutDescription": "Financial forecasting helps you project your future financial situation based on current assets, income, and expenses.",
+    "features": "Key Features",
+    "feature1": "Monthly cash flow projections",
+    "feature2": "Passive income coverage analysis",
+    "feature3": "Asset growth tracking",
+    "insights": "Insights You'll Gain",
+    "insight1": "Future financial independence timeline",
+    "insight2": "Expense coverage predictions",
+    "insight3": "Portfolio growth projections"
   }
 }

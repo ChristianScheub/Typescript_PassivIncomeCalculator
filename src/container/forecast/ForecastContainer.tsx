@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '../hooks/redux';
-import { updateForecastValues } from '../store/slices/forecastSlice';
-import Logger from '../service/Logger/logger';
-import ForecastView from '../view/components/ForecastView';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux';
+import { updateForecastValues } from '../../store/slices/forecastSlice';
+import Logger from '../../service/Logger/logger';
+import ForecastView from '../../view/components/ForecastView';
 
-const ForecastContainer: React.FC = () => {
+interface ForecastContainerProps {
+  onBack?: () => void;
+}
+
+const ForecastContainer: React.FC<ForecastContainerProps> = ({ onBack }) => {
   const dispatch = useAppDispatch();
   const { status: assetsStatus } = useAppSelector(state => state.assets);
   const { status: incomeStatus } = useAppSelector(state => state.income);
   const { status: expensesStatus } = useAppSelector(state => state.expenses);
   const { status: liabilitiesStatus } = useAppSelector(state => state.liabilities);
   const forecast = useAppSelector(state => state.forecast);
-  const [selectedTab, setSelectedTab] = useState<'projections' | 'fire'>('fire');
 
   // Check if any of the underlying data is loading
   const isDataLoading = [assetsStatus, incomeStatus, expensesStatus, liabilitiesStatus].includes('loading');
@@ -40,10 +43,9 @@ const ForecastContainer: React.FC = () => {
 
   return (
     <ForecastView
-      selectedTab={selectedTab}
-      isLoading={isLoading}
+          isLoading={isLoading}
       projections={forecast.projections}
-      onTabChange={setSelectedTab}
+      onBack={onBack}
     />
   );
 };

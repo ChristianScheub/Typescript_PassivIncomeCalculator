@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { fetchIncome, addIncome, updateIncome, deleteIncome } from '../store/slices/incomeSlice';
-import { Income } from '../types';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { fetchIncome, addIncome, updateIncome, deleteIncome } from '../../store/slices/incomeSlice';
+import { Income } from '../../types';
 import { useTranslation } from 'react-i18next';
-import Logger from '../service/Logger/logger';
-import calculatorService from '../service/calculatorService';
-import IncomeView from '../view/income/IncomeView';
-import IncomeAnalyticsContainer from './IncomeAnalyticsContainer';
-import { sortIncome, SortOrder } from '../utils/sortingUtils';
+import Logger from '../../service/Logger/logger';
+import calculatorService from '../../service/calculatorService';
+import IncomeView from '../../view/income/IncomeView';
+import IncomeAnalyticsContainer from '../analytics/IncomeAnalyticsContainer';
+import { sortIncome, SortOrder } from '../../utils/sortingUtils';
 
 const IncomeContainer: React.FC = () => {
   const { t } = useTranslation();

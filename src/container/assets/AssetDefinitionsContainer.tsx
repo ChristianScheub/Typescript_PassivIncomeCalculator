@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
-import { RootState } from '../store';
-import { fetchAssetDefinitions, addAssetDefinition, updateAssetDefinition, deleteAssetDefinition } from '../store/slices/assetDefinitionsSlice';
+import { RootState } from '../../store';
+import { fetchAssetDefinitions, addAssetDefinition, updateAssetDefinition, deleteAssetDefinition } from '../../store/slices/assetDefinitionsSlice';
 import { 
   fetchAssetCategories, 
   fetchAssetCategoryOptions, 
   fetchAssetCategoryAssignments,
   addAssetCategoryAssignment,
   deleteAssetCategoryAssignmentsByAssetId
-} from '../store/slices/assetCategoriesSlice';
-import { AssetDefinitionsView } from '../view/assets/AssetDefinitionsView';
-import { AssetDefinition, AssetType, AssetCategoryAssignment } from '../types';
-import Logger from '../service/Logger/logger';
+} from '../../store/slices/assetCategoriesSlice';
+import { AssetDefinitionsView } from '../../view/assets/AssetDefinitionsView';
+import { AssetDefinition, AssetType, AssetCategoryAssignment } from '../../types';
+import Logger from '../../service/Logger/logger';
 import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { StockPriceUpdater } from '../service/helper/stockPriceUpdater';
+import { StockPriceUpdater } from '../../service/helper/stockPriceUpdater';
 
 interface AssetDefinitionsContainerProps {
   onBack?: () => void;

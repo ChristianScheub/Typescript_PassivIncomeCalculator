@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { fetchExpenses, addExpense, updateExpense, deleteExpense } from '../store/slices/expensesSlice';
-import { Expense } from '../types';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { fetchExpenses, addExpense, updateExpense, deleteExpense } from '../../store/slices/expensesSlice';
+import { Expense } from '../../types';
 import { useTranslation } from 'react-i18next';
-import Logger from '../service/Logger/logger';
-import calculatorService from '../service/calculatorService';
-import ExpensesView from '../view/expenses/ExpensesView';
-import ExpenseAnalyticsContainer from './ExpenseAnalyticsContainer';
-import { sortExpenses, SortOrder } from '../utils/sortingUtils';
+import Logger from '../../service/Logger/logger';
+import calculatorService from '../../service/calculatorService';
+import ExpensesView from '../../view/expenses/ExpensesView';
+import ExpenseAnalyticsContainer from '../analytics/ExpenseAnalyticsContainer';
+import { sortExpenses, SortOrder } from '../../utils/sortingUtils';
 
 const ExpensesContainer: React.FC = () => {
   const { t } = useTranslation();

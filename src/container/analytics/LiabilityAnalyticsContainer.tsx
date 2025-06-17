@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { useAppSelector } from '../hooks/redux';
-import LiabilityAnalyticsView from '../view/analytics/liabilities/LiabilityAnalyticsView';
-import calculatorService from '../service/calculatorService';
-import { Liability } from '../types';
-import Logger from '../service/Logger/logger';
+import { useAppSelector } from '../../hooks/redux';
+import LiabilityAnalyticsView from '../../view/analytics/liabilities/LiabilityAnalyticsView';
+import calculatorService from '../../service/calculatorService';
+import { Liability } from '../../types';
+import Logger from '../../service/Logger/logger';
 
 type LiabilityAnalyticsTab = 'monthly' | 'annual' | 'more';
 

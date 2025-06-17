@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks/redux';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { 
   fetchAssets, 
   addAsset, 
@@ -13,16 +13,16 @@ import {
   selectPortfolioCacheValid,
   selectPortfolioTotals,
   selectSortedAssets
-} from '../store/slices/assetsSlice';
-import { fetchAssetDefinitions } from '../store/slices/assetDefinitionsSlice';
-import { AssetsView } from '../view/assets/AssetsView';
-import { Asset } from '../types';
+} from '../../store/slices/assetsSlice';
+import { fetchAssetDefinitions } from '../../store/slices/assetDefinitionsSlice';
+import { AssetsView } from '../../view/assets/AssetsView';
+import { Asset } from '../../types';
 import { useTranslation } from 'react-i18next';
-import Logger from '../service/Logger/logger';
-import PortfolioAnalyticsContainer from './PortfolioAnalyticsContainer';
-import calculatorService from '../service/calculatorService';
+import Logger from '../../service/Logger/logger';
+import PortfolioAnalyticsContainer from '../analytics/PortfolioAnalyticsContainer';
+import calculatorService from '../../service/calculatorService';
 // Removed dividend cache service import
-import { createCachedDividends } from '../utils/dividendCacheUtils';
+import { createCachedDividends } from '../../utils/dividendCacheUtils';
 import AssetDefinitionsContainer from './AssetDefinitionsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
 import { AssetCategoryContainer } from './AssetCategoryContainer';

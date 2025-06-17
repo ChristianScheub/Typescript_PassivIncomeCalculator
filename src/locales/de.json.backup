@@ -792,42 +792,6 @@
         }
       }
     },
-    "overview": {
-      "title": "Finanz-Übersicht",
-      "subtitle": "Vollständige Übersicht Ihrer finanziellen Situation",
-      "keyMetrics": "Wichtige Finanzkennzahlen",
-      "netWorth": "Nettovermögen",
-      "monthlyCashFlow": "Monatlicher Cashflow",
-      "totalAssets": "Gesamtvermögen",
-      "totalLiabilities": "Gesamtverbindlichkeiten",
-      "incomeExpenses": "Einkommen & Ausgaben",
-      "monthlyIncome": "Monatliches Einkommen",
-      "monthlyExpenses": "Monatliche Ausgaben",
-      "portfolioCounts": "Portfolio-Übersicht",
-      "assetsCount": "Assets",
-      "incomeSourcesCount": "Einkommensquellen",
-      "expenseCategories": "Ausgabenkategorien",
-      "liabilitiesCount": "Verbindlichkeiten",
-      "financialHealth": "Finanzgesundheit Zusammenfassung",
-      "assetToLiabilityRatio": "Asset-zu-Verbindlichkeiten-Verhältnis",
-      "savingsRate": "Sparquote",
-      "expenseRatio": "Ausgabenrate",
-      "tabs": {
-        "summary": "Zusammenfassung",
-        "insights": "Einblicke",
-        "trends": "Trends"
-      },
-      "financialInsights": "Finanzielle Einblicke",
-      "netWorthAnalysis": "Nettovermögen-Analyse",
-      "positiveNetWorth": "Ihr Nettovermögen ist positiv und zeigt eine gute finanzielle Gesundheit an.",
-      "negativeNetWorth": "Ihr Nettovermögen ist negativ. Erwägen Sie, Verbindlichkeiten zu reduzieren oder Vermögen zu erhöhen.",
-      "cashFlowAnalysis": "Cashflow-Analyse",
-      "positiveCashFlow": "Sie haben einen positiven monatlichen Cashflow, was ausgezeichnet für den Vermögensaufbau ist.",
-      "negativeCashFlow": "Ihre monatlichen Ausgaben übersteigen das Einkommen. Erwägen Sie, Ausgaben zu reduzieren oder das Einkommen zu erhöhen.",
-      "diversificationTip": "Portfolio-Diversifikation",
-      "diversificationAdvice": "Erwägen Sie, Ihre Assets über verschiedene Kategorien zu diversifizieren, um das Risiko zu reduzieren.",
-      "monthlyTrends": "Monatliche Trends"
-    },
     "portfolioAnalytics": "Portfolio-Analysen",
     "assetDistribution": "Vermögen",
     "incomeDistribution": "Einkommen",
@@ -933,14 +897,5 @@
     "valueHistory": "Wertverlauf",
     "portfolioValue": "Portfolio-Wert",
     "transactionDays": "Transaktionstage"
-  },
-  "milestones": {
-    "title": "Finanzielle Meilensteine",
-    "subtitle": "Verfolgen Sie Ihren Fortschritt zur finanziellen Unabhängigkeit",
-    "progressOverview": "Fortschritts-Übersicht",
-    "expenseCoverage": "Ausgabendeckung",
-    "debtProgress": "Schuldenfortschritt",
-    "monthsBuffer": "Monate Puffer",
-    "fixedCosts": "Fixkostendeckung"
   }
 }

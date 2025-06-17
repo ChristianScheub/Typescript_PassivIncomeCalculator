@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Asset, AssetDefinition } from '../types';
-import portfolioHistoryService, { PortfolioHistoryPoint }  from '../service/portfolioHistoryService';
-import { PortfolioHistoryView } from '../view/portfolio/PortfolioHistoryView';
-import { ViewHeader } from '../ui/layout/ViewHeader';
-import { useDeviceCheck } from '../service/helper/useDeviceCheck';
+import { Asset, AssetDefinition } from '../../types';
+import portfolioHistoryService, { PortfolioHistoryPoint }  from '../../service/portfolioHistoryService';
+import { PortfolioHistoryView } from '../../view/portfolio/PortfolioHistoryView';
+import { ViewHeader } from '../../ui/layout/ViewHeader';
+import { useDeviceCheck } from '../../service/helper/useDeviceCheck';
 
 interface PortfolioHistoryContainerProps {
   assets: Asset[];

@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks/redux';
-import { fetchLiabilities, addLiability, updateLiability, deleteLiability } from '../store/slices/liabilitiesSlice';
-import { Liability } from '../types';
+import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { fetchLiabilities, addLiability, updateLiability, deleteLiability } from '../../store/slices/liabilitiesSlice';
+import { Liability } from '../../types';
 import { useTranslation } from 'react-i18next';
-import Logger from '../service/Logger/logger';
-import calculatorService from '../service/calculatorService';
-import LiabilitiesView from '../view/liabilities/LiabilitiesView';
-import LiabilityAnalyticsContainer from './LiabilityAnalyticsContainer';
-import { sortLiabilitiesByPayment, SortOrder } from '../utils/sortingUtils';
+import Logger from '../../service/Logger/logger';
+import calculatorService from '../../service/calculatorService';
+import LiabilitiesView from '../../view/liabilities/LiabilitiesView';
+import LiabilityAnalyticsContainer from '../analytics/LiabilityAnalyticsContainer';
+import { sortLiabilitiesByPayment, SortOrder } from '../../utils/sortingUtils';
 
 const LiabilitiesContainer: React.FC = () => {
   const { t } = useTranslation();
