@@ -49,7 +49,6 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
 
     Logger.info('Calculating portfolio analytics for overview');
     
-    // ✅ CACHE-FIRST: Direct cache helper instead of calculator service
     const assetAllocation = getAssetAllocationFromCache(portfolioCache.positions);
     
     // Income sources breakdown

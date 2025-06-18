@@ -52,35 +52,11 @@ export const updateDashboardValues = createAsyncThunk(
     const monthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses.items);
     const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities.items);
 
-    /**
-     * 🎯 CACHE-FIRST ARCHITECTURE IMPLEMENTATION
-     * 
-     * BEFORE (INEFFICIENT):
-     * - Multiple wrapper functions: calculatePortfolioAssetAllocation(), calculateTotalMonthlyAssetIncomeWithCache()
-     * - Complex fallback logic in multiple components
-     * - Redundant calculations: same data calculated in different places
-     * - O(n) complexity even when cache available
-     * 
-     * AFTER (OPTIMIZED):
-     * - Direct cache access: portfolioCache.totals.monthlyIncome (O(1))
-     * - Eliminated wrapper functions that just returned cache values
-     * - Simplified logic: cache-first, zero fallback until recalculation
-     * - Centralized cache helpers in portfolioCacheHelpers.ts
-     * 
-     * PERFORMANCE BENEFITS:
-     * - ~300 LOC removed (wrapper functions + fallback logic)
-     * - Cache access now O(1) instead of O(n)
-     * - No redundant calculations across components
-     * - Cleaner, more maintainable code
-     */
-    
-    // Use portfolio cache for asset income and totals if available
     const portfolioCache = assets.portfolioCache;
     let monthlyAssetIncome = 0;
     let totalAssets = 0;
     
     if (portfolioCache && assets.portfolioCacheValid) {
-      // ✅ CACHE-FIRST: Direct cache access
       monthlyAssetIncome = portfolioCache.totals.monthlyIncome;
       totalAssets = portfolioCache.totals.totalValue;
       Logger.infoRedux(`Using portfolio cache - monthlyIncome: ${monthlyAssetIncome}, totalValue: ${totalAssets}`);
@@ -106,11 +82,8 @@ export const updateDashboardValues = createAsyncThunk(
     
     const passiveIncomeRatio = calculatorService.calculatePassiveIncomeRatio(monthlyIncome, passiveIncome);
     
-    // ✅ CACHE-FIRST: Direct cache access for asset allocation
     let assetAllocation: Array<{name: string; type: string; value: number; percentage: number}> = [];
     if (portfolioCache && assets.portfolioCacheValid) {
-      // Direct cache access - no wrapper function needed!
-      // Group positions by type and sum their values
       const typeMap = new Map<string, number>();
       portfolioCache.positions.forEach(position => {
         const currentValue = typeMap.get(position.type) || 0;

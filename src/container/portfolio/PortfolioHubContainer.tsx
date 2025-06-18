@@ -63,7 +63,6 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
 
   // Portfolio summary for hub context
   const portfolioSummary = useMemo(() => {
-    // ✅ CACHE-FIRST: Direct cache access for asset data
     const totalAssetValue = portfolioCache?.totals?.totalValue || 0;
     const monthlyIncome = portfolioCache?.totals?.monthlyIncome || 0;
     

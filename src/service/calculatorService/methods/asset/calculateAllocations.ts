@@ -1,5 +1,4 @@
 import { Asset, Income, AssetAllocation, IncomeAllocation, IncomeType, AssetType } from '../../../../types';
-// ❌ REMOVED: import { PortfolioPosition } from '../../../portfolioService/portfolioCalculations';
 import Logger from '../../../Logger/logger';
 import { calculateMonthlyIncome } from '../income/calculateIncome';
 import { calculateAssetMonthlyIncome } from './calculateAssetIncome';
@@ -87,8 +86,3 @@ export const calculateAssetAllocation = (assets: Asset[]): AssetAllocation[] => 
   Logger.info(`Asset allocation calculated - types: ${result.length}, total: ${total}`);
   return result;
 };
-
-// ❌ REMOVED: Redundant wrapper function - use direct cache access instead
-// export const calculatePortfolioAssetAllocation = (positions: PortfolioPosition[]): AssetAllocation[] => {
-//   // This was just: return positions.map(...) - can be done directly in components!
-// }

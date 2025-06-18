@@ -5,7 +5,6 @@ import {
   calculateTotalAssetIncomeForMonth,
   calculateTotalMonthlyAssetIncomeFromCache,
   calculateTotalAssetIncomeForMonthFromCache,
-  // ❌ REMOVED: calculateTotalMonthlyAssetIncomeWithCache - use portfolio cache instead
   calculateTotalAssetIncomeForMonthWithCache,
   areAssetsCached,
   calculateAssetMonthlyIncomeWithCache
@@ -51,7 +50,6 @@ const calculatorService: ICalculatorService = {
   calculateLiquidAssetValue: (assets) => assets
     .filter(asset => ['stock', 'bond', 'cash'].includes(asset.type))
     .reduce((sum, asset) => sum + asset.value, 0),
-  // ✅ CACHE-FIRST: Optimized total monthly income calculation
   calculateTotalMonthlyAssetIncome: (assets) => {
     // Priority 1: Try pure cache approach (fastest - O(1))
     const cachedTotal = calculateTotalMonthlyAssetIncomeFromCache(assets);
@@ -72,9 +70,7 @@ const calculatorService: ICalculatorService = {
   },
   calculateAnnualAssetIncome: (monthlyIncome) => monthlyIncome * 12,
 
-  // ✅ CACHE-FIRST: Cached asset calculations
   calculateAssetMonthlyIncomeWithCache,
-  // ❌ REMOVED: calculateTotalMonthlyAssetIncomeWithCache - use portfolio cache instead
   calculateTotalAssetIncomeForMonthWithCache,
 
   // Income calculations
@@ -103,7 +99,6 @@ const calculatorService: ICalculatorService = {
 
   // Analysis calculations
   calculateAssetAllocation,
-  // ❌ REMOVED: calculatePortfolioAssetAllocation - use direct cache access instead
   calculateIncomeAllocation,
   calculateExpenseBreakdown,
   calculateProjections,

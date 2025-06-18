@@ -74,12 +74,6 @@ export const calculateTotalAssetIncomeForMonthFromCache = (
   }
 };
 
-// ❌ REMOVED: Redundant wrapper function - use portfolio cache instead
-// export const calculateTotalMonthlyAssetIncomeWithCache = (assets: Asset[]): number => {
-//   // This wrapper should be replaced with direct portfolio cache access
-//   // Portfolio cache already contains totals.monthlyIncome
-// }
-
 // New function to calculate total asset income for a specific month with cache
 export const calculateTotalAssetIncomeForMonthWithCache = (
   assets: Asset[],
