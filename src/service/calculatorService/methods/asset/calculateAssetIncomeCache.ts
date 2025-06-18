@@ -74,33 +74,11 @@ export const calculateTotalAssetIncomeForMonthFromCache = (
   }
 };
 
-// New function to calculate total monthly asset income with cache
-export const calculateTotalMonthlyAssetIncomeWithCache = (assets: Asset[]): number => {
-  // First try pure cache approach for best performance
-  const cachedTotal = calculateTotalMonthlyAssetIncomeFromCache(assets);
-  if (cachedTotal !== null) {
-    return cachedTotal;
-  }
-  
-  // Directly calculate using individual asset calculations with cache
-  let totalIncome = 0;
-  let cacheHits = 0;
-  let cacheMisses = 0;
-  
-  for (const asset of assets) {
-    const result = calculateAssetMonthlyIncomeWithCache(asset);
-    totalIncome += result.monthlyAmount;
-    
-    if (result.cacheHit) {
-      cacheHits++;
-    } else {
-      cacheMisses++;
-    }
-  }
-  
-  Logger.cache(`Calculated total monthly income with mixed cache: ${totalIncome} (hits: ${cacheHits}, misses: ${cacheMisses})`);
-  return totalIncome;
-};
+// ❌ REMOVED: Redundant wrapper function - use portfolio cache instead
+// export const calculateTotalMonthlyAssetIncomeWithCache = (assets: Asset[]): number => {
+//   // This wrapper should be replaced with direct portfolio cache access
+//   // Portfolio cache already contains totals.monthlyIncome
+// }
 
 // New function to calculate total asset income for a specific month with cache
 export const calculateTotalAssetIncomeForMonthWithCache = (

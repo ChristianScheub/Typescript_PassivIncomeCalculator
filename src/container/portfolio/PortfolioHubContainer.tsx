@@ -63,10 +63,13 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
 
   // Portfolio summary for hub context
   const portfolioSummary = useMemo(() => {
+    // ✅ CACHE-FIRST: Direct cache access for asset data
     const totalAssetValue = portfolioCache?.totals?.totalValue || 0;
+    const monthlyIncome = portfolioCache?.totals?.monthlyIncome || 0;
+    
+    // Standard calculations for non-cached data
     const totalLiabilities = liabilities.reduce((sum, liability) => sum + (liability.currentBalance || 0), 0);
     const netWorth = totalAssetValue - totalLiabilities;
-    const monthlyIncome = portfolioCache?.totals?.monthlyIncome || 0;
     const monthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
     const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
     const monthlyCashFlow = monthlyIncome - monthlyExpenses - monthlyLiabilityPayments;

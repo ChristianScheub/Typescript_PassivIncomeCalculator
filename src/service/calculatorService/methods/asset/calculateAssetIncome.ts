@@ -25,7 +25,7 @@ export {
   areAssetsCached,
   calculateTotalMonthlyAssetIncomeFromCache,
   calculateTotalAssetIncomeForMonthFromCache,
-  calculateTotalMonthlyAssetIncomeWithCache,
+  // ❌ REMOVED: calculateTotalMonthlyAssetIncomeWithCache - use portfolio cache instead
   calculateTotalAssetIncomeForMonthWithCache,
   updateAssetCacheData
 } from './calculateAssetIncomeCache';

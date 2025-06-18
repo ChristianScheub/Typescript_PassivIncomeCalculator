@@ -40,7 +40,7 @@ export interface ICalculatorService {
       monthlyBreakdown: Record<number, number>;
     };
   };
-  calculateTotalMonthlyAssetIncomeWithCache?: (assets: Asset[]) => number;
+  // ❌ REMOVED: calculateTotalMonthlyAssetIncomeWithCache - use portfolio cache instead
   calculateTotalAssetIncomeForMonthWithCache?: (assets: Asset[], monthNumber: number) => number;
 
   // Income calculations
@@ -72,7 +72,7 @@ export interface ICalculatorService {
 
   // Analysis calculations
   calculateAssetAllocation: (assets: Asset[]) => AssetAllocation[];
-  calculatePortfolioAssetAllocation: (positions: PortfolioPosition[]) => AssetAllocation[];
+  // ❌ REMOVED: calculatePortfolioAssetAllocation - use direct cache access instead
   calculateIncomeAllocation: (income: Income[], assets: Asset[]) => IncomeAllocation[];
   calculateExpenseBreakdown: (expenses: Expense[]) => ExpenseBreakdown[];
   calculateProjections: (

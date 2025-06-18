@@ -3,7 +3,8 @@ import { useAppSelector } from '../../hooks/redux';
 import { selectPortfolioCache } from '../../store/slices/assetsSlice';
 import PortfolioOverviewView from '../../view/portfolio-hub/PortfolioOverviewView';
 import calculatorService from '../../service/calculatorService';
-import recentActivityService, { PortfolioCategory, PortfolioSubCategory } from '../../service/recentActivityService';
+import { PortfolioCategory, PortfolioSubCategory } from '../../service/recentActivityService';
+import { getAssetAllocationFromCache } from '../../utils/portfolioCacheHelpers';
 import Logger from '../../service/Logger/logger';
 
 interface PortfolioSummary {
@@ -48,8 +49,8 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
 
     Logger.info('Calculating portfolio analytics for overview');
     
-    // Asset allocation from portfolio positions
-    const assetAllocation = calculatorService.calculatePortfolioAnalytics(portfolioCache.positions).assetAllocation;
+    // ✅ CACHE-FIRST: Direct cache helper instead of calculator service
+    const assetAllocation = getAssetAllocationFromCache(portfolioCache.positions);
     
     // Income sources breakdown
     const incomeSourcesBreakdown = income.reduce((acc, incomeItem) => {

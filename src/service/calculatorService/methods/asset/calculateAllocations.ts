@@ -1,5 +1,5 @@
 import { Asset, Income, AssetAllocation, IncomeAllocation, IncomeType, AssetType } from '../../../../types';
-import { PortfolioPosition } from '../../../portfolioService/portfolioCalculations';
+// ❌ REMOVED: import { PortfolioPosition } from '../../../portfolioService/portfolioCalculations';
 import Logger from '../../../Logger/logger';
 import { calculateMonthlyIncome } from '../income/calculateIncome';
 import { calculateAssetMonthlyIncome } from './calculateAssetIncome';
@@ -88,25 +88,7 @@ export const calculateAssetAllocation = (assets: Asset[]): AssetAllocation[] => 
   return result;
 };
 
-// NEW: Portfolio-based asset allocation using cached positions
-export const calculatePortfolioAssetAllocation = (positions: PortfolioPosition[]): AssetAllocation[] => {
-  const allocationMap = new Map<AssetType, number>();
-  const total = positions.reduce((sum, position) => sum + position.currentValue, 0);
-
-  positions.forEach(position => {
-    const currentAmount = allocationMap.get(position.type as AssetType) || 0;
-    allocationMap.set(position.type as AssetType, currentAmount + position.currentValue);
-  });
-
-  const result = Array.from(allocationMap.entries())
-    .map(([type, value]) => ({
-      name: type,
-      type,
-      value,
-      percentage: total > 0 ? (value / total) * 100 : 0
-    }))
-    .sort((a, b) => b.value - a.value);
-
-  Logger.info(`Portfolio asset allocation calculated from ${positions.length} positions - types: ${result.length}, total: ${total}`);
-  return result;
-};
+// ❌ REMOVED: Redundant wrapper function - use direct cache access instead
+// export const calculatePortfolioAssetAllocation = (positions: PortfolioPosition[]): AssetAllocation[] => {
+//   // This was just: return positions.map(...) - can be done directly in components!
+// }
