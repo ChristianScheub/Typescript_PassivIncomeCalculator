@@ -1,4 +1,4 @@
-import { Asset, CachedDividends } from '../types';
+import { Asset, CachedDividends } from '@/types/domains/assets';
 import { getCurrentQuantity } from './transactionCalculations';
 
 /**
@@ -31,7 +31,7 @@ export function generateDividendCalculationHash(asset: Asset): string {
     dividendInfo: dividendInfo,
     currentQuantity: getCurrentQuantity(asset), // Use helper function
     purchaseQuantity: asset.purchaseQuantity,
-    currentPrice: currentPrice, // Now from AssetDefinition
+    currentPrice: currentPrice, // Now from marketData
     type: asset.type,
     interestRate: interestRate,
     value: asset.value,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { AssetType } from '../../types';
+import { AssetType } from '@/types/shared/base';
 import { UseFormSetValue } from 'react-hook-form';
 import { OptionalSection } from '../forms/StandardFormWrapper';
 import { useTranslation } from 'react-i18next';

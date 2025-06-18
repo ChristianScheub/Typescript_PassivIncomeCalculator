@@ -2,7 +2,7 @@ import React from 'react';
 import { UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { OptionalSection } from '../forms/StandardFormWrapper';
-import { SectorAllocation } from '../../types';
+import { SectorAllocation } from '@/types/domains/portfolio';
 
 interface SectorSectionProps {
   watch: (field: string) => any;

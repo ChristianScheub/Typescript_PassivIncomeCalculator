@@ -21,7 +21,7 @@ export const localStorageMiddleware: Middleware = store => next => (action: any)
     try {
       const stateToSave = {
         assets: { 
-          items: state.assets.items,
+          items: state.transactions.items,
           status: 'idle',
           error: null
         },

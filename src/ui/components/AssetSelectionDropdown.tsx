@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { AssetDefinition } from '../../types';
+import { AssetDefinition } from '../../types/domains/assets/';
 
 interface AssetSelectionDropdownProps {
   register: any; // From react-hook-form

@@ -184,7 +184,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
   
   // Get data needed for charts
   const assetAllocation = useAppSelector(state => state.dashboard.assetAllocation);
-  const portfolioCache = useAppSelector(state => state.assets.portfolioCache);
+  const portfolioCache = useAppSelector(state => state.transactions.portfolioCache);
 
   // Calculate portfolio analytics data from portfolio positions
   const portfolioAnalytics = useMemo(() => {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { MonthlyProjection } from '../../../types';
+import { MonthlyProjection } from '@/types/domains/analytics';
 import { ViewHeader } from '../../../ui/layout/ViewHeader';
 import BarChartCashFlowProjection from '../../../ui/charts/barCharts/BarChartCashFlowProjection';
 import BarChartNetCashFlow from '../../../ui/charts/barCharts/BarChartNetCashFlow';

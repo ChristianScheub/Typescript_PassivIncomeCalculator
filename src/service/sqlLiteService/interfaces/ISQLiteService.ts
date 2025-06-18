@@ -1,9 +1,21 @@
 import { DBSchema } from 'idb';
-import { Asset, Liability, Expense, Income, AssetDefinition, AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../../types';
+// Neue Domain-Driven Types
+import { 
+  Transaction as Asset, 
+  AssetDefinition, 
+  AssetCategory, 
+  AssetCategoryOption, 
+  AssetCategoryAssignment 
+} from '../../../types/domains/assets/';
+import { 
+  Liability, 
+  Expense, 
+  Income 
+} from '../../../types/domains/financial/';
 import { ExchangeRate } from '../../exchangeService/interfaces/IExchangeService';
 
 export interface FinanceDB extends DBSchema {
-  assets: {
+  transactions: {
     key: string;
     value: Asset;
     indexes: { 'by-type': string };
@@ -48,7 +60,7 @@ export interface FinanceDB extends DBSchema {
   };
 }
 
-export type StoreNames = 'assets' | 'assetDefinitions' | 'assetCategories' | 'assetCategoryOptions' | 'assetCategoryAssignments' | 'liabilities' | 'expenses' | 'income' | 'exchangeRates';
+export type StoreNames = 'transactions' | 'assetDefinitions' | 'assetCategories' | 'assetCategoryOptions' | 'assetCategoryAssignments' | 'liabilities' | 'expenses' | 'income' | 'exchangeRates';
 
 export interface ISQLiteService {
   getAll<K extends StoreNames>(storeName: K): Promise<FinanceDB[K]['value'][]>;

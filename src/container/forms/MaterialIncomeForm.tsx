@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Income, IncomeType, PaymentFrequency } from '../../types';
+import { Income } from '@/types/domains/financial';
+import { IncomeType } from '@/types/shared/base';
 import { useSharedForm } from '../../hooks/useSharedForm';
 import { createIncomeSchema } from '../../utils/validationSchemas';
 import Logger from '../../service/Logger/logger';
@@ -25,7 +26,7 @@ export const MaterialIncomeForm: React.FC<IncomeFormProps> = ({ initialData, onS
       return {
         type: 'salary' as IncomeType,
         paymentSchedule: {
-          frequency: 'monthly' as PaymentFrequency,
+          frequency: 'monthly',
           amount: 0,
           dayOfMonth: 1 // Standard: erster Tag des Monats
         },
@@ -37,7 +38,7 @@ export const MaterialIncomeForm: React.FC<IncomeFormProps> = ({ initialData, onS
     return {
       ...initialData,
       paymentSchedule: {
-        frequency: initialData.paymentSchedule.frequency,
+        frequency: (initialData.paymentSchedule.frequency === 'none' ? 'monthly' : initialData.paymentSchedule.frequency) as 'monthly' | 'quarterly' | 'annually' | 'custom',
         amount: initialData.paymentSchedule.amount,
         months: initialData.paymentSchedule.months,
         dayOfMonth: initialData.paymentSchedule.dayOfMonth || 1
@@ -60,22 +61,7 @@ export const MaterialIncomeForm: React.FC<IncomeFormProps> = ({ initialData, onS
     onSubmit: (data: IncomeFormData) => {
       Logger.info(`MaterialIncomeForm submit: ${JSON.stringify(data)}`);
       try {
-        const transformedData: Income = {
-          id: initialData?.id || Date.now().toString(),
-          name: data.name,
-          type: data.type,
-          createdAt: initialData?.createdAt || new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          isPassive: data.isPassive,
-          startDate: data.startDate,
-          endDate: data.endDate,
-          notes: data.notes,
-          paymentSchedule: {
-            ...data.paymentSchedule
-          }
-        };
-
-        onSubmit(transformedData);
+        onSubmit(data);
       } catch (error) {
         Logger.error(`Form submission error: ${JSON.stringify(error)}`);
       }

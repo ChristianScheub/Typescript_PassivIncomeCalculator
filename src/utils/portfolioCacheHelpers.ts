@@ -1,5 +1,5 @@
 import { PortfolioPosition } from '../service/portfolioService/portfolioCalculations';
-import { AssetAllocation } from '../types';
+import { AssetAllocation } from '@/types/domains/portfolio';
 import Logger from '../service/Logger/logger';
 
 export const getAssetAllocationFromCache = (positions: PortfolioPosition[]): AssetAllocation[] => {

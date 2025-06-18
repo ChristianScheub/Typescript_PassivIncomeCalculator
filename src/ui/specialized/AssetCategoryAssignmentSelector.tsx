@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../types';
+import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/shared/base';
 import { Plus, X, Tag } from 'lucide-react';
 
 interface AssetCategoryAssignmentSelectorProps {

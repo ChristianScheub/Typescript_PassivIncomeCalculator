@@ -63,6 +63,7 @@ export const calculatePortfolioPositions = (
   categoryAssignments: any[] = []
 ): PortfolioPosition[] => {
   Logger.infoService('Calculating portfolio positions from assets');
+  Logger.infoService(`Input: ${assets.length} assets, ${assetDefinitions.length} assetDefinitions`);
   
   // Group assets by AssetDefinitionId or fallback to name
   const grouped = new Map<string, Asset[]>();
@@ -109,7 +110,14 @@ export const calculatePortfolioPositions = (
     // Now calculate final investment based on remaining quantity and average purchase price
     const totalInvestment = (totalQuantity * avgPurchasePrice) + transactions.reduce((sum, t) => sum + (t.transactionCosts || 0), 0);
 
-    const currentValue = totalQuantity > 0 ? (assetDefinition?.currentPrice || 0) * totalQuantity : 0;
+    // Get current price
+    const currentPrice = assetDefinition?.currentPrice || 0;
+    
+    Logger.infoService(`Position ${assetDefinition?.name || transactions[0].name}: qty=${totalQuantity}, currentPrice=${currentPrice}, avgPrice=${avgPurchasePrice}, assetDefCurrentPrice=${assetDefinition?.currentPrice}, hasAssetDef=${!!assetDefinition}, assetDefId=${transactions[0].assetDefinitionId}`);
+
+    const currentValue = totalQuantity > 0 ? currentPrice * totalQuantity : 0;
+    
+    Logger.infoService(`  -> currentValue calculated: ${currentValue} (${totalQuantity} * ${currentPrice})`);
 
     const averagePurchasePrice = totalQuantity > 0 ? Math.abs(totalInvestment / totalQuantity) : 0;
     const totalReturn = currentValue - totalInvestment;
@@ -147,7 +155,7 @@ export const calculatePortfolioPositions = (
       monthlyIncome: formatCurrency(monthlyIncome),
       annualIncome: formatCurrency(annualIncome),
       averagePurchasePrice: formatCurrency(averagePurchasePrice),
-      currentPrice: formatCurrency(assetDefinition?.currentPrice || 0),
+      currentPrice: formatCurrency(currentPrice),
     };
     
     const position: PortfolioPosition = {
@@ -163,7 +171,7 @@ export const calculatePortfolioPositions = (
       averagePurchasePrice,
       totalInvestment,
       currentValue,
-      currentPrice: assetDefinition?.currentPrice,
+      currentPrice,
       
       totalReturn,
       totalReturnPercentage,

@@ -5,7 +5,6 @@ import {
   addAsset, 
   updateAsset, 
   deleteAsset, 
-  updateAssetDividendCache, 
   calculatePortfolioData,
   selectAssets,
   selectAssetsStatus,
@@ -13,7 +12,7 @@ import {
   selectPortfolioCacheValid,
   selectPortfolioTotals,
   selectSortedAssets
-} from '../../store/slices/assetsSlice';
+} from '../../store/slices/transactionsSlice';
 import { fetchAssetDefinitions } from '../../store/slices/assetDefinitionsSlice';
 import { AssetsView } from '../../view/portfolio-hub/assets/AssetsView';
 import { Asset } from '../../types';
@@ -21,8 +20,6 @@ import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import PortfolioAnalyticsContainer from '../analytics/PortfolioAnalyticsContainer';
 import calculatorService from '../../service/calculatorService';
-// Removed dividend cache service import
-import { createCachedDividends } from '../../utils/dividendCacheUtils';
 import AssetDefinitionsContainer from './AssetDefinitionsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
 import { AssetCategoryContainer } from './AssetCategoryContainer';
@@ -90,17 +87,41 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   // Extract values from cached totals
   const { totalAssetValue, monthlyAssetIncome, annualAssetIncome } = useMemo(() => {
     return {
-      totalAssetValue: portfolioTotals.totalValue,
-      monthlyAssetIncome: portfolioTotals.monthlyIncome,
-      annualAssetIncome: portfolioTotals.annualIncome
+      totalAssetValue: portfolioTotals?.totalValue || 0,
+      monthlyAssetIncome: portfolioTotals?.monthlyIncome || 0,
+      annualAssetIncome: portfolioTotals?.annualIncome || 0
     };
   }, [portfolioTotals]);
 
   // Portfolio data for the view (using cached data or fallback)
   const portfolioData = useMemo(() => {
-    return portfolioCache || {
+    if (portfolioCache) {
+      return {
+        positions: portfolioCache.positions,
+        totals: portfolioCache.totals,
+        metadata: {
+          lastCalculated: portfolioCache.lastCalculated,
+          assetCount: assets.length,
+          definitionCount: assetDefinitions.length,
+          positionCount: portfolioCache.positions.length
+        }
+      };
+    }
+    
+    const defaultTotals = {
+      totalValue: 0,
+      totalInvestment: 0,
+      totalReturn: 0,
+      totalReturnPercentage: 0,
+      monthlyIncome: 0,
+      annualIncome: 0,
+      positionCount: 0,
+      transactionCount: 0
+    };
+    
+    return {
       positions: [],
-      totals: portfolioTotals,
+      totals: portfolioTotals || defaultTotals,
       metadata: {
         lastCalculated: new Date().toISOString(),
         assetCount: assets.length,
@@ -198,13 +219,14 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
         if (!calculatorService.calculateAssetMonthlyIncomeWithCache) return;
         const result = calculatorService.calculateAssetMonthlyIncomeWithCache(asset);
         if (!result.cacheHit && result.cacheDataToUpdate) {
-          const cachedDividends = createCachedDividends(
-            result.cacheDataToUpdate.monthlyAmount,
-            result.cacheDataToUpdate.annualAmount,
-            result.cacheDataToUpdate.monthlyBreakdown,
-            asset
-          );
-          dispatch(updateAssetDividendCache({ assetId: asset.id, cachedDividends }));
+          // TODO: Handle dividend cache update if needed in new architecture
+          // const cachedDividends = createCachedDividends(
+          //   result.cacheDataToUpdate.monthlyAmount,
+          //   result.cacheDataToUpdate.annualAmount,
+          //   result.cacheDataToUpdate.monthlyBreakdown,
+          //   asset
+          // );
+          // dispatch(updateAssetDividendCache({ assetId: asset.id, cachedDividends }));
         }
       });
     }
@@ -288,8 +310,8 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
       <PortfolioHistoryContainer 
         assets={assets}
         assetDefinitions={assetDefinitions}
-        totalInvestment={portfolioTotals.totalInvestment}
-        currentValue={portfolioTotals.totalValue}
+        totalInvestment={portfolioTotals?.totalInvestment || 0}
+        currentValue={portfolioTotals?.totalValue || 0}
         onBack={handleBackToAssets}
       />
     );

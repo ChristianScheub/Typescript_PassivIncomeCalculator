@@ -1,4 +1,4 @@
-import { DividendSchedule, PaymentSchedule } from '../../../../types';
+import { DividendSchedule, PaymentSchedule } from '@/types/shared/base';
 
 export const calculateMonthlyAmountFromFrequency = (
   amount: number,

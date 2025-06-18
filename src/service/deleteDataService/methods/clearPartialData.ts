@@ -1,5 +1,5 @@
 import { store } from '../../../store';
-import { clearAllAssets } from '../../../store/slices/assetsSlice';
+import { clearAllAssets } from '../../../store/slices/transactionsSlice';
 import { clearAllLiabilities } from '../../../store/slices/liabilitiesSlice';
 import { clearAllExpenses } from '../../../store/slices/expensesSlice';
 import { clearAllIncome } from '../../../store/slices/incomeSlice';

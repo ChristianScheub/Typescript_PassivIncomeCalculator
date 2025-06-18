@@ -2,13 +2,13 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { StoreState } from '../../store';
-import { AssetType } from '../../types';
+import { AssetType } from '@/types/shared/base';
 import AssetCalendarView from '../../view/portfolio-hub/assets/AssetCalendarView';
 import Logger from '../../service/Logger/logger';
 import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
 import { calculatorService } from '../../service/calculatorService';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/assetsSlice';
+import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/transactionsSlice';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 
 interface MonthData {
@@ -33,7 +33,7 @@ interface AssetCalendarContainerProps {
 }
 
 const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack }) => {
-  const assets = useSelector((state: StoreState) => state.assets.items);
+  const assets = useSelector((state: StoreState) => state.transactions.items);
   const assetDefinitions = useSelector((state: StoreState) => state.assetDefinitions.items);
   const assetCategories = useSelector((state: StoreState) => state.assetCategories.categories);
   const categoryOptions = useSelector((state: StoreState) => state.assetCategories.categoryOptions);

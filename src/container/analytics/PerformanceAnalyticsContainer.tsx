@@ -15,7 +15,7 @@ const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps
 }) => {
   const [selectedTab, setSelectedTab] = useState<'portfolio' | 'returns' | 'historical'>(initialTab);
   
-  const { items: assets, portfolioCache } = useAppSelector(state => state.assets);
+  const { items: assets, portfolioCache } = useAppSelector(state => state.transactions);
 
   // Scroll to top when component mounts
   useEffect(() => {

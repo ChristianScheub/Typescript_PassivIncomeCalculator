@@ -1,4 +1,5 @@
-import { Asset, Liability } from '../../../types';
+import { Transaction as Asset } from '../../../types/domains/assets/';
+import { Liability } from '../../../types/domains/financial/';
 import { PortfolioRecommendation } from '../interfaces/IAnalyticsService';
 import { calculatorService } from '../../calculatorService';
 

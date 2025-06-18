@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from '../../common/Card';
 // Removed unused import
-import { MonthlyProjection } from '../../../types';
+import { MonthlyProjection } from '@/types/domains/analytics';
 
 interface BarChartExpenseCoverageProps {
   projections: MonthlyProjection[];

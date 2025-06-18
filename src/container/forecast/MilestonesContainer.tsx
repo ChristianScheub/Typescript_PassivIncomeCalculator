@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import calculatorService from '../../service/calculatorService';
 import MilestonesView from '../../view/analytics-hub/milestones/MilestonesView';
-import { Expense, Liability } from '../../types';
+import { Expense, Liability } from '@/types/domains/financial';
 
 interface MilestonesContainerProps {
   onBack?: () => void;
@@ -10,7 +10,7 @@ interface MilestonesContainerProps {
 
 const MilestonesContainer: React.FC<MilestonesContainerProps> = ({ onBack }) => {
   // Get necessary data from the store
-  const { portfolioCache } = useAppSelector(state => state.assets);
+  const { portfolioCache } = useAppSelector(state => state.transactions);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: income } = useAppSelector(state => state.income);

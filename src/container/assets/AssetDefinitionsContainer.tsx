@@ -11,7 +11,7 @@ import {
   deleteAssetCategoryAssignmentsByAssetId
 } from '../../store/slices/assetCategoriesSlice';
 import { AssetDefinitionsView } from '../../view/portfolio-hub/assets/AssetDefinitionsView';
-import { AssetDefinition, AssetType, AssetCategoryAssignment } from '../../types';
+import { AssetDefinition, AssetType, AssetCategoryAssignment } from '@/types/shared/base';
 import Logger from '../../service/Logger/logger';
 import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

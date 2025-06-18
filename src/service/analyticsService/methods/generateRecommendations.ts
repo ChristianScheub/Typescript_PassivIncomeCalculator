@@ -1,4 +1,5 @@
-import { Asset, Liability, Expense, Income, AssetDefinition } from '../../../types';
+import { Transaction as Asset, AssetDefinition } from '../../../types/domains/assets/';
+import { Liability, Expense, Income } from '../../../types/domains/financial/';
 import { PortfolioRecommendation } from '../interfaces/IAnalyticsService';
 import { generateAssetRecommendations } from './generateAssetRecommendations';
 import { generateIncomeRecommendations } from './generateIncomeRecommendations';

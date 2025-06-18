@@ -17,18 +17,18 @@ Import and use the service in containers, Redux slices, or other modules that ne
 import sqlLiteService from '../service/sqlLiteService';
 
 // Create operations
-const assetId = await sqlLiteService.add('assets', newAsset);
+const transactionId = await sqlLiteService.add('transactions', newTransaction);
 const liabilityId = await sqlLiteService.add('liabilities', newLiability);
 
 // Read operations
-const allAssets = await sqlLiteService.getAll('assets');
-const specificAsset = await sqlLiteService.getById('assets', 'asset-id');
+const allTransactions = await sqlLiteService.getAll('transactions');
+const specificTransaction = await sqlLiteService.getById('transactions', 'transaction-id');
 
 // Update operations
-await sqlLiteService.update('assets', updatedAsset);
+await sqlLiteService.update('transactions', updatedTransaction);
 
 // Delete operations
-await sqlLiteService.remove('assets', 'asset-id');
+await sqlLiteService.remove('transactions', 'transaction-id');
 
 // Import/Export operations
 const backupData = await sqlLiteService.exportData();
@@ -36,15 +36,19 @@ await sqlLiteService.importData(jsonBackupString);
 ```
 
 ## Structure
-- **Database Schema**: Supports 5 object stores (assets, liabilities, expenses, income, exchangeRates)
+- **Database Schema**: Supports 9 object stores (transactions, assetDefinitions, assetCategories, assetCategoryOptions, assetCategoryAssignments, liabilities, expenses, income, exchangeRates)
 - **Type Safety**: Full TypeScript interfaces for all database operations
 - **CRUD Operations**: Complete Create, Read, Update, Delete functionality
 - **Import/Export**: JSON-based backup and restore capabilities
-- **Database Versioning**: Handles schema migrations (currently version 2)
+- **Database Versioning**: Handles schema migrations (currently version 5)
 - **Index Support**: Optimized queries with indexes on key fields
 
 ## Supported Data Stores
-- `assets` - Financial assets (stocks, bonds, real estate, cash)
+- `transactions` - Financial asset transactions (buy/sell operations)
+- `assetDefinitions` - Master data for financial assets (stocks, ETFs, etc.)
+- `assetCategories` - User-defined categories for asset organization
+- `assetCategoryOptions` - Options within asset categories
+- `assetCategoryAssignments` - Assignments of assets to categories
 - `liabilities` - Debts and obligations
 - `expenses` - Regular and one-time expenses
 - `income` - Income sources and amounts
@@ -62,7 +66,9 @@ await sqlLiteService.importData(jsonBackupString);
 ## Database Schema
 ```typescript
 interface FinanceDB extends DBSchema {
-  assets: { key: string; value: Asset; indexes: { 'by-type': string } };
+  transactions: { key: string; value: Transaction; indexes: { 'by-type': string } };
+  assetDefinitions: { key: string; value: AssetDefinition; indexes: { 'by-type': string } };
+  assetCategories: { key: string; value: AssetCategory; indexes: { 'by-name': string } };
   liabilities: { key: string; value: Liability };
   expenses: { key: string; value: Expense; indexes: { 'by-category': string } };
   income: { key: string; value: Income };

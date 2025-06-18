@@ -46,7 +46,7 @@ export const createPersistedStore: StoreEnhancer = (createStore) =>
         const state = store.getState() as any;
         const stateToSave = {
           assets: { 
-            items: state.assets.items
+            items: state.transactions.items
           },
           liabilities: {
             items: state.liabilities.items

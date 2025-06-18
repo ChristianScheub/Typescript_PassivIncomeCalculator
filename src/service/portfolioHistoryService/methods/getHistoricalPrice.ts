@@ -1,4 +1,4 @@
-import { AssetDefinition } from '../../../types';
+import { AssetDefinition } from '../../../types/domains/assets/';
 import Logger from '../../Logger/logger';
 
 /**

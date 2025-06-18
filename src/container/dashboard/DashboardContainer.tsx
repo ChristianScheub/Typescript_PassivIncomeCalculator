@@ -16,7 +16,7 @@ const DashboardContainer: React.FC = () => {
   const dispatch = useAppDispatch();
 
   // Redux state
-  const { items: assets } = useAppSelector(state => state.assets);
+  const { items: assets } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: expenses } = useAppSelector(state => state.expenses);
@@ -36,12 +36,17 @@ const DashboardContainer: React.FC = () => {
 
   // Navigation handlers
   const navigationHandlers = useMemo(() => ({
-    onNavigateToIncome: () => navigate('/income'),
-    onNavigateToExpenses: () => navigate('/expenses'),
-    onNavigateToAssets: () => navigate('/assets'),
-    onNavigateToLiabilities: () => navigate('/liabilities'),
-    onNavigateToForecast: () => navigate('/forecast'),
-    onNavigateToSettings: () => navigate('/settings')
+    onNavigateToIncome: () => navigate('/portfolio'),
+    onNavigateToExpenses: () => navigate('/portfolio'),
+    onNavigateToAssets: () => navigate('/portfolio'),
+    onNavigateToLiabilities: () => navigate('/portfolio'),
+    onNavigateToForecast: () => navigate('/analytics'),
+    onNavigateToSettings: () => navigate('/settings'),
+    // Quick Action specific handlers - navigate to portfolio with URL parameters
+    onAddIncome: () => navigate('/portfolio?category=income&action=addIncome'),
+    onAddExpense: () => navigate('/portfolio?category=expenses&action=addExpense'),
+    onAddTransaction: () => navigate('/portfolio?category=assets&action=addTransaction'),
+    onAddLiability: () => navigate('/portfolio?category=liabilities&action=addDebt')
   }), [navigate]);
 
   // UI Configuration using custom hook

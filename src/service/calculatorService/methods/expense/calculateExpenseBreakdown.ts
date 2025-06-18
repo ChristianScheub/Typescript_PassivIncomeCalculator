@@ -1,4 +1,5 @@
-import { Expense, ExpenseBreakdown, ExpenseCategory } from '../../../../types';
+import { Expense, ExpenseBreakdown } from '../../../../types/domains/financial/';
+import { ExpenseCategory } from '../../../../types/shared/';
 import Logger from '../../../Logger/logger';
 import { calculateMonthlyExpense } from './calculateExpenses';
 

@@ -1,4 +1,4 @@
-import { Income } from '../../../../types';
+import { Income } from '@/types/domains/financial';
 
 export const calculateMonthlyIncome = (income: Income): number => {
     if (!income.paymentSchedule) {

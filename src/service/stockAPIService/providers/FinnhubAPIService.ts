@@ -4,7 +4,7 @@ import {
   StockPrice,
   StockHistory,
   StockHistoryEntry
-} from '../types';
+} from '../../../types/domains/assets/';
 import Logger from '../../Logger/logger';
 import { CapacitorHttp } from '@capacitor/core';
 import exchangeService from '../../exchangeService';
@@ -150,6 +150,11 @@ export class FinnhubAPIService implements IStockAPIService {
           const suffix = parts.length > 1 ? parts[parts.length - 1] : '';
           
           exchanges.push({
+            code: result.symbol,
+            name: this.getExchangeName(suffix),
+            country: this.getExchangeCountry(suffix),
+            timezone: '',
+            // API compatibility fields
             symbol: result.symbol,
             suffix: suffix,
             exchangeName: this.getExchangeName(suffix),
@@ -163,6 +168,11 @@ export class FinnhubAPIService implements IStockAPIService {
       if (exchanges.length === 0) {
         exchanges.push(
           {
+            code: `${symbol}.US`,
+            name: 'NASDAQ/NYSE',
+            country: 'USA',
+            timezone: 'America/New_York',
+            // API compatibility fields
             symbol: `${symbol}.US`,
             suffix: 'US',
             exchangeName: 'NASDAQ/NYSE',
@@ -170,6 +180,11 @@ export class FinnhubAPIService implements IStockAPIService {
             currency: 'USD'
           },
           {
+            code: `${symbol}.DE`,
+            name: 'XETRA',
+            country: 'Germany',
+            timezone: 'Europe/Berlin',
+            // API compatibility fields
             symbol: `${symbol}.DE`,
             suffix: 'DE',
             exchangeName: 'XETRA',
@@ -262,15 +277,18 @@ export class FinnhubAPIService implements IStockAPIService {
           date: date,
           timestamp: timestamp,
           open: open,
-          midday: convertedMidday,
+          high: await this.convertPrice(candles.h[i]),
+          low: await this.convertPrice(candles.l[i]),
           close: close,
+          midday: convertedMidday,
           volume: candles.v[i]
         });
       }
 
       return {
         symbol: symbol,
-        data: historyData,
+        entries: historyData,
+        data: historyData, // For API compatibility
         currency: this.getCurrency()
       };
     } catch (error) {
@@ -324,5 +342,25 @@ export class FinnhubAPIService implements IStockAPIService {
     };
     
     return currencyMap[suffix] || 'USD';
+  }
+
+  /**
+   * Get country for exchange suffix
+   */
+  private getExchangeCountry(suffix: string): string {
+    const countryMap: Record<string, string> = {
+      'US': 'USA',
+      'DE': 'Germany', 
+      'L': 'UK',
+      'PA': 'France',
+      'AS': 'Netherlands',
+      'MI': 'Italy',
+      'SW': 'Switzerland',
+      'T': 'Japan',
+      'HK': 'Hong Kong',
+      'AX': 'Australia'
+    };
+    
+    return countryMap[suffix] || 'Unknown';
   }
 }

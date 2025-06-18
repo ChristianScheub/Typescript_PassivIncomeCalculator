@@ -1,4 +1,4 @@
-import { DividendSchedule, PaymentSchedule, PaymentFrequency } from '../../../../types';
+import { DividendSchedule, PaymentSchedule, PaymentFrequency } from '@/types/shared/base';
 import Logger from '../../../Logger/logger';
 import {
   calculateMonthlyAmountFromFrequency,

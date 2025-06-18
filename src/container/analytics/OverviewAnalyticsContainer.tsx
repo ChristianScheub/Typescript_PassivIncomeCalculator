@@ -10,7 +10,7 @@ interface OverviewAnalyticsContainerProps {
 const OverviewAnalyticsContainer: React.FC<OverviewAnalyticsContainerProps> = ({ onBack }) => {
   const [selectedTab, setSelectedTab] = useState<'summary' | 'insights' | 'trends'>('summary');
   
-  const { items: assets, portfolioCache } = useAppSelector(state => state.assets);
+  const { items: assets, portfolioCache } = useAppSelector(state => state.transactions);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: income } = useAppSelector(state => state.income);

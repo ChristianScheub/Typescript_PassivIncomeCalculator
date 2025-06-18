@@ -1,4 +1,4 @@
-import { Expense, Income } from '../../../types';
+import { Expense, Income } from '../../../types/domains/financial/';
 import { PortfolioRecommendation } from '../interfaces/IAnalyticsService';
 import { calculatorService } from '../../calculatorService';
 

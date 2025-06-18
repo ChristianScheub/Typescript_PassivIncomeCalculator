@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import type { AnyAction, ThunkAction } from '@reduxjs/toolkit';
-import assetsReducer from './slices/assetsSlice';
+import transactionsReducer from './slices/transactionsSlice';
 import assetDefinitionsReducer from './slices/assetDefinitionsSlice';
 import assetCategoriesReducer from './slices/assetCategoriesSlice';
 import liabilitiesReducer from './slices/liabilitiesSlice';
@@ -30,22 +30,24 @@ const loadState = () => {
     const state = JSON.parse(serializedState);
     
     // Validate portfolio cache from localStorage
+    // Use the transactions data
+    const transactionsData = state.transactions;
     const cacheValid = validatePortfolioCache(
-      state.assets?.portfolioCache, 
-      state.assets?.portfolioCacheValid
+      transactionsData?.portfolioCache, 
+      transactionsData?.portfolioCacheValid
     );
     
     Logger.infoRedux(`Loading state from localStorage - portfolio cache ${cacheValid ? 'valid' : 'invalid/missing'}`);
     
     return {
-      assets: { 
-        items: state.assets?.items || [],
+      transactions: { 
+        items: transactionsData?.items || [],
         status: 'idle' as Status,
         error: null,
         // Restore portfolio cache from localStorage if valid
-        portfolioCache: cacheValid ? state.assets?.portfolioCache : undefined,
+        portfolioCache: cacheValid ? transactionsData?.portfolioCache : undefined,
         portfolioCacheValid: cacheValid,
-        lastPortfolioCalculation: cacheValid ? state.assets?.lastPortfolioCalculation : undefined
+        lastPortfolioCalculation: cacheValid ? transactionsData?.lastPortfolioCalculation : undefined
       },
       assetDefinitions: {
         items: state.assetDefinitions?.items || [],
@@ -103,7 +105,7 @@ const persistedState = loadState();
 // Define the root reducer object with explicit type
 // Define the reducer object
 const rootReducer = {
-  assets: assetsReducer,
+  transactions: transactionsReducer,
   assetDefinitions: assetDefinitionsReducer,
   assetCategories: assetCategoriesReducer,
   liabilities: liabilitiesReducer,
@@ -136,12 +138,12 @@ store.subscribe(() => {
   const state = store.getState();
   try {
     const stateToSave = {
-      assets: { 
-        items: state.assets.items,
+      transactions: { 
+        items: state.transactions.items,
         // Save portfolio cache to localStorage
-        portfolioCache: state.assets.portfolioCache,
-        portfolioCacheValid: state.assets.portfolioCacheValid,
-        lastPortfolioCalculation: state.assets.lastPortfolioCalculation
+        portfolioCache: state.transactions.portfolioCache,
+        portfolioCacheValid: state.transactions.portfolioCacheValid,
+        lastPortfolioCalculation: state.transactions.lastPortfolioCalculation
       },
       assetDefinitions: {
         items: state.assetDefinitions.items
@@ -169,7 +171,7 @@ store.subscribe(() => {
     };
     
     // Check if we're clearing data (all arrays are empty)
-    const isEmpty = state.assets.items.length === 0 && 
+    const isEmpty = state.transactions.items.length === 0 && 
                    state.assetDefinitions.items.length === 0 &&
                    state.assetCategories.categories.length === 0 &&
                    state.assetCategories.categoryOptions.length === 0 &&

@@ -3,17 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
 import { CreditCard } from 'lucide-react';
 import formatService from '../../service/formatService';
-import type { LiabilityType } from '../../types';
+import type { DebtEntry } from '../../types';
 import { getHighestMilestone, getMilestoneKey } from '../../utils/milestoneUtils';
 import './milestones.css';
-
-interface DebtEntry {
-  name: string;
-  type: LiabilityType;
-  initialAmount: number;
-  currentAmount: number;
-  progress: number;
-}
 
 interface DebtBreakerProps {
   debts: DebtEntry[];

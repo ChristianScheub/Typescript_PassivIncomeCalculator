@@ -1,10 +1,10 @@
 import { IStockAPIService } from '../interfaces/IStockAPIService';
-import { 
+import {
   StockExchange,
   StockPrice,
   StockHistory,
   StockHistoryEntry
-} from '../types';
+} from '../../../types/domains/assets/';
 import Logger from '../../Logger/logger';
 import { CapacitorHttp } from '@capacitor/core';
 
@@ -75,6 +75,11 @@ export class YahooAPIService implements IStockAPIService {
       const exchanges: StockExchange[] = res.data.items
         .filter((item: any) => item.symbol.toLowerCase().startsWith(symbol.toLowerCase()))
         .map((item: any) => ({
+          code: item.symbol,
+          name: item.exchange ?? '',
+          country: item.market ?? '',
+          timezone: '',
+          // Additional API compatibility fields
           symbol: item.symbol,
           suffix: item.symbol.replace(symbol, ''),
           exchangeName: item.exchange ?? '',
@@ -148,15 +153,18 @@ export class YahooAPIService implements IStockAPIService {
           date: new Date(t * 1000).toISOString().split('T')[0],
           timestamp: t * 1000,
           open,
-          midday,
+          high: open, // Yahoo liefert keine high/low, verwende open als Fallback
+          low: close, // Yahoo liefert keine high/low, verwende close als Fallback
           close,
+          midday,
           volume: quote.volume ? quote.volume[i] : undefined,
         };
       });
 
       const history: StockHistory = {
         symbol,
-        data,
+        entries: data,
+        data, // For API compatibility
         currency,
       };
 

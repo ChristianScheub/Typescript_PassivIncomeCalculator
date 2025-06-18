@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { fetchIncome, addIncome, updateIncome, deleteIncome } from '../../store/slices/incomeSlice';
-import { Income } from '../../types';
+import { Income } from '@/types/domains/financial';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import calculatorService from '../../service/calculatorService';

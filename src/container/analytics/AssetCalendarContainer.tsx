@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import Logger from '../../service/Logger/logger';
 import AssetCalendarView from '../../view/portfolio-hub/assets/AssetCalendarView';
-import { AssetType } from '../../types';
+import { AssetType } from '@/types/shared/base';
 import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
 
 interface AssetCalendarContainerProps {
@@ -31,7 +31,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   selectedTab = 'calendar',
   onBack 
 }) => {
-  const { portfolioCache } = useAppSelector(state => state.assets);
+  const { portfolioCache } = useAppSelector(state => state.transactions);
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
   const [selectedAssetType, setSelectedAssetType] = useState<AssetType | 'all'>('all');
 

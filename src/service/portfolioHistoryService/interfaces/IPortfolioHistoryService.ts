@@ -1,4 +1,4 @@
-import { Asset, AssetDefinition } from '../../../types';
+import { Transaction as Asset, AssetDefinition } from '../../../types/domains/assets/';
 
 /**
  * Portfolio History Point - represents portfolio value at a specific date

@@ -1,4 +1,4 @@
-import { Asset } from "../../../../types";
+import { Transaction as Asset } from "../../../../types/domains/assets/";
 import Logger from "../../../Logger/logger";
 import { 
   getCachedDividendData,

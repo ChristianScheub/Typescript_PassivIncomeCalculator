@@ -1,4 +1,13 @@
-import { Asset, Liability, Expense, Income, AssetDefinition } from '../../../types';
+// Neue Domain-Driven Types
+import { 
+  Transaction as Asset, 
+  AssetDefinition 
+} from '../../../types/domains/assets/';
+import { 
+  Liability, 
+  Expense, 
+  Income 
+} from '../../../types/domains/financial/';
 
 export interface FinancialSummary {
   netWorth: number;

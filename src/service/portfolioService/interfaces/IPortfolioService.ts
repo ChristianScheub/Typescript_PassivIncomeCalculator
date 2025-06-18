@@ -1,4 +1,8 @@
-import { Asset, AssetDefinition } from '../../../types';
+// Neue Domain-Driven Types
+import { 
+  AssetDefinition, 
+  Transaction as Asset 
+} from '../../../types/domains/assets/';
 import { PortfolioPosition } from '../portfolioCalculations';
 
 export interface IPortfolioService {

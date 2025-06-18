@@ -15,6 +15,9 @@
     "openManager": "Open Manager"
   },
   "categories": {
+    "income": "Income",
+    "expenses": "Expenses",
+    "planning": "Planning",
     "title": "Asset Categories",
     "addCategory": "Add Category",
     "editCategory": "Edit Category",
@@ -61,6 +64,8 @@
     "totalAnnualAmount": "Total Annual Amount",
     "expand": "Expand",
     "collapse": "Collapse",
+    "notes": "Notes",
+    "notesPlaceholder": "Additional information or notes...",
     "income": "Income",
     "expenses": "Expenses"
   },
@@ -514,6 +519,12 @@
   },
   "assets": {
     "title": "Assets",
+    "type": "Type",
+    "sector": "Sector",
+    "country": "Country",
+    "currency": "Currency",
+    "dividend": "Dividend",
+    "frequency": "Frequency",
     "purchase": "Purchase",
     "updatePrices": "Update Prices",
     "updateHistoricalData": "Update Historical Data",
@@ -523,6 +534,15 @@
     "sectors": "Sectors",
     "addSector": "Add Sector",
     "total": "Total",
+    "types": {
+      "STOCK": "Stock",
+      "BOND": "Bond",
+      "REAL_ESTATE": "Real Estate",
+      "COMMODITY": "Commodity",
+      "CRYPTO": "Cryptocurrency",
+      "CASH": "Cash",
+      "OTHER": "Other"
+    },
     "priceHistory": {
       "entries": "price history entries",
       "title": "Price History",
@@ -841,6 +861,12 @@
     "fixedCosts": "Fixed Cost Coverage"
   },
   "portfolio": {
+    "track": "Track",
+    "manage": "Manage",
+    "totalDebt": "Total Debt",
+    "debts": "Debts", 
+    "transactionsDesc": "Unified transaction management across all categories",
+    "diversification": "Diversification",
     "available": "Available",
     "unified": "Unified View",
     "totalValue": "Total Value",
@@ -849,8 +875,12 @@
     "calendar": "Calendar",
     "monthlyIncome": "Monthly Income",
     "categories": {
+      "liabilities": "Liabilities Management",
+      "transactions": "Transactions Center", 
+      "analytics": "Portfolio Analytics",
       "income": "Income Management"
     },
+    "categoriesLabel": "Categories",
     "debtRatio": "Debt Ratio",
     "analyze": "Analyze",
     "recentActivity": "Recent Activity",
@@ -883,8 +913,10 @@
       "activities": {
         "overview": "Portfolio Overview",
         "assets": "Viewed Assets Section",
+        "assets.addTransaction": "Added New Asset Transaction",
         "liabilities": "Viewed Liabilities Section",
         "income": "Viewed Income Section",
+        "income.addIncome": "Added New Income Source",
         "expenses": "Viewed Expenses Section",
         "transactions": "Viewed Transactions Section",
         "assets.portfolio": "Viewed Asset Portfolio",

@@ -1,4 +1,4 @@
-import { AssetDefinition } from '../../types';
+import { AssetDefinition } from '../../types/domains/assets/';
 import Logger from '../Logger/logger';
 import stockAPIService from '../stockAPIService';
 import { updateAssetDefinitionPrice, cleanupOldPriceHistory } from '../../utils/priceHistoryUtils';
@@ -17,7 +17,7 @@ export class StockPriceUpdater {
       .filter(definition => 
         definition.type === 'stock' && 
         definition.ticker && 
-        definition.autoUpdatePrice === true  // Only update if auto-update is enabled
+        definition.marketData?.autoUpdatePrice === true  // Only update if auto-update is enabled
       )
       .slice(0, 30);
 
@@ -82,7 +82,7 @@ export class StockPriceUpdater {
       .filter(definition => 
         definition.type === 'stock' && 
         definition.ticker && 
-        definition.autoUpdateHistoricalPrices === true  // Only update if auto-update is enabled
+        definition.marketData?.autoUpdateHistoricalPrices === true  // Only update if auto-update is enabled
       )
       .slice(0, 10); // Limit to prevent API overload
 

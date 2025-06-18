@@ -1,4 +1,4 @@
-import { Expense } from '../../../../types';
+import { Expense } from '../../../../types/domains/financial/';
 
 export const calculateMonthlyExpense = (expense: Expense): number => {
     if (!expense.paymentSchedule) {

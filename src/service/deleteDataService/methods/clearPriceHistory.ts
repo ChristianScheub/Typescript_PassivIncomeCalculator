@@ -1,5 +1,5 @@
 import { store } from '../../../store';
-import { invalidatePortfolioCache } from '../../../store/slices/assetsSlice';
+import { invalidatePortfolioCache } from '../../../store/slices/transactionsSlice';
 import Logger from '../../Logger/logger';
 import sqliteService from '../../sqlLiteService';
 

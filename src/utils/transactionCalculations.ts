@@ -3,7 +3,7 @@
  * These functions replace the removed currentQuantity and currentValue fields
  */
 
-import { Transaction, Asset } from '../types';
+import { Transaction, Asset } from '@/types/domains/assets';
 
 /**
  * Gets the current quantity for a transaction

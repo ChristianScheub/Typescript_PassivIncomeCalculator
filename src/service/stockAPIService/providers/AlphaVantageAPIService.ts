@@ -3,7 +3,7 @@ import {
   StockExchange,
   StockPrice,
   StockHistory
-} from '../types';
+} from '../../../types/domains/assets/';
 import Logger from '../../Logger/logger';
 
 /**

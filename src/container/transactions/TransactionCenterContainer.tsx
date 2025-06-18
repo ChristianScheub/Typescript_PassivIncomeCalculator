@@ -13,7 +13,7 @@ const TransactionCenterContainer: React.FC<TransactionCenterContainerProps> = ({
   const { t } = useTranslation();
   
   // Get data from Redux store
-  const assets = useAppSelector(state => state.assets.items);
+  const assets = useAppSelector(state => state.transactions.items);
   const income = useAppSelector(state => state.income.items);
   const expenses = useAppSelector(state => state.expenses.items);
   const liabilities = useAppSelector(state => state.liabilities.items);

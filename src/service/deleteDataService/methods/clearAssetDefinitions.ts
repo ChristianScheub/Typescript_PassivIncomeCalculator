@@ -1,6 +1,6 @@
 import { store } from '../../../store';
 import { clearAllAssetCategories } from '../../../store/slices/assetCategoriesSlice';
-import { invalidatePortfolioCache } from '../../../store/slices/assetsSlice';
+import { invalidatePortfolioCache } from '../../../store/slices/transactionsSlice';
 import Logger from '../../Logger/logger';
 import { StoreNames } from '../../sqlLiteService';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';

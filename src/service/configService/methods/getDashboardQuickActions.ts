@@ -7,27 +7,27 @@ export const getDashboardQuickActions = (handlers: NavigationHandlers): QuickAct
     icon: DollarSign,
     color: 'text-green-500',
     translationKey: 'dashboard.addIncome',
-    onClick: handlers.onNavigateToIncome
+    onClick: handlers.onAddIncome
   },
   {
     id: 'expense',
     icon: CreditCard,
     color: 'text-red-500',
     translationKey: 'dashboard.addExpense',
-    onClick: handlers.onNavigateToExpenses
+    onClick: handlers.onAddExpense
   },
   {
     id: 'asset',
     icon: Wallet,
     color: 'text-blue-500',
     translationKey: 'dashboard.recordTransaction',
-    onClick: handlers.onNavigateToAssets
+    onClick: handlers.onAddTransaction
   },
   {
     id: 'debt',
     icon: Target,
     color: 'text-orange-500',
     translationKey: 'dashboard.payDebt',
-    onClick: handlers.onNavigateToLiabilities
+    onClick: handlers.onAddLiability
   }
 ];

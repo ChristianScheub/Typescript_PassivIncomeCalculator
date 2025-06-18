@@ -1,4 +1,15 @@
-import { Asset, Income, AssetAllocation, IncomeAllocation, IncomeType, AssetType } from '../../../../types';
+// Neue Domain-Driven Types
+import { 
+  Transaction as Asset
+} from '../../../../types/domains/assets/';
+import { 
+  AssetAllocation,
+  IncomeAllocation
+} from '../../../../types/domains/portfolio/';
+import { 
+  Income
+} from '../../../../types/domains/financial/';
+import { AssetType, IncomeType } from '../../../../types/shared/';
 import Logger from '../../../Logger/logger';
 import { calculateMonthlyIncome } from '../income/calculateIncome';
 import { calculateAssetMonthlyIncome } from './calculateAssetIncome';
@@ -54,32 +65,45 @@ export const calculateIncomeAllocation = (income: Income[], assets: Asset[]): In
     total += monthlyAmount;
   });
 
+  // Count für jeden IncomeType berechnen
+  const countByType = new Map<IncomeType, number>();
+  income.forEach(incomeItem => {
+    const currentCount = countByType.get(incomeItem.type) || 0;
+    countByType.set(incomeItem.type, currentCount + 1);
+  });
+
   // In Array mit Prozentangaben umwandeln
   const result = Array.from(incomeByType.entries()).map(([type, amount]) => ({
     type,
-    amount,
-    percentage: total > 0 ? (amount / total) * 100 : 0
+    value: amount, // 'amount' zu 'value' umbenennen für Konsistenz
+    percentage: total > 0 ? (amount / total) * 100 : 0,
+    count: countByType.get(type) || 0
   }));
 
   Logger.info(`Income allocation calculated - types: ${result.length}, total: ${total}`);
-  return result.sort((a, b) => b.amount - a.amount);
+  return result.sort((a, b) => b.value - a.value);
 };
 
 export const calculateAssetAllocation = (assets: Asset[]): AssetAllocation[] => {
   const allocationMap = new Map<AssetType, number>();
-  const total = assets.reduce((sum, asset) => sum + asset.value, 0);
+  const countMap = new Map<AssetType, number>();
+  let total = 0;
 
   assets.forEach(asset => {
     const currentAmount = allocationMap.get(asset.type) || 0;
+    const currentCount = countMap.get(asset.type) || 0;
+    
     allocationMap.set(asset.type, currentAmount + asset.value);
+    countMap.set(asset.type, currentCount + 1);
+    total += asset.value;
   });
 
   const result = Array.from(allocationMap.entries())
     .map(([type, value]) => ({
-      name: type,
       type,
       value,
-      percentage: total > 0 ? (value / total) * 100 : 0
+      percentage: total > 0 ? (value / total) * 100 : 0,
+      count: countMap.get(type) || 0
     }))
     .sort((a, b) => b.value - a.value);
 

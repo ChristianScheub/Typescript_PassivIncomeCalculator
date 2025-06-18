@@ -1,5 +1,5 @@
 import React from 'react';
-import { AssetType } from '../../types';
+import { AssetType } from '@/types/shared/base';
 import { UseFormSetValue } from 'react-hook-form';
 import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { useTranslation } from 'react-i18next';

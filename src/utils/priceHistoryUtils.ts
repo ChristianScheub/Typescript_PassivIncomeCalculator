@@ -1,4 +1,4 @@
-import { PriceHistoryEntry, AssetDefinition, Transaction, Asset } from '../types';
+import { PriceHistoryEntry, AssetDefinition, Transaction, Asset } from '@/types/domains/assets';
 
 /**
  * Utility functions for managing price history data

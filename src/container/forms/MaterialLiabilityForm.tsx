@@ -1,4 +1,4 @@
-import { Liability, LiabilityType, PaymentFrequency } from '../../types';
+import { Liability, LiabilityType, PaymentFrequency } from '@/types/shared/base';
 import { usePaymentSchedule } from '../../hooks/usePaymentSchedule';
 import { useSharedForm } from '../../hooks/useSharedForm';
 import { createValidationSchema, createPaymentScheduleSchema } from '../../utils/validationSchemas';

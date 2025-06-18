@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { fetchLiabilities, addLiability, updateLiability, deleteLiability } from '../../store/slices/liabilitiesSlice';
-import { Liability } from '../../types';
+import { Liability } from '@/types/domains/financial';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import calculatorService from '../../service/calculatorService';

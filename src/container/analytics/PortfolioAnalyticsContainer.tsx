@@ -2,8 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import PortfolioAnalyticsView from '../../view/analytics-hub/assets/PortfolioAnalyticsView';
 import calculatorService from '../../service/calculatorService';
-import { AssetType } from '../../types';
-import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/assetsSlice';
+import { AssetType } from '@/types/shared/base';
+import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/transactionsSlice';
 import Logger from '../../service/Logger/logger';
 
 type AnalyticsTab = 'asset_distribution' | 'income_distribution' | 'custom';
@@ -20,7 +20,7 @@ const PortfolioAnalyticsContainer: React.FC<PortfolioAnalyticsContainerProps> = 
   const dispatch = useAppDispatch();
   const portfolioCache = useAppSelector(selectPortfolioCache);
   const portfolioCacheValid = useAppSelector(selectPortfolioCacheValid);
-  const assets = useAppSelector(state => state.assets.items);
+  const assets = useAppSelector(state => state.transactions.items);
   const assetDefinitions = useAppSelector(state => state.assetDefinitions.items);
   const { categories, categoryOptions, categoryAssignments } = useAppSelector(state => state.assetCategories || {
     categories: [],

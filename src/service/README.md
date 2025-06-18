@@ -137,7 +137,7 @@ Integrates with financial APIs for comprehensive market data and portfolio manag
 
 ### **sqlLiteService**
 Handles local data persistence with SQLite database for comprehensive financial data:
-- Type-safe CRUD operations for all financial entities (assets, liabilities, income, expenses)
+- Type-safe CRUD operations for all financial entities (transactions, assetDefinitions, liabilities, income, expenses)
 - Data import/export functionality with validation for backup and migration
 - Database schema management and migrations for data integrity
 - Transaction support for multi-table financial operations

@@ -35,11 +35,11 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
   const [navigationHistory, setNavigationHistory] = useState<Array<{ category: AnalyticsCategory; subCategory: AnalyticsSubCategory }>>([]);
   
   // Get data for analytics insights
-  const { items: assets } = useAppSelector(state => state.assets);
+  const { items: assets } = useAppSelector(state => state.transactions);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: income } = useAppSelector(state => state.income);
-  const { portfolioCache } = useAppSelector(state => state.assets);
+  const { portfolioCache } = useAppSelector(state => state.transactions);
 
   // Scroll to top when category changes
   useEffect(() => {

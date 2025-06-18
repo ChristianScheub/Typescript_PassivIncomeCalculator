@@ -1,5 +1,5 @@
 import { Middleware } from '@reduxjs/toolkit';
-import { invalidatePortfolioCache } from '../slices/assetsSlice';
+import { invalidatePortfolioCache } from '../slices/transactionsSlice';
 import Logger from '../../service/Logger/logger';
 import { StoreState } from '../index';
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { fetchExpenses, addExpense, updateExpense, deleteExpense } from '../../store/slices/expensesSlice';
-import { Expense } from '../../types';
+import { Expense } from '@/types/domains/financial';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import calculatorService from '../../service/calculatorService';

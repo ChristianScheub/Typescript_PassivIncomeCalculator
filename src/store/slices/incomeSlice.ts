@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Income } from '../../types';
+import { Income } from '../../types/domains/financial/';
 import sqliteService from '../../service/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
 import Logger from '../../service/Logger/logger';

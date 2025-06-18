@@ -1,6 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Asset, PriceHistoryEntry, Transaction } from '../../types';
+import { Transaction as Asset } from '../../types/domains/assets/';
+import { PriceHistoryEntry } from '../../types/domains/assets/';
+// Legacy alias
+import { Transaction } from '../../types';
 import { formatCurrency } from '../../service/formatService/methods/formatCurrency';
 import { TrendingUp, TrendingDown, Calendar, Database, Upload } from 'lucide-react';
 import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtils';

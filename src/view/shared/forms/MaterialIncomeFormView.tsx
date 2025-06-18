@@ -1,5 +1,5 @@
 import React from 'react';
-import { IncomeType, PaymentFrequency } from '../../../types';
+import { IncomeType } from '../../../types';
 import { UseFormSetValue } from 'react-hook-form';
 import { 
   StandardFormWrapper,
@@ -17,7 +17,7 @@ interface IncomeFormData {
   name: string;
   type: IncomeType;
   paymentSchedule: {
-    frequency: PaymentFrequency;
+    frequency: 'monthly' | 'quarterly' | 'annually' | 'custom';
     amount: number;
     months?: number[];
     dayOfMonth?: number; // Tag des Monats für die Zahlung

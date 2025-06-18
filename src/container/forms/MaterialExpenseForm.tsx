@@ -1,4 +1,5 @@
-import { Expense, ExpenseCategory, PaymentFrequency } from '../../types';
+import { Expense } from '@/types/domains/financial';
+import { ExpenseCategory } from '@/types/shared/base';
 import { usePaymentSchedule } from '../../hooks/usePaymentSchedule';
 import { useSharedForm } from '../../hooks/useSharedForm';
 import { createValidationSchema, createPaymentScheduleSchema } from '../../utils/validationSchemas';
@@ -39,10 +40,9 @@ export const MaterialExpenseForm = ({ initialData, onSubmit }: ExpenseFormProps)
   const getDefaultValues = (): Partial<ExpenseFormData> => {
     if (!initialData) {
       return {
-        category: 'other' as ExpenseCategory,
-        paymentSchedule: {
-          frequency: 'monthly' as PaymentFrequency,
-          amount: 0,
+        category: 'other' as ExpenseCategory,      paymentSchedule: {
+        frequency: 'monthly',
+        amount: 0,
           dayOfMonth: 1 // Standard: erster Tag des Monats
         },
         startDate: new Date().toISOString().split('T')[0]
@@ -52,6 +52,7 @@ export const MaterialExpenseForm = ({ initialData, onSubmit }: ExpenseFormProps)
       ...initialData,
       paymentSchedule: {
         ...initialData.paymentSchedule,
+        frequency: (initialData.paymentSchedule.frequency === 'none' ? 'monthly' : initialData.paymentSchedule.frequency) as 'monthly' | 'quarterly' | 'annually' | 'custom',
         dayOfMonth: initialData.paymentSchedule.dayOfMonth || 1
       }
     };

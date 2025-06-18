@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { setApiEnabled, setApiKey, setSelectedProvider, StockAPIProvider } from "../../store/slices/apiConfigSlice";
-import { clearAllAssets } from "../../store/slices/assetsSlice";
+import { clearAllAssets } from "../../store/slices/transactionsSlice";
 import { clearAllLiabilities } from "../../store/slices/liabilitiesSlice";
 import { clearAllExpenses } from "../../store/slices/expensesSlice";
 import { clearAllIncome } from "../../store/slices/incomeSlice";
@@ -300,7 +300,7 @@ const SettingsContainer: React.FC = () => {
 
       // 2. Clear all data from SQLite
       const stores: StoreNames[] = [
-        "assets",
+        "transactions",
         "assetDefinitions",
         "assetCategories",
         "assetCategoryOptions",

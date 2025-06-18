@@ -1,10 +1,9 @@
 import { store } from '../../../store';
 import { 
-    invalidateAllDividendCaches, 
     invalidatePortfolioCache, 
     calculatePortfolioData,
     fetchAssets 
-} from '../../../store/slices/assetsSlice';
+} from '../../../store/slices/transactionsSlice';
 import { fetchAssetDefinitions } from '../../../store/slices/assetDefinitionsSlice';
 import { 
     fetchAssetCategories,
@@ -37,7 +36,8 @@ export async function refreshAllCaches(): Promise<void> {
     try {
         // Step 1: Clear all dividend caches
         Logger.infoService("Clearing dividend caches");
-        store.dispatch(invalidateAllDividendCaches());
+        // TODO: Handle individual asset dividend cache invalidation if needed
+        // Individual dividend caches are now managed per asset basis
 
         // Step 2: Clear portfolio cache
         Logger.infoService("Clearing portfolio cache");
@@ -74,7 +74,7 @@ export async function refreshAllCaches(): Promise<void> {
         
         // Get fresh data from store
         const state = store.getState();
-        const { items: assets } = state.assets;
+        const { items: assets } = state.transactions;
         const { items: assetDefinitions } = state.assetDefinitions;
         const { categories, categoryOptions, categoryAssignments } = state.assetCategories;
         const { items: liabilities } = state.liabilities;

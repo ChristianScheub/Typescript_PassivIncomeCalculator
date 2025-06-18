@@ -167,7 +167,7 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
                       {t('assets.currentPrice')}:
                     </span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {formatService.formatCurrency(asset.assetDefinition.currentPrice)}
+                      {formatService.formatCurrency(asset.assetDefinition.currentPrice || 0)}
                     </span>
                   </div>
                 )}

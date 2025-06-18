@@ -2,7 +2,7 @@ import {
   StockExchange,
   StockPrice,
   StockHistory
-} from '../types';
+} from '../../../types/domains/assets/';
 
 /**
  * Simplified Stock API Service Interface

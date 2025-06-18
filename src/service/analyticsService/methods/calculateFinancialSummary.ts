@@ -1,4 +1,5 @@
-import { Asset, Liability, Expense, Income, AssetDefinition } from '../../../types';
+import { Asset, AssetDefinition } from '../../../types/domains/assets/';
+import { Liability, Expense, Income } from '../../../types/domains/financial/';
 import { FinancialSummary } from '../interfaces/IAnalyticsService';
 import calculatorService from '../../calculatorService';
 import { calculatePortfolioPositions } from '../../portfolioService/portfolioCalculations';

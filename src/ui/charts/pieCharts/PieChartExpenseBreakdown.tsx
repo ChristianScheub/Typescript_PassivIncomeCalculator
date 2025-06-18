@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../../common/Card';
-import { ExpenseBreakdown } from '../../../types';
+import { ExpenseBreakdown } from '@/types/domains/analytics';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import formatService from '../../../service/formatService';
 import { useTheme } from '../../../hooks/useTheme';

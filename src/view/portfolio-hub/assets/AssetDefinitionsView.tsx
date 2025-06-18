@@ -205,7 +205,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                           </span>
                           <div className="text-right">
                             <span className="text-gray-900 dark:text-gray-100">
-                              {formatService.formatCurrency(definition.currentPrice)}
+                              {formatService.formatCurrency(definition.currentPrice || 0)}
                             </span>
                             {definition.priceHistory && definition.priceHistory.length > 1 && (
                               <div className="text-xs text-gray-500 dark:text-gray-400">

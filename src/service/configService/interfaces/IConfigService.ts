@@ -34,6 +34,11 @@ export interface NavigationHandlers {
   onNavigateToLiabilities: () => void;
   onNavigateToForecast: () => void;
   onNavigateToSettings: () => void;
+  // Quick Action specific handlers
+  onAddIncome: () => void;
+  onAddExpense: () => void;
+  onAddTransaction: () => void;
+  onAddLiability: () => void;
 }
 
 export interface IConfigService {

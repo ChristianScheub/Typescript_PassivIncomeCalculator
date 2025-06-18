@@ -1,4 +1,5 @@
-import { Asset, Income, AssetDefinition } from '../../../types';
+import { Transaction as Asset, AssetDefinition } from '../../../types/domains/assets/';
+import { Income } from '../../../types/domains/financial/';
 import { PortfolioRecommendation } from '../interfaces/IAnalyticsService';
 import { calculatorService } from '../../calculatorService';
 

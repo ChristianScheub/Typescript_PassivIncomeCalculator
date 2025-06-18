@@ -1,15 +1,22 @@
+// Neue Domain-Driven Types
 import { 
-  Asset, 
+  Transaction as Asset
+} from '../../../types/domains/assets/';
+import { 
+  AssetAllocation,
+  IncomeAllocation
+} from '../../../types/domains/portfolio/';
+import { 
   Income, 
   Liability, 
   Expense, 
   PaymentSchedule, 
-  DividendSchedule, 
-  AssetAllocation,
-  IncomeAllocation,
   ExpenseBreakdown,
+  DividendSchedule
+} from '../../../types/domains/financial/';
+import { 
   MonthlyProjection 
-} from '../../../types';
+} from '../../../types/domains/analytics/';
 import { PortfolioPosition } from '../../portfolioService/portfolioCalculations';
 import { PortfolioAnalyticsData, IncomeAnalyticsData } from '../methods/analytics/calculatePortfolioAnalytics';
 

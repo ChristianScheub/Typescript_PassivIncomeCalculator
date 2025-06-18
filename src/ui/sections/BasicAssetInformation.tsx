@@ -3,7 +3,7 @@ import { UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { RequiredSection } from '../forms/StandardFormWrapper';
-import { AssetType } from '../../types';
+import { AssetType } from '@/types/shared/base';
 import { getAssetTypeOptions } from '../../constants';
 
 interface BasicAssetInformationProps {

@@ -32,7 +32,7 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
   const { t } = useTranslation();
   
   // Get real data from Redux store
-  const { items: assets, portfolioCache } = useAppSelector(state => state.assets);
+  const { items: assets, portfolioCache } = useAppSelector(state => state.transactions);
   const { items: income } = useAppSelector(state => state.income);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: liabilities } = useAppSelector(state => state.liabilities);

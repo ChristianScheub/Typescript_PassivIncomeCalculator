@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { MonthlyProjection } from '../../types';
+import { MonthlyProjection } from '@/types/domains/analytics';
 import calculatorService from '../../service/calculatorService';
 import { StoreState } from '..';
 import Logger from '../../service/Logger/logger';

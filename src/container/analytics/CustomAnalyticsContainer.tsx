@@ -8,7 +8,7 @@ interface CustomAnalyticsContainerProps {
 
 const CustomAnalyticsContainer: React.FC<CustomAnalyticsContainerProps> = () => {
   // Get portfolio positions from cache to pass to the view
-  const { portfolioCache } = useAppSelector(state => state.assets);
+  const { portfolioCache } = useAppSelector(state => state.transactions);
   const filteredPositions = portfolioCache?.positions || [];
 
   // Scroll to top when component mounts

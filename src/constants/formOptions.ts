@@ -1,4 +1,4 @@
-import { PaymentFrequency, DividendFrequency, ExpenseCategory, IncomeType, LiabilityType, AssetType } from '../types';
+import { PaymentFrequency, DividendFrequency, ExpenseCategory, IncomeType, LiabilityType, AssetType } from '@/types/shared/base';
 
 export interface PaymentFrequencyOption {
   value: PaymentFrequency;

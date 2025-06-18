@@ -10,7 +10,7 @@ interface ForecastContainerProps {
 
 const ForecastContainer: React.FC<ForecastContainerProps> = ({ onBack }) => {
   const dispatch = useAppDispatch();
-  const { status: assetsStatus } = useAppSelector(state => state.assets);
+  const { status: assetsStatus } = useAppSelector(state => state.transactions);
   const { status: incomeStatus } = useAppSelector(state => state.income);
   const { status: expensesStatus } = useAppSelector(state => state.expenses);
   const { status: liabilitiesStatus } = useAppSelector(state => state.liabilities);

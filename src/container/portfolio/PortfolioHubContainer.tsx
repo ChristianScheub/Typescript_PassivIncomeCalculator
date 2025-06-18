@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '../../hooks/redux';
-import { selectPortfolioCache } from '../../store/slices/assetsSlice';
+import { selectPortfolioCache } from '../../store/slices/transactionsSlice';
 import AssetsContainer from '../assets/AssetsContainer';
 import LiabilitiesContainer from '../finance/LiabilitiesContainer';
 import IncomeContainer from '../finance/IncomeContainer';
@@ -44,14 +45,31 @@ interface PortfolioHubContainerProps {
 }
 
 const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
+  const location = useLocation();
+  
   // Portfolio Hub Navigation State
   const [selectedCategory, setSelectedCategory] = useState<PortfolioCategory>('overview');
   const [selectedSubCategory, setSelectedSubCategory] = useState<PortfolioSubCategory>('dashboard');
   const [navigationHistory, setNavigationHistory] = useState<NavigationHistoryItem[]>([]);
 
+  // Process URL parameters to trigger specific actions
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const categoryParam = searchParams.get('category') as PortfolioCategory | null;
+    const actionParam = searchParams.get('action') as PortfolioSubCategory | null;
+    
+    if (categoryParam && ['overview', 'assets', 'liabilities', 'income', 'expenses', 'transactions'].includes(categoryParam)) {
+      setSelectedCategory(categoryParam);
+      
+      if (actionParam) {
+        setSelectedSubCategory(actionParam);
+      }
+    }
+  }, [location.search]);
+
   // Get portfolio data for context sharing
   const portfolioCache = useAppSelector(selectPortfolioCache);
-  const assets = useAppSelector(state => state.assets.items);
+  const assets = useAppSelector(state => state.transactions.items);
   const liabilities = useAppSelector(state => state.liabilities.items);
   const income = useAppSelector(state => state.income.items);
   const expenses = useAppSelector(state => state.expenses.items);

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Asset, AssetType } from '../../types';
+import { Asset, AssetType } from '@/types/shared/base';
 import { useSharedForm } from '../../hooks/useSharedForm';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
@@ -60,7 +60,7 @@ const getDefaultValues = (initialData?: Asset): Partial<AssetFormData> => {
     ticker: initialData.assetDefinition?.ticker,
     symbol: initialData.assetDefinition?.ticker, // Use ticker for crypto symbol as well
     acquisitionCost: initialData.purchasePrice, // Use purchasePrice as acquisitionCost for crypto
-    currentPrice: initialData.assetDefinition?.currentPrice // Get currentPrice from AssetDefinition
+    currentPrice: initialData.assetDefinition?.currentPrice // Get currentPrice directly
   };
 };
 

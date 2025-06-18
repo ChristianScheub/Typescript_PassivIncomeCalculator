@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExpenseCategory, PaymentFrequency } from '../../../types';
+import { ExpenseCategory } from '../../../types';
 import { UseFormSetValue } from 'react-hook-form';
 import { 
   StandardFormWrapper,
@@ -17,7 +17,7 @@ interface ExpenseFormData {
   name: string;
   category: ExpenseCategory;
   paymentSchedule: {
-    frequency: PaymentFrequency;
+    frequency: 'monthly' | 'quarterly' | 'annually' | 'custom';
     amount: number;
     months?: number[];
     dayOfMonth?: number; // Tag des Monats für die Zahlung
@@ -32,7 +32,7 @@ interface ExpenseFormData {
 
 interface MaterialExpenseFormViewProps {
   // Form state props
-  paymentFrequency: PaymentFrequency;
+  paymentFrequency: 'monthly' | 'quarterly' | 'annually' | 'custom';
   errors: any;
   
   // Form handlers

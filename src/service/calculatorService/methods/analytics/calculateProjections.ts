@@ -1,5 +1,23 @@
-import { Income, Expense, Liability, MonthlyProjection, Asset } from '../../../../types';
+import { 
+  Income, 
+  Expense, 
+  Liability
+} from '../../../../types/domains/financial/';
+import { Transaction as Asset } from '../../../../types/domains/assets/';
 import Logger from '../../../Logger/logger';
+
+// Lokaler Type für diese spezielle Projektions-Funktion
+interface CalculatorProjection {
+  month: string;
+  activeIncome: number;
+  passiveIncome: number;
+  assetIncome: number;
+  expenseTotal: number;
+  liabilityPayments: number;
+  incomeTotal: number;
+  netCashFlow: number;
+  passiveIncomeCoverage: number;
+}
 import { calculateTotalMonthlyExpenses } from '../expense/calculateExpenses';
 import { calculateTotalMonthlyLiabilityPayments } from '../liability/calculateLiabilities';
 import { calculatePassiveIncome,calculateTotalMonthlyIncome } from '../income/calculateIncome';
@@ -11,8 +29,8 @@ export const calculateProjections = (
   liabilities: Liability[],
   assets: Asset[] = [],
   months = 12
-): MonthlyProjection[] => {
-  const projections: MonthlyProjection[] = [];
+): CalculatorProjection[] => {
+  const projections: CalculatorProjection[] = [];
   
   // Calculate monthly income
   const monthlyIncome = calculateTotalMonthlyIncome(income);
@@ -76,8 +94,8 @@ export const calculateProjectionsWithCache = (
   },
   monthlyAssetIncomeCache: Record<number, number>,
   months = 12
-): MonthlyProjection[] => {
-  const projections: MonthlyProjection[] = [];
+): CalculatorProjection[] => {
+  const projections: CalculatorProjection[] = [];
   
   Logger.infoService(`Starting cached projection calculations - using cached base values and monthly asset income`);
 
