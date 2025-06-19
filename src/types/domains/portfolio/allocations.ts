@@ -46,7 +46,7 @@ export interface AllocationBreakdown {
 }
 
 export interface AllocationTarget {
-  type: AssetType | IncomeType | string;
+  type: AssetType | IncomeType;
   targetPercentage: number;
   currentPercentage: number;
   deviation: number;

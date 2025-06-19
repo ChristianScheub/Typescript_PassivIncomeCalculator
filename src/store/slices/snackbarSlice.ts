@@ -26,7 +26,7 @@ const snackbarSlice = createSlice({
   initialState,
   reducers: {
     showSnackbar: (state, action: PayloadAction<Omit<SnackbarMessage, 'id'>>) => {
-      const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+      const id = Date.now().toString() + Math.random().toString(36).substring(2, 11);
       const newMessage: SnackbarMessage = {
         id,
         severity: 'info',
@@ -54,7 +54,7 @@ const snackbarSlice = createSlice({
     
     // Convenience actions for different severities
     showSuccessSnackbar: (state, action: PayloadAction<string>) => {
-      const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+      const id = Date.now().toString() + Math.random().toString(36).substring(2, 11);
       const newMessage: SnackbarMessage = {
         id,
         message: action.payload,
@@ -67,7 +67,7 @@ const snackbarSlice = createSlice({
     },
     
     showErrorSnackbar: (state, action: PayloadAction<string>) => {
-      const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+      const id = Date.now().toString() + Math.random().toString(36).substring(2, 11);
       const newMessage: SnackbarMessage = {
         id,
         message: action.payload,
@@ -80,7 +80,7 @@ const snackbarSlice = createSlice({
     },
     
     showWarningSnackbar: (state, action: PayloadAction<string>) => {
-      const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+      const id = Date.now().toString() + Math.random().toString(36).substring(2, 11);
       const newMessage: SnackbarMessage = {
         id,
         message: action.payload,
@@ -93,7 +93,7 @@ const snackbarSlice = createSlice({
     },
     
     showInfoSnackbar: (state, action: PayloadAction<string>) => {
-      const id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+      const id = Date.now().toString() + Math.random().toString(36).substring(2, 11);
       const newMessage: SnackbarMessage = {
         id,
         message: action.payload,

@@ -14,7 +14,7 @@ const GlobalSnackbar: React.FC = () => {
   const currentMessage = messages[0];
 
   useEffect(() => {
-    if (currentMessage && currentMessage.autoHideDuration) {
+    if (currentMessage?.autoHideDuration) {
       const timer = setTimeout(() => {
         handleClose();
       }, currentMessage.autoHideDuration);
