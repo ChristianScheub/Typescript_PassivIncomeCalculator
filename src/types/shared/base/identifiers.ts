@@ -2,14 +2,6 @@
  * Identifier types and reference utilities
  */
 
-// Generic ID types
-export type EntityId = string;
-export type AssetId = string;
-export type TransactionId = string;
-export type PortfolioId = string;
-export type CategoryId = string;
-export type UserId = string;
-
 // Reference types
 export interface EntityReference<T = string> {
   id: T;

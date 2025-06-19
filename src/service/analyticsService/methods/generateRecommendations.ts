@@ -31,8 +31,8 @@ export const generateRecommendations = (
   ];
 
   // Sort by priority: high -> medium -> low
-  const sortedRecommendations = allRecommendations.sort((a, b) => {
-    const priorityOrder = { high: 3, medium: 2, low: 1 };
+  const priorityOrder = { high: 3, medium: 2, low: 1 };
+  const sortedRecommendations = allRecommendations.toSorted((a, b) => {
     return priorityOrder[b.priority] - priorityOrder[a.priority];
   });
 

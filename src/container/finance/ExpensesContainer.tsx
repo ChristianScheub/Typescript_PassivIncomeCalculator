@@ -2,15 +2,18 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { fetchExpenses, addExpense, updateExpense, deleteExpense } from '../../store/slices/expensesSlice';
 import { Expense } from '@/types/domains/financial';
+import { ExpenseFormData } from '@/types/domains/forms/form-data';
 import { useTranslation } from 'react-i18next';
 import Logger from '../../service/Logger/logger';
 import calculatorService from '../../service/calculatorService';
 import ExpensesView from '../../view/portfolio-hub/expenses/ExpensesView';
 import { sortExpenses, SortOrder } from '../../utils/sortingUtils';
+import { useAsyncOperation } from '../../utils/containerUtils';
 
 const ExpensesContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const { executeAsyncOperation } = useAsyncOperation();
   const { items: expenses, status } = useAppSelector(state => state.expenses);
   const [isAddingExpense, setIsAddingExpense] = useState(false);
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
@@ -36,36 +39,53 @@ const ExpensesContainer: React.FC<{ onBack?: () => void; initialAction?: string 
     return sortExpenses(expenses, SortOrder.DESC);
   }, [expenses]);
 
-  const handleAddExpense = async (data: Omit<Expense, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      Logger.info('Adding new expense' + " - " + JSON.stringify(data));
-      await dispatch(addExpense(data));
-      setIsAddingExpense(false);
-    } catch (error) {
-      Logger.error('Failed to add expense' + " - " + JSON.stringify(error as Error));
-    }
+  const handleAddExpense = (data: ExpenseFormData) => {
+    // Convert ExpenseFormData to Expense format
+    const expenseData: Omit<Expense, 'id' | 'createdAt' | 'updatedAt'> = {
+      name: data.name,
+      amount: data.paymentSchedule.amount, // Extract amount from paymentSchedule
+      category: data.category,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      notes: data.notes,
+      paymentSchedule: data.paymentSchedule
+    };
+
+    executeAsyncOperation(
+      'add expense',
+      () => dispatch(addExpense(expenseData)),
+      () => setIsAddingExpense(false)
+    );
   };
 
-  const handleUpdateExpense = async (data: Expense) => {
+  const handleUpdateExpense = (data: ExpenseFormData) => {
     if (editingExpense) {
-      try {
-        Logger.info('Updating expense: ' + JSON.stringify({ id: editingExpense.id, data }));
-        await dispatch(updateExpense({ ...data, id: editingExpense.id }));
-        setEditingExpense(null);
-      } catch (error) {
-        Logger.error('Failed to update expense: ' + JSON.stringify(error as Error));
-      }
+      // Convert ExpenseFormData to Expense format
+      const expenseData: Expense = {
+        ...editingExpense,
+        name: data.name,
+        amount: data.paymentSchedule.amount, // Extract amount from paymentSchedule
+        category: data.category,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        notes: data.notes,
+        paymentSchedule: data.paymentSchedule
+      };
+
+      executeAsyncOperation(
+        'update expense',
+        () => dispatch(updateExpense(expenseData)),
+        () => setEditingExpense(null)
+      );
     }
   };
 
-  const handleDeleteExpense = async (id: string) => {
+  const handleDeleteExpense = (id: string) => {
     if (window.confirm(t('common.deleteConfirm'))) {
-      try {
-        Logger.info('Deleting expense: ' + JSON.stringify({ id }));
-        await dispatch(deleteExpense(id));
-      } catch (error) {
-        Logger.error('Failed to delete expense: ' + JSON.stringify(error as Error));
-      }
+      executeAsyncOperation(
+        'delete expense',
+        () => dispatch(deleteExpense(id))
+      );
     }
   };
 

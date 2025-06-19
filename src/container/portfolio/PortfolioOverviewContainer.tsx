@@ -6,6 +6,8 @@ import calculatorService from '../../service/calculatorService';
 import { PortfolioCategory, PortfolioSubCategory } from '../../service/recentActivityService';
 import { getAssetAllocationFromCache } from '../../utils/portfolioCacheHelpers';
 import Logger from '../../service/Logger/logger';
+import { Income, Expense, Liability } from '../../types/domains/financial/entities';
+import { CategoryBreakdown } from '../../types/domains/portfolio/allocations';
 
 interface PortfolioSummary {
   totalAssetValue: number;
@@ -52,11 +54,11 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
     const assetAllocation = getAssetAllocationFromCache(portfolioCache.positions);
     
     // Income sources breakdown
-    const incomeSourcesBreakdown = income.reduce((acc, incomeItem) => {
+    const incomeSourcesBreakdown = income.reduce((acc: CategoryBreakdown[], incomeItem: Income) => {
       const type = incomeItem.type;
       const monthlyAmount = calculatorService.calculateMonthlyIncome(incomeItem);
       
-      const existingItem = acc.find(item => item.name === type);
+      const existingItem = acc.find((item: CategoryBreakdown) => item.name === type);
       if (existingItem) {
         existingItem.value += monthlyAmount;
       } else {
@@ -67,20 +69,20 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
         });
       }
       return acc;
-    }, [] as Array<{ name: string; value: number; percentage: number }>);
+    }, []);
 
     // Calculate percentages for income
-    const totalIncome = incomeSourcesBreakdown.reduce((sum, item) => sum + item.value, 0);
-    incomeSourcesBreakdown.forEach(item => {
+    const totalIncome = incomeSourcesBreakdown.reduce((sum: number, item: CategoryBreakdown) => sum + item.value, 0);
+    incomeSourcesBreakdown.forEach((item: CategoryBreakdown) => {
       item.percentage = totalIncome > 0 ? (item.value / totalIncome) * 100 : 0;
     });
 
     // Expense categories breakdown
-    const expenseCategoriesBreakdown = expenses.reduce((acc, expense) => {
+    const expenseCategoriesBreakdown = expenses.reduce((acc: CategoryBreakdown[], expense: Expense) => {
       const category = expense.category;
       const monthlyAmount = calculatorService.calculateMonthlyExpense(expense);
       
-      const existingItem = acc.find(item => item.name === category);
+      const existingItem = acc.find((item: CategoryBreakdown) => item.name === category);
       if (existingItem) {
         existingItem.value += monthlyAmount;
       } else {
@@ -91,20 +93,20 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
         });
       }
       return acc;
-    }, [] as Array<{ name: string; value: number; percentage: number }>);
+    }, []);
 
     // Calculate percentages for expenses
-    const totalExpenses = expenseCategoriesBreakdown.reduce((sum, item) => sum + item.value, 0);
-    expenseCategoriesBreakdown.forEach(item => {
+    const totalExpenses = expenseCategoriesBreakdown.reduce((sum: number, item: CategoryBreakdown) => sum + item.value, 0);
+    expenseCategoriesBreakdown.forEach((item: CategoryBreakdown) => {
       item.percentage = totalExpenses > 0 ? (item.value / totalExpenses) * 100 : 0;
     });
 
     // Liability types breakdown
-    const liabilityTypesBreakdown = liabilities.reduce((acc, liability) => {
+    const liabilityTypesBreakdown = liabilities.reduce((acc: CategoryBreakdown[], liability: Liability) => {
       const type = liability.type;
       const balance = liability.currentBalance || 0;
       
-      const existingItem = acc.find(item => item.name === type);
+      const existingItem = acc.find((item: CategoryBreakdown) => item.name === type);
       if (existingItem) {
         existingItem.value += balance;
       } else {
@@ -115,11 +117,11 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
         });
       }
       return acc;
-    }, [] as Array<{ name: string; value: number; percentage: number }>);
+    }, []);
 
     // Calculate percentages for liabilities
-    const totalLiabilities = liabilityTypesBreakdown.reduce((sum, item) => sum + item.value, 0);
-    liabilityTypesBreakdown.forEach(item => {
+    const totalLiabilities = liabilityTypesBreakdown.reduce((sum: number, item: CategoryBreakdown) => sum + item.value, 0);
+    liabilityTypesBreakdown.forEach((item: CategoryBreakdown) => {
       item.percentage = totalLiabilities > 0 ? (item.value / totalLiabilities) * 100 : 0;
     });
 
@@ -135,10 +137,20 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
   const healthIndicators = useMemo(() => {
     const { netWorth, totalAssetValue, totalLiabilities, monthlyCashFlow } = portfolioSummary;
     
+    // Determine cash flow health based on monthly cash flow
+    let cashFlowHealth: 'positive' | 'negative' | 'neutral';
+    if (monthlyCashFlow > 0) {
+      cashFlowHealth = 'positive';
+    } else if (monthlyCashFlow < 0) {
+      cashFlowHealth = 'negative';
+    } else {
+      cashFlowHealth = 'neutral';
+    }
+    
     return {
       netWorthTrend: netWorth > 0 ? 'positive' as const : 'negative' as const,
       debtToAssetRatio: totalAssetValue > 0 ? (totalLiabilities / totalAssetValue) * 100 : 0,
-      cashFlowHealth: monthlyCashFlow > 0 ? 'positive' as const : monthlyCashFlow < 0 ? 'negative' as const : 'neutral' as const,
+      cashFlowHealth,
       diversificationScore: portfolioAnalytics.assetAllocation.length * 20 // Simple diversification score
     };
   }, [portfolioSummary, portfolioAnalytics.assetAllocation.length]);

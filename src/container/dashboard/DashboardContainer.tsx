@@ -9,11 +9,13 @@ import alertsService from '../../service/alertsService';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
 import cacheRefreshService from '../../service/cacheRefreshService';
 import Logger from '../../service/Logger/logger';
+import { useAsyncOperation } from '../../utils/containerUtils';
 
 const DashboardContainer: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { executeAsyncOperation } = useAsyncOperation();
 
   // Redux state
   const { items: assets } = useAppSelector(state => state.transactions);
@@ -85,14 +87,12 @@ const DashboardContainer: React.FC = () => {
     }
 
     Logger.infoService("Dashboard pull-to-refresh triggered - user at top of page");
-    try {
-      await cacheRefreshService.refreshAllCaches();
-      Logger.infoService("Dashboard cache refresh completed successfully");
-    } catch (error) {
-      Logger.error("Dashboard cache refresh failed: " + JSON.stringify(error));
-      throw error; // Re-throw to let the UI handle the error state
-    }
-  }, []);
+    
+    executeAsyncOperation(
+      'refresh dashboard cache',
+      () => cacheRefreshService.refreshAllCaches()
+    );
+  }, [executeAsyncOperation]);
 
   return (
     <DashboardView

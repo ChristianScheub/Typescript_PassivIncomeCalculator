@@ -15,9 +15,8 @@ import {
   StandardFormField
 } from '../../../ui/forms/StandardFormWrapper';
 import { AssetSearchBar, AssetSelectionDropdown, SelectedAssetInfo } from '../../../ui/components';
+import { FormFieldValue } from '../../../types/shared/ui/specialized';
 import formatService from '../../../service/formatService';
-
-type FormFieldValue = string | number | boolean;
 
 const assetTransactionSchema = createAssetTransactionSchema();
 
@@ -305,7 +304,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.purchaseQuantity?.message}
                   value={watch('purchaseQuantity')}
-                  onChange={(value: string | number | boolean) => setValue('purchaseQuantity', value as number)}
+                  onChange={(value: FormFieldValue) => setValue('purchaseQuantity', value as number)}
                   step={0.001}
                   min={0.001}
                 />
@@ -322,7 +321,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.saleDate?.message}
                   value={watch('saleDate')}
-                  onChange={(value: string | number | boolean) => setValue('saleDate', value as string)}
+                  onChange={(value: FormFieldValue) => setValue('saleDate', value as string)}
                 />
 
                 <StandardFormField
@@ -332,7 +331,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.salePrice?.message}
                   value={watch('salePrice')}
-                  onChange={(value: string | number | boolean) => setValue('salePrice', value as number)}
+                  onChange={(value: FormFieldValue) => setValue('salePrice', value as number)}
                   step={0.01}
                   min={0}
                 />
@@ -344,7 +343,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.saleQuantity?.message}
                   value={watch('saleQuantity')}
-                  onChange={(value: string | number | boolean) => setValue('saleQuantity', value as number)}
+                  onChange={(value: FormFieldValue) => setValue('saleQuantity', value as number)}
                   step={0.001}
                   min={0.001}
                 />
@@ -361,7 +360,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
               type="number"
               error={errors.transactionCosts?.message}
               value={watch('transactionCosts')}
-              onChange={(value: string | number | boolean) => setValue('transactionCosts', value as number)}
+              onChange={(value: FormFieldValue) => setValue('transactionCosts', value as number)}
               step={0.01}
               min={0}
             />
@@ -384,7 +383,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
               type="textarea"
               error={errors.notes?.message}
               value={watch('notes')}
-              onChange={(value: string | number | boolean) => setValue('notes', value as string)}
+              onChange={(value: FormFieldValue) => setValue('notes', value as string)}
               placeholder={t('assets.notesPlaceholder')}
             />
           </FormGrid>

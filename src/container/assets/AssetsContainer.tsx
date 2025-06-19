@@ -24,10 +24,12 @@ import AssetDefinitionsContainer from './AssetDefinitionsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
 import { AssetCategoryContainer } from './AssetCategoryContainer';
 import { PortfolioHistoryContainer } from './PortfolioHistoryContainer';
+import { useAsyncOperation } from '../../utils/containerUtils';
 
 const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const { executeAsyncOperation } = useAsyncOperation();
   
   // Use new selectors for better performance
   const assets = useAppSelector(selectAssets);
@@ -131,22 +133,20 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     };
   }, [portfolioCache, portfolioTotals, assets.length, assetDefinitions.length]);
 
-  const handleAddAsset = async (data: any) => {
-    try {
-      Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
-      
-      // Ensure transactionType is set, default to 'buy'
-      const transactionData = {
-        ...data,
-        transactionType: data.transactionType || 'buy'
-      };
-      
-      await dispatch(addAsset(transactionData));
-      setIsAddingAsset(false);
-      
-    } catch (error) {
-      Logger.error('Failed to add asset transaction' + " - " + JSON.stringify(error as Error));
-    }
+  const handleAddAsset = (data: any) => {
+    Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
+    
+    // Ensure transactionType is set, default to 'buy'
+    const transactionData = {
+      ...data,
+      transactionType: data.transactionType || 'buy'
+    };
+    
+    executeAsyncOperation(
+      'add asset',
+      () => dispatch(addAsset(transactionData)),
+      () => setIsAddingAsset(false)
+    );
   };
 
   // Helper: Calculate stock value and differences
@@ -162,33 +162,32 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     }
   }
 
-  const handleUpdateAsset = async (data: any) => {
+  const handleUpdateAsset = (data: any) => {
     if (!editingAsset) return;
-    try {
-      Logger.info('Updating asset transaction' + " - " + JSON.stringify({ id: editingAsset.id, data }));
-      
-      // Ensure transactionType is preserved, default to 'buy'
-      const transactionData = {
-        ...data,
-        transactionType: data.transactionType || editingAsset.transactionType || 'buy'
-      };
-      
-      updateStockValueFields(transactionData);
-      await dispatch(updateAsset({ ...transactionData, id: editingAsset.id }));
-      setEditingAsset(null);
-    } catch (error) {
-      Logger.error('Failed to update asset transaction' + " - " + JSON.stringify(error as Error));
-    }
+    
+    Logger.info('Updating asset transaction' + " - " + JSON.stringify({ id: editingAsset.id, data }));
+    
+    // Ensure transactionType is preserved, default to 'buy'
+    const transactionData = {
+      ...data,
+      transactionType: data.transactionType || editingAsset.transactionType || 'buy'
+    };
+    
+    updateStockValueFields(transactionData);
+    
+    executeAsyncOperation(
+      'update asset',
+      () => dispatch(updateAsset({ ...transactionData, id: editingAsset.id })),
+      () => setEditingAsset(null)
+    );
   };
 
-  const handleDeleteAsset = async (id: string) => {
+  const handleDeleteAsset = (id: string) => {
     if (window.confirm(t('common.deleteConfirm'))) {
-      try {
-        Logger.info('Deleting asset' + " - " + JSON.stringify({ id }));
-        await dispatch(deleteAsset(id));
-      } catch (error) {
-        Logger.error('Failed to delete asset' + " - " + JSON.stringify(error as Error));
-      }
+      executeAsyncOperation(
+        'delete asset',
+        () => dispatch(deleteAsset(id))
+      );
     }
   };
 

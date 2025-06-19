@@ -1,6 +1,8 @@
 import React from 'react';
 import { UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { ExpenseFormData } from '../../../types/domains/forms';
+import { FormFieldValue } from '../../../types/shared/ui/specialized';
+import { ExpenseCategory } from '../../../types/shared/base/enums';
 import { 
   StandardFormWrapper,
   RequiredSection,
@@ -11,8 +13,6 @@ import {
 import { OptionalFieldsSection } from '../../../ui/forms';
 import { useTranslation } from 'react-i18next';
 import { getPaymentFrequencyOptions, getExpenseCategoryOptions } from '../../../constants';
-
-type ExpenseCategory = 'housing' | 'transportation' | 'food' | 'utilities' | 'insurance' | 'healthcare' | 'entertainment' | 'personal' | 'debt_payments' | 'education' | 'subscriptions' | 'other';
 
 type PaymentFrequency = 'monthly' | 'quarterly' | 'annually' | 'custom';
 
@@ -49,27 +49,27 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
   const { t } = useTranslation();
   
   // Type-safe onChange handlers
-  const handleNameChange = (value: string | number | boolean) => {
+  const handleNameChange = (value: FormFieldValue) => {
     setValue('name', String(value));
   };
   
-  const handleCategoryChange = (value: string | number | boolean) => {
+  const handleCategoryChange = (value: FormFieldValue) => {
     setValue('category', String(value) as ExpenseCategory);
   };
   
-  const handleFrequencyChange = (value: string | number | boolean) => {
+  const handleFrequencyChange = (value: FormFieldValue) => {
     setValue('paymentSchedule.frequency', String(value) as PaymentFrequency);
   };
   
-  const handleAmountChange = (value: string | number | boolean) => {
+  const handleAmountChange = (value: FormFieldValue) => {
     setValue('paymentSchedule.amount', Number(value));
   };
   
-  const handleDayOfMonthChange = (value: string | number | boolean) => {
+  const handleDayOfMonthChange = (value: FormFieldValue) => {
     setValue('paymentSchedule.dayOfMonth', Number(value));
   };
   
-  const handleStartDateChange = (value: string | number | boolean) => {
+  const handleStartDateChange = (value: FormFieldValue) => {
     setValue('startDate', String(value));
   };
 

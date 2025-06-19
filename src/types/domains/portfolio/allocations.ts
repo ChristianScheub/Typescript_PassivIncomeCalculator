@@ -2,7 +2,7 @@
  * Portfolio domain - Allocations and Distribution
  */
 
-import { AssetType, IncomeType } from '../../shared/base';
+import { AssetType, IncomeType } from '../../shared/base/enums';
 
 export interface AssetAllocation {
   type: AssetType;
@@ -59,4 +59,13 @@ export interface RebalanceRecommendation {
   amount: number;
   priority: 'high' | 'medium' | 'low';
   reason: string;
+}
+
+// Generic breakdown interface for portfolio analytics
+export interface CategoryBreakdown {
+  name: string;
+  value: number;
+  percentage: number;
+  count?: number;
+  color?: string;
 }

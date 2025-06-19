@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
@@ -15,8 +15,9 @@ import {
   updateAssetCategoryOption,
   deleteAssetCategoryOption
 } from '../../store/slices/assetCategoriesSlice';
-import { AssetCategory, AssetCategoryOption } from '../../types';
+import { AssetCategory, AssetCategoryOption } from '../../types/domains/assets';
 import Logger from '../../service/Logger/logger';
+import { useAsyncOperation } from '../../utils/containerUtils';
 
 // Type aliases for complex union types
 type NewAssetCategory = Omit<AssetCategory, 'id' | 'createdAt' | 'updatedAt'>;
@@ -38,12 +39,24 @@ const categoryOptionSchema = z.object({
 type CategoryFormData = z.infer<typeof categorySchema>;
 type CategoryOptionFormData = z.infer<typeof categoryOptionSchema>;
 
+// Form adapter to bridge React Hook Form with view expectations
+const createFormAdapter = <T extends Record<string, any>>(form: UseFormReturn<T>) => ({
+  control: form.control,
+  handleSubmit: (callback: (data: T) => void) => form.handleSubmit(callback),
+  reset: form.reset,
+  formState: form.formState,
+  watch: form.watch,
+  setValue: (field: string, value: any) => form.setValue(field as any, value),
+  getValues: form.getValues,
+});
+
 interface AssetCategoryContainerProps {
   onBack?: () => void;
 }
 
 export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ onBack }) => {
   const dispatch = useAppDispatch();
+  const { executeAsyncOperation } = useAsyncOperation();
   const { categories, categoryOptions, status } = useAppSelector(
     state => state.assetCategories
   );
@@ -191,84 +204,71 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
     setNewCategoryOptions((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleAddCategory = async (data: NewAssetCategory) => {
-    try {
-      Logger.info('Adding new asset category: ' + JSON.stringify(data));
-      await dispatch(addAssetCategory(data));
-    } catch (error) {
-      Logger.error('Failed to add asset category: ' + JSON.stringify(error as Error));
-    }
+  const handleAddCategory = (data: NewAssetCategory) => {
+    executeAsyncOperation(
+      'add category',
+      () => dispatch(addAssetCategory(data))
+    );
   };
 
-  const handleAddCategoryWithOptions = async (
+  const handleAddCategoryWithOptions = (
     categoryData: NewAssetCategory, 
     options: NewAssetCategoryOption[]
   ) => {
-    try {
-      Logger.info('Adding new asset category with options: ' + JSON.stringify({ category: categoryData, optionsCount: options.length }));
-      
-      // First add the category
-      const result = await dispatch(addAssetCategory(categoryData));
-      const categoryId = (result.payload as AssetCategory).id;
-      
-      // Then add each option
-      for (const optionData of options) {
-        const optionWithCategoryId = {
-          ...optionData,
-          categoryId: categoryId
-        };
-        await dispatch(addAssetCategoryOption(optionWithCategoryId));
+    executeAsyncOperation(
+      'add category',
+      async () => {
+        // First add the category
+        const result = await dispatch(addAssetCategory(categoryData));
+        const categoryId = (result.payload as AssetCategory).id;
+        
+        // Then add each option
+        for (const optionData of options) {
+          const optionWithCategoryId = {
+            ...optionData,
+            categoryId: categoryId
+          };
+          await dispatch(addAssetCategoryOption(optionWithCategoryId));
+        }
+        
+        Logger.info('Successfully added category with ' + options.length + ' options');
       }
-      
-      Logger.info('Successfully added category with ' + options.length + ' options');
-    } catch (error) {
-      Logger.error('Failed to add asset category with options: ' + JSON.stringify(error as Error));
-    }
+    );
   };
 
-  const handleUpdateCategory = async (data: AssetCategory) => {
-    try {
-      Logger.info('Updating asset category: ' + JSON.stringify({ id: data.id, name: data.name }));
-      await dispatch(updateAssetCategory(data));
-    } catch (error) {
-      Logger.error('Failed to update asset category: ' + JSON.stringify(error as Error));
-    }
+  const handleUpdateCategory = (data: AssetCategory) => {
+    executeAsyncOperation(
+      'update category',
+      () => dispatch(updateAssetCategory(data))
+    );
   };
 
-  const handleDeleteCategory = async (id: string) => {
-    try {
-      Logger.info('Deleting asset category: ' + JSON.stringify({ id }));
-      await dispatch(deleteAssetCategory(id));
-    } catch (error) {
-      Logger.error('Failed to delete asset category: ' + JSON.stringify(error as Error));
-    }
+  const handleDeleteCategory = (id: string) => {
+    executeAsyncOperation(
+      'delete category',
+      () => dispatch(deleteAssetCategory(id))
+    );
   };
 
-  const handleAddCategoryOption = async (data: NewAssetCategoryOptionWithCategory) => {
-    try {
-      Logger.info('Adding new category option: ' + JSON.stringify(data));
-      await dispatch(addAssetCategoryOption(data));
-    } catch (error) {
-      Logger.error('Failed to add category option: ' + JSON.stringify(error as Error));
-    }
+  const handleAddCategoryOption = (data: NewAssetCategoryOptionWithCategory) => {
+    executeAsyncOperation(
+      'add category option',
+      () => dispatch(addAssetCategoryOption(data))
+    );
   };
 
-  const handleUpdateCategoryOption = async (data: AssetCategoryOption) => {
-    try {
-      Logger.info('Updating category option: ' + JSON.stringify({ id: data.id, name: data.name }));
-      await dispatch(updateAssetCategoryOption(data));
-    } catch (error) {
-      Logger.error('Failed to update category option: ' + JSON.stringify(error as Error));
-    }
+  const handleUpdateCategoryOption = (data: AssetCategoryOption) => {
+    executeAsyncOperation(
+      'update category option',
+      () => dispatch(updateAssetCategoryOption(data))
+    );
   };
 
-  const handleDeleteCategoryOption = async (id: string) => {
-    try {
-      Logger.info('Deleting category option: ' + JSON.stringify({ id }));
-      await dispatch(deleteAssetCategoryOption(id));
-    } catch (error) {
-      Logger.error('Failed to delete category option: ' + JSON.stringify(error as Error));
-    }
+  const handleDeleteCategoryOption = (id: string) => {
+    executeAsyncOperation(
+      'delete category option',
+      () => dispatch(deleteAssetCategoryOption(id))
+    );
   };
 
   if (status === 'loading') {
@@ -290,8 +290,8 @@ export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ 
       editingCategory={editingCategory}
       editingOption={editingOption}
       newCategoryOptions={newCategoryOptions}
-      categoryForm={categoryForm}
-      optionForm={optionForm}
+      categoryForm={createFormAdapter(categoryForm)}
+      optionForm={createFormAdapter(optionForm)}
       onSetSelectedCategoryId={setSelectedCategoryId}
       onSetIsAddingCategory={setIsAddingCategory}
       onSetIsAddingOption={setIsAddingOption}

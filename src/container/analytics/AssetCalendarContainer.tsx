@@ -2,8 +2,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import Logger from '../../service/Logger/logger';
 import AssetCalendarView from '../../view/portfolio-hub/assets/AssetCalendarView';
-import { AssetType } from '@/types/shared/base';
-import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
+import { AssetType } from '../../types/shared';
+import { PortfolioPosition } from '../../types/domains/portfolio/position';
 
 interface AssetCalendarContainerProps {
   selectedTab?: 'calendar' | 'history' | 'timeline';

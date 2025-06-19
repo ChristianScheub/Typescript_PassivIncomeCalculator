@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { StoreState } from '../../store';
-import { AssetType } from '@/types/shared/base';
+import { AssetType } from '../../types/shared/';
 import AssetCalendarView from '../../view/portfolio-hub/assets/AssetCalendarView';
 import Logger from '../../service/Logger/logger';
-import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
+import { PortfolioPosition } from '../../types/domains/portfolio/position';
 import { calculatorService } from '../../service/calculatorService';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/transactionsSlice';
@@ -121,7 +121,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
   const filteredPositions = useMemo(() => {
     return selectedAssetType === 'all' 
       ? portfolioData.positions 
-      : portfolioData.positions.filter(position => position.type === selectedAssetType);
+      : portfolioData.positions.filter((position: PortfolioPosition) => position.type === selectedAssetType);
   }, [portfolioData.positions, selectedAssetType]);
 
   // Helper functions for income calculation by asset type
@@ -194,8 +194,8 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
     if (filteredPositions.length === 0) return;
     
     Logger.info(`Logging details for ${filteredPositions.length} portfolio positions`);
-    
-    filteredPositions.forEach(position => {
+
+    filteredPositions.forEach((position: PortfolioPosition) => {
       Logger.info(`Position: ${position.name} (${position.type}) - Value: ${position.currentValue}`);
       
       // Check dividend info from AssetDefinition
@@ -229,7 +229,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
       const monthPositions: Array<{ position: PortfolioPosition; income: number }> = [];
       let totalIncome = 0;
 
-      filteredPositions.forEach((position) => {
+      filteredPositions.forEach((position: PortfolioPosition) => {
         const income = calculatePositionIncomeForMonth(position, month);
         Logger.cache(`Position ${position.name} income for month ${month}: ${income}`);
         

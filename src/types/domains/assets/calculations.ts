@@ -3,11 +3,11 @@
  */
 
 export interface CachedDividends {
-  [key: string]: {
-    annualDividend: number;
-    lastCalculated: string;
-    confidence: number;
-  };
+  monthlyAmount: number;
+  annualAmount: number;
+  monthlyBreakdown: Record<number, number>;
+  lastCalculated: string;
+  calculationHash: string;
 }
 
 export interface AssetCalculation {

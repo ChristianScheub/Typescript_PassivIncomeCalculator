@@ -11,6 +11,7 @@ import forecastReducer from './slices/forecastSlice';
 import apiConfigReducer, { StockAPIProvider } from './slices/apiConfigSlice';
 import customAnalyticsReducer from './slices/customAnalyticsSlice';
 import portfolioHistoryReducer from './slices/portfolioHistorySlice';
+import snackbarReducer from './slices/snackbarSlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
 import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
 import Logger from '../service/Logger/logger';
@@ -47,7 +48,18 @@ const loadState = () => {
         // Restore portfolio cache from localStorage if valid
         portfolioCache: cacheValid ? transactionsData?.portfolioCache : undefined,
         portfolioCacheValid: cacheValid,
-        lastPortfolioCalculation: cacheValid ? transactionsData?.lastPortfolioCalculation : undefined
+        lastPortfolioCalculation: cacheValid ? transactionsData?.lastPortfolioCalculation : undefined,
+        calculationMetadata: {
+          lastCalculated: '',
+          totalValue: 0,
+          totalInvestment: 0,
+          totalReturn: 0,
+          totalReturnPercentage: 0,
+          assetDefinitions: [],
+          categories: [],
+          categoryOptions: [],
+          categoryAssignments: []
+        }
       },
       assetDefinitions: {
         items: state.assetDefinitions?.items || [],
@@ -101,32 +113,36 @@ const loadState = () => {
 
 const persistedState = loadState();
 
-// Define root reducer type
-// Define the root reducer object with explicit type
-// Define the reducer object
-const rootReducer = {
-  transactions: transactionsReducer,
-  assetDefinitions: assetDefinitionsReducer,
-  assetCategories: assetCategoriesReducer,
-  liabilities: liabilitiesReducer,
-  expenses: expensesReducer,
-  income: incomeReducer,
-  dashboard: dashboardReducer,
-  forecast: forecastReducer,
-  apiConfig: apiConfigReducer,
-  customAnalytics: customAnalyticsReducer,
-  portfolioHistory: portfolioHistoryReducer,
-};
-
-// Create the store 
+// Create the store
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const store = configureStore({
-  reducer: rootReducer,
-  preloadedState: persistedState,
-  middleware: (getDefaultMiddleware) => 
+  reducer: {
+    transactions: transactionsReducer,
+    assetDefinitions: assetDefinitionsReducer,
+    assetCategories: assetCategoriesReducer,
+    liabilities: liabilitiesReducer,
+    expenses: expensesReducer,
+    income: incomeReducer,
+    dashboard: dashboardReducer,
+    forecast: forecastReducer,
+    apiConfig: apiConfigReducer,
+    customAnalytics: customAnalyticsReducer,
+    portfolioHistory: portfolioHistoryReducer,
+    snackbar: snackbarReducer,
+  },
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  preloadedState: persistedState as any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  middleware: (getDefaultMiddleware: any) => 
     getDefaultMiddleware({
       serializableCheck: false, // For storing Date objects in state
-    }).concat(dataChangeMiddleware, portfolioCacheMiddleware)
-});
+    }).concat(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      dataChangeMiddleware as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      portfolioCacheMiddleware as any
+    ),
+} as any);
 
 // Subscribe to store changes and save to localStorage
 let isClearing = false;
@@ -194,18 +210,16 @@ store.subscribe(() => {
   }
 });
 
-// Type definitions using typeof rootReducer to avoid circular references
-export type StoreState = {
-  [K in keyof typeof rootReducer]: ReturnType<typeof rootReducer[K]>;
-};
-
-// Export RootState as an alias for StoreState for compatibility
-export type RootState = StoreState;
-
+// Export types derived from the store
+export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+
+// Export StoreState as an alias for RootState for compatibility
+export type StoreState = RootState;
+
 export type AppThunk<ReturnType = void> = ThunkAction<
   ReturnType,
-  StoreState,
+  RootState,
   unknown,
   AnyAction
 >;

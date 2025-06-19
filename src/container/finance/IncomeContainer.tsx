@@ -7,10 +7,12 @@ import Logger from '../../service/Logger/logger';
 import calculatorService from '../../service/calculatorService';
 import IncomeView from '../../view/portfolio-hub/income/IncomeView';
 import { sortIncome, SortOrder } from '../../utils/sortingUtils';
+import { useAsyncOperation } from '../../utils/containerUtils';
 
 const IncomeContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const { executeAsyncOperation } = useAsyncOperation();
   const { items: incomeItems, status } = useAppSelector(state => state.income);
   const [isAddingIncome, setIsAddingIncome] = useState(false);
   const [editingIncome, setEditingIncome] = useState<Income | null>(null);
@@ -45,33 +47,27 @@ const IncomeContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   };
 
   const handleAddIncome = async (data: Omit<Income, 'id' | 'createdAt' | 'updatedAt'>) => {
-    try {
-      Logger.info('Adding new income' + " - " + JSON.stringify(data));
-      await dispatch(addIncome(data));
-      setIsAddingIncome(false); // Close the form after successful addition
-    } catch (error) {
-      Logger.error('Failed to add income' + " - " + JSON.stringify(error as Error));
-    }
+    await executeAsyncOperation(
+      'add income',
+      () => dispatch(addIncome(data)),
+      () => setIsAddingIncome(false)
+    );
   };
 
   const handleUpdateIncome = async (data: Income) => {
-    try {
-      Logger.info('Updating income' + " - " + JSON.stringify(data));
-      await dispatch(updateIncome(data));
-      setEditingIncome(null);
-    } catch (error) {
-      Logger.error('Failed to update income' + " - " + JSON.stringify(error as Error));
-    }
+    await executeAsyncOperation(
+      'update income',
+      () => dispatch(updateIncome(data)),
+      () => setEditingIncome(null)
+    );
   };
 
-  const handleDeleteIncome = async (id: string) => {
+  const handleDeleteIncome = (id: string) => {
     if (window.confirm(t('common.deleteConfirmation'))) {
-      try {
-        Logger.info('Deleting income' + " - " + id);
-        await dispatch(deleteIncome(id));
-      } catch (error) {
-        Logger.error('Failed to delete income' + " - " + JSON.stringify(error as Error));
-      }
+      executeAsyncOperation(
+        'delete income',
+        () => dispatch(deleteIncome(id))
+      );
     }
   };
 
