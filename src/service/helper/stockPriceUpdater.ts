@@ -2,6 +2,8 @@ import { AssetDefinition } from '../../types/domains/assets/';
 import Logger from '../Logger/logger';
 import stockAPIService from '../stockAPIService';
 import { updateAssetDefinitionPrice, cleanupOldPriceHistory } from '../../utils/priceHistoryUtils';
+import { IStockAPIService } from '../stockAPIService/interfaces/IStockAPIService';
+import { StockHistory, StockHistoryEntry } from '../../types/domains/assets/market-data';
 
 /**
  * Helper class to update stock prices in batch
@@ -52,7 +54,7 @@ export class StockPriceUpdater {
     }
   }
 
-  private static async updateSingleDefinition(definition: AssetDefinition, stockAPI: any): Promise<AssetDefinition | null> {
+  private static async updateSingleDefinition(definition: AssetDefinition, stockAPI: IStockAPIService): Promise<AssetDefinition | null> {
     const priceData = await stockAPI.getCurrentStockPrice(definition.ticker!);
     if (!priceData?.price) return null;
 
@@ -103,11 +105,11 @@ export class StockPriceUpdater {
           
           if (historicalData?.data && historicalData.data.length > 0) {
             // Convert historical data to price history format and update definition
-            const priceHistory = historicalData.data.map((entry: any) => ({
+            const priceHistory = historicalData.data?.map((entry: StockHistoryEntry) => ({
               date: entry.date,
               price: entry.close,
               source: 'api' as const
-            }));
+            })) || [];
 
             const updatedDefinition = {
               ...definition,

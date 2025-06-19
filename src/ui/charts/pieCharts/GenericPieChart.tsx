@@ -7,17 +7,11 @@ import formatService from '../../../service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
 import { ChartTooltip } from '../../charts/ChartTooltips';
 import { ChartEmptyState } from '../../feedback/EnhancedEmptyState';
-
-interface GenericPieChartData {
-  name: string;
-  value: number;
-  percentage?: number;
-  [key: string]: any;
-}
+import { PieChartData } from '../../../types/shared/charts';
 
 interface GenericPieChartProps {
   title: string;
-  data: GenericPieChartData[];
+  data: PieChartData[];
   nameKey: string;
   valueKey: string;
   showTitle?: boolean;
@@ -72,7 +66,7 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
                     fill="#8884d8"
                     dataKey={valueKey}
                   >
-                    {data.map((item: GenericPieChartData, index: number) => (
+                    {data.map((item: PieChartData, index: number) => (
                       <Cell key={`cell-${item[nameKey]}`} fill={colors[index % colors.length]} />
                     ))}
                   </Pie>
@@ -91,7 +85,7 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
 
             {/* Legend - Single column layout for better readability */}
             <div className="mt-6 space-y-3 px-4 max-h-48 overflow-y-auto">
-              {data.map((item: GenericPieChartData, index: number) => {
+              {data.map((item: PieChartData, index: number) => {
                 // Use translation if key is provided and showDirectLabels is false
                 const displayName = !showDirectLabels && translationKey 
                   ? t(`${translationKey}.${item[nameKey]}`)
@@ -108,8 +102,8 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
                         {displayName}
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {formatService.formatCurrency(item[valueKey])}
-                        {item.percentage && ` (${item.percentage.toFixed(1)}%)`}
+                        {formatService.formatCurrency(typeof item[valueKey] === 'number' ? item[valueKey] : 0)}
+                        {item.percentage && typeof item.percentage === 'number' && ` (${item.percentage.toFixed(1)}%)`}
                       </div>
                     </div>
                   </div>

@@ -17,24 +17,24 @@ export const paymentScheduleSchema = z.object({
   customAmounts: z.record(z.number()).optional(),
 });
 
-// Form validation utilities
-export type ValidationSchema = z.ZodType<any, any>;
+// Form validation utilities with proper typing
+export type ValidationSchema<T = unknown> = z.ZodType<T>;
 
 export interface ValidationOptions {
   required?: boolean;
   min?: number;
   max?: number;
   pattern?: RegExp;
-  customValidation?: (value: any) => boolean;
+  customValidation?: (value: unknown) => boolean;
 }
 
-const createStringValidation = (options: ValidationOptions): z.ZodType<any> => {
+const createStringValidation = (options: ValidationOptions): z.ZodString | z.ZodOptional<z.ZodString> => {
   const schema = z.string();
   const withPattern = options.pattern ? schema.regex(options.pattern) : schema;
   return options.required ? withPattern.min(1, 'Field is required') : withPattern.optional();
 };
 
-const createNumberValidation = (options: ValidationOptions): z.ZodType<any> => {
+const createNumberValidation = (options: ValidationOptions): z.ZodNumber | z.ZodOptional<z.ZodNumber> => {
   const schema = z.number();
   
   let withBounds = schema;
@@ -49,21 +49,24 @@ const createNumberValidation = (options: ValidationOptions): z.ZodType<any> => {
   return options.required ? withBounds : withBounds.optional();
 };
 
-const createBooleanValidation = (options: ValidationOptions): z.ZodType<any> => {
+const createBooleanValidation = (options: ValidationOptions): z.ZodBoolean | z.ZodOptional<z.ZodBoolean> => {
   const schema = z.boolean();
   return options.required ? schema : schema.optional();
 };
 
-const createDateValidation = (options: ValidationOptions): z.ZodType<any> => {
+const createDateValidation = (options: ValidationOptions): z.ZodString | z.ZodOptional<z.ZodString> => {
   const schema = z.string();
   return options.required ? schema.min(1, 'Date is required') : schema.optional();
 };
 
+type FieldType = 'string' | 'number' | 'boolean' | 'date';
+type FieldValidation = z.ZodTypeAny;
+
 export const createFieldValidation = (
-  type: 'string' | 'number' | 'boolean' | 'date',
+  type: FieldType,
   options: ValidationOptions = {}
-) => {
-  let schema: z.ZodType<any>;
+): FieldValidation => {
+  let schema: FieldValidation;
 
   switch (type) {
     case 'string':
@@ -85,14 +88,20 @@ export const createFieldValidation = (
   return options.customValidation ? schema.refine(options.customValidation) : schema;
 };
 
-export function createValidationSchema<T extends Record<string, any>>(fields: T): z.ZodObject<any> {
-  const shape: Record<string, z.ZodType<any>> = {};
+interface FieldConfig extends ValidationOptions {
+  type: FieldType;
+}
+
+export function createValidationSchema<T extends Record<string, FieldType | FieldConfig>>(
+  fields: T
+): z.ZodObject<Record<string, FieldValidation>> {
+  const shape: Record<string, FieldValidation> = {};
 
   for (const [key, config] of Object.entries(fields)) {
     const defaultOptions = {};
     if (typeof config === 'string') {
       // Simple field type
-      shape[key] = createFieldValidation(config as any, defaultOptions);
+      shape[key] = createFieldValidation(config, defaultOptions);
     } else if (typeof config === 'object') {
       // Complex field configuration
       const { type, ...options } = config;

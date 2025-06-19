@@ -6,16 +6,11 @@ import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import formatService from '../../../service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
 import { ChartEmptyState } from '../../feedback/EnhancedEmptyState';
+import { LineChartData, ChartTooltipPayload } from '../../../types/shared/charts';
 
 interface GenericLineChartProps {
   title: string;
-  data: Array<{
-    name: string;
-    value: number;
-    date?: string;
-    month?: string;
-    year?: string;
-  }>;
+  data: LineChartData[];
   nameKey?: string;
   valueKey?: string;
   emptyStateMessage?: string;
@@ -25,11 +20,7 @@ interface GenericLineChartProps {
 }
 
 // Custom tooltip for line chart
-const LineChartTooltip: React.FC<{
-  active?: boolean;
-  payload?: any[];
-  label?: string;
-}> = ({ active, payload, label }) => {
+const LineChartTooltip: React.FC<ChartTooltipPayload> = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null;
   
   const data = payload?.[0]?.payload;

@@ -1,13 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import formatService from '../../service/formatService';
+import { ChartTooltipPayload, RechartsPayload } from '../../types/shared/charts';
 
-interface ChartTooltipProps {
-  // Common props
-  active?: boolean;
-  payload?: any[];
-  label?: string;
-  
+interface ChartTooltipProps extends ChartTooltipPayload {
   // Chart type specific props
   chartType?: 'bar' | 'pie' | 'line' | 'stacked';
   

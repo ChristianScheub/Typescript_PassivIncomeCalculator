@@ -1,13 +1,23 @@
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { invalidatePortfolioCache } from '../slices/transactionsSlice';
 import Logger from '../../service/Logger/logger';
 import { StoreState } from '../index';
 
+// Type guard to check if action has a type property
+function isActionWithType(action: unknown): action is AnyAction {
+  return typeof action === 'object' && action !== null && 'type' in action;
+}
+
 /**
  * Middleware to automatically invalidate portfolio cache when related data changes
  */
-export const portfolioCacheMiddleware: Middleware<{}, StoreState> = (store) => (next) => (action: any) => {
+export const portfolioCacheMiddleware: Middleware<object, StoreState> = (store) => (next) => (action: unknown) => {
   const result = next(action);
+  
+  // Check if action has type property
+  if (!isActionWithType(action)) {
+    return result;
+  }
   
   // Actions that should invalidate the portfolio cache
   const cacheInvalidatingActions = [

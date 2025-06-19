@@ -1,47 +1,31 @@
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useTranslation } from 'react-i18next';
+import { BarChartData, GenericChartProps, ChartEventHandlers } from '../../../types/shared/charts';
+import TypedChartTooltip from '../TypedChartTooltip';
 
-interface GenericBarChartProps<T extends Record<string, any> = { name: string; value: number; percentage?: number }> {
+interface GenericBarChartProps<T extends BarChartData = BarChartData> extends GenericChartProps<T>, ChartEventHandlers<T> {
   title: string;
-  data: T[];
-  nameKey: Extract<keyof T, string>;
-  valueKey: Extract<keyof T, string>;
+  nameKey: keyof T;
+  valueKey: keyof T;
   translationKey?: string;
   emptyStateMessage?: string;
   orientation?: 'horizontal' | 'vertical';
+  formatValue?: (value: number) => string;
 }
 
-// Custom tooltip component moved outside of parent component
-const CustomTooltip = ({ active, payload, formatValue }: { active?: boolean; payload?: any; formatValue: (value: number) => string }) => {
-  if (active && payload?.length) {
-    const data = payload[0].payload;
-    return (
-      <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-        <p className="font-medium text-gray-900 dark:text-gray-100">
-          {data.displayName}
-        </p>
-        <p className="text-blue-600 dark:text-blue-400">
-          {`${formatValue(data.value)} €`}
-        </p>
-        {data.percentage && (
-          <p className="text-gray-600 dark:text-gray-400 text-sm">
-            {`${data.percentage.toFixed(1)}%`}
-          </p>
-        )}
-      </div>
-    );
-  }
-  return null;
-};
-
-const GenericBarChart = <T extends Record<string, any> = { name: string; value: number; percentage?: number }>({
+const GenericBarChart = <T extends BarChartData = BarChartData>({
   title,
   data,
   nameKey,
   valueKey,
   translationKey,
   emptyStateMessage = 'No data available',
-  orientation = 'vertical'
+  orientation = 'vertical',
+  width,
+  height = 300,
+  margin,
+  onBarClick,
+  formatValue = (value: number) => `€${value.toLocaleString()}`
 }: GenericBarChartProps<T>) => {
   const { t } = useTranslation();
 

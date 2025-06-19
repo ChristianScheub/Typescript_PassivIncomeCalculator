@@ -4,23 +4,24 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } fro
 import { Card } from '../../common/Card';
 import { MonthlyProjection } from '@/types/domains/analytics';
 import formatService from '../../../service/formatService';
+import { CashFlowTooltipPayload, CashFlowPayload } from '../../../types/shared/charts';
 
 interface BarChartCashFlowProjectionProps {
   projections: MonthlyProjection[];
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip: React.FC<CashFlowTooltipPayload> = ({ active, payload, label }) => {
   const { t } = useTranslation();
 
   if (active && payload && payload.length > 0) {
     // Prüfe ob Asset-Einkommen deutlich höher als normal ist (Dividendenzahlungen)
-    const assetIncomeEntry = payload.find((entry: any) => entry.dataKey === 'assetIncome');
+    const assetIncomeEntry = payload.find((entry: CashFlowPayload) => entry.dataKey === 'assetIncome');
     const isDividendMonth = assetIncomeEntry && assetIncomeEntry.value > 0;
     
     return (
       <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
         <p className="text-gray-600 dark:text-gray-400 font-medium mb-2">
-          {new Date(label).toLocaleString('default', { month: 'long', year: 'numeric' })}
+          {label ? new Date(label).toLocaleString('default', { month: 'long', year: 'numeric' }) : ''}
           {isDividendMonth && assetIncomeEntry.value > 0 && (
             <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-1 rounded">
               📈 {t('forecast.dividendPayment')}
@@ -29,7 +30,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         </p>
         
         {/* Zeige alle Einträge */}
-        {payload.map((entry: any) => {
+        {payload.map((entry: CashFlowPayload) => {
           if (entry.value === 0) return null;
           
           let entryLabel = '';

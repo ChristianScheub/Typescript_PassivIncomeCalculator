@@ -2,11 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../../common/Card';
-import { ExpenseBreakdown } from '@/types/domains/analytics';
+import { ExpenseBreakdown } from '../../../types/domains/financial/entities';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import formatService from '../../../service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
-
+import { RechartsPayload } from '../../../types/shared/charts';
 
 interface PieChartExpenseBreakdownProps {
   readonly expenseBreakdown: ReadonlyArray<ExpenseBreakdown>;
@@ -15,7 +15,7 @@ interface PieChartExpenseBreakdownProps {
 
 interface PieChartExpenseBreakdownTooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: RechartsPayload[];
 }
 
 // Move tooltip component outside to avoid recreation on every render
@@ -33,8 +33,10 @@ const PieChartExpenseBreakdownTooltip: React.FC<PieChartExpenseBreakdownTooltipP
   return (
     <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
       <p className="text-sm font-medium">{name}</p>
-      <p className="text-sm">{formatService.formatCurrency(data.amount)}</p>
-      <p className="text-sm">({data.percentage.toFixed(1)}%)</p>
+      <p className="text-sm">{formatService.formatCurrency(typeof data.amount === 'number' ? data.amount : 0)}</p>
+      {data.percentage && typeof data.percentage === 'number' && (
+        <p className="text-sm">({data.percentage.toFixed(1)}%)</p>
+      )}
     </div>
   );
 };

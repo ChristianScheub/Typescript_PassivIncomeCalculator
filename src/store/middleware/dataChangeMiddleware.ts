@@ -1,15 +1,16 @@
-import { Middleware, MiddlewareAPI } from '@reduxjs/toolkit';
+import { Middleware, MiddlewareAPI, AnyAction } from '@reduxjs/toolkit';
 import { updateForecastValues, updateMonthlyAssetIncomeCache } from '../slices/forecastSlice';
 import { updateDashboardValues } from '../slices/dashboardSlice';
+import { StoreState } from '../index';
 import Logger from '../../service/Logger/logger';
 
 // Type guard to check if action has a type property
-function isActionWithType(action: unknown): action is { type: string } {
-  return typeof action === 'object' && action !== null && 'type' in action && typeof (action as any).type === 'string';
+function isActionWithType(action: unknown): action is AnyAction {
+  return typeof action === 'object' && action !== null && 'type' in action && typeof (action as AnyAction).type === 'string';
 }
 
 // Middleware um automatisch Forecast und Dashboard zu aktualisieren wenn sich relevante Daten ändern
-export const dataChangeMiddleware: Middleware<{}, any> = (store: MiddlewareAPI<any, any>) => (next) => (action) => {
+export const dataChangeMiddleware: Middleware<object, StoreState> = (store: MiddlewareAPI<any, StoreState>) => (next) => (action) => {
   const result = next(action);
   
   // Listen for successful data changes (but not fetch operations)

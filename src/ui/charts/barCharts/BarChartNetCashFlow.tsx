@@ -4,22 +4,25 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 
 import { Card } from '../../common/Card';
 import { MonthlyProjection } from '@/types/domains/analytics';
 import formatService from '../../../service/formatService';
+import { CashFlowTooltipPayload } from '../../../types/shared/charts';
 
 interface BarChartNetCashFlowProps {
   projections: MonthlyProjection[];
 }
 
-const CustomNetTooltip = ({ active, payload, label }: any) => {
+const CustomNetTooltip: React.FC<CashFlowTooltipPayload> = ({ active, payload, label }) => {
   const { t } = useTranslation();
 
   if (active && payload && payload.length > 0) {
     const data = payload[0].payload; // Gesamte Datenzeile
     const netValue = payload[0].value;
     
+    if (!data) return null;
+    
     return (
       <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
         <p className="text-gray-600 dark:text-gray-400 font-medium mb-2">
-          {new Date(label).toLocaleString('default', { month: 'long', year: 'numeric' })}
+          {label ? new Date(label).toLocaleString('default', { month: 'long', year: 'numeric' }) : ''}
         </p>
         
         {/* Zeige Einnahmen Details */}
@@ -29,7 +32,7 @@ const CustomNetTooltip = ({ active, payload, label }: any) => {
               {t('dashboard.income')}:
             </span>
             <span className="text-sm font-medium text-green-600">
-              +{formatService.formatCurrency(data.activeIncome || 0)}
+              +{formatService.formatCurrency(data.activeIncome)}
             </span>
           </div>
           {data.assetIncome > 0 && (
@@ -43,7 +46,7 @@ const CustomNetTooltip = ({ active, payload, label }: any) => {
             </div>
           )}
         </div>
-
+        
         {/* Zeige Ausgaben Details */}
         <div className="mb-2">
           {data.expenseTotal > 0 && (

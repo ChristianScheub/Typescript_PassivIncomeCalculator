@@ -5,3 +5,4 @@
 export * from './allocations';
 export * from './history';
 export * from './performance';
+export * from './cache';

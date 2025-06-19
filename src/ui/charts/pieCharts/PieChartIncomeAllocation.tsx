@@ -2,10 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../../common/Card';
-import { IncomeAllocation } from '@/types/domains/analytics';
+import { IncomeAllocation } from '../../../types/domains/financial/entities';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import formatService from '../../../service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
+import { RechartsPayload } from '../../../types/shared/charts';
 
 interface PieChartIncomeAllocationProps {
   readonly incomeAllocation: ReadonlyArray<IncomeAllocation>;
@@ -14,7 +15,7 @@ interface PieChartIncomeAllocationProps {
 // Custom tooltip for income allocation
 const IncomeTooltip: React.FC<{
   active?: boolean;
-  payload?: any[];
+  payload?: RechartsPayload[];
 }> = ({ active, payload }) => {
   const { t } = useTranslation();
   
@@ -28,8 +29,10 @@ const IncomeTooltip: React.FC<{
   return (
     <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
       <p className="text-sm font-medium">{name}</p>
-      <p className="text-sm">{formatService.formatCurrency(data.amount)}</p>
-      <p className="text-sm">({data.percentage.toFixed(1)}%)</p>
+      <p className="text-sm">{formatService.formatCurrency(typeof data.amount === 'number' ? data.amount : 0)}</p>
+      {data.percentage && typeof data.percentage === 'number' && (
+        <p className="text-sm">({data.percentage.toFixed(1)}%)</p>
+      )}
     </div>
   );
 };

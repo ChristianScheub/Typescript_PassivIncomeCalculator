@@ -94,29 +94,32 @@ export type FormArrayOperation<T> = {
   update: (index: number, value: T) => void;
 }
 
-// Form array helper hook
-export function useFormArray<T>(form: UseFormReturn<any>, name: string): FormArrayOperation<T> & { fields: T[] } {
+// Form array helper hook with proper typing
+export function useFormArray<T, TForm extends FieldValues>(
+  form: UseFormReturn<TForm>, 
+  name: keyof TForm
+): FormArrayOperation<T> & { fields: T[] } {
   const { getValues, setValue } = form;
   
   return {
-    fields: getValues(name) || [],
+    fields: (getValues(name) as T[]) || [],
     append: (value: T) => {
-      const current = getValues(name) || [];
-      setValue(name, [...current, value], { shouldValidate: true });
+      const current = (getValues(name) as T[]) || [];
+      setValue(name, [...current, value] as TForm[keyof TForm], { shouldValidate: true });
     },
     remove: (index: number) => {
-      const current = getValues(name) || [];
+      const current = (getValues(name) as T[]) || [];
       setValue(
         name,
-        current.filter((_: T, i: number) => i !== index),
+        current.filter((_, i: number) => i !== index) as TForm[keyof TForm],
         { shouldValidate: true }
       );
     },
     update: (index: number, value: T) => {
-      const current = getValues(name) || [];
+      const current = (getValues(name) as T[]) || [];
       setValue(
         name,
-        current.map((item: T, i: number) => (i === index ? value : item)),
+        current.map((item: T, i: number) => (i === index ? value : item)) as TForm[keyof TForm],
         { shouldValidate: true }
       );
     },

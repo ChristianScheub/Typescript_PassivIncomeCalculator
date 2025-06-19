@@ -3,7 +3,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 
-export function useAssetForm<T extends Record<string, any>>(
+export function useAssetForm<T extends Record<string, unknown>>(
   schema: z.ZodSchema<T>,
   defaultValues?: DefaultValues<T>
 ) {

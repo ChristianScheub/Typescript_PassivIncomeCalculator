@@ -2,6 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { StoreState } from '..';
 import Logger from '../../service/Logger/logger';
 import { getPriceHistoryForRange } from '../../utils/priceHistoryUtils';
+import { PortfolioCache } from './transactionsSlice';
+import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
+import { AssetDefinition } from '../../types/domains/assets/entities';
 
 interface PortfolioHistoryDay {
   date: string;
@@ -28,11 +31,11 @@ export const calculate30DayHistory = createAsyncThunk(
   'portfolioHistory/calculate30Days',
   async (_, { getState }) => {
     const state = getState() as StoreState;
-    const { assets } = state;
+    const { transactions } = state;
     Logger.infoRedux('Calculating 30-day portfolio history using portfolio system');
     
-    const portfolioCache = assets.portfolioCache;
-    if (!portfolioCache || !assets.portfolioCacheValid) {
+    const portfolioCache = transactions.portfolioCache;
+    if (!portfolioCache || !transactions.portfolioCacheValid) {
       throw new Error('Portfolio cache not available for history calculation');
     }
     
@@ -40,21 +43,24 @@ export const calculate30DayHistory = createAsyncThunk(
   }
 );
 
-// Function for portfolio-based history calculation
-const calculateHistoryFromPortfolio = (portfolioCache: any) => {
+// Function for portfolio-based history calculation with proper typing
+const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache): PortfolioHistoryDay[] => {
   Logger.infoRedux('Portfolio-based history calculation - analyzing positions');
   
-  // Get all unique asset definitions from portfolio positions
+  // Get all unique asset definitions from portfolio positions with price history
   const relevantDefinitions = portfolioCache.positions
-    .map((pos: any) => pos.assetDefinition)
-    .filter((def: any) => def && def.priceHistory?.length > 0);
+    .map((pos: PortfolioPosition) => pos.assetDefinition)
+    .filter((def): def is AssetDefinition => 
+      def != null && Array.isArray(def.priceHistory) && def.priceHistory.length > 0
+    );
 
   Logger.infoRedux('Asset Definitions in portfolio for history:');
   Logger.infoRedux('=================================================');
-  relevantDefinitions.forEach((def: any) => {
+  relevantDefinitions.forEach((def: AssetDefinition) => {
     Logger.infoRedux(`- ${def.name} (ID: ${def.id})`);
     Logger.infoRedux(`  Price History Points: ${def.priceHistory?.length || 0}`);
-    Logger.infoRedux(`  Associated Transactions: ${portfolioCache.positions.find((p: any) => p.assetDefinition?.id === def.id)?.transactionCount || 0}`);
+    const position = portfolioCache.positions.find((p: PortfolioPosition) => p.assetDefinition?.id === def.id);
+    Logger.infoRedux(`  Associated Transactions: ${position?.transactionCount || 0}`);
   });
   Logger.infoRedux('=================================================');
 
@@ -72,7 +78,7 @@ const calculateHistoryFromPortfolio = (portfolioCache: any) => {
     const date = d.toISOString().split('T')[0];
     let totalValue = 0;
 
-    portfolioCache.positions.forEach((position: any) => {
+    portfolioCache.positions.forEach((position: PortfolioPosition) => {
       const definition = position.assetDefinition;
       if (!definition?.priceHistory?.length) return;
 
@@ -90,12 +96,12 @@ const calculateHistoryFromPortfolio = (portfolioCache: any) => {
       }
 
       // Calculate position value considering only transactions that occurred before or on this date
-      const validTransactions = position.transactions.filter((t: any) => 
-        t.transactionType === 'buy' && new Date(t.purchaseDate) <= new Date(date)
+      const validTransactions = position.transactions.filter((transaction) => 
+        transaction.transactionType === 'buy' && new Date(transaction.purchaseDate) <= new Date(date)
       );
 
-      const positionQuantity = validTransactions.reduce((sum: number, t: any) => {
-        return sum + (t.purchaseQuantity || 0);
+      const positionQuantity = validTransactions.reduce((sum: number, transaction) => {
+        return sum + (transaction.purchaseQuantity || 0);
       }, 0);
 
       const positionValue = positionQuantity * price;

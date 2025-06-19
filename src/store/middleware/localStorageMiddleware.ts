@@ -1,8 +1,13 @@
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { StoreState } from '..';
 import { HYDRATE } from '../actions/hydrateAction';
 
 const STORAGE_KEY = 'passiveIncomeCalculator';
+
+// Type guard to check if action has a type property
+function isActionWithType(action: unknown): action is AnyAction {
+  return typeof action === 'object' && action !== null && 'type' in action;
+}
 
 // Aktionen, die wir nicht persistieren wollen
 const BLACKLISTED_ACTIONS = [
@@ -12,8 +17,13 @@ const BLACKLISTED_ACTIONS = [
   HYDRATE
 ];
 
-export const localStorageMiddleware: Middleware = store => next => (action: any) => {
+export const localStorageMiddleware: Middleware<object, StoreState> = store => next => (action: unknown) => {
   const result = next(action);
+
+  // Check if action has type property
+  if (!isActionWithType(action)) {
+    return result;
+  }
 
   // Speichere den State nur, wenn die Aktion nicht blacklisted ist
   if (!BLACKLISTED_ACTIONS.includes(action.type)) {
