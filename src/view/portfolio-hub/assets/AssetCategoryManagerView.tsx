@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { AssetCategory, AssetCategoryOption } from "../../../types";
+import { AssetCategory, AssetCategoryOption } from "../../../types/domains/assets/categories";
+import { CategoryFormData, OptionFormData } from "../../../types/shared/ui/view-props";
 import { Plus, Trash2 } from "lucide-react";
 import { Add } from "@mui/icons-material";
 import { Modal } from "../../../ui/common/Modal";
@@ -27,18 +28,26 @@ interface AssetCategoryManagerViewProps {
     AssetCategoryOption,
     "id" | "createdAt" | "updatedAt" | "categoryId"
   >[];
-  categoryForm: any;
-  optionForm: any; 
+  categoryForm: {
+    control: any; // TODO: Type this properly with react-hook-form
+    handleSubmit: (callback: (data: CategoryFormData) => void) => (e?: React.BaseSyntheticEvent) => Promise<void>;
+    reset: () => void;
+  };
+  optionForm: {
+    control: any; // TODO: Type this properly with react-hook-form  
+    handleSubmit: (callback: (data: OptionFormData) => void) => (e?: React.BaseSyntheticEvent) => Promise<void>;
+    reset: () => void;
+  }; 
   onSetSelectedCategoryId: (id: string | null) => void;
   onSetIsAddingCategory: (isAdding: boolean) => void;
   onSetIsAddingOption: (isAdding: boolean) => void;
   onSetEditingCategory: (category: AssetCategory | null) => void;
   onSetEditingOption: (option: AssetCategoryOption | null) => void;
-  onCategorySubmit: (data: any) => void;
-  onOptionSubmit: (data: any) => void;
+  onCategorySubmit: (data: CategoryFormData) => void;
+  onOptionSubmit: (data: OptionFormData) => void;
   onDeleteCategory: (category: AssetCategory) => void;
   onDeleteCategoryOption: (id: string) => void;
-  onAddOptionToNewCategory: (optionData: any) => void;
+  onAddOptionToNewCategory: (optionData: OptionFormData) => void;
   onRemoveOptionFromNewCategory: (index: number) => void;
   getOptionsForCategory: (categoryId: string) => AssetCategoryOption[];
   onBack?: () => void;

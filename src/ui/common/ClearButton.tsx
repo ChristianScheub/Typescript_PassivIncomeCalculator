@@ -1,6 +1,7 @@
 import React from 'react';
 import { ChevronRight, Trash } from 'lucide-react';
 import clsx from 'clsx';
+import { TFunction } from 'i18next';
 import { Button } from './Button';
 
 // LoadingSpinner component
@@ -9,7 +10,7 @@ const LoadingSpinner: React.FC = () => (
 );
 
 // Helper function to get button text based on status
-export const getButtonText = (status: string, t: any, loadingKey: string, successKey: string, defaultKey: string): string => {
+export const getButtonText = (status: string, t: TFunction, loadingKey: string, successKey: string, defaultKey: string): string => {
   if (status === 'loading' || status === 'saving' || status === 'clearing') {
     return t(loadingKey);
   }
@@ -37,7 +38,7 @@ interface ClearButtonProps {
   onClick: () => void;
   titleKey: string;
   descKey: string;
-  t: any;
+  t: TFunction;
 }
 
 export const ClearButton: React.FC<ClearButtonProps> = ({ status, onClick, titleKey, descKey, t }) => {

@@ -1,24 +1,11 @@
 import Logger from '../service/Logger/logger';
-
-// Define PortfolioCache interface locally to avoid circular imports
-interface PortfolioCache {
-  positions: Array<{
-    formatted?: {
-      currentValue: string;
-    };
-  }>;
-  totals: any;
-  metadata: {
-    lastCalculated: string;
-    combinedHash: string;
-  };
-}
+import { LegacyPortfolioCache } from '../types/domains/portfolio/cache';
 
 /**
  * Validates if a portfolio cache from localStorage is still valid
  */
 export const validatePortfolioCache = (
-  cache: PortfolioCache | undefined,
+  cache: LegacyPortfolioCache | undefined,
   cacheValid: boolean
 ): boolean => {
   if (!cache || !cacheValid) {
@@ -60,7 +47,7 @@ export const validatePortfolioCache = (
  * Gets the cache validity based on data hashes
  */
 export const getCacheValidityFromHashes = (
-  cache: PortfolioCache | undefined,
+  cache: LegacyPortfolioCache | undefined,
   currentAssetHash: string,
   currentDefinitionHash: string,
   currentCategoryHash: string

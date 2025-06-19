@@ -1,16 +1,9 @@
 import { useForm, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PaymentSchedule, PaymentFrequency } from '@/types/shared/base';
+import { PaymentSchedule } from '@/types/shared/base/payments';
+import { PaymentScheduleFields } from '@/types/shared/hooks/payment-schedule';
 import { createPaymentScheduleSchema } from '../utils/validationSchemas';
 import Logger from '../service/Logger/logger';
-
-interface PaymentScheduleFields {
-  frequency: PaymentFrequency;
-  amount: number;
-  months?: number[];
-  customAmounts?: Record<number, number>;
-  paymentMonths?: number[];
-}
 
 export function usePaymentSchedule(initialData?: PaymentSchedule): {
   fields: PaymentScheduleFields;

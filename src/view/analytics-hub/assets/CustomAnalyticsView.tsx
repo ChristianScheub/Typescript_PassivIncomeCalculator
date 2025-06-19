@@ -13,7 +13,7 @@ import {
   closeConfigPanel,
   ChartType, CustomAnalyticsConfig, DataSource, GroupBy
 } from '../../../store/slices/customAnalyticsSlice';
-import { PortfolioPosition } from '../../../service/portfolioService/portfolioCalculations';
+import { PortfolioPosition } from '../../../types/shared/analytics';
 import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
 import { Plus, Trash2, Edit3, X } from 'lucide-react';
 
@@ -283,7 +283,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
     return items.map(item => ({
       name: t(`assets.types.${item.name}`),
       value: item.value,
-      percentage: item.percentage
+      percentage: item.percentage || ((item.value / items.reduce((sum, i) => sum + i.value, 0)) * 100)
     }));
   };
 
@@ -292,7 +292,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
     return items.map(item => ({
       name: item.name,
       value: item.value,
-      percentage: item.percentage
+      percentage: item.percentage || ((item.value / items.reduce((sum, i) => sum + i.value, 0)) * 100)
     }));
   };
 

@@ -30,3 +30,11 @@ export interface PaymentReminder {
   isActive: boolean;
   isSent: boolean;
 }
+
+export interface PaymentSchedule {
+  frequency: PaymentFrequency;
+  amount: number;
+  months?: number[];
+  customAmounts?: Record<number, number>;
+  paymentMonths?: number[];
+}

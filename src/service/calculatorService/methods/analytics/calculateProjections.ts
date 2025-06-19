@@ -4,20 +4,8 @@ import {
   Liability
 } from '../../../../types/domains/financial/';
 import { Transaction as Asset } from '../../../../types/domains/assets/';
+import { CalculatorProjection } from '../../../../types/domains/analytics/calculations';
 import Logger from '../../../Logger/logger';
-
-// Lokaler Type für diese spezielle Projektions-Funktion
-interface CalculatorProjection {
-  month: string;
-  activeIncome: number;
-  passiveIncome: number;
-  assetIncome: number;
-  expenseTotal: number;
-  liabilityPayments: number;
-  incomeTotal: number;
-  netCashFlow: number;
-  passiveIncomeCoverage: number;
-}
 import { calculateTotalMonthlyExpenses } from '../expense/calculateExpenses';
 import { calculateTotalMonthlyLiabilityPayments } from '../liability/calculateLiabilities';
 import { calculatePassiveIncome,calculateTotalMonthlyIncome } from '../income/calculateIncome';

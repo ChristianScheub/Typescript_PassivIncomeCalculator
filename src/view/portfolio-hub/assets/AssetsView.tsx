@@ -1,8 +1,10 @@
 import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Asset } from "../../../types";
+import { Asset } from "../../../types/domains/assets/entities";
+import { AssetFormData } from "../../../types/domains/forms/form-data";
+import { TranslationProps } from "../../../types/shared/ui/view-props";
 import { Card, CardContent } from "../../../ui/common/Card";
-import { PortfolioPosition } from "../../../service/portfolioService/portfolioCalculations";
+import { PortfolioPosition } from "../../../types/domains/portfolio/position";
 import { AssetTransactionForm } from "../../shared/forms/AssetTransactionForm";
 import { useDeviceCheck } from "../../../service/helper/useDeviceCheck";
 import { MobileAssetSummaryCard } from "../../../ui/layout/MobileAssetSummaryCard";
@@ -54,8 +56,8 @@ interface AssetsViewProps {
   isAddingAsset: boolean;
   editingAsset: Asset | null;
   getAssetTypeLabel: (type: string) => string;
-  onAddAsset: (data: any) => void;
-  onUpdateAsset: (data: any) => void;
+  onAddAsset: (data: AssetFormData) => void;
+  onUpdateAsset: (data: AssetFormData) => void;
   onDeleteAsset: (id: string) => void;
   onSetIsAddingAsset: (isAdding: boolean) => void;
   onSetEditingAsset: (asset: Asset | null) => void;
@@ -68,7 +70,7 @@ interface AssetsViewProps {
 }
 
 // Helper components to reduce cognitive complexity
-const LoadingView: React.FC<{ t: any }> = ({ t }) => (
+const LoadingView: React.FC<TranslationProps> = ({ t }) => (
   <div className="container mx-auto px-4 py-8">
     <div className="flex justify-center items-center h-64">
       <div className="text-lg">{t("common.loading")}</div>
@@ -77,7 +79,7 @@ const LoadingView: React.FC<{ t: any }> = ({ t }) => (
 );
 
 const EmptyStateView: React.FC<{ 
-  t: any; 
+  t: TranslationProps['t']; 
   onSetIsAddingAsset: (isAdding: boolean) => void;
   onNavigateToDefinitions: () => void;
 }> = ({ 
@@ -99,14 +101,14 @@ const EmptyStateView: React.FC<{
       label: t("emptyStates.assets.secondaryAction"),
       onClick: onNavigateToDefinitions
     }}
-    tips={t("emptyStates.assets.tips")}
+    tips={t("emptyStates.assets.tips", { returnObjects: true }) as string[]}
   />
 );
 
 //der component for header buttons
 const HeaderButtons: React.FC<{
   isDesktop: boolean;
-  t: any;
+  t: TranslationProps['t'];
   onNavigateToDefinitions: () => void;
   onNavigateToCategories?: () => void;
   onNavigateToAnalytics: () => void;
@@ -197,7 +199,7 @@ const MobileSummary: React.FC<{
   sortedPortfolioAssets: PortfolioPosition[];
   assets: Asset[];
   viewModeTabs: Array<{ id: string; label: string }>;
-  t: any;
+  t: TranslationProps['t'];
   onNavigateToCalendar: () => void;
   onNavigateToAnalytics: () => void;
   onNavigateToPortfolioHistory?: () => void;
@@ -276,7 +278,7 @@ const AssetsList: React.FC<{
   onDeleteAsset: (id: string) => void;
   onSetIsAddingAsset: (isAdding: boolean) => void;
   onNavigateToDefinitions: () => void;
-  t: any;
+  t: TranslationProps['t'];
 }> = ({
   viewMode,
   sortedPortfolioAssets,

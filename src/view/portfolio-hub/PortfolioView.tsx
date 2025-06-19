@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
+import { PortfolioPosition } from '../../types/domains/portfolio/position';
 import formatService from '../../service/formatService';
 
 interface PortfolioViewProps {

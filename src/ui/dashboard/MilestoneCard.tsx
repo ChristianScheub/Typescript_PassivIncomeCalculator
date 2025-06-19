@@ -31,11 +31,11 @@ export const MilestoneCard: React.FC<MilestoneCardProps> = ({
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {milestones.map((milestone, index) => {
+          {milestones.map((milestone) => {
             const IconComponent = milestone.icon;
             return (
               <div 
-                key={index}
+                key={milestone.title}
                 className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 p-3 rounded-lg transition-colors"
                 onClick={milestone.onClick}
               >

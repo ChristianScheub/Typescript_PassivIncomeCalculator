@@ -1,66 +1,18 @@
-import { Asset, AssetDefinition, AssetCategory, AssetCategoryOption } from '../../types';
+import { AssetDefinition, Transaction as Asset } from '../../types/domains/assets';
+import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../types/domains/assets/categories';
+import { PortfolioPosition } from '../../types/domains/portfolio/position';
 import Logger from '../Logger/logger';
 import { calculatorService } from '../calculatorService';
 import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
 import { formatCurrency } from '../formatService/methods/formatCurrency';
 import { formatPercentage } from '../formatService/methods/formatPercentage';
 
-export interface PortfolioPosition {
-  id: string; // AssetDefinitionId or fallback identifier
-  assetDefinition?: AssetDefinition;
-  name: string;
-  ticker?: string;
-  type: string;
-  sector?: string;
-  country?: string;
-  currency?: string;
-  
-  // Aggregated quantities and values
-  totalQuantity: number;
-  averagePurchasePrice: number;
-  totalInvestment: number;
-  currentValue: number;
-  currentPrice?: number;
-  
-  // Performance metrics
-  totalReturn: number;
-  totalReturnPercentage: number;
-  
-  // Income calculations (based on AssetDefinition and total quantity)
-  monthlyIncome: number;
-  annualIncome: number;
-  
-  // PRE-FORMATTED VALUES FOR UI (to avoid repeated formatting calls)
-  formatted: {
-    currentValue: string;
-    totalInvestment: string;
-    totalReturn: string;
-    totalReturnPercentage: string;
-    monthlyIncome: string;
-    annualIncome: string;
-    averagePurchasePrice: string;
-    currentPrice: string;
-  };
-  
-  // Category information
-  categoryAssignments?: {
-    category: AssetCategory;
-    option: AssetCategoryOption;
-  }[];
-  
-  // Transaction details
-  transactions: Asset[];
-  transactionCount: number;
-  firstPurchaseDate: string;
-  lastPurchaseDate: string;
-}
-
 export const calculatePortfolioPositions = (
   assets: Asset[],
   assetDefinitions: AssetDefinition[] = [],
   categories: AssetCategory[] = [],
   categoryOptions: AssetCategoryOption[] = [],
-  categoryAssignments: any[] = []
+  categoryAssignments: AssetCategoryAssignment[] = []
 ): PortfolioPosition[] => {
   Logger.infoService('Calculating portfolio positions from assets');
   Logger.infoService(`Input: ${assets.length} assets, ${assetDefinitions.length} assetDefinitions`);

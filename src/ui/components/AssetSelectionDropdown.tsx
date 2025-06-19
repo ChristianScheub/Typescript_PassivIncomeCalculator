@@ -1,13 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { AssetDefinition } from '../../types/domains/assets/';
-
-interface AssetSelectionDropdownProps {
-  register: any; // From react-hook-form
-  handleDefinitionSelect: (definitionId: string) => void;
-  filteredDefinitions: AssetDefinition[];
-  errors: any;
-}
+import { AssetSelectionDropdownProps } from '../../types/shared/ui/asset-selection';
 
 export const AssetSelectionDropdown: React.FC<AssetSelectionDropdownProps> = ({
   register,
@@ -34,7 +27,9 @@ export const AssetSelectionDropdown: React.FC<AssetSelectionDropdownProps> = ({
         ))}
       </select>
       {errors.assetDefinitionId && (
-        <p className="mt-1 text-sm text-red-600">{errors.assetDefinitionId.message}</p>
+        <p className="mt-1 text-sm text-red-600">
+          {typeof errors.assetDefinitionId.message === 'string' ? errors.assetDefinitionId.message : 'Invalid selection'}
+        </p>
       )}
     </div>
   );

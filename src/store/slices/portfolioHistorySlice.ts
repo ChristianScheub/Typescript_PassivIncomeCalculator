@@ -3,7 +3,7 @@ import { StoreState } from '..';
 import Logger from '../../service/Logger/logger';
 import { getPriceHistoryForRange } from '../../utils/priceHistoryUtils';
 import { PortfolioCache } from './transactionsSlice';
-import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
+import { PortfolioPosition } from '../../types/domains/portfolio/position';
 import { AssetDefinition } from '../../types/domains/assets/entities';
 
 interface PortfolioHistoryDay {

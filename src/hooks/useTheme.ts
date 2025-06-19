@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-
-type Theme = 'light' | 'dark';
+import { Theme } from '../types/shared/hooks/theme';
 
 export const useTheme = () => {
   const [theme, setTheme] = useState<Theme>(() => {

@@ -1,9 +1,10 @@
-// Neue Domain-Driven Types
 import { 
   AssetDefinition, 
-  Transaction as Asset 
+  Transaction as Asset,
+  DividendInfo
 } from '../../../types/domains/assets/';
-import { PortfolioPosition } from '../portfolioCalculations';
+import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../../types/domains/assets/categories';
+import { PortfolioPosition } from '../../../types/domains/portfolio/position';
 
 export interface IPortfolioService {
   /**
@@ -12,15 +13,15 @@ export interface IPortfolioService {
   calculatePortfolio(
     assets: Asset[], 
     assetDefinitions: AssetDefinition[],
-    categories?: any[],
-    categoryOptions?: any[],
-    categoryAssignments?: any[]
+    categories?: AssetCategory[],
+    categoryOptions?: AssetCategoryOption[],
+    categoryAssignments?: AssetCategoryAssignment[]
   ): {
     positions: PortfolioPosition[],
     totals: {
       totalValue: number,
       monthlyIncome: number,
-      [key: string]: any
+      [key: string]: number | string
     },
     metadata: {
       lastCalculated: string,
@@ -37,9 +38,9 @@ export interface IPortfolioService {
     assets: Asset[], 
     assetDefinitions: AssetDefinition[], 
     positionId: string,
-    categories?: any[],
-    categoryOptions?: any[],
-    categoryAssignments?: any[]
+    categories?: AssetCategory[],
+    categoryOptions?: AssetCategoryOption[],
+    categoryAssignments?: AssetCategoryAssignment[]
   ): PortfolioPosition | null;
 
   /**
@@ -54,6 +55,6 @@ export interface IPortfolioService {
     assets: Asset[], 
     assetDefinitions: AssetDefinition[], 
     definitionId: string, 
-    newDividendInfo: any
+    newDividendInfo: Partial<DividendInfo>
   ): number;
 }

@@ -15,6 +15,29 @@ interface ButtonGroupProps {
   className?: string;
 }
 
+// Helper functions to reduce cognitive complexity
+const getOrientationClasses = (isHorizontal: boolean) => {
+  return isHorizontal ? "flex-row" : "flex-col";
+};
+
+const getSpacingClasses = (isHorizontal: boolean, size: string) => {
+  if (size === 'sm') {
+    return isHorizontal ? "space-x-2" : "space-y-2";
+  }
+  if (size === 'lg') {
+    return isHorizontal ? "space-x-4" : "space-y-4";
+  }
+  return isHorizontal ? "space-x-3" : "space-y-3";
+};
+
+const getAttachedClasses = (isHorizontal: boolean) => {
+  return isHorizontal ? "space-x-0" : "space-y-0";
+};
+
+const getAttachedBorderClasses = () => {
+  return "[&>*:not(:first-child)]:border-l-0 [&>*:not(:last-child)]:rounded-r-none [&>*:not(:first-child)]:rounded-l-none";
+};
+
 export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   children,
   orientation = 'horizontal',
@@ -23,26 +46,24 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   className
 }) => {
   const isHorizontal = orientation === 'horizontal';
+  const orientationClasses = getOrientationClasses(isHorizontal);
+  const spacingClasses = attached 
+    ? getAttachedClasses(isHorizontal)
+    : getSpacingClasses(isHorizontal, size);
+  const attachedBorderClasses = attached ? getAttachedBorderClasses() : "";
   
   return (
-    <div
+    <fieldset
       className={cn(
-        "flex",
-        isHorizontal ? "flex-row" : "flex-col",
-        attached ? (isHorizontal ? "space-x-0" : "space-y-0") : (
-          size === 'sm' 
-            ? (isHorizontal ? "space-x-2" : "space-y-2")
-            : size === 'lg'
-            ? (isHorizontal ? "space-x-4" : "space-y-4") 
-            : (isHorizontal ? "space-x-3" : "space-y-3")
-        ),
-        attached && "[&>*:not(:first-child)]:border-l-0 [&>*:not(:last-child)]:rounded-r-none [&>*:not(:first-child)]:rounded-l-none",
+        "flex border-0 p-0 m-0",
+        orientationClasses,
+        spacingClasses,
+        attachedBorderClasses,
         className
       )}
-      role="group"
     >
       {children}
-    </div>
+    </fieldset>
   );
 };
 

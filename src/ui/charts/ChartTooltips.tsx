@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import formatService from '../../service/formatService';
-import { ChartTooltipPayload, RechartsPayload } from '../../types/shared/charts';
+import { ChartTooltipPayload } from '../../types/shared/charts';
 
 interface ChartTooltipProps extends ChartTooltipPayload {
   // Chart type specific props
@@ -86,23 +86,33 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   
   // Stacked bar special case
   if (chartType === 'stacked' && data) {
-    const { amount, percentage, firstBar, secondBar } = data;
+    const stackedData = data as any; // Type assertion for stacked data
+    const { amount, percentage, firstBar, secondBar } = stackedData;
+    
+    // Helper function to check if an object has the required properties
+    const hasBarData = (bar: any): bar is { name: string; value: number } => {
+      return bar && 
+             typeof bar === 'object' && 
+             typeof bar.name === 'string' && 
+             (typeof bar.value === 'number' || typeof bar.value === 'string') && 
+             bar.value != null;
+    };
     
     return (
       <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
         <div className="space-y-1">
-          {firstBar?.value && (
+          {hasBarData(firstBar) && (
             <p className="text-sm" style={{ color: firstBarColor }}>
-              {firstBar.name}: {formatCurrencyFn(firstBar.value)}
+              {firstBar.name}: {formatCurrencyFn(Number(firstBar.value))}
             </p>
           )}
-          {secondBar?.value && (
+          {hasBarData(secondBar) && (
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              {secondBar.name}: {formatCurrencyFn(secondBar.value)}
+              {secondBar.name}: {formatCurrencyFn(Number(secondBar.value))}
             </p>
           )}
-          {amount && <p className="text-sm">{t('common.total')}: {formatCurrencyFn(amount)}</p>}
-          {percentage && <p className="text-sm">({formatPercentageFn(percentage)})</p>}
+          {amount != null && <p className="text-sm">{t('common.total')}: {formatCurrencyFn(Number(amount))}</p>}
+          {percentage != null && <p className="text-sm">({formatPercentageFn(Number(percentage))})</p>}
         </div>
       </div>
     );
@@ -124,9 +134,9 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
     return (
       <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
         <p className="text-sm font-medium">{displayName}</p>
-        <p className="text-sm">{formatCurrencyFn(data[valueKey] || data.value || data.amount)}</p>
+        <p className="text-sm">{formatCurrencyFn(Number(data[valueKey] || data.value || data.amount || 0))}</p>
         {data.percentage !== undefined && (
-          <p className="text-sm">({formatPercentageFn(data.percentage)})</p>
+          <p className="text-sm">({formatPercentageFn(Number(data.percentage))})</p>
         )}
       </div>
     );
@@ -143,11 +153,11 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
               {translateItemKey && item.dataKey 
                 ? t(`${translationPrefix}.${item.dataKey}`) 
                 : (item.name || item.dataKey)
-              }: {formatCurrencyFn(item.value)}
+              }: {formatCurrencyFn(Number(item.value || 0))}
             </p>
           ))
         ) : (
-          <p className="text-sm">{formatCurrencyFn(data[valueKey] || data.value || data.amount)}</p>
+          <p className="text-sm">{formatCurrencyFn(Number(data[valueKey] || data.value || data.amount || 0))}</p>
         )}
       </div>
     );
@@ -157,7 +167,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   return (
     <div className="bg-white dark:bg-gray-800 p-2 border border-gray-200 dark:border-gray-700 rounded shadow">
       {label && <p className="text-sm font-medium">{label}</p>}
-      <p className="text-sm">{formatCurrencyFn(data[valueKey] || data.value || data.amount)}</p>
+      <p className="text-sm">{formatCurrencyFn(Number(data[valueKey] || data.value || data.amount || 0))}</p>
     </div>
   );
 };

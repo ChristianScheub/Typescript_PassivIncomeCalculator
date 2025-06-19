@@ -1,4 +1,10 @@
 import { z } from 'zod';
+import { 
+  FieldType, 
+  FieldValidation, 
+  ValidationOptions, 
+  FieldConfig 
+} from '../types/shared/utils/form-validation';
 
 // Basic field types
 const baseFields = {
@@ -59,9 +65,6 @@ const createDateValidation = (options: ValidationOptions): z.ZodString | z.ZodOp
   return options.required ? schema.min(1, 'Date is required') : schema.optional();
 };
 
-type FieldType = 'string' | 'number' | 'boolean' | 'date';
-type FieldValidation = z.ZodTypeAny;
-
 export const createFieldValidation = (
   type: FieldType,
   options: ValidationOptions = {}
@@ -87,10 +90,6 @@ export const createFieldValidation = (
 
   return options.customValidation ? schema.refine(options.customValidation) : schema;
 };
-
-interface FieldConfig extends ValidationOptions {
-  type: FieldType;
-}
 
 export function createValidationSchema<T extends Record<string, FieldType | FieldConfig>>(
   fields: T

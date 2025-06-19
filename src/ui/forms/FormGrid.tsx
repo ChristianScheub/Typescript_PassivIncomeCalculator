@@ -84,8 +84,8 @@ interface StandardFormFieldProps {
   type?: 'text' | 'number' | 'select' | 'date' | 'checkbox' | 'textarea';
   required?: boolean;
   error?: string;
-  value: any;
-  onChange: (value: any) => void;
+  value: string | number | boolean | undefined;
+  onChange: (value: string | number | boolean) => void;
   placeholder?: string;
   options?: Array<{ value: string; label: string }>;
   step?: number;
@@ -136,6 +136,8 @@ export const StandardFormField: React.FC<StandardFormFieldProps> = ({
     const newValue = type === 'number' ? parseFloat(event.target.value) || 0 : event.target.value;
     onChange?.(newValue);
   };
+
+  const displayValue = value ?? '';
 
   if (type === 'checkbox') {
     return (
@@ -191,7 +193,7 @@ export const StandardFormField: React.FC<StandardFormFieldProps> = ({
         </InputLabel>
         <Select
           labelId={`${name}-label`}
-          value={value || ''}
+          value={value ?? ''}
           onChange={(e) => onChange?.(e.target.value)}
           label={label}
           sx={{
@@ -233,7 +235,7 @@ export const StandardFormField: React.FC<StandardFormFieldProps> = ({
           fullWidth={fullWidth}
           multiline
           rows={rows}
-          value={value || ''}
+          value={value ?? ''}
           onChange={handleChange}
           placeholder={placeholder}
           error={Boolean(error)}

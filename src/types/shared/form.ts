@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FieldErrors, FieldValues } from 'react-hook-form';
 
 export interface FormSectionProps {
   title?: string;
@@ -12,11 +13,11 @@ export interface FormProps {
   isLoading?: boolean;
 }
 
-export type ValidationSchema = z.ZodType<any, any>;
+export type ValidationSchema<T = unknown> = z.ZodType<T>;
 
-export interface UseFormConfig<T> {
-  validationSchema: ValidationSchema;
+export interface UseFormConfig<T extends FieldValues> {
+  validationSchema: ValidationSchema<T>;
   defaultValues: Partial<T>;
-  onSubmit: (data: T) => void | Promise<any>;
-  onError?: (errors: any) => void;
+  onSubmit: (data: T) => void | Promise<void>;
+  onError?: (errors: FieldErrors<T>) => void;
 }

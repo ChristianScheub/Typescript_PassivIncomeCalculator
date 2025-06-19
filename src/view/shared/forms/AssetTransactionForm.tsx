@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../../hooks/redux';
-import { Asset, AssetDefinition } from '../../../types';
+import { Asset } from '../../../types/domains/assets/entities';
+import { AssetDefinition } from '../../../types/domains/assets/entities';
+import { AssetFormData } from '../../../types/domains/forms/form-data';
+import { createAssetTransactionSchema } from '../../../utils/validationSchemas';
 import { Modal } from '../../../ui/common/Modal';
 import { 
   StandardFormWrapper,
@@ -16,72 +18,9 @@ import {
 import { AssetSearchBar, AssetSelectionDropdown, SelectedAssetInfo } from '../../../ui/components';
 import formatService from '../../../service/formatService';
 
-const assetTransactionSchema = z.object({
-  assetDefinitionId: z.string().min(1, 'Please select an asset'),
-  name: z.string().min(1, 'Name is required'),
-  transactionType: z.enum(['buy', 'sell'] as const, {
-    required_error: "Transaction type is required"
-  }),
-  // Buy fields
-  purchaseDate: z.string().optional(),
-  purchasePrice: z.number().min(0, 'Price must be positive').optional(),
-  purchaseQuantity: z.number().min(0.001, 'Quantity must be positive').optional(),
-  // Sale fields  
-  saleDate: z.string().optional(),
-  salePrice: z.number().min(0, 'Sale price must be positive').optional(),
-  saleQuantity: z.number().min(0.001, 'Sale quantity must be positive').optional(),
-  // Common fields
-  transactionCosts: z.number().min(0, 'Transaction costs must be positive'),
-  notes: z.string().optional(),
-}).superRefine((data, ctx) => {
-  if (data.transactionType === 'buy') {
-    if (!data.purchaseDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Purchase date is required for buy transactions',
-        path: ['purchaseDate']
-      });
-    }
-    if (!data.purchasePrice || data.purchasePrice <= 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Purchase price is required for buy transactions',
-        path: ['purchasePrice']
-      });
-    }
-    if (!data.purchaseQuantity || data.purchaseQuantity <= 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Purchase quantity is required for buy transactions',
-        path: ['purchaseQuantity']
-      });
-    }
-  } else if (data.transactionType === 'sell') {
-    if (!data.saleDate) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Sale date is required for sell transactions',
-        path: ['saleDate']
-      });
-    }
-    if (!data.salePrice || data.salePrice <= 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Sale price is required for sell transactions',
-        path: ['salePrice']
-      });
-    }
-    if (!data.saleQuantity || data.saleQuantity <= 0) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Sale quantity is required for sell transactions',
-        path: ['saleQuantity']
-      });
-    }
-  }
-});
+const assetTransactionSchema = createAssetTransactionSchema();
 
-type AssetTransactionFormData = z.infer<typeof assetTransactionSchema>;
+type AssetTransactionFormData = AssetFormData;
 
 interface AssetTransactionFormProps {
   isOpen: boolean;
@@ -311,7 +250,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
               required
               error={errors.name?.message}
               value={watch('name')}
-              onChange={(value: any) => setValue('name', value)}
+              onChange={(value: string | number | boolean) => setValue('name', value as string)}
               placeholder={t('assets.transactionNamePlaceholder')}
             />
 
@@ -343,7 +282,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.purchaseDate?.message}
                   value={watch('purchaseDate')}
-                  onChange={(value: any) => setValue('purchaseDate', value)}
+                  onChange={(value: string | number | boolean) => setValue('purchaseDate', value as string)}
                 />
 
                 <StandardFormField
@@ -353,7 +292,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.purchasePrice?.message}
                   value={watch('purchasePrice')}
-                  onChange={(value: any) => setValue('purchasePrice', value)}
+                  onChange={(value: string | number | boolean) => setValue('purchasePrice', value as number)}
                   step={0.01}
                   min={0}
                 />
@@ -365,7 +304,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.purchaseQuantity?.message}
                   value={watch('purchaseQuantity')}
-                  onChange={(value: any) => setValue('purchaseQuantity', value)}
+                  onChange={(value: string | number | boolean) => setValue('purchaseQuantity', value as number)}
                   step={0.001}
                   min={0.001}
                 />
@@ -382,7 +321,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.saleDate?.message}
                   value={watch('saleDate')}
-                  onChange={(value: any) => setValue('saleDate', value)}
+                  onChange={(value: string | number | boolean) => setValue('saleDate', value as string)}
                 />
 
                 <StandardFormField
@@ -392,7 +331,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.salePrice?.message}
                   value={watch('salePrice')}
-                  onChange={(value: any) => setValue('salePrice', value)}
+                  onChange={(value: string | number | boolean) => setValue('salePrice', value as number)}
                   step={0.01}
                   min={0}
                 />
@@ -404,7 +343,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.saleQuantity?.message}
                   value={watch('saleQuantity')}
-                  onChange={(value: any) => setValue('saleQuantity', value)}
+                  onChange={(value: string | number | boolean) => setValue('saleQuantity', value as number)}
                   step={0.001}
                   min={0.001}
                 />
@@ -421,7 +360,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
               type="number"
               error={errors.transactionCosts?.message}
               value={watch('transactionCosts')}
-              onChange={(value: any) => setValue('transactionCosts', value)}
+              onChange={(value: string | number | boolean) => setValue('transactionCosts', value as number)}
               step={0.01}
               min={0}
             />
@@ -444,7 +383,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
               type="textarea"
               error={errors.notes?.message}
               value={watch('notes')}
-              onChange={(value: any) => setValue('notes', value)}
+              onChange={(value: string | number | boolean) => setValue('notes', value as string)}
               placeholder={t('assets.notesPlaceholder')}
             />
           </FormGrid>

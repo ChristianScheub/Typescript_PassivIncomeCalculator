@@ -17,7 +17,7 @@ import {
 import { 
   MonthlyProjection 
 } from '../../../types/domains/analytics/';
-import { PortfolioPosition } from '../../portfolioService/portfolioCalculations';
+import { PortfolioPosition } from '../../../types/domains/portfolio/position';
 import { PortfolioAnalyticsData, IncomeAnalyticsData } from '../methods/analytics/calculatePortfolioAnalytics';
 
 export interface ICalculatorService {

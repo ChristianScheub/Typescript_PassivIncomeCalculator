@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { ExpenseFormData } from "../../../types/domains/forms/form-data";
 import { Card, CardContent } from "../../../ui/common/Card";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
 import { MotivationalEmptyState } from "../../../ui/feedback/EnhancedEmptyState";
@@ -9,7 +10,7 @@ import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { ReceiptText } from "lucide-react";
 import formatService from '../../../service/formatService';
-import { Expense } from "../../../types";
+import { Expense } from "../../../types/domains/financial/entities";
 import { Add } from "@mui/icons-material";
 
 
@@ -20,8 +21,8 @@ interface ExpensesViewProps {
   isAddingExpense: boolean;
   editingExpense: Expense | null;
   calculateMonthlyAmount: (expense: Expense) => number;
-  onAddExpense: (data: any) => void;
-  onUpdateExpense: (data: any) => void;
+  onAddExpense: (data: ExpenseFormData) => void;
+  onUpdateExpense: (data: ExpenseFormData) => void;
   onDeleteExpense: (id: string) => void;
   onSetIsAddingExpense: (isAdding: boolean) => void;
   onSetEditingExpense: (expense: Expense | null) => void;

@@ -60,6 +60,36 @@ export interface Liability extends BaseEntity {
   notes?: string;
 }
 
+// Asset entities (alias for backward compatibility)
+export type Asset = {
+  id: string;
+  name: string;
+  type: string;
+  assetDefinitionId?: string;
+  assetDefinition?: {
+    ticker?: string;
+    sector?: string;
+    fullName?: string;
+  };
+  transactionType: 'buy' | 'sell';
+  purchasePrice: number;
+  purchaseQuantity: number;
+  purchaseDate: string;
+  salePrice?: number;
+  saleQuantity?: number;
+  saleDate?: string;
+  transactionCosts?: number;
+  currency?: string;
+  exchange?: string;
+  currentPrice?: number;
+  currentValue?: number;
+  value?: number;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+};
+
 // Financial calculations
 export interface ExpenseBreakdown {
   category: ExpenseCategory;

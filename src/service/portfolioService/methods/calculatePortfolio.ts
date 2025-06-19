@@ -1,13 +1,14 @@
-import { Asset, AssetDefinition } from '../../../types';
+import { AssetDefinition, Transaction as Asset } from '../../../types/domains/assets';
+import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../../types/domains/assets/categories';
 import { calculatePortfolioPositions, calculatePortfolioTotals } from '../portfolioCalculations';
 import Logger from '../../Logger/logger';
 
 export function calculatePortfolio(
   assets: Asset[], 
   assetDefinitions: AssetDefinition[] = [],
-  categories: any[] = [],
-  categoryOptions: any[] = [],
-  categoryAssignments: any[] = []
+  categories: AssetCategory[] = [],
+  categoryOptions: AssetCategoryOption[] = [],
+  categoryAssignments: AssetCategoryAssignment[] = []
 ) {
   Logger.infoService(`Calculating portfolio with ${assets.length} assets and ${assetDefinitions.length} definitions`);
   

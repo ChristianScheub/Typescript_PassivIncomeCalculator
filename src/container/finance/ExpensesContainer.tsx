@@ -36,7 +36,7 @@ const ExpensesContainer: React.FC<{ onBack?: () => void; initialAction?: string 
     return sortExpenses(expenses, SortOrder.DESC);
   }, [expenses]);
 
-  const handleAddExpense = async (data: any) => {
+  const handleAddExpense = async (data: Omit<Expense, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       Logger.info('Adding new expense' + " - " + JSON.stringify(data));
       await dispatch(addExpense(data));
@@ -46,7 +46,7 @@ const ExpensesContainer: React.FC<{ onBack?: () => void; initialAction?: string 
     }
   };
 
-  const handleUpdateExpense = async (data: any) => {
+  const handleUpdateExpense = async (data: Expense) => {
     if (editingExpense) {
       try {
         Logger.info('Updating expense: ' + JSON.stringify({ id: editingExpense.id, data }));

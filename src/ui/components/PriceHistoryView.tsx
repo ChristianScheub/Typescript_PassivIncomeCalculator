@@ -1,16 +1,13 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Transaction as Asset } from '../../types/domains/assets/';
-import { PriceHistoryEntry } from '../../types/domains/assets/';
-// Legacy alias
-import { Transaction } from '../../types';
+import { Transaction, PriceHistoryEntry } from '../../types/domains/assets/';
 import { formatCurrency } from '../../service/formatService/methods/formatCurrency';
 import { TrendingUp, TrendingDown, Calendar, Database, Upload } from 'lucide-react';
 import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtils';
 
 interface PriceHistoryViewProps {
   priceHistory: PriceHistoryEntry[];
-  transactions?: Array<Asset | Transaction>;  // Optional transactions for portfolio value calculation
+  transactions?: Array<Transaction | Transaction>;  // Optional transactions for portfolio value calculation
   title?: string;
   showSourceIcons?: boolean;
   maxEntries?: number;

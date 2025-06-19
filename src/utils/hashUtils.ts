@@ -2,12 +2,14 @@
  * Utility functions for generating hashes for caching purposes
  */
 
+import { AssetDefinition, Transaction } from '../types/domains/assets';
+
 /**
  * Simple hash function for generating consistent hash strings from objects
  * @param obj - Object to hash
  * @returns Hash string
  */
-export const simpleHash = (obj: any): string => {
+export const simpleHash = (obj: Record<string, unknown> | unknown[]): string => {
   const str = JSON.stringify(obj);
   let hash = 0;
   
@@ -27,11 +29,11 @@ export const simpleHash = (obj: any): string => {
  * @param assets - Array of assets
  * @returns Hash string
  */
-export const generateAssetHash = (assets: any[]): string => {
+export const generateAssetHash = (assets: Transaction[]): string => {
   const relevantData = assets.map(a => ({
     id: a.id,
-    quantity: a.purchaseQuantity || a.currentQuantity,
-    price: a.purchasePrice || a.currentPrice,
+    quantity: a.purchaseQuantity || (a as any).currentQuantity,
+    price: a.purchasePrice || (a as any).currentPrice,
     updatedAt: a.updatedAt
   }));
   
@@ -43,7 +45,7 @@ export const generateAssetHash = (assets: any[]): string => {
  * @param definitions - Array of asset definitions
  * @returns Hash string
  */
-export const generateDefinitionHash = (definitions: any[]): string => {
+export const generateDefinitionHash = (definitions: AssetDefinition[]): string => {
   const relevantData = definitions.map(d => ({
     id: d.id,
     dividendInfo: d.dividendInfo,

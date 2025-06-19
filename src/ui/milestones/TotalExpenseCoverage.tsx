@@ -1,7 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Card, CardContent, CardHeader, CardTitle } from "../common/Card";
-import { Target } from "lucide-react";
 import formatService from "../../service/formatService";
 import {
   getHighestMilestone,

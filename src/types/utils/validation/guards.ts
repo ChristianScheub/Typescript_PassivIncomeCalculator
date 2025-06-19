@@ -6,22 +6,27 @@ import { BaseEntity } from '../../shared/base/entities';
 import { AssetType, TransactionType } from '../../shared/base/enums';
 
 // Type guards
-export function isBaseEntity(obj: any): obj is BaseEntity {
+export function isBaseEntity(obj: unknown): obj is BaseEntity {
   return (
-    obj &&
-    typeof obj.id === 'string' &&
-    typeof obj.name === 'string' &&
-    typeof obj.createdAt === 'string' &&
-    typeof obj.updatedAt === 'string'
+    obj !== null &&
+    typeof obj === 'object' &&
+    'id' in obj &&
+    'name' in obj &&
+    'createdAt' in obj &&
+    'updatedAt' in obj &&
+    typeof (obj as Record<string, unknown>).id === 'string' &&
+    typeof (obj as Record<string, unknown>).name === 'string' &&
+    typeof (obj as Record<string, unknown>).createdAt === 'string' &&
+    typeof (obj as Record<string, unknown>).updatedAt === 'string'
   );
 }
 
-export function isAssetType(value: any): value is AssetType {
+export function isAssetType(value: unknown): value is AssetType {
   const assetTypes: AssetType[] = ['stock', 'bond', 'real_estate', 'crypto', 'cash', 'other'];
-  return assetTypes.includes(value);
+  return typeof value === 'string' && assetTypes.includes(value as AssetType);
 }
 
-export function isTransactionType(value: any): value is TransactionType {
+export function isTransactionType(value: unknown): value is TransactionType {
   return value === 'buy' || value === 'sell';
 }
 

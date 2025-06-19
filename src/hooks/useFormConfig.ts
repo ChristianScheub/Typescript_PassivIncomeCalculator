@@ -2,12 +2,7 @@ import { UseFormProps, useForm, FieldValues, DefaultValues } from 'react-hook-fo
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
-
-interface UseFormConfigProps<T extends FieldValues> {
-  onSubmit: (data: T) => void;
-  defaultValues?: DefaultValues<T>;
-  validationSchema: z.ZodSchema<T>;
-}
+import { UseFormConfigProps } from '../types/shared/hooks/form-config';
 
 export function useFormConfig<T extends FieldValues>({
   onSubmit,

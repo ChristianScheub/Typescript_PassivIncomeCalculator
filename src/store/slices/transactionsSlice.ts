@@ -2,8 +2,10 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { 
   Transaction as Asset
 } from '../../types/domains/assets/';
-import { AssetDefinition, AssetCategory, AssetCategoryOption } from '../../types';
-import { PortfolioPosition, calculatePortfolioPositions, calculatePortfolioTotals } from '../../service/portfolioService/portfolioCalculations';
+import { AssetDefinition, AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../types/domains/assets';
+import { PortfolioPosition } from '../../types/domains/portfolio/position';
+import { TransactionsState } from '../../types/domains/financial/state';
+import { calculatePortfolioPositions, calculatePortfolioTotals } from '../../service/portfolioService/portfolioCalculations';
 import sqliteService from '../../service/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
 import Logger from '../../service/Logger/logger';
@@ -24,22 +26,24 @@ export interface PortfolioCache {
   confidence: number;
 }
 
-interface TransactionsState {
-  items: Asset[];
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null;
-  portfolioCache?: PortfolioCache;
-  portfolioCacheValid: boolean;
-  lastPortfolioCalculation?: string;
-}
-
 const initialState: TransactionsState = {
   items: [],
   status: 'idle',
   error: null,
   portfolioCache: undefined,
   portfolioCacheValid: false,
-  lastPortfolioCalculation: undefined
+  lastPortfolioCalculation: undefined,
+  calculationMetadata: {
+    lastCalculated: '',
+    totalValue: 0,
+    totalInvestment: 0,
+    totalReturn: 0,
+    totalReturnPercentage: 0,
+    assetDefinitions: [],
+    categories: [],
+    categoryOptions: [],
+    categoryAssignments: []
+  }
 };
 
 // Async Thunks
@@ -88,7 +92,7 @@ export const calculatePortfolioData = createAsyncThunk(
     categoryData: {
       categories: AssetCategory[];
       categoryOptions: AssetCategoryOption[];
-      categoryAssignments: any[];
+      categoryAssignments: AssetCategoryAssignment[];
     };
   }, { getState }) => {
     const state = getState() as { transactions: TransactionsState };

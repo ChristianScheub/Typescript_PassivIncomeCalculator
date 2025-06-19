@@ -1,17 +1,9 @@
 import React from 'react';
-import { UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { RequiredSection } from '../forms/StandardFormWrapper';
-import { AssetType } from '@/types/shared/base';
 import { getAssetTypeOptions } from '../../constants';
-
-interface BasicAssetInformationProps {
-  watch: (field: string) => any;
-  setValue: UseFormSetValue<any>;
-  errors: any;
-  isDefinition?: boolean;
-}
+import { BasicAssetInformationProps } from '../../types/shared/ui/asset-sections';
 
 export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
   watch,

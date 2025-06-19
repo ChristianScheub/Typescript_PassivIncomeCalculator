@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ActionButtonGroup } from '../../../ui/common/ActionButtonGroup';
-import { Asset } from '../../../types';
-import { PortfolioPosition } from '../../../service/portfolioService/portfolioCalculations';
+import { Asset } from '../../../types/domains/financial/';
+import { Transaction } from '../../../types/domains/assets/entities';
+import { PortfolioPosition } from '../../../types/domains/portfolio/position';
 import formatService from '../../../service/formatService';
 import { getCurrentQuantity, getCurrentValue } from '../../../utils/transactionCalculations';
 
@@ -32,7 +33,7 @@ export const TransactionView: React.FC<TransactionViewProps> = ({
       return 0;
     }
     
-    const transactionQuantity = getCurrentQuantity(asset);
+    const transactionQuantity = getCurrentQuantity(asset as Transaction);
     return (position.monthlyIncome * transactionQuantity) / position.totalQuantity;
   };
 
@@ -61,7 +62,7 @@ export const TransactionView: React.FC<TransactionViewProps> = ({
               <div className="flex justify-between">
                 <span className="text-gray-600 dark:text-gray-400">{t('assets.currentValue')}:</span>
                 <span className="font-medium text-gray-900 dark:text-gray-100">
-                  {formatService.formatCurrency(getCurrentValue(asset))}
+                  {formatService.formatCurrency(getCurrentValue(asset as Transaction))}
                 </span>
               </div>
               

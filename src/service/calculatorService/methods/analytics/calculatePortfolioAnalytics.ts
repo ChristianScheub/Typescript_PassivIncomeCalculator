@@ -1,4 +1,4 @@
-import { PortfolioPosition } from '../../../portfolioService/portfolioCalculations';
+import { PortfolioPosition } from '../../../../types/domains/portfolio/position';
 import Logger from '../../../Logger/logger';
 
 export interface AllocationData {

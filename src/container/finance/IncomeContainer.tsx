@@ -44,7 +44,7 @@ const IncomeContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     return t(`income.types.${type}`, type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' '));
   };
 
-  const handleAddIncome = async (data: any) => {
+  const handleAddIncome = async (data: Omit<Income, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
       Logger.info('Adding new income' + " - " + JSON.stringify(data));
       await dispatch(addIncome(data));
@@ -54,7 +54,7 @@ const IncomeContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     }
   };
 
-  const handleUpdateIncome = async (data: any) => {
+  const handleUpdateIncome = async (data: Income) => {
     try {
       Logger.info('Updating income' + " - " + JSON.stringify(data));
       await dispatch(updateIncome(data));

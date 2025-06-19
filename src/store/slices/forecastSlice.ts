@@ -4,7 +4,7 @@ import calculatorService from '../../service/calculatorService';
 import { StoreState } from '..';
 import Logger from '../../service/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
-import { PortfolioPosition } from '../../service/portfolioService/portfolioCalculations';
+import { PortfolioPosition } from '../../types/domains/portfolio/position';
 
 // Helper functions to calculate income for different asset types
 const calculateStockDividendIncome = (position: PortfolioPosition, month: number): number => {
@@ -95,7 +95,7 @@ export const updateForecastValues = createAsyncThunk(
   async (_, { getState }) => {
     Logger.infoRedux('Starting forecast values update');
     const state = getState() as StoreState;
-    const { assets, income, expenses, liabilities, dashboard } = state;
+    const { transactions, income, expenses, liabilities, dashboard } = state;
 
     // Verwende bereits berechnete Dashboard-Werte wenn verfügbar, sonst berechne neu
     const baseValues = {
@@ -118,8 +118,8 @@ export const updateForecastValues = createAsyncThunk(
     const monthlyAssetIncomeCache: Record<number, number> = {};
     
     // Use portfolio cache if available (new transaction-based system)
-    const portfolioCache = assets.portfolioCache;
-    if (portfolioCache && assets.portfolioCacheValid) {
+    const portfolioCache = transactions.portfolioCache;
+    if (portfolioCache && transactions.portfolioCacheValid) {
       Logger.infoRedux('Using portfolio positions for monthly asset income cache');
       for (let month = 1; month <= 12; month++) {
         monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
@@ -128,7 +128,7 @@ export const updateForecastValues = createAsyncThunk(
       // Fallback to legacy asset-based calculations
       Logger.infoRedux('Using legacy assets for monthly asset income cache');
       for (let month = 1; month <= 12; month++) {
-        monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(assets.items, month);
+        monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(transactions.items, month);
       }
     }
 
@@ -159,13 +159,13 @@ export const updateMonthlyAssetIncomeCache = createAsyncThunk<
   async (_, { getState }) => {
     Logger.infoRedux('Updating monthly asset income cache');
     const state = getState() as StoreState;
-    const { assets } = state;
+    const { transactions } = state;
 
     const monthlyAssetIncomeCache: Record<number, number> = {};
     
     // Use portfolio cache if available (new transaction-based system)
-    const portfolioCache = assets.portfolioCache;
-    if (portfolioCache && assets.portfolioCacheValid) {
+    const portfolioCache = transactions.portfolioCache;
+    if (portfolioCache && transactions.portfolioCacheValid) {
       Logger.infoRedux('Using portfolio positions for cache update');
       for (let month = 1; month <= 12; month++) {
         monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
@@ -174,7 +174,7 @@ export const updateMonthlyAssetIncomeCache = createAsyncThunk<
       // Fallback to legacy asset-based calculations
       Logger.infoRedux('Using legacy assets for cache update');
       for (let month = 1; month <= 12; month++) {
-        monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(assets.items, month);
+        monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(transactions.items, month);
       }
     }
 

@@ -202,7 +202,7 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {recentAnalytics.map((item, index) => {
+          {recentAnalytics.map((item: any, index: number) => {
             const IconComponent = item.icon;
             return (
               <div 
@@ -239,7 +239,7 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {recommendations.map((item, index) => {
+          {recommendations.map((item: any, index: number) => {
             const IconComponent = item.icon;
             const priorityColor = getPriorityColor(item.priority);
             

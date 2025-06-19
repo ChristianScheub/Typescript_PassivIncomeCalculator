@@ -1,14 +1,8 @@
 import React from 'react';
-import { UseFormSetValue } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { OptionalSection } from '../forms/StandardFormWrapper';
-
-interface AdditionalInformationSectionProps {
-  watch: (field: string) => any;
-  setValue: UseFormSetValue<any>;
-  showExchange?: boolean;
-}
+import { AdditionalInformationSectionProps } from '../../types/shared/ui/asset-sections';
 
 export const AdditionalInformationSection: React.FC<AdditionalInformationSectionProps> = ({
   watch,

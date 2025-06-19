@@ -1,6 +1,6 @@
 import React from 'react';
-import { ExpenseCategory } from '../../../types';
-import { UseFormSetValue } from 'react-hook-form';
+import { UseFormSetValue, FieldErrors } from 'react-hook-form';
+import { ExpenseFormData } from '../../../types/domains/forms';
 import { 
   StandardFormWrapper,
   RequiredSection,
@@ -12,31 +12,13 @@ import { OptionalFieldsSection } from '../../../ui/forms';
 import { useTranslation } from 'react-i18next';
 import { getPaymentFrequencyOptions, getExpenseCategoryOptions } from '../../../constants';
 
-// Define the ExpenseFormData interface for the form
-interface ExpenseFormData {
-  name: string;
-  category: ExpenseCategory;
-  paymentSchedule: {
-    frequency: 'monthly' | 'quarterly' | 'annually' | 'custom';
-    amount: number;
-    months?: number[];
-    dayOfMonth?: number; // Tag des Monats für die Zahlung
-  };
-  startDate: string;
-  endDate?: string;
-  notes?: string;
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
 interface MaterialExpenseFormViewProps {
   // Form state props
   paymentFrequency: 'monthly' | 'quarterly' | 'annually' | 'custom';
-  errors: any;
+  errors: FieldErrors<ExpenseFormData>;
   
   // Form handlers
-  watch: (field: string) => any;
+  watch: <K extends keyof ExpenseFormData>(field: K) => ExpenseFormData[K];
   setValue: UseFormSetValue<ExpenseFormData>;
   onFormSubmit: () => void;
   
@@ -61,6 +43,31 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
   title
 }) => {
   const { t } = useTranslation();
+  
+  // Type-safe onChange handlers
+  const handleNameChange = (value: string | number | boolean) => {
+    setValue('name', String(value));
+  };
+  
+  const handleCategoryChange = (value: string | number | boolean) => {
+    setValue('category', String(value) as 'housing' | 'transportation' | 'food' | 'utilities' | 'insurance' | 'healthcare' | 'entertainment' | 'personal' | 'debt_payments' | 'education' | 'subscriptions' | 'other');
+  };
+  
+  const handleFrequencyChange = (value: string | number | boolean) => {
+    setValue('paymentSchedule.frequency', String(value) as 'monthly' | 'quarterly' | 'annually' | 'custom');
+  };
+  
+  const handleAmountChange = (value: string | number | boolean) => {
+    setValue('paymentSchedule.amount', Number(value));
+  };
+  
+  const handleDayOfMonthChange = (value: string | number | boolean) => {
+    setValue('paymentSchedule.dayOfMonth', Number(value));
+  };
+  
+  const handleStartDateChange = (value: string | number | boolean) => {
+    setValue('startDate', String(value));
+  };
 
   const categoryOptions = getExpenseCategoryOptions(t);
   const paymentFrequencyOptions = getPaymentFrequencyOptions(t);
@@ -79,7 +86,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
             required
             error={errors.name?.message}
             value={watch('name')}
-            onChange={(value) => setValue('name', value)}
+            onChange={handleNameChange}
             placeholder={t('expenses.form.enterExpenseName')}
           />
 
@@ -91,7 +98,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
             options={categoryOptions}
             error={errors.category?.message}
             value={watch('category')}
-            onChange={(value) => setValue('category', value)}
+            onChange={handleCategoryChange}
             placeholder={t('expenses.form.selectCategory')}
           />
 
@@ -103,7 +110,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
             options={paymentFrequencyOptions}
             error={errors.paymentSchedule?.frequency?.message}
             value={watch('paymentSchedule.frequency')}
-            onChange={(value) => setValue('paymentSchedule.frequency', value)}
+            onChange={handleFrequencyChange}
             placeholder={t('expenses.form.selectFrequency')}
           />
 
@@ -114,7 +121,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
             required
             error={errors.paymentSchedule?.amount?.message}
             value={watch('paymentSchedule.amount')}
-            onChange={(value) => setValue('paymentSchedule.amount', value)}
+            onChange={handleAmountChange}
             placeholder="0"
             step={0.01}
             min={0}
@@ -126,7 +133,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
             type="number"
             error={errors.paymentSchedule?.dayOfMonth?.message}
             value={watch('paymentSchedule.dayOfMonth')}
-            onChange={(value) => setValue('paymentSchedule.dayOfMonth', value)}
+            onChange={handleDayOfMonthChange}
             placeholder={t('expenses.form.dayOfMonthPlaceholder')}
             step={1}
             min={1}
@@ -140,7 +147,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
             required
             error={errors.startDate?.message}
             value={watch('startDate')}
-            onChange={(value) => setValue('startDate', value)}
+            onChange={handleStartDateChange}
           />
         </FormGrid>
       </RequiredSection>

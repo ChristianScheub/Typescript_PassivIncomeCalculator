@@ -46,6 +46,99 @@ export const cryptoFields = {
   acquisitionCost: amountSchema.optional(),
 };
 
+// Asset Transaction Form Schema - matches AssetFormData exactly
+export const createAssetTransactionSchema = () => {
+  return z.object({
+    assetDefinitionId: z.string().min(1, 'Asset definition is required'),
+    name: z.string().min(1, 'Name is required'),
+    symbol: z.string().optional(),
+    assetType: z.string().min(1, 'Asset type is required'),
+    transactionType: z.enum(['buy', 'sell']),
+    purchasePrice: z.number().min(0, 'Purchase price must be positive'),
+    purchaseQuantity: z.number().min(0.001, 'Purchase quantity must be positive'),
+    purchaseDate: z.string().min(1, 'Purchase date is required'),
+    salePrice: z.number().min(0, 'Sale price must be positive').optional(),
+    saleQuantity: z.number().min(0.001, 'Sale quantity must be positive').optional(),
+    saleDate: z.string().optional(),
+    transactionCosts: z.number().min(0, 'Transaction costs must be positive').optional(),
+    notes: z.string().optional(),
+    currency: z.string().optional(),
+    exchange: z.string().optional(),
+  });
+};
+
+// Material Asset Form Schema - matches MaterialAssetFormData
+export const createMaterialAssetSchema = () => {
+  const schema = z.object({
+    name: z.string({
+      required_error: "Asset name is required",
+      invalid_type_error: "Asset name must be a string"
+    }).min(1, "Asset name is required"),
+    type: z.enum(['stock', 'bond', 'real_estate', 'crypto', 'cash', 'other'] as const, {
+      required_error: "Asset type is required",
+      invalid_type_error: "Please select a valid asset type"
+    }),
+    value: z.number({
+      invalid_type_error: "Asset value must be a number"
+    }).min(0, "Asset value must be positive").optional(),
+    purchaseDate: z.string().optional(),
+    
+    // Stock specific fields
+    ticker: z.string().optional(),
+    quantity: z.number({
+      invalid_type_error: "Quantity must be a number"
+    }).min(0, "Quantity must be positive").optional(),
+    purchasePrice: z.number({
+      invalid_type_error: "Purchase price must be a number"
+    }).min(0, "Purchase price must be positive").optional(),
+    currentPrice: z.number({
+      invalid_type_error: "Current price must be a number"
+    }).min(0, "Current price must be positive").optional(),
+    
+    // Real estate specific fields
+    propertyValue: z.number().min(0).optional(),
+    
+    // Crypto specific fields
+    symbol: z.string().optional(),
+    acquisitionCost: z.number().min(0).optional(),
+    
+    // Transaction notes
+    notes: z.string().optional(),
+    
+    // System fields
+    id: z.string().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
+  });
+
+  return schema.superRefine((data, ctx) => {
+    if (data.type === 'stock') {
+      // For stocks, require quantity and purchase price
+      if (!data.quantity || data.quantity <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Quantity is required for stocks",
+          path: ["quantity"]
+        });
+      }
+      if (!data.purchasePrice || data.purchasePrice <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Purchase price is required for stocks",
+          path: ["purchasePrice"]
+        });
+      }
+    } else if (!data.value || data.value <= 0) {
+      // For non-stocks, require value
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Value is required for non-stock assets",
+        path: ["value"]
+      });
+    }
+  });
+};
+
 // Asset Schema - Transaction-focused, references AssetDefinition for master data
 export const createAssetSchema = () => {
   const assetSchema = z.object({
@@ -146,23 +239,35 @@ export const createAssetSchema = () => {
 
 // Liability Schema
 export const createLiabilitySchema = () => baseEntitySchema.extend({
-  type: z.enum(['mortgage', 'personal_loan', 'credit_card', 'student_loan', 'auto_loan', 'other'] as const),
-  initialBalance: amountSchema,
-  currentBalance: amountSchema,
-  interestRate: amountSchema,
-  paymentSchedule: createPaymentScheduleSchema(),
+  totalAmount: z.number().min(0, 'Total amount must be positive'),
+  currentBalance: z.number().min(0, 'Current balance must be positive'),
+  interestRate: z.number().min(0, 'Interest rate must be positive'),
+  minimumPayment: z.number().min(0, 'Minimum payment must be positive'),
+  frequency: z.string().min(1, 'Frequency is required'),
+  description: z.string().optional(),
+  isActive: z.boolean(),
+  type: z.enum(['mortgage', 'personal_loan', 'credit_card', 'student_loan', 'auto_loan', 'other'] as const).optional(),
+  initialBalance: amountSchema.optional(),
+  paymentSchedule: createPaymentScheduleSchema().optional(),
 });
 
 // Income Schema
 export const createIncomeSchema = () => baseEntitySchema.extend({
-  type: z.enum(['salary', 'interest', 'dividend', 'rental', 'side_hustle', 'other'] as const),
-  paymentSchedule: createPaymentScheduleSchema(),
-  isPassive: z.boolean(),
+  amount: z.number().min(0, 'Amount must be positive'),
+  frequency: z.string().min(1, 'Frequency is required'),
+  category: z.string().optional(),
+  description: z.string().optional(),
+  isActive: z.boolean(),
+  type: z.enum(['salary', 'interest', 'dividend', 'rental', 'side_hustle', 'other'] as const).optional(),
+  paymentSchedule: createPaymentScheduleSchema().optional(),
+  isPassive: z.boolean().optional(),
   sourceId: z.string().optional(),
 });
 
 // Expense Schema
 export const createExpenseSchema = () => baseEntitySchema.extend({
+  amount: z.number().min(0, 'Amount must be positive'),
+  frequency: z.string().min(1, 'Frequency is required'),
   category: z.enum([
     'housing',
     'transportation',
@@ -176,7 +281,9 @@ export const createExpenseSchema = () => baseEntitySchema.extend({
     'education',
     'subscriptions',
     'other'
-  ] as const),
+  ] as const).optional(),
+  description: z.string().optional(),
+  isActive: z.boolean(),
   paymentSchedule: createPaymentScheduleSchema(),
 });
 

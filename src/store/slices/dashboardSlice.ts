@@ -2,24 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { StoreState } from '..';
 import calculatorService from '../../service/calculatorService';
 import Logger from '../../service/Logger/logger';
-
-interface DashboardState {
-  netWorth: number;
-  totalAssets: number;
-  totalLiabilities: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  monthlyLiabilityPayments: number;
-  monthlyAssetIncome: number;
-  passiveIncome: number;
-  monthlyCashFlow: number;
-  passiveIncomeRatio: number;
-  assetAllocation: Array<{ name: string; type: string; value: number; percentage: number }>;
-  totalAssetGain: number;
-  totalAssetGainPercentage: number;
-  status: 'idle' | 'loading' | 'succeeded' | 'failed';
-  error: string | null;
-}
+import { DashboardState } from '../../types/domains/dashboard/state';
 
 const initialState: DashboardState = {
   netWorth: 0,

@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { AssetDefinition, AssetCategoryAssignment } from "../../../types";
+import { AssetCategoryAssignment } from "../../../types/domains/assets/categories";
+import { AssetDefinition } from "../../../types/domains/assets";
 import { AssetDefinitionForm } from "../../shared/forms/AssetDefinitionForm";
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
@@ -290,27 +291,48 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
               onSetEditingDefinition(null);
             }}
             onSubmit={(data, categoryAssignments) => {
+              // Transform sectors data to match SectorAllocation interface
+              const transformedData = {
+                ...data,
+                sectors: data.sectors?.map(sector => ({
+                  sector: sector.sectorName,
+                  sectorName: sector.sectorName,
+                  value: 0, // Will be calculated later
+                  percentage: sector.percentage,
+                  count: 0, // Will be calculated later
+                })) || undefined
+              };
+
+              // Transform category assignments to include required fields
+              const transformedCategoryAssignments = categoryAssignments.map(assignment => ({
+                ...assignment,
+                name: assignment.name || `${assignment.categoryId}-${assignment.categoryOptionId}`, // Generate a name if not provided
+                assetDefinitionId: editingDefinition?.id || '', // Will be set after creation for new definitions
+                categoryId: assignment.categoryId || '',
+                categoryOptionId: assignment.categoryOptionId || ''
+              }));
+
               if (editingDefinition) {
                 // For updates, merge the form data with the existing definition's metadata
                 if (onUpdateDefinitionWithCategories) {
                   onUpdateDefinitionWithCategories(
                     {
                       ...editingDefinition,
-                      ...data,
+                      ...transformedData,
                     },
-                    categoryAssignments
+                    transformedCategoryAssignments
                   );
                 } else {
                   onUpdateDefinition({
                     ...editingDefinition,
-                    ...data,
+                    ...transformedData,
                   });
                 }
               } else {
                 // For new definitions, just pass the form data
                 onAddDefinitionWithCategories 
-                  ? onAddDefinitionWithCategories(data, categoryAssignments)
-                  : onAddDefinition(data);
+                  ? onAddDefinitionWithCategories(transformedData, transformedCategoryAssignments)
+                  : onAddDefinition(transformedData);
               }
             }}
             editingDefinition={editingDefinition}

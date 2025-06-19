@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, DollarSign, CreditCard, Wallet, Target } from 'lucide-react';
+import { Plus} from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
 import { Button } from '../common/Button';
 
