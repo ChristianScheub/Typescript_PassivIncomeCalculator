@@ -54,6 +54,242 @@ const PerformanceAnalyticsView: React.FC<PerformanceAnalyticsViewProps> = ({
     { id: 'historical' as const, label: t('analytics.performance.historical') || 'Historical Data' }
   ];
 
+  // Helper function to determine Sharpe ratio color
+  const getSharpeRatioColor = (sharpeRatio: number): string => {
+    if (sharpeRatio > 1) return 'bg-green-500';
+    if (sharpeRatio > 0.5) return 'bg-yellow-500';
+    return 'bg-red-500';
+  };
+
+  // Helper components to reduce cognitive complexity
+  interface TopPerformersProps {
+    assetPerformance: AssetPerformance[];
+    t: (key: string) => string;
+  }
+
+  const TopPerformers: React.FC<TopPerformersProps> = ({ assetPerformance, t }) => (
+    <Card>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        {t('analytics.performance.topPerformers') || 'Top Performers'}
+      </h3>
+      {assetPerformance.length > 0 ? (
+        <div className="space-y-3">
+          {assetPerformance.slice(0, 5).map((asset) => (
+            <AssetPerformanceRow key={asset.id} asset={asset} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-gray-600 dark:text-gray-400 text-center py-8">
+          {t('analytics.performance.noData') || 'No performance data available'}
+        </p>
+      )}
+    </Card>
+  );
+
+  interface AssetPerformanceRowProps {
+    asset: AssetPerformance;
+  }
+
+  const AssetPerformanceRow: React.FC<AssetPerformanceRowProps> = ({ asset }) => (
+    <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <div>
+        <h4 className="font-medium text-gray-900 dark:text-white">
+          {asset.name}
+        </h4>
+        {asset.symbol && (
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            {asset.symbol}
+          </p>
+        )}
+      </div>
+      <div className="text-right">
+        <p className={`font-medium ${
+          asset.gain >= 0 
+            ? 'text-green-600 dark:text-green-400' 
+            : 'text-red-600 dark:text-red-400'
+        }`}>
+          {formatCurrency(asset.gain)}
+        </p>
+        <p className={`text-sm ${
+          asset.gainPercent >= 0 
+            ? 'text-green-600 dark:text-green-400' 
+            : 'text-red-600 dark:text-red-400'
+        }`}>
+          {asset.gainPercent >= 0 ? '+' : ''}{asset.gainPercent.toFixed(2)}%
+        </p>
+      </div>
+    </div>
+  );
+
+  interface PerformanceOverviewProps {
+    performanceData: PerformanceData;
+    t: (key: string) => string;
+  }
+
+  const PerformanceOverview: React.FC<PerformanceOverviewProps> = ({ performanceData, t }) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <MiniAnalyticsCard
+        title={t('analytics.performance.currentValue') || 'Current Value'}
+        value={formatCurrency(performanceData.currentValue)}
+        icon={<TrendingUp className="h-5 w-5" />}
+        color="text-blue-600 dark:text-blue-400"
+      />
+      <MiniAnalyticsCard
+        title={t('analytics.performance.totalReturn') || 'Total Return'}
+        value={`${formatCurrency(performanceData.totalReturn)} (${performanceData.totalReturnPercent.toFixed(2)}%)`}
+        icon={performanceData.totalReturn >= 0 ? 
+          <TrendingUp className="h-5 w-5" /> : 
+          <TrendingDown className="h-5 w-5" />
+        }
+        color={performanceData.totalReturn >= 0 ? 
+          "text-green-600 dark:text-green-400" : 
+          "text-red-600 dark:text-red-400"
+        }
+      />
+      <MiniAnalyticsCard
+        title={t('analytics.performance.peakValue') || 'Peak Value'}
+        value={formatCurrency(performanceData.peakValue)}
+        icon={<TrendingUp className="h-5 w-5" />}
+        color="text-green-600 dark:text-green-400"
+      />
+      <MiniAnalyticsCard
+        title={t('analytics.performance.volatility') || 'Volatility'}
+        value={`${performanceData.volatility.toFixed(2)}%`}
+        icon={<TrendingUp className="h-5 w-5" />}
+        color="text-yellow-600 dark:text-yellow-400"
+      />
+    </div>
+  );
+
+  interface ReturnsOverviewProps {
+    performanceData: PerformanceData;
+    t: (key: string) => string;
+  }
+
+  const ReturnsOverview: React.FC<ReturnsOverviewProps> = ({ performanceData, t }) => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <MiniAnalyticsCard
+        title={t('analytics.performance.dailyReturn') || 'Daily Return'}
+        value={`${performanceData.dailyReturn.toFixed(3)}%`}
+        icon={performanceData.dailyReturn >= 0 ? 
+          <TrendingUp className="h-5 w-5" /> : 
+          <TrendingDown className="h-5 w-5" />
+        }
+        color={performanceData.dailyReturn >= 0 ? 
+          "text-green-600 dark:text-green-400" : 
+          "text-red-600 dark:text-red-400"
+        }
+      />
+      <MiniAnalyticsCard
+        title={t('analytics.performance.monthlyReturn') || 'Monthly Return'}
+        value={`${performanceData.monthlyReturn.toFixed(2)}%`}
+        icon={performanceData.monthlyReturn >= 0 ? 
+          <TrendingUp className="h-5 w-5" /> : 
+          <TrendingDown className="h-5 w-5" />
+        }
+        color={performanceData.monthlyReturn >= 0 ? 
+          "text-green-600 dark:text-green-400" : 
+          "text-red-600 dark:text-red-400"
+        }
+      />
+      <MiniAnalyticsCard
+        title={t('analytics.performance.annualizedReturn') || 'Annualized Return'}
+        value={`${performanceData.annualizedReturn.toFixed(2)}%`}
+        icon={performanceData.annualizedReturn >= 0 ? 
+          <TrendingUp className="h-5 w-5" /> : 
+          <TrendingDown className="h-5 w-5" />
+        }
+        color={performanceData.annualizedReturn >= 0 ? 
+          "text-green-600 dark:text-green-400" : 
+          "text-red-600 dark:text-red-400"
+        }
+      />
+    </div>
+  );
+
+  interface DetailedAssetPerformanceProps {
+    assetPerformance: AssetPerformance[];
+    t: (key: string) => string;
+  }
+
+  const DetailedAssetPerformance: React.FC<DetailedAssetPerformanceProps> = ({ assetPerformance, t }) => (
+    <Card>
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+        {t('analytics.performance.assetReturns') || 'Returns by Asset'}
+      </h3>
+      {assetPerformance.length > 0 ? (
+        <div className="space-y-4">
+          {assetPerformance.map((asset) => (
+            <DetailedAssetRow key={asset.id} asset={asset} t={t} />
+          ))}
+        </div>
+      ) : (
+        <p className="text-gray-600 dark:text-gray-400 text-center py-8">
+          {t('analytics.performance.noData') || 'No performance data available'}
+        </p>
+      )}
+    </Card>
+  );
+
+  interface DetailedAssetRowProps {
+    asset: AssetPerformance;
+    t: (key: string) => string;
+  }
+
+  const DetailedAssetRow: React.FC<DetailedAssetRowProps> = ({ asset, t }) => (
+    <div className="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h4 className="font-medium text-gray-900 dark:text-white">
+            {asset.name}
+          </h4>
+          {asset.symbol && (
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              {asset.symbol}
+            </p>
+          )}
+        </div>
+        <div className="grid grid-cols-3 gap-4 text-right">
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('analytics.performance.invested') || 'Invested'}
+            </p>
+            <p className="font-medium text-gray-900 dark:text-white">
+              {formatCurrency(asset.invested)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('analytics.performance.currentValue') || 'Current'}
+            </p>
+            <p className="font-medium text-gray-900 dark:text-white">
+              {formatCurrency(asset.currentValue)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('analytics.performance.return') || 'Return'}
+            </p>
+            <p className={`font-medium ${
+              asset.gain >= 0 
+                ? 'text-green-600 dark:text-green-400' 
+                : 'text-red-600 dark:text-red-400'
+            }`}>
+              {formatCurrency(asset.gain)}
+            </p>
+            <p className={`text-sm ${
+              asset.gainPercent >= 0 
+                ? 'text-green-600 dark:text-green-400' 
+                : 'text-red-600 dark:text-red-400'
+            }`}>
+              {asset.gainPercent >= 0 ? '+' : ''}{asset.gainPercent.toFixed(2)}%
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -108,193 +344,20 @@ const PerformanceAnalyticsView: React.FC<PerformanceAnalyticsViewProps> = ({
         {selectedTab === 'portfolio' && (
           <div className="space-y-6">
             {/* Performance Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <MiniAnalyticsCard
-                title={t('analytics.performance.currentValue') || 'Current Value'}
-                value={formatCurrency(performanceData.currentValue)}
-                icon={<TrendingUp className="h-5 w-5" />}
-                color="text-blue-600 dark:text-blue-400"
-              />
-              <MiniAnalyticsCard
-                title={t('analytics.performance.totalReturn') || 'Total Return'}
-                value={`${formatCurrency(performanceData.totalReturn)} (${performanceData.totalReturnPercent.toFixed(2)}%)`}
-                icon={performanceData.totalReturn >= 0 ? 
-                  <TrendingUp className="h-5 w-5" /> : 
-                  <TrendingDown className="h-5 w-5" />
-                }
-                color={performanceData.totalReturn >= 0 ? 
-                  "text-green-600 dark:text-green-400" : 
-                  "text-red-600 dark:text-red-400"
-                }
-              />
-              <MiniAnalyticsCard
-                title={t('analytics.performance.peakValue') || 'Peak Value'}
-                value={formatCurrency(performanceData.peakValue)}
-                icon={<TrendingUp className="h-5 w-5" />}
-                color="text-green-600 dark:text-green-400"
-              />
-              <MiniAnalyticsCard
-                title={t('analytics.performance.volatility') || 'Volatility'}
-                value={`${performanceData.volatility.toFixed(2)}%`}
-                icon={<TrendingUp className="h-5 w-5" />}
-                color="text-yellow-600 dark:text-yellow-400"
-              />
-            </div>
+            <PerformanceOverview performanceData={performanceData} t={t} />
 
             {/* Top Performers */}
-            <Card>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {t('analytics.performance.topPerformers') || 'Top Performers'}
-              </h3>
-              {assetPerformance.length > 0 ? (
-                <div className="space-y-3">
-                  {assetPerformance.slice(0, 5).map((asset) => (
-                    <div key={asset.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div>
-                        <h4 className="font-medium text-gray-900 dark:text-white">
-                          {asset.name}
-                        </h4>
-                        {asset.symbol && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {asset.symbol}
-                          </p>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <p className={`font-medium ${
-                          asset.gain >= 0 
-                            ? 'text-green-600 dark:text-green-400' 
-                            : 'text-red-600 dark:text-red-400'
-                        }`}>
-                          {formatCurrency(asset.gain)}
-                        </p>
-                        <p className={`text-sm ${
-                          asset.gainPercent >= 0 
-                            ? 'text-green-600 dark:text-green-400' 
-                            : 'text-red-600 dark:text-red-400'
-                        }`}>
-                          {asset.gainPercent >= 0 ? '+' : ''}{asset.gainPercent.toFixed(2)}%
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-600 dark:text-gray-400 text-center py-8">
-                  {t('analytics.performance.noData') || 'No performance data available'}
-                </p>
-              )}
-            </Card>
+            <TopPerformers assetPerformance={assetPerformance} t={t} />
           </div>
         )}
 
         {selectedTab === 'returns' && (
           <div className="space-y-6">
             {/* Returns Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <MiniAnalyticsCard
-                title={t('analytics.performance.dailyReturn') || 'Daily Return'}
-                value={`${performanceData.dailyReturn.toFixed(3)}%`}
-                icon={performanceData.dailyReturn >= 0 ? 
-                  <TrendingUp className="h-5 w-5" /> : 
-                  <TrendingDown className="h-5 w-5" />
-                }
-                color={performanceData.dailyReturn >= 0 ? 
-                  "text-green-600 dark:text-green-400" : 
-                  "text-red-600 dark:text-red-400"
-                }
-              />
-              <MiniAnalyticsCard
-                title={t('analytics.performance.monthlyReturn') || 'Monthly Return'}
-                value={`${performanceData.monthlyReturn.toFixed(2)}%`}
-                icon={performanceData.monthlyReturn >= 0 ? 
-                  <TrendingUp className="h-5 w-5" /> : 
-                  <TrendingDown className="h-5 w-5" />
-                }
-                color={performanceData.monthlyReturn >= 0 ? 
-                  "text-green-600 dark:text-green-400" : 
-                  "text-red-600 dark:text-red-400"
-                }
-              />
-              <MiniAnalyticsCard
-                title={t('analytics.performance.annualizedReturn') || 'Annualized Return'}
-                value={`${performanceData.annualizedReturn.toFixed(2)}%`}
-                icon={performanceData.annualizedReturn >= 0 ? 
-                  <TrendingUp className="h-5 w-5" /> : 
-                  <TrendingDown className="h-5 w-5" />
-                }
-                color={performanceData.annualizedReturn >= 0 ? 
-                  "text-green-600 dark:text-green-400" : 
-                  "text-red-600 dark:text-red-400"
-                }
-              />
-            </div>
+            <ReturnsOverview performanceData={performanceData} t={t} />
 
             {/* Returns Breakdown by Asset */}
-            <Card>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                {t('analytics.performance.assetReturns') || 'Returns by Asset'}
-              </h3>
-              {assetPerformance.length > 0 ? (
-                <div className="space-y-3">
-                  {assetPerformance.map((asset) => (
-                    <div key={asset.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900 dark:text-white">
-                          {asset.name}
-                        </h4>
-                        {asset.symbol && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {asset.symbol}
-                          </p>
-                        )}
-                      </div>
-                      <div className="grid grid-cols-3 gap-4 text-right">
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {t('analytics.performance.invested') || 'Invested'}
-                          </p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {formatCurrency(asset.invested)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {t('analytics.performance.currentValue') || 'Current'}
-                          </p>
-                          <p className="font-medium text-gray-900 dark:text-white">
-                            {formatCurrency(asset.currentValue)}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {t('analytics.performance.return') || 'Return'}
-                          </p>
-                          <p className={`font-medium ${
-                            asset.gain >= 0 
-                              ? 'text-green-600 dark:text-green-400' 
-                              : 'text-red-600 dark:text-red-400'
-                          }`}>
-                            {formatCurrency(asset.gain)}
-                          </p>
-                          <p className={`text-sm ${
-                            asset.gainPercent >= 0 
-                              ? 'text-green-600 dark:text-green-400' 
-                              : 'text-red-600 dark:text-red-400'
-                          }`}>
-                            {asset.gainPercent >= 0 ? '+' : ''}{asset.gainPercent.toFixed(2)}%
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-600 dark:text-gray-400 text-center py-8">
-                  {t('analytics.performance.noData') || 'No performance data available'}
-                </p>
-              )}
-            </Card>
+            <DetailedAssetPerformance assetPerformance={assetPerformance} t={t} />
 
             {/* Risk Metrics */}
             <Card>
@@ -329,10 +392,7 @@ const PerformanceAnalyticsView: React.FC<PerformanceAnalyticsViewProps> = ({
                   </div>
                   <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                     <div 
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        performanceData.sharpeRatio > 1 ? 'bg-green-500' : 
-                        performanceData.sharpeRatio > 0.5 ? 'bg-yellow-500' : 'bg-red-500'
-                      }`}
+                      className={`h-2 rounded-full transition-all duration-300 ${getSharpeRatioColor(performanceData.sharpeRatio)}`}
                       style={{ width: `${Math.min(Math.max(performanceData.sharpeRatio * 20, 10), 100)}%` }}
                     />
                   </div>

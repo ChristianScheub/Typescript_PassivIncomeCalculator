@@ -3,7 +3,7 @@ import Logger from '../Logger/logger';
 import stockAPIService from '../stockAPIService';
 import { updateAssetDefinitionPrice, cleanupOldPriceHistory } from '../../utils/priceHistoryUtils';
 import { IStockAPIService } from '../stockAPIService/interfaces/IStockAPIService';
-import { StockHistory, StockHistoryEntry } from '../../types/domains/assets/market-data';
+import { StockHistoryEntry } from '../../types/domains/assets/market-data';
 
 /**
  * Helper class to update stock prices in batch

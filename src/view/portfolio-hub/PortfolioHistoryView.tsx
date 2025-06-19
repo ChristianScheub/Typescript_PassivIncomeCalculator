@@ -15,6 +15,32 @@ interface PortfolioHistoryViewProps {
   isLoading?: boolean;
 }
 
+interface ChartDotProps {
+  cx: number;
+  cy: number;
+  payload?: {
+    hasTransactions?: boolean;
+  };
+}
+
+const ChartDot = (props: ChartDotProps) => {
+  const { cx, cy, payload } = props;
+  const hasTransactions = payload?.hasTransactions;
+  const radius = hasTransactions ? 6 : 3;
+  const color = hasTransactions ? "#dc2626" : "#2563eb";
+
+  return (
+    <circle
+      cx={cx}
+      cy={cy}
+      r={radius}
+      fill={color}
+      stroke={color}
+      strokeWidth={2}
+    />
+  );
+};
+
 type TimeFilter = '1T' | '1W' | '1M' | 'YTD' | '1J' | 'Max';
 
 export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
@@ -235,19 +261,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
                 dataKey="value" 
                 stroke="#2563eb" 
                 strokeWidth={2}
-                dot={(props: any) => {
-                  const { payload } = props;
-                  return (
-                    <circle
-                      cx={props.cx}
-                      cy={props.cy}
-                      r={payload?.hasTransactions ? 6 : 3}
-                      fill={payload?.hasTransactions ? "#dc2626" : "#2563eb"}
-                      stroke={payload?.hasTransactions ? "#dc2626" : "#2563eb"}
-                      strokeWidth={2}
-                    />
-                  );
-                }}
+                dot={ChartDot}
                 activeDot={{ r: 6, fill: "#2563eb" }}
               />
             </LineChart>

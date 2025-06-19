@@ -8,5 +8,7 @@ export const addPortfolioActivity = (
 ): void => {
   const activity = sharedActivityManager.activityFactory.createPortfolioActivity(category, subCategory);
   sharedActivityManager.addActivity(activity);
-  Logger.info(`Added portfolio activity: ${category}${subCategory ? `/${subCategory}` : ''}`);
+  
+  const activityPath = subCategory ? `${category}/${subCategory}` : category;
+  Logger.info(`Added portfolio activity: ${activityPath}`);
 };

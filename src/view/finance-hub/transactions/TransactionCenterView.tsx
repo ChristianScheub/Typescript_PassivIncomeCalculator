@@ -92,8 +92,6 @@ interface TransactionCenterViewProps {
   isLoading: boolean;
   onBack?: () => void;
   onFilterChange: (filters: TransactionFilters) => void;
-  onTransactionAdd: (transaction: Omit<Transaction, 'id'>) => void;
-  onTransactionEdit: (id: string, transaction: Partial<Transaction>) => void;
   onTransactionDelete: (id: string) => void;
   onExportTransactions: (format: 'csv' | 'excel' | 'pdf') => void;
   onImportTransactions: (file: File) => void;

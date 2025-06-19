@@ -41,7 +41,7 @@ export const calculateNextExpenseDate = (expense: Expense, fromDate?: Date): Dat
     const baseDate = fromDate || new Date();
     const paymentDay = expense.paymentSchedule.dayOfMonth || 1;
     
-    let nextPayment = new Date(baseDate);
+    const nextPayment = new Date(baseDate);
     nextPayment.setDate(paymentDay);
     
     // Wenn der Zahlungstag in diesem Monat bereits vorbei ist, nehme den nächsten Monat

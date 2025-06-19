@@ -3,8 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../../hooks/redux';
-import { Asset } from '../../../types/domains/assets/entities';
-import { AssetDefinition } from '../../../types/domains/assets/entities';
+import { AssetDefinition,Asset } from '../../../types/domains/assets/entities';
 import { AssetFormData } from '../../../types/domains/forms/form-data';
 import { createAssetTransactionSchema } from '../../../utils/validationSchemas';
 import { Modal } from '../../../ui/common/Modal';
@@ -17,6 +16,8 @@ import {
 } from '../../../ui/forms/StandardFormWrapper';
 import { AssetSearchBar, AssetSelectionDropdown, SelectedAssetInfo } from '../../../ui/components';
 import formatService from '../../../service/formatService';
+
+type FormFieldValue = string | number | boolean;
 
 const assetTransactionSchema = createAssetTransactionSchema();
 
@@ -250,7 +251,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
               required
               error={errors.name?.message}
               value={watch('name')}
-              onChange={(value: string | number | boolean) => setValue('name', value as string)}
+              onChange={(value: FormFieldValue) => setValue('name', value as string)}
               placeholder={t('assets.transactionNamePlaceholder')}
             />
 
@@ -282,7 +283,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.purchaseDate?.message}
                   value={watch('purchaseDate')}
-                  onChange={(value: string | number | boolean) => setValue('purchaseDate', value as string)}
+                  onChange={(value: FormFieldValue) => setValue('purchaseDate', value as string)}
                 />
 
                 <StandardFormField
@@ -292,7 +293,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   required
                   error={errors.purchasePrice?.message}
                   value={watch('purchasePrice')}
-                  onChange={(value: string | number | boolean) => setValue('purchasePrice', value as number)}
+                  onChange={(value: FormFieldValue) => setValue('purchasePrice', value as number)}
                   step={0.01}
                   min={0}
                 />

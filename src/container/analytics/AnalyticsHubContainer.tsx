@@ -74,7 +74,8 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
 
   // Navigation handlers
   const handleCategoryChange = (category: AnalyticsCategory, subCategory?: AnalyticsSubCategory) => {
-    Logger.info(`Analytics Hub: Navigating to category ${category}${subCategory ? `, subcategory ${subCategory}` : ''}`);
+    const subCategoryText = subCategory ? `, subcategory ${subCategory}` : '';
+    Logger.info(`Analytics Hub: Navigating to category ${category}${subCategoryText}`);
     
     // Add current position to history
     setNavigationHistory(prev => [...prev, { category: selectedCategory, subCategory: selectedSubCategory }]);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { updateForecastValues } from '../../store/slices/forecastSlice';
 import Logger from '../../service/Logger/logger';

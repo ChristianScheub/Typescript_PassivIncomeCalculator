@@ -105,8 +105,8 @@ export const MotivationalEmptyState: React.FC<MotivationalEmptyStateProps> = ({
               <span className="text-sm font-medium">Tipp:</span>
             </div>
             <div className="space-y-1">
-              {tips.map((tip, index) => (
-                <p key={index} className="text-sm text-gray-600 dark:text-gray-400 text-left">
+              {tips.map((tip) => (
+                <p key={tip} className="text-sm text-gray-600 dark:text-gray-400 text-left">
                   • {tip}
                 </p>
               ))}
@@ -177,37 +177,5 @@ export const ChartEmptyState: React.FC<ChartEmptyStateProps> = ({
         )}
       </div>
     </div>
-  );
-};
-
-// Legacy EmptyState component (for backwards compatibility)
-interface LegacyEmptyStateProps {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-  actionLabel: string;
-  onAction: () => void;
-  className?: string;
-}
-
-export const EmptyState: React.FC<LegacyEmptyStateProps> = ({
-  icon,
-  title,
-  description,
-  actionLabel,
-  onAction,
-  className
-}) => {
-  return (
-    <MotivationalEmptyState
-      icon={icon}
-      title={title}
-      description={description}
-      primaryAction={{
-        label: actionLabel,
-        onClick: onAction
-      }}
-      className={className}
-    />
   );
 };

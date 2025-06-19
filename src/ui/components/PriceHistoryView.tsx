@@ -7,7 +7,7 @@ import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtil
 
 interface PriceHistoryViewProps {
   priceHistory: PriceHistoryEntry[];
-  transactions?: Array<Transaction | Transaction>;  // Optional transactions for portfolio value calculation
+  transactions?: Transaction[];  // Optional transactions for portfolio value calculation
   title?: string;
   showSourceIcons?: boolean;
   maxEntries?: number;

@@ -36,8 +36,8 @@ export const updateDashboardValues = createAsyncThunk(
     const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities.items);
 
     const portfolioCache = assets.portfolioCache;
-    let monthlyAssetIncome = 0;
-    let totalAssets = 0;
+    let monthlyAssetIncome: number;
+    let totalAssets: number;
     
     if (portfolioCache && assets.portfolioCacheValid) {
       monthlyAssetIncome = portfolioCache.totals.monthlyIncome;

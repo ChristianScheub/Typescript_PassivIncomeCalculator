@@ -148,7 +148,6 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
   return (
     <PortfolioOverviewView
       portfolioSummary={portfolioSummary}
-      portfolioAnalytics={portfolioAnalytics}
       healthIndicators={healthIndicators}
       onCategoryChange={onCategoryChange}
     />

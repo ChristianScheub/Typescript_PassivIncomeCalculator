@@ -12,8 +12,8 @@ export type PortfolioCategory =
 export type PortfolioSubCategory = 
   | 'dashboard' | 'summary' | 'allocations'
   | 'portfolio' | 'definitions' | 'categories' | 'calendar' | 'history' | 'addTransaction'
-  | 'debts' | 'payments' | 'projections' | 'addDebt'
-  | 'sources' | 'streams' | 'addIncome'
+  | 'debts' | 'payments' | 'liabilityProjections' | 'addDebt'
+  | 'sources' | 'streams' | 'incomeProjections' | 'addIncome'
   | 'budgets' | 'tracking' | 'addExpense'
   | 'recent' | 'import' | 'export';
 

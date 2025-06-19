@@ -137,8 +137,6 @@ export const StandardFormField: React.FC<StandardFormFieldProps> = ({
     onChange?.(newValue);
   };
 
-  const displayValue = value ?? '';
-
   if (type === 'checkbox') {
     return (
       <FormControlLabel

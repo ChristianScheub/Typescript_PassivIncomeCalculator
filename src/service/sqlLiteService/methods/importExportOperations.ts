@@ -1,7 +1,7 @@
 import { StoreNames } from '../interfaces/ISQLiteService';
 import { dbOperations } from './dbOperations';
 import Logger from '../../Logger/logger';
-import { ExportData, ImportDataFlags, ImportValidationResult } from '../../../types/domains/database/import-export';
+import { ExportData, ImportDataFlags } from '../../../types/domains/database/import-export';
 
 // Helper function to determine import data flags
 const getImportDataFlags = (data: ExportData): ImportDataFlags => ({

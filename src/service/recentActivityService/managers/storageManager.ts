@@ -28,7 +28,7 @@ export const createStorageManager = (config: ActivityServiceConfig) => {
       if (!stored) return [];
       
       const activities: RecentActivity[] = JSON.parse(stored);
-      return activities.sort((a, b) => b.timestamp - a.timestamp);
+      return activities.toSorted((a, b) => b.timestamp - a.timestamp);
     } catch (error) {
       Logger.error(`Error loading ${type} activities: ${JSON.stringify(error as Error)}`);
       return [];
@@ -39,7 +39,7 @@ export const createStorageManager = (config: ActivityServiceConfig) => {
     try {
       const key = getStorageKey(type);
       const sortedActivities = activities
-        .sort((a, b) => b.timestamp - a.timestamp)
+        .toSorted((a, b) => b.timestamp - a.timestamp)
         .slice(0, config.maxHistoryEntries);
       
       localStorage.setItem(key, JSON.stringify(sortedActivities));

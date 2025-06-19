@@ -12,9 +12,13 @@ import { OptionalFieldsSection } from '../../../ui/forms';
 import { useTranslation } from 'react-i18next';
 import { getPaymentFrequencyOptions, getExpenseCategoryOptions } from '../../../constants';
 
+type ExpenseCategory = 'housing' | 'transportation' | 'food' | 'utilities' | 'insurance' | 'healthcare' | 'entertainment' | 'personal' | 'debt_payments' | 'education' | 'subscriptions' | 'other';
+
+type PaymentFrequency = 'monthly' | 'quarterly' | 'annually' | 'custom';
+
 interface MaterialExpenseFormViewProps {
   // Form state props
-  paymentFrequency: 'monthly' | 'quarterly' | 'annually' | 'custom';
+  paymentFrequency: PaymentFrequency;
   errors: FieldErrors<ExpenseFormData>;
   
   // Form handlers
@@ -50,11 +54,11 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
   };
   
   const handleCategoryChange = (value: string | number | boolean) => {
-    setValue('category', String(value) as 'housing' | 'transportation' | 'food' | 'utilities' | 'insurance' | 'healthcare' | 'entertainment' | 'personal' | 'debt_payments' | 'education' | 'subscriptions' | 'other');
+    setValue('category', String(value) as ExpenseCategory);
   };
   
   const handleFrequencyChange = (value: string | number | boolean) => {
-    setValue('paymentSchedule.frequency', String(value) as 'monthly' | 'quarterly' | 'annually' | 'custom');
+    setValue('paymentSchedule.frequency', String(value) as PaymentFrequency);
   };
   
   const handleAmountChange = (value: string | number | boolean) => {

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Home, Briefcase, BarChart3 } from 'lucide-react';
-import { NavLink } from 'react-router-dom';
 import { NavLinkItem } from '../ui/navigation/NavLinkItem';
 import { useTranslation } from 'react-i18next';
 

@@ -11,7 +11,7 @@ import Logger from '../../Logger/logger';
  * Implements the simplified IStockAPIService interface
  */
 export class AlphaVantageAPIService implements IStockAPIService {
-  private apiKey: string;
+  private readonly apiKey: string;
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;

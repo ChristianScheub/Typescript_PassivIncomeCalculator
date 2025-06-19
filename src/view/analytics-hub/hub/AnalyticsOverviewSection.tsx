@@ -202,11 +202,11 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {recentAnalytics.map((item: any, index: number) => {
+          {recentAnalytics.map((item: any) => {
             const IconComponent = item.icon;
             return (
               <div 
-                key={index}
+                key={`recent-${item.title}-${item.color}`}
                 className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                 onClick={item.onClick}
               >
@@ -239,13 +239,13 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {recommendations.map((item: any, index: number) => {
+          {recommendations.map((item: any) => {
             const IconComponent = item.icon;
             const priorityColor = getPriorityColor(item.priority);
             
             return (
               <div 
-                key={index}
+                key={`recommendation-${item.title}-${item.priority}`}
                 className="p-3 rounded-lg border border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                 onClick={item.onClick}
               >

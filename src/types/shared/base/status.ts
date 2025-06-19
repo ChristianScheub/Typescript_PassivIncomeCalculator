@@ -4,6 +4,5 @@
 
 export type StoreStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
 
-// Re-export specific status types
-export type AssetCategoriesStatus = StoreStatus;
+// Asset category system fields
 export type AssetCategorySystemFields = 'id' | 'createdAt' | 'updatedAt';

@@ -48,7 +48,7 @@ interface FinnhubCandle {
  * Implements the simplified IStockAPIService interface using Finnhub API
  */
 export class FinnhubAPIService implements IStockAPIService {
-  private apiKey: string;
+  private readonly apiKey: string;
 
   constructor(apiKey: string) {
     this.apiKey = apiKey;

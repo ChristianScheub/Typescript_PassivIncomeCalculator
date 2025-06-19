@@ -71,7 +71,7 @@ const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache): Portfoli
     .split('T')[0];
 
   const history: PortfolioHistoryDay[] = [];
-  let previousValue = 0;
+  let previousValue: number | null = null;
 
   // Calculate portfolio value for each day using portfolio positions
   for (let d = new Date(startDate); d <= new Date(endDate); d.setDate(d.getDate() + 1)) {
@@ -111,8 +111,8 @@ const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache): Portfoli
     });
 
     // Calculate change from previous day
-    const change = previousValue ? totalValue - previousValue : 0;
-    const changePercentage = previousValue ? (change / previousValue) * 100 : 0;
+    const change = previousValue !== null ? totalValue - previousValue : 0;
+    const changePercentage = previousValue !== null && previousValue !== 0 ? (change / previousValue) * 100 : 0;
     
     history.push({
       date,

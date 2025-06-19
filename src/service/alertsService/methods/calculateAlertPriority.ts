@@ -1,43 +1,64 @@
 import { FinancialAlert, FinancialMetrics } from '../interfaces/IAlertsService';
 
+interface PriorityAdjustmentConfig {
+  criticalThreshold: number;
+  warningThreshold: number;
+  isLowerWorse: boolean;
+}
+
+const getCategoryConfig = (category: string): PriorityAdjustmentConfig | null => {
+  const configs: Record<string, PriorityAdjustmentConfig> = {
+    cashflow: { criticalThreshold: -1000, warningThreshold: 0, isLowerWorse: true },
+    debt: { criticalThreshold: 80, warningThreshold: 50, isLowerWorse: false },
+    passive_income: { criticalThreshold: 5, warningThreshold: 10, isLowerWorse: true }
+  };
+  
+  return configs[category] || null;
+};
+
+const calculatePriorityAdjustment = (
+  calculatedValue: number,
+  thresholds: { critical?: number; warning?: number },
+  config: PriorityAdjustmentConfig
+): number => {
+  const criticalThreshold = thresholds.critical || config.criticalThreshold;
+  const warningThreshold = thresholds.warning || config.warningThreshold;
+  
+  if (config.isLowerWorse) {
+    if (calculatedValue < criticalThreshold) return 2;
+    if (calculatedValue < warningThreshold) return 1;
+  } else {
+    if (calculatedValue > criticalThreshold) return 2;
+    if (calculatedValue > warningThreshold) return 1;
+  }
+  
+  return 0;
+};
+
 export const calculateAlertPriority = (
   alert: FinancialAlert, 
-  metrics: FinancialMetrics
+  _metrics: FinancialMetrics
 ): number => {
   let priority = alert.priority;
 
-  // Adjust priority based on severity of the calculated value
-  if (alert.calculatedValue !== undefined && alert.thresholds) {
-    const { calculatedValue, thresholds } = alert;
-    
-    // For negative values (like cash flow), lower is worse
-    if (alert.category === 'cashflow' && alert.type !== 'success') {
-      if (calculatedValue < (thresholds.critical || -1000)) {
-        priority += 2;
-      } else if (calculatedValue < (thresholds.warning || 0)) {
-        priority += 1;
-      }
-    }
-    
-    // For ratio values (like debt ratio), higher is worse
-    if (alert.category === 'debt') {
-      if (calculatedValue > (thresholds.critical || 80)) {
-        priority += 2;
-      } else if (calculatedValue > (thresholds.warning || 50)) {
-        priority += 1;
-      }
-    }
-    
-    // For passive income ratio, lower is worse
-    if (alert.category === 'passive_income') {
-      if (calculatedValue < (thresholds.critical || 5)) {
-        priority += 2;
-      } else if (calculatedValue < (thresholds.warning || 10)) {
-        priority += 1;
-      }
-    }
+  if (alert.calculatedValue === undefined || !alert.thresholds) {
+    return Math.max(1, Math.min(10, priority));
   }
 
-  // Ensure priority stays within bounds (1-10)
+  // Skip priority adjustment for success alerts
+  if (alert.type === 'success') {
+    return Math.max(1, Math.min(10, priority));
+  }
+
+  const config = getCategoryConfig(alert.category);
+  if (config) {
+    const adjustment = calculatePriorityAdjustment(
+      alert.calculatedValue,
+      alert.thresholds,
+      config
+    );
+    priority += adjustment;
+  }
+
   return Math.max(1, Math.min(10, priority));
 };

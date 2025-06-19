@@ -7,33 +7,10 @@ import LiabilitiesContainer from '../finance/LiabilitiesContainer';
 import IncomeContainer from '../finance/IncomeContainer';
 import ExpensesContainer from '../finance/ExpensesContainer';
 import TransactionCenterContainer from '../transactions/TransactionCenterContainer';
-import recentActivityService from '../../service/recentActivityService';
+import recentActivityService, { PortfolioCategory, PortfolioSubCategory } from '../../service/recentActivityService';
 import calculatorService from '../../service/calculatorService';
 import Logger from '../../service/Logger/logger';
 import PortfolioOverviewContainer from './PortfolioOverviewContainer';
-
-// Portfolio Hub Category Types
-type PortfolioCategory = 
-  | 'overview'        // Portfolio-Übersicht (Landing Page)
-  | 'assets'          // Asset-Management  
-  | 'liabilities'     // Schulden-Management
-  | 'income'          // Einkommens-Management
-  | 'expenses'        // Ausgaben-Management
-  | 'transactions';   // Transaction-Center (Future)
-
-type PortfolioSubCategory = 
-  // Overview
-  | 'dashboard' | 'summary' | 'allocations'
-  // Assets  
-  | 'portfolio' | 'definitions' | 'categories' | 'calendar' | 'history' | 'addTransaction'
-  // Liabilities
-  | 'debts' | 'payments' | 'projections' | 'addDebt'
-  // Income
-  | 'sources' | 'streams' | 'projections' | 'addIncome'
-  // Expenses
-  | 'categories' | 'budgets' | 'tracking' | 'addExpense'
-  // Transactions
-  | 'recent' | 'import' | 'export';
 
 interface NavigationHistoryItem {
   category: PortfolioCategory;
@@ -108,7 +85,8 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
 
   // Navigation handlers
   const handleCategoryChange = (category: PortfolioCategory, subCategory?: PortfolioSubCategory) => {
-    Logger.info(`Portfolio Hub: Navigating to category ${category}${subCategory ? `, subcategory ${subCategory}` : ''}`);
+    const subCategoryText = subCategory ? `, subcategory ${subCategory}` : '';
+    Logger.info(`Portfolio Hub: Navigating to category ${category}${subCategoryText}`);
     
     // Track portfolio activity in recent activity service
     recentActivityService.addPortfolioActivity(category, subCategory);
@@ -172,6 +150,9 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
         return <TransactionCenterContainer onBack={handleBackToHub} />;
         
       default:
+        // Fallback to overview for any unknown category
+        setSelectedCategory('overview');
+        setSelectedSubCategory('dashboard');
         return (
           <PortfolioOverviewContainer
             portfolioSummary={portfolioSummary}

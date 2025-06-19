@@ -45,6 +45,7 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
       // Fallback to default portfolio activities if no history
       return [
         {
+          id: 'asset-management-fallback',
           title: t('portfolio.hub.recent.assetManagement'),
           subtitle: `${portfolioData.assetsCount} ${t('portfolio.hub.insights.assetsCount')}`,
           icon: Wallet,
@@ -52,6 +53,7 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
           onClick: () => onCategoryChange('assets', 'portfolio')
         },
         {
+          id: 'income-management-fallback',
           title: t('portfolio.hub.recent.incomeManagement'),
           subtitle: `${portfolioData.incomeSourcesCount} ${t('portfolio.hub.insights.incomeSourcesCount')}`,
           icon: CreditCard,
@@ -59,6 +61,7 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
           onClick: () => onCategoryChange('income', 'sources')
         },
         {
+          id: 'expense-tracking-fallback',
           title: t('portfolio.hub.recent.expenseTracking'),
           subtitle: t('portfolio.hub.recent.viewedRecently'),
           icon: ReceiptText,
@@ -76,6 +79,7 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
         const colors = ['text-blue-500', 'text-green-500', 'text-orange-500'];
         
         return {
+          id: entry.id, // Use the entry's unique ID
           title: t(entry.titleKey), // Use translation key
           subtitle: entry.subtitleKey ? t(entry.subtitleKey) : t('portfolio.hub.recent.viewedRecently'),
           icon: IconComponent,
@@ -95,11 +99,11 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
-          {recentPortfolioActivities.map((activity, index) => {
+          {recentPortfolioActivities.map((activity) => {
             const IconComponent = activity.icon;
             return (
               <div 
-                key={index}
+                key={activity.id}
                 className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
                 onClick={activity.onClick}
               >

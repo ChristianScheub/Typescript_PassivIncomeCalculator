@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from '../../../utils/uuid';
 
 export const generateEmergencyFundAlerts = (metrics: FinancialMetrics): FinancialAlert[] => {
   const alerts: FinancialAlert[] = [];
-  const { totalAssets, monthlyExpenses, monthlyLiabilityPayments, totalLiabilities } = metrics;
+  const { totalAssets, monthlyExpenses, monthlyLiabilityPayments } = metrics;
   const totalMonthlyExpenses = monthlyExpenses + monthlyLiabilityPayments;
   
   // Assuming liquid assets are roughly 60% of total assets (conservative estimate)

@@ -37,25 +37,6 @@ interface PortfolioSummary {
   expenseCategoriesCount: number;
 }
 
-interface PortfolioAnalytics {
-  assetAllocation: Array<{ name: string; value: number; percentage: number }>;
-  incomeSourcesBreakdown: Array<{
-    name: string;
-    value: number;
-    percentage: number;
-  }>;
-  expenseCategoriesBreakdown: Array<{
-    name: string;
-    value: number;
-    percentage: number;
-  }>;
-  liabilityTypesBreakdown: Array<{
-    name: string;
-    value: number;
-    percentage: number;
-  }>;
-}
-
 interface HealthIndicators {
   netWorthTrend: "positive" | "negative";
   debtToAssetRatio: number;
@@ -65,7 +46,6 @@ interface HealthIndicators {
 
 interface PortfolioOverviewViewProps {
   portfolioSummary: PortfolioSummary;
-  portfolioAnalytics: PortfolioAnalytics;
   healthIndicators: HealthIndicators;
   onCategoryChange: (
     category: PortfolioCategory,

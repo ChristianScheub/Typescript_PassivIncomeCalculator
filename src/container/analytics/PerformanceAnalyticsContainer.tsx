@@ -4,8 +4,10 @@ import Logger from '../../service/Logger/logger';
 import PerformanceAnalyticsView from '../../view/analytics-hub/performance/PerformanceAnalyticsView';
 import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
 
+type PerformanceTab = 'portfolio' | 'returns' | 'historical';
+
 interface PerformanceAnalyticsContainerProps {
-  selectedTab?: 'portfolio' | 'returns' | 'historical';
+  selectedTab?: PerformanceTab;
   onBack?: () => void;
 }
 
@@ -13,7 +15,7 @@ const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps
   selectedTab: initialTab = 'portfolio', 
   onBack 
 }) => {
-  const [selectedTab, setSelectedTab] = useState<'portfolio' | 'returns' | 'historical'>(initialTab);
+  const [selectedTab, setSelectedTab] = useState<PerformanceTab>(initialTab);
   
   const { items: assets, portfolioCache } = useAppSelector(state => state.transactions);
 

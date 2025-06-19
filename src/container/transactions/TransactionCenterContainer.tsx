@@ -3,7 +3,8 @@ import { useAppSelector } from '../../hooks/redux';
 import TransactionCenterView, { Transaction, TransactionSummary, TransactionFilters } from '../../view/finance-hub/transactions/TransactionCenterView';
 import Logger from '../../service/Logger/logger';
 import { useTranslation } from 'react-i18next';
-import { Asset, Income, Expense, Liability } from '../../types';
+import { Income, Expense, Liability } from '../../types/domains/financial';
+import { Asset } from '../../types/domains/assets';
 
 interface TransactionCenterContainerProps {
   onBack?: () => void;

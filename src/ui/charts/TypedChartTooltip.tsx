@@ -40,7 +40,11 @@ const getNumericValue = (value: unknown): number => {
 };
 
 const getStringValue = (value: unknown): string => {
-  return typeof value === 'string' ? value : String(value || '');
+  if (typeof value === 'string') return value;
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  // For objects and other complex types, return empty string to avoid '[object Object]'
+  return '';
 };
 
 /**

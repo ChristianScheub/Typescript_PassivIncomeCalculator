@@ -4,6 +4,8 @@ import { Card } from '../../../ui/common/Card';
 import { Button } from '../../../ui/common/Button';
 import { ArrowLeft, Plus, Trash2, BarChart3 } from 'lucide-react';
 
+type ChartType = 'line' | 'pie' | 'bar';
+
 interface DataSource {
   id: string;
   name: string;
@@ -13,7 +15,7 @@ interface DataSource {
 interface ChartConfig {
   id: string;
   title: string;
-  type: 'line' | 'pie' | 'bar';
+  type: ChartType;
   dataSource: string;
   groupBy: string;
   created: Date;
@@ -23,7 +25,7 @@ interface Template {
   id: string;
   title: string;
   description: string;
-  type: 'line' | 'pie' | 'bar';
+  type: ChartType;
   dataSource: string;
   groupBy: string;
 }
@@ -55,7 +57,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({
 
   // Chart builder state
   const [chartTitle, setChartTitle] = useState('');
-  const [chartType, setChartType] = useState<'line' | 'pie' | 'bar'>('pie');
+  const [chartType, setChartType] = useState<ChartType>('pie');
   const [selectedDataSource, setSelectedDataSource] = useState('');
   const [selectedGroupBy, setSelectedGroupBy] = useState('');
 
@@ -169,7 +171,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({
                 </label>
                 <select
                   value={chartType}
-                  onChange={(e) => setChartType(e.target.value as 'line' | 'pie' | 'bar')}
+                  onChange={(e) => setChartType(e.target.value as ChartType)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 >
                   {chartTypes.map(type => (

@@ -15,23 +15,25 @@ interface ButtonGroupProps {
   className?: string;
 }
 
-// Helper functions to reduce cognitive complexity
-const getOrientationClasses = (isHorizontal: boolean) => {
-  return isHorizontal ? "flex-row" : "flex-col";
+// Orientation-specific class generators
+const horizontalButtonGroup = {
+  getClasses: () => "flex-row",
+  getSpacingClasses: (size: string) => {
+    if (size === 'sm') return "space-x-2";
+    if (size === 'lg') return "space-x-4";
+    return "space-x-3";
+  },
+  getAttachedClasses: () => "space-x-0"
 };
 
-const getSpacingClasses = (isHorizontal: boolean, size: string) => {
-  if (size === 'sm') {
-    return isHorizontal ? "space-x-2" : "space-y-2";
-  }
-  if (size === 'lg') {
-    return isHorizontal ? "space-x-4" : "space-y-4";
-  }
-  return isHorizontal ? "space-x-3" : "space-y-3";
-};
-
-const getAttachedClasses = (isHorizontal: boolean) => {
-  return isHorizontal ? "space-x-0" : "space-y-0";
+const verticalButtonGroup = {
+  getClasses: () => "flex-col",
+  getSpacingClasses: (size: string) => {
+    if (size === 'sm') return "space-y-2";
+    if (size === 'lg') return "space-y-4";
+    return "space-y-3";
+  },
+  getAttachedClasses: () => "space-y-0"
 };
 
 const getAttachedBorderClasses = () => {
@@ -45,11 +47,13 @@ export const ButtonGroup: React.FC<ButtonGroupProps> = ({
   attached = false,
   className
 }) => {
-  const isHorizontal = orientation === 'horizontal';
-  const orientationClasses = getOrientationClasses(isHorizontal);
+  // Select the appropriate strategy object based on orientation
+  const strategy = orientation === 'horizontal' ? horizontalButtonGroup : verticalButtonGroup;
+  
+  const orientationClasses = strategy.getClasses();
   const spacingClasses = attached 
-    ? getAttachedClasses(isHorizontal)
-    : getSpacingClasses(isHorizontal, size);
+    ? strategy.getAttachedClasses()
+    : strategy.getSpacingClasses(size);
   const attachedBorderClasses = attached ? getAttachedBorderClasses() : "";
   
   return (

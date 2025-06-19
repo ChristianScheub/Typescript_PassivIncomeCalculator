@@ -26,11 +26,13 @@ interface MonthlyTrendData {
   cashFlow: number;
 }
 
+type OverviewTab = 'summary' | 'insights' | 'trends';
+
 interface OverviewAnalyticsViewProps {
-  selectedTab: 'summary' | 'insights' | 'trends';
+  selectedTab: OverviewTab;
   overviewData: OverviewData;
   monthlyTrends: MonthlyTrendData[];
-  onTabChange: (tab: 'summary' | 'insights' | 'trends') => void;
+  onTabChange: (tab: OverviewTab) => void;
   onBack?: () => void;
 }
 
@@ -278,8 +280,8 @@ const OverviewAnalyticsView: React.FC<OverviewAnalyticsViewProps> = ({
                 {t('analytics.overview.monthlyTrends') || 'Monthly Trends'}
               </h3>
               <div className="space-y-4">
-                {monthlyTrends.map((trend, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                {monthlyTrends.map((trend) => (
+                  <div key={trend.month} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <span className="text-gray-700 dark:text-gray-300 font-medium">{trend.month}</span>
                     <div className="flex space-x-4 text-sm">
                       <span className="text-green-600 dark:text-green-400">

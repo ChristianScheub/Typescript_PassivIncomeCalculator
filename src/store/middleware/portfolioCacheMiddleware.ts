@@ -12,6 +12,7 @@ function isActionWithType(action: unknown): action is AnyAction {
  * Middleware to automatically invalidate portfolio cache when related data changes
  */
 export const portfolioCacheMiddleware: Middleware<object, StoreState> = (store) => (next) => (action: unknown) => {
+  // First, process the action
   const result = next(action);
   
   // Check if action has type property
@@ -38,9 +39,15 @@ export const portfolioCacheMiddleware: Middleware<object, StoreState> = (store) 
     'assetCategories/deleteCategoryAssignment/fulfilled',
   ];
   
+  // Invalidate cache if action type matches
   if (cacheInvalidatingActions.includes(action.type)) {
     Logger.info(`Action ${action.type} detected, invalidating portfolio cache`);
-    store.dispatch(invalidatePortfolioCache());
+    try {
+      store.dispatch(invalidatePortfolioCache());
+    } catch (error) {
+      Logger.error(`Failed to invalidate portfolio cache: ${error}`);
+      // Continue with original result even if cache invalidation fails
+    }
   }
   
   return result;

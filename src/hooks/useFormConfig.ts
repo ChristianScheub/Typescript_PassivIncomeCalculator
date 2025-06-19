@@ -1,6 +1,5 @@
-import { UseFormProps, useForm, FieldValues, DefaultValues } from 'react-hook-form';
+import { UseFormProps, useForm, FieldValues } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { UseFormConfigProps } from '../types/shared/hooks/form-config';
 
