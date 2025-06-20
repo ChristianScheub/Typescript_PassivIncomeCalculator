@@ -9,6 +9,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@/types': path.resolve(__dirname, './src/types/index'),
+      '@service': path.resolve(__dirname, './src/service'),
     },
   },
   optimizeDeps: {

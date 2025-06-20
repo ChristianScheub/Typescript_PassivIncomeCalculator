@@ -7,9 +7,9 @@ import LiabilitiesContainer from '../finance/LiabilitiesContainer';
 import IncomeContainer from '../finance/IncomeContainer';
 import ExpensesContainer from '../finance/ExpensesContainer';
 import TransactionCenterContainer from '../transactions/TransactionCenterContainer';
-import recentActivityService, { PortfolioCategory, PortfolioSubCategory } from '../../service/recentActivityService';
-import calculatorService from '../../service/calculatorService';
-import Logger from '../../service/Logger/logger';
+import recentActivityService, { PortfolioCategory, PortfolioSubCategory } from '../../service/domain/analytics/reporting/recentActivityService';
+import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
+import Logger from '../../service/shared/logging/Logger/logger';
 import PortfolioOverviewContainer from './PortfolioOverviewContainer';
 
 interface NavigationHistoryItem {

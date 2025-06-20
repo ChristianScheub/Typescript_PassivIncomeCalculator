@@ -17,9 +17,9 @@ import { fetchAssetDefinitions } from '../../store/slices/assetDefinitionsSlice'
 import { AssetsView } from '../../view/portfolio-hub/assets/AssetsView';
 import { Asset } from '../../types/domains/assets';
 import { useTranslation } from 'react-i18next';
-import Logger from '../../service/Logger/logger';
+import Logger from '../../service/shared/logging/Logger/logger';
 import PortfolioAnalyticsContainer from '../analytics/PortfolioAnalyticsContainer';
-import calculatorService from '../../service/calculatorService';
+import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
 import AssetDefinitionsContainer from './AssetDefinitionsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
 import { AssetCategoryContainer } from './AssetCategoryContainer';

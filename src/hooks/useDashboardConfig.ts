@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { FinancialRatios } from '../service/analyticsService/interfaces/IAnalyticsService';
+import { FinancialRatios } from '../service/analytics/financialAnalyticsService/interfaces/IAnalyticsService';
 import { NavigationHandlers } from '../service/configService/interfaces/IConfigService';
-import configService from '../service/configService';
+import configService from '../service/infrastructure/configService';
 
 export const useDashboardConfig = (
   ratios: FinancialRatios,

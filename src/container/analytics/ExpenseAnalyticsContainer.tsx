@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import ExpenseAnalyticsView from '../../view/analytics-hub/expenses/ExpenseAnalyticsView';
-import calculatorService from '../../service/calculatorService';
+import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
 import { Expense } from '../../types';
-import Logger from '../../service/Logger/logger';
+import Logger from '../../service/shared/logging/Logger/logger';
 
 type ExpenseAnalyticsTab = 'monthly' | 'annual';
 

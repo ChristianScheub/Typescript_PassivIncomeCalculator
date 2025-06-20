@@ -6,15 +6,15 @@ import { clearAllLiabilities } from "../../store/slices/liabilitiesSlice";
 import { clearAllExpenses } from "../../store/slices/expensesSlice";
 import { clearAllIncome } from "../../store/slices/incomeSlice";
 import { clearAllAssetCategories } from "../../store/slices/assetCategoriesSlice";
-import sqliteService, { StoreNames } from "../../service/sqlLiteService";
-import Logger from "../../service/Logger/logger";
+import sqliteService, { StoreNames } from "../../service/infrastructure/sqlLiteService";
+import Logger from "../../service/shared/logging/Logger/logger";
 import SettingsView from "../../view/settings/general/SettingsView";
-import { handleFileDownload } from "../../service/helper/downloadFile";
+import { handleFileDownload } from "../../service/shared/utilities/helper/downloadFile";
 import {
   setCurrency as setGlobalCurrency,
   getCurrency,
-} from "../../service/stockAPIService/utils/fetch";
-import deleteDataService from "../../service/deleteDataService";
+} from "../../service/domain/assets/market-data/stockAPIService/utils/fetch";
+import deleteDataService from "../../service/application/workflows/deleteDataService";
 import { t } from "i18next";
 import { ConfirmationDialogState } from "../../ui/dialog/types";
 

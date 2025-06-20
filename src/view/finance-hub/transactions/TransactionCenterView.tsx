@@ -23,8 +23,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/common/Car
 import { ViewHeader } from '../../../ui/layout/ViewHeader';
 import { Button } from '../../../ui/common/Button';
 import TabSelector from '../../../ui/navigation/TabSelector';
-import formatService from '../../../service/formatService';
-import { useDeviceCheck } from '../../../service/helper/useDeviceCheck';
+import { formatService } from '../../../service';
+import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
 
 // Transaction Types
 export interface Transaction {

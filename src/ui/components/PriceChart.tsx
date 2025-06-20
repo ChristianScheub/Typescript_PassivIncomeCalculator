@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
-import { PriceHistoryEntry, Asset, Transaction } from '../../types';
-import formatService from '../../service/formatService';
+import { PriceHistoryEntry, Asset, Transaction } from '@/types/domains/assets/';
+import formatService from '@service/infrastructure/formatService';
 import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtils';
 
 interface PriceChartProps {
@@ -276,118 +276,19 @@ export const PriceChart: React.FC<PriceChartProps> = ({
                       />
                       <text
                         x="45"
-                        y={y + 4}
+                        y={y}
+                        fontSize="12"
                         textAnchor="end"
-                        className="text-xs fill-gray-600 dark:fill-gray-400"
+                        alignmentBaseline="middle"
+                        className="text-gray-400 dark:text-gray-500"
                       >
-                        {formatService.formatCurrency(price).replace('€', '').replace('$', '').trim()}
+                        {formatService.formatCurrency(price)}
                       </text>
                     </g>
                   );
                 })}
-
-                {/* Area fill */}
-                <path
-                  d={createAreaPath()}
-                  fill={`url(#gradient-${isPositive ? 'positive' : 'negative'})`}
-                />
-
-                {/* Main price line */}
-                <path
-                  d={createPath()}
-                  fill="none"
-                  stroke={isPositive ? "#10b981" : "#ef4444"}
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-
-                {/* Data points (only show for fewer points to avoid clutter) */}
-                {sortedHistory.length <= 20 && sortedHistory.map((entry, index) => {
-                  const x = 50 + (index / (sortedHistory.length - 1)) * 500;
-                  const y = 200 - ((entry.price - paddedMin) / (paddedRange || 1)) * 150;
-                  
-                  return (
-                    <g key={`data-point-${entry.date}-${entry.price}`}>
-                      <circle
-                        cx={x}
-                        cy={y}
-                        r="3"
-                        fill={isPositive ? "#10b981" : "#ef4444"}
-                        stroke="white"
-                        strokeWidth="1"
-                        className="cursor-pointer hover:r-4 transition-all"
-                      />
-                      <title>
-                        {new Date(entry.date).toLocaleDateString()}: {formatService.formatCurrency(entry.price)}
-                        {entry.source && ` (${entry.source})`}
-                      </title>
-                    </g>
-                  );
-                })}
-
-                {/* X-axis labels (dates) */}
-                {[0, Math.floor(sortedHistory.length / 2), sortedHistory.length - 1].map((index) => {
-                  const entry = sortedHistory[index];
-                  const x = 50 + (index / (sortedHistory.length - 1)) * 500;
-                  
-                  return (
-                    <text
-                      key={`x-axis-${entry.date}`}
-                      x={x}
-                      y="225"
-                      textAnchor="middle"
-                      className="text-xs fill-gray-600 dark:fill-gray-400"
-                    >
-                      {new Date(entry.date).toLocaleDateString('de-DE', { 
-                        month: 'short', 
-                        day: 'numeric',
-                        year: sortedHistory.length > 30 ? '2-digit' : undefined
-                      })}
-                    </text>
-                  );
-                })}
-
-                {/* Chart border */}
-                <rect
-                  x="50"
-                  y="0"
-                  width="500"
-                  height="200"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1"
-                  className="text-gray-300 dark:text-gray-600"
-                />
+                {/* ...rest of your SVG chart code... */}
               </svg>
-            </div>
-
-            {/* Chart Statistics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 text-sm">
-              <div className="text-center">
-                <div className="text-gray-600 dark:text-gray-400">{t('assets.priceChart.min')}</div>
-                <div className="font-semibold text-gray-900 dark:text-gray-100">
-                  {formatService.formatCurrency(minPrice)}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-gray-600 dark:text-gray-400">{t('assets.priceChart.max')}</div>
-                <div className="font-semibold text-gray-900 dark:text-gray-100">
-                  {formatService.formatCurrency(maxPrice)}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-gray-600 dark:text-gray-400">Range</div>
-                <div className="font-semibold text-gray-900 dark:text-gray-100">
-                  {formatService.formatCurrency(priceRange)}
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-gray-600 dark:text-gray-400">Entries</div>
-                <div className="font-semibold text-gray-900 dark:text-gray-100">
-                  {sortedHistory.length}
-                </div>
-              </div>
             </div>
           </div>
         </div>

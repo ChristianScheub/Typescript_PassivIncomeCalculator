@@ -9,7 +9,7 @@ import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { Landmark } from "lucide-react";
 import { Add } from "@mui/icons-material";
-import formatService from '../../../service/formatService';
+import formatService from "@service/infrastructure/formatService";
 import { Liability } from '../../../types/domains/financial';
 import { LoadingSpinner } from '../../../ui/feedback/LoadingSpinner';
 

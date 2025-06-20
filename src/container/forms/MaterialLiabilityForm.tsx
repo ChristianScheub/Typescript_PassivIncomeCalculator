@@ -3,7 +3,7 @@ import { usePaymentSchedule } from '../../hooks/usePaymentSchedule';
 import { useSharedForm } from '../../hooks/useSharedForm';
 import { createValidationSchema, createPaymentScheduleSchema } from '../../utils/validationSchemas';
 import { useTranslation } from 'react-i18next';
-import Logger from '../../service/Logger/logger';
+import Logger from '../../service/shared/logging/Logger/logger';
 import { z } from 'zod';
 import { MaterialLiabilityFormView } from '../../view/shared/forms/MaterialLiabilityFormView';
 

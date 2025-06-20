@@ -14,7 +14,7 @@ import DebtCoverage from "../../../ui/milestones/DebtCoverage";
 import FixedCostFreedom from "../../../ui/milestones/FixedCostFreedom";
 import LeisureMilestone from "../../../ui/milestones/LeisureMilestone";
 import TotalExpenseCoverage from "../../../ui/milestones/TotalExpenseCoverage";
-import { DebtEntry, DebtWithCoverage } from "../../../types";
+import { DebtEntry, DebtWithCoverage } from "../../../types/domains/financial/calculations";
 
 interface MilestonesViewProps {
   liquidAssets: number;

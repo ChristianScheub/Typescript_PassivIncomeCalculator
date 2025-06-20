@@ -16,7 +16,7 @@ import {
   deleteAssetCategoryOption
 } from '../../store/slices/assetCategoriesSlice';
 import { AssetCategory, AssetCategoryOption } from '../../types/domains/assets';
-import Logger from '../../service/Logger/logger';
+import Logger from '../../service/shared/logging/Logger/logger';
 import { useAsyncOperation } from '../../utils/containerUtils';
 
 // Type aliases for complex union types

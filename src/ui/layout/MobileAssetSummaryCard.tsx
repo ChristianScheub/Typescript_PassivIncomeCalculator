@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { getDynamicFontSize } from "../../service/helper/fontSizeHelper";
-import formatService from "../../service/formatService";
+import { getDynamicFontSize } from "../../service/shared/utilities/helper/fontSizeHelper";
+import { formatService } from "../../service";
 import {
   Calendar,
   Wallet,

@@ -1,6 +1,6 @@
 import { Asset } from '@/types/domains/assets';
 import { Income, Expense, Liability } from '@/types/domains/financial';
-import calculatorService from '../service/calculatorService';
+import { calculatorService } from '../service';
 
 export enum SortOrder {
   ASC = 'asc',

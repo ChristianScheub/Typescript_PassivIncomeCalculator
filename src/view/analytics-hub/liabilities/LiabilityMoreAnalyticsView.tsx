@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
 import { ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area } from 'recharts';
-import formatService from '../../../service/formatService';
+import formatService from '@service/infrastructure/formatService';
 
 interface LiabilityMoreAnalyticsViewProps {
   debtBalanceBreakdown: Array<{ category: string; amount: number; percentage: number }>;

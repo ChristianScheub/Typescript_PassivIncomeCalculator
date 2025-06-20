@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, TrendingUp, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import formatService from '../../../service/formatService';
+import formatService from "@service/infrastructure/formatService";
 import { AssetType } from '../../../types';
 import { PortfolioPosition } from '../../../service/portfolioService/portfolioCalculations';
 import { ViewHeader } from '../../../ui/layout/ViewHeader';

@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Expense } from '../../types/domains/financial/';
-import sqliteService from '../../service/sqlLiteService';
+import sqliteService from '@service/infrastructure/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';
-import Logger from '../../service/Logger/logger';
+import Logger from '@service/shared/logging/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
 
 interface ExpensesState {

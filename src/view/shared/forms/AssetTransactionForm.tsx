@@ -16,7 +16,7 @@ import {
 } from '../../../ui/forms/StandardFormWrapper';
 import { AssetSearchBar, AssetSelectionDropdown, SelectedAssetInfo } from '../../../ui/components';
 import { FormFieldValue } from '../../../types/shared/ui/specialized';
-import formatService from '../../../service/formatService';
+import { formatService } from '../../../service';
 
 const assetTransactionSchema = createAssetTransactionSchema();
 

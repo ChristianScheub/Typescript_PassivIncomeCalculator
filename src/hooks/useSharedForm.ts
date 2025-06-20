@@ -8,7 +8,7 @@ import {
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback } from 'react';
-import Logger from '../service/Logger/logger';
+import Logger from '../service/shared/logging/Logger/logger';
 import { UseFormConfig } from '../types/shared/';
 
 export interface UseSharedFormReturn<T extends FieldValues> extends Omit<UseFormReturn<T>, 'handleSubmit'> {

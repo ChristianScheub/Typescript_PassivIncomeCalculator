@@ -1,6 +1,6 @@
 import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { invalidatePortfolioCache } from '../slices/transactionsSlice';
-import Logger from '../../service/Logger/logger';
+import Logger from '@service/shared/logging/Logger/logger';
 import { StoreState } from '../index';
 
 // Type guard to check if action has a type property

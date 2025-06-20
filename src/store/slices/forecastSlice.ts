@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { MonthlyProjection } from '@/types/domains/analytics';
-import calculatorService from '../../service/calculatorService';
+import calculatorService from '@service/domain/financial/calculations/compositeCalculatorService';
 import { StoreState } from '..';
-import Logger from '../../service/Logger/logger';
+import Logger from '@service/shared/logging/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
 import { PortfolioPosition } from '../../types/domains/portfolio/position';
 

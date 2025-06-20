@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppSelector } from '../../hooks/redux';
-import Logger from '../../service/Logger/logger';
+import Logger from '../../service/shared/logging/Logger/logger';
 import PerformanceAnalyticsView from '../../view/analytics-hub/performance/PerformanceAnalyticsView';
 import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
 

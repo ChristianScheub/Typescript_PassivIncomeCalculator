@@ -2,7 +2,7 @@ import { Middleware, MiddlewareAPI, AnyAction } from '@reduxjs/toolkit';
 import { updateForecastValues, updateMonthlyAssetIncomeCache } from '../slices/forecastSlice';
 import { updateDashboardValues } from '../slices/dashboardSlice';
 import { StoreState } from '../index';
-import Logger from '../../service/Logger/logger';
+import Logger from '@service/shared/logging/Logger/logger';
 
 // Type guard to check if action has a type property
 function isActionWithType(action: unknown): action is AnyAction {

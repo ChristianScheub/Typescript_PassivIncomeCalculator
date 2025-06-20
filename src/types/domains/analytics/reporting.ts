@@ -26,15 +26,22 @@ export interface FinancialSummary {
   netWorth: number;
   monthlyIncome: number;
   monthlyExpenses: number;
-  monthlyNetCashFlow: number;
+  monthlyLiabilityPayments: number;
+  monthlyAssetIncome: number;
   passiveIncome: number;
-  passiveIncomeCoverage: number;
-  debtToIncomeRatio: number;
-  savingsRate: number;
-  emergencyFundMonths: number;
-  riskScore: number;
-  diversificationScore: number;
-  lastUpdated: string;
+  monthlyCashFlow: number;
+  totalMonthlyIncome: number;
+  totalPassiveIncome: number;
+  totalMonthlyExpenses: number;
+  // Legacy/computed properties for backward compatibility
+  monthlyNetCashFlow?: number;
+  passiveIncomeCoverage?: number;
+  debtToIncomeRatio?: number;
+  savingsRate?: number;
+  emergencyFundMonths?: number;
+  riskScore?: number;
+  diversificationScore?: number;
+  lastUpdated?: string;
 }
 
 // Dashboard state and configuration

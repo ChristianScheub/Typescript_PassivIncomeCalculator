@@ -1,0 +1,81 @@
+import { ICalculatorService } from '../calculatorService/interfaces/ICalculatorService';
+import { assetCalculatorService } from './assetCalculatorService';
+import { incomeCalculatorService } from './incomeCalculatorService';
+import { expenseCalculatorService } from './expenseCalculatorService';
+import { liabilityCalculatorService } from './liabilityCalculatorService';
+import { financialCalculatorService } from './financialCalculatorService';
+
+/**
+ * Composite Calculator Service that combines all individual calculator services
+ * This provides the same interface as the original calculatorService while using
+ * the new modular architecture underneath
+ */
+const compositeCalculatorService: ICalculatorService = {
+  // Asset calculations (delegated to assetCalculatorService)
+  calculateAssetMonthlyIncome: assetCalculatorService.calculateAssetMonthlyIncome,
+  calculateAssetIncomeForMonth: assetCalculatorService.calculateAssetIncomeForMonth,
+  calculateTotalAssetValue: assetCalculatorService.calculateTotalAssetValue,
+  calculateLiquidAssetValue: assetCalculatorService.calculateLiquidAssetValue,
+  calculateTotalMonthlyAssetIncome: assetCalculatorService.calculateTotalMonthlyAssetIncome,
+  calculateTotalAssetIncomeForMonth: assetCalculatorService.calculateTotalAssetIncomeForMonth,
+  calculateAnnualAssetIncome: assetCalculatorService.calculateAnnualAssetIncome,
+  calculateAssetAllocation: assetCalculatorService.calculateAssetAllocation,
+  
+  // Cached asset calculations
+  calculateAssetMonthlyIncomeWithCache: assetCalculatorService.calculateAssetMonthlyIncomeWithCache,
+  calculateTotalAssetIncomeForMonthWithCache: assetCalculatorService.calculateTotalAssetIncomeForMonthWithCache,
+  areAssetsCached: assetCalculatorService.areAssetsCached,
+
+  // Income calculations (delegated to incomeCalculatorService)
+  calculateMonthlyIncome: incomeCalculatorService.calculateMonthlyIncome,
+  calculateTotalMonthlyIncome: incomeCalculatorService.calculateTotalMonthlyIncome,
+  calculatePassiveIncome: incomeCalculatorService.calculatePassiveIncome,
+  calculatePassiveIncomeRatio: incomeCalculatorService.calculatePassiveIncomeRatio,
+  calculateAnnualIncome: incomeCalculatorService.calculateAnnualIncome,
+  calculatePaymentSchedule: incomeCalculatorService.calculatePaymentSchedule,
+  calculateDividendSchedule: incomeCalculatorService.calculateDividendSchedule,
+  calculateDividendForMonth: incomeCalculatorService.calculateDividendForMonth,
+
+  // Liability calculations (delegated to liabilityCalculatorService)
+  calculateTotalDebt: liabilityCalculatorService.calculateTotalDebt,
+  calculateTotalMonthlyLiabilityPayments: liabilityCalculatorService.calculateTotalMonthlyLiabilityPayments,
+  calculateLiabilityMonthlyPayment: liabilityCalculatorService.calculateLiabilityMonthlyPayment,
+
+  // Expense calculations (delegated to expenseCalculatorService)
+  calculateMonthlyExpense: expenseCalculatorService.calculateMonthlyExpense,
+  calculateTotalMonthlyExpenses: expenseCalculatorService.calculateTotalMonthlyExpenses,
+  calculateAnnualExpenses: expenseCalculatorService.calculateAnnualExpenses,
+
+  // Financial calculations (delegated to financialCalculatorService)
+  calculateMonthlyCashFlow: financialCalculatorService.calculateMonthlyCashFlow,
+  calculateNetWorth: financialCalculatorService.calculateNetWorth,
+
+  // Placeholder implementations for missing functions
+  // These will be implemented once we add the missing functions to the appropriate services
+  calculateIncomeAllocation: (income, assets) => {
+    // TODO: Implement in incomeCalculatorService
+    return [];
+  },
+  calculateExpenseBreakdown: (expenses) => {
+    // TODO: Implement in expenseCalculatorService
+    return [];
+  },
+  calculateProjections: (income, expenses, liabilities, assets, months) => {
+    // TODO: Implement in financialCalculatorService
+    return [];
+  },
+  calculateProjectionsWithCache: (baseValues, monthlyAssetIncomeCache, months) => {
+    // TODO: Implement in financialCalculatorService
+    return [];
+  },
+  calculatePortfolioAnalytics: (positions) => {
+    // TODO: Implement in financialAnalyticsService
+    return {} as any;
+  },
+  calculateIncomeAnalytics: (positions) => {
+    // TODO: Implement in financialAnalyticsService
+    return {} as any;
+  },
+};
+
+export default compositeCalculatorService;

@@ -3,7 +3,7 @@ import { Asset } from '../../types/domains/assets/entities';
 import { AssetType } from '../../types/shared/base/enums';
 import { useSharedForm } from '../../hooks/useSharedForm';
 import { useTranslation } from 'react-i18next';
-import Logger from '../../service/Logger/logger';
+import Logger from '../../service/shared/logging/Logger/logger';
 import { createMaterialAssetSchema } from '../../utils/validationSchemas';
 import { MaterialAssetFormView } from '../../view/shared/forms/MaterialAssetFormView';
 import { getCurrentQuantity } from '../../utils/transactionCalculations';

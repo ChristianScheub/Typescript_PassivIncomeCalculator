@@ -15,12 +15,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../ui/common/Card";
 import { Button } from "../../ui/common/Button";
 import { ViewHeader } from "../../ui/layout/ViewHeader";
 import { PortfolioRecentActivities } from "../../ui/portfolio/PortfolioRecentActivities";
-import formatService from "../../service/formatService";
-import { useDeviceCheck } from "../../service/helper/useDeviceCheck";
+import formatService from "@service/infrastructure/formatService";
+import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
 import {
   PortfolioCategory,
   PortfolioSubCategory,
-} from "../../service/recentActivityService";
+} from "@service/domain/analytics/reporting/recentActivityService";
 import PortfolioHubRecommendations from "./hub/PortfolioHubRecommendations";
 
 interface PortfolioSummary {

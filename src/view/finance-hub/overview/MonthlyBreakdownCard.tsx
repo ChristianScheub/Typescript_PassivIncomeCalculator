@@ -5,7 +5,7 @@ import {
   Wallet,
   CreditCard,
 } from "lucide-react";
-import formatService from "../../../service/formatService";
+import formatService from "@service/infrastructure/formatService";
 import { useTranslation } from "react-i18next";
 
 interface MonthlyBreakdownCardProps {

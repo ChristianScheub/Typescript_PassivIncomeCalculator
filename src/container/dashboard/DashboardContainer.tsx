@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { calculate30DayHistory } from '../../store/slices/portfolioHistorySlice';
 import DashboardView from '../../view/finance-hub/overview/DashboardView';
-import analyticsService from '../../service/analyticsService';
-import alertsService from '../../service/alertsService';
+import analyticsService from '../../service/domain/analytics/calculations/financialAnalyticsService';
+import alertsService from '../../service/application/notifications/alertsService';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
-import cacheRefreshService from '../../service/cacheRefreshService';
-import Logger from '../../service/Logger/logger';
+import cacheRefreshService from '../../service/application/orchestration/cacheRefreshService';
+import Logger from '../../service/shared/logging/Logger/logger';
 import { useAsyncOperation } from '../../utils/containerUtils';
 
 const DashboardContainer: React.FC = () => {

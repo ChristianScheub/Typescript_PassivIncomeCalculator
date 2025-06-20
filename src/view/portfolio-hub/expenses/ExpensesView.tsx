@@ -9,7 +9,7 @@ import { MaterialExpenseForm } from "../../../container/forms/MaterialExpenseFor
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { ReceiptText } from "lucide-react";
-import formatService from '../../../service/formatService';
+import formatService from "@service/infrastructure/formatService";
 import { Expense } from "../../../types/domains/financial/entities";
 import { Add } from "@mui/icons-material";
 

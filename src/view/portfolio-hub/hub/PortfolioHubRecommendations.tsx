@@ -2,12 +2,12 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import analyticsService from "../../../service/analyticsService";
-import { RecommendationPriority } from "../../../service/analyticsService/interfaces/IAnalyticsService";
+import analyticsService from "@service/domain/analytics/calculations/financialAnalyticsService";
+import { RecommendationPriority } from "@service/domain/analytics/calculations/financialAnalyticsService/interfaces/IAnalyticsService";
 import {
   PortfolioCategory,
   PortfolioSubCategory,
-} from "../../../service/recentActivityService/types";
+} from "@service/domain/analytics/reporting/recentActivityService/types";
 import { CollapsibleSection } from "@/ui/common";
 import { Target } from "lucide-react";
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { PortfolioPosition } from '../../types/domains/portfolio/position';
-import formatService from '../../service/formatService';
+import { formatService } from '../../service';
 
 interface PortfolioViewProps {
   portfolioAssets: PortfolioPosition[];

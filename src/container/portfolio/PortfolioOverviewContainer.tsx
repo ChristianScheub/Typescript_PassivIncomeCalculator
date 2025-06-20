@@ -2,10 +2,10 @@ import React, { useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import { selectPortfolioCache } from '../../store/slices/transactionsSlice';
 import PortfolioOverviewView from '../../view/portfolio-hub/PortfolioOverviewView';
-import calculatorService from '../../service/calculatorService';
-import { PortfolioCategory, PortfolioSubCategory } from '../../service/recentActivityService';
+import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
+import { PortfolioCategory, PortfolioSubCategory } from '../../service/domain/analytics/reporting/recentActivityService';
 import { getAssetAllocationFromCache } from '../../utils/portfolioCacheHelpers';
-import Logger from '../../service/Logger/logger';
+import Logger from '../../service/shared/logging/Logger/logger';
 import { Income, Expense, Liability } from '../../types/domains/financial/entities';
 import { CategoryBreakdown } from '../../types/domains/portfolio/allocations';
 

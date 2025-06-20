@@ -10,7 +10,7 @@ import { Wallet, RefreshCw, History } from "lucide-react";
 import { ActionButtonGroup } from "../../../ui/common/ActionButtonGroup";
 import { IconButton } from "../../../ui/common";
 import { Tooltip } from "@mui/material";
-import formatService from "../../../service/formatService";
+import { formatService } from "../../../service";
 
 /**
  * Type for creating new asset definitions, omits metadata fields like id, createdAt, updatedAt.

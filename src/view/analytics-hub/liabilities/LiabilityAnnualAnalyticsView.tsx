@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, TooltipProps } from 'recharts';
-import formatService from '../../../service/formatService';
+import formatService from '@service/infrastructure/formatService';
 
 interface LiabilityAnnualAnalyticsViewProps {
   categoryBreakdown: Array<{ category: string; amount: number; percentage: number }>;
@@ -97,7 +97,7 @@ const LiabilityAnnualAnalyticsView: React.FC<LiabilityAnnualAnalyticsViewProps> 
                 <YAxis 
                   stroke="#6B7280"
                   fontSize={12}
-                  tickFormatter={(value) => formatService.formatCurrency(value, "EUR")}
+                  tickFormatter={(value) => formatService.formatCurrency(value)}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />

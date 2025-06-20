@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { StoreState } from '..';
-import Logger from '../../service/Logger/logger';
+import Logger from '@service/shared/logging/Logger/logger';
 import { getPriceHistoryForRange } from '../../utils/priceHistoryUtils';
 import { PortfolioCache } from './transactionsSlice';
-import { PortfolioPosition } from '../../types/domains/portfolio/position';
-import { AssetDefinition } from '../../types/domains/assets/entities';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import { AssetDefinition } from '@/types/domains/assets/entities';
 
 interface PortfolioHistoryDay {
   date: string;
@@ -31,7 +31,7 @@ export const calculate30DayHistory = createAsyncThunk(
   'portfolioHistory/calculate30Days',
   async (_, { getState }) => {
     const state = getState() as StoreState;
-    const { transactions } = state;
+    const { transactions, liabilities } = state;
     Logger.infoRedux('Calculating 30-day portfolio history using portfolio system');
     
     const portfolioCache = transactions.portfolioCache;
@@ -39,7 +39,7 @@ export const calculate30DayHistory = createAsyncThunk(
       throw new Error('Portfolio cache not available for history calculation');
     }
     
-    return calculateHistoryFromPortfolio(portfolioCache);
+    return calculateHistoryFromPortfolio(portfolioCache, liabilities.items);
   }
 );
 
@@ -47,12 +47,11 @@ export const calculate30DayHistory = createAsyncThunk(
 const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache): PortfolioHistoryDay[] => {
   Logger.infoRedux('Portfolio-based history calculation - analyzing positions');
   
-  // Get all unique asset definitions from portfolio positions with price history
+  // Get all unique asset definitions from portfolio positions
+  // Include ALL assets, not just those with price history
   const relevantDefinitions = portfolioCache.positions
     .map((pos: PortfolioPosition) => pos.assetDefinition)
-    .filter((def): def is AssetDefinition => 
-      def != null && Array.isArray(def.priceHistory) && def.priceHistory.length > 0
-    );
+    .filter((def): def is AssetDefinition => def != null);
 
   Logger.infoRedux('Asset Definitions in portfolio for history:');
   Logger.infoRedux('=================================================');
@@ -76,23 +75,35 @@ const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache): Portfoli
   // Calculate portfolio value for each day using portfolio positions
   for (let d = new Date(startDate); d <= new Date(endDate); d.setDate(d.getDate() + 1)) {
     const date = d.toISOString().split('T')[0];
-    let totalValue = 0;
+    let totalAssetValue = 0;
 
     portfolioCache.positions.forEach((position: PortfolioPosition) => {
       const definition = position.assetDefinition;
-      if (!definition?.priceHistory?.length) return;
+      if (!definition) return;
 
-      // Get the price for this date
-      const dayPrices = getPriceHistoryForRange(date, date, definition.priceHistory);
       let price = 0;
-      
-      if (!dayPrices.length) {
-        // If no price on exact date, use the most recent previous price
-        const pastPrices = getPriceHistoryForRange(startDate, date, definition.priceHistory);
-        if (!pastPrices.length) return;
-        price = pastPrices[pastPrices.length - 1].price;
+
+      // Handle assets with price history
+      if (definition.priceHistory?.length) {
+        // Get the price for this date
+        const dayPrices = getPriceHistoryForRange(date, date, definition.priceHistory);
+        
+        if (!dayPrices.length) {
+          // If no price on exact date, use the most recent previous price
+          const pastPrices = getPriceHistoryForRange(startDate, date, definition.priceHistory);
+          if (!pastPrices.length) {
+            // If no historical price, use current price if available
+            price = definition.currentPrice || 0;
+          } else {
+            price = pastPrices[pastPrices.length - 1].price;
+          }
+        } else {
+          price = dayPrices[0].price;
+        }
       } else {
-        price = dayPrices[0].price;
+        // For assets without price history, use current price
+        // This handles real estate, bonds, and other assets that don't have daily price updates
+        price = definition.currentPrice || 0;
       }
 
       // Calculate position value considering only transactions that occurred before or on this date
@@ -105,10 +116,19 @@ const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache): Portfoli
       }, 0);
 
       const positionValue = positionQuantity * price;
-      totalValue += positionValue;
+      totalAssetValue += positionValue;
 
       Logger.infoRedux(`Date ${date}: Position ${definition.name} - Valid transactions: ${validTransactions.length}/${position.transactions.length}, Quantity: ${positionQuantity}, Price: ${price}, Value: ${positionValue}`);
     });
+
+    // Get current liabilities (simplified approach - using current liabilities for all dates)
+    // In a real implementation, you'd want to track liability history over time
+    const totalLiabilities = (portfolioCache as any)?.liabilities || 0;
+    
+    // Calculate net worth (total assets - total liabilities)
+    const totalValue = totalAssetValue - totalLiabilities;
+
+    Logger.infoRedux(`Date ${date}: Total Asset Value: ${totalAssetValue}, Total Liabilities: ${totalLiabilities}, Net Worth: ${totalValue}`);
 
     // Calculate change from previous day
     const change = previousValue !== null ? totalValue - previousValue : 0;

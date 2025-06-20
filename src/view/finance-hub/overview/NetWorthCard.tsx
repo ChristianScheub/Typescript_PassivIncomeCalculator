@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '../../../ui/common/Card';
 import { ArrowUpCircle, ArrowDownCircle } from 'lucide-react';
-import formatService from '../../../service/formatService';
+import formatService from '@service/infrastructure/formatService';
 import { useTranslation } from 'react-i18next';
 
 interface NetWorthCardProps {

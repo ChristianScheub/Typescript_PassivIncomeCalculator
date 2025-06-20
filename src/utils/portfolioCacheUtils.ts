@@ -1,4 +1,4 @@
-import Logger from '../service/Logger/logger';
+import Logger from '../service/shared/logging/Logger/logger';
 import { PortfolioCache } from '../store/slices/transactionsSlice';
 
 /**

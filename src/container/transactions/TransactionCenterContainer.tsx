@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import TransactionCenterView, { Transaction, TransactionSummary, TransactionFilters } from '../../view/finance-hub/transactions/TransactionCenterView';
-import Logger from '../../service/Logger/logger';
+import Logger from '../../service/shared/logging/Logger/logger';
 import { useTranslation } from 'react-i18next';
 import { Income, Expense, Liability } from '../../types/domains/financial';
 import { Asset } from '../../types/domains/assets';

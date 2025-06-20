@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { StoreState } from '..';
-import calculatorService from '../../service/calculatorService';
-import Logger from '../../service/Logger/logger';
-import { DashboardState } from '../../types/domains/dashboard/state';
+import calculatorService from '@service/domain/financial/calculations/compositeCalculatorService';
+import Logger from '@service/shared/logging/Logger/logger';
+import { DashboardState } from '@/types/domains/dashboard/state';
 
 const initialState: DashboardState = {
   netWorth: 0,

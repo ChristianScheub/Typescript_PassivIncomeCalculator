@@ -1,0 +1,3 @@
+/Users/christianscheub/Documents/Develope/PassiveIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/configService/methods/getDashboardMilestones.ts
+/Users/christianscheub/Documents/Develope/PassiveIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/configService/methods/getDashboardMiniAnalytics.ts
+/Users/christianscheub/Documents/Develope/PassiveIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/configService/interfaces/IConfigService.ts

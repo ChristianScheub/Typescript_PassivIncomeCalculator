@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Transaction, PriceHistoryEntry } from '../../types/domains/assets/';
-import { formatCurrency } from '../../service/formatService/methods/formatCurrency';
+import { Transaction, PriceHistoryEntry } from '@/types/domains/assets/';
+import { formatCurrency } from '@service/infrastructure/formatService/methods/formatCurrency';
 import { TrendingUp, TrendingDown, Calendar, Database, Upload } from 'lucide-react';
 import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtils';
 

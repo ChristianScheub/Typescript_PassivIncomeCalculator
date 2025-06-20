@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../../common/Card';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
-import formatService from '../../../service/formatService';
+import formatService from '@service/infrastructure/formatService';
 import { useTheme } from '../../../hooks/useTheme';
 import { ChartTooltip } from '../../charts/ChartTooltips';
 import { ChartEmptyState } from '../../feedback/EnhancedEmptyState';
-import { PieChartData } from '../../../types/shared/charts';
+import { PieChartData } from '@/types/shared/charts';
 
 interface GenericPieChartProps {
   title: string;

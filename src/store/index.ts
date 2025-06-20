@@ -14,7 +14,7 @@ import portfolioHistoryReducer from './slices/portfolioHistorySlice';
 import snackbarReducer from './slices/snackbarSlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
 import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
-import Logger from '../service/Logger/logger';
+import Logger from '@service/shared/logging/Logger/logger';
 import { validatePortfolioCache } from '../utils/portfolioCacheUtils';
 
 // Define types for our application state

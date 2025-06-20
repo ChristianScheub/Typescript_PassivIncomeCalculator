@@ -2,8 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
 import { CreditCard } from 'lucide-react';
-import formatService from '../../service/formatService';
-import type { DebtEntry } from '../../types';
+import { formatService } from '../../service';
+import type { DebtEntry } from '../../types/domains/financial/calculations';
 import { getHighestMilestone, getMilestoneKey } from '../../utils/milestoneUtils';
 import './milestones.css';
 

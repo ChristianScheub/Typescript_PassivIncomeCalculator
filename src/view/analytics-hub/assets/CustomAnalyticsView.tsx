@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../../hooks/redux';
-import calculatorService from '../../../service/calculatorService';
+import { compositeCalculatorService as calculatorService } from '../../../service';
 import { Button, ButtonGroup } from '../../../ui/common';
 import { IconButton } from '../../../ui/common/IconButton';
 import { 

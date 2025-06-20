@@ -13,10 +13,10 @@ import {
 import { AssetDefinitionsView } from '../../view/portfolio-hub/assets/AssetDefinitionsView';
 import { AssetDefinition, AssetCategoryAssignment } from '../../types/domains/assets';
 import { AssetType } from '../../types/shared';
-import Logger from '../../service/Logger/logger';
+import Logger from '../../service/shared/logging/Logger/logger';
 import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { StockPriceUpdater } from '../../service/helper/stockPriceUpdater';
+import { StockPriceUpdater } from '../../service/shared/utilities/helper/stockPriceUpdater';
 
 interface AssetDefinitionsContainerProps {
   onBack?: () => void;

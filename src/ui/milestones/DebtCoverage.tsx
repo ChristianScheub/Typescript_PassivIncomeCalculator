@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
 import { CreditCard } from 'lucide-react';
-import formatService from '../../service/formatService';
+import { formatService } from '../../service';
 
 interface DebtWithCoverage {
   name: string;

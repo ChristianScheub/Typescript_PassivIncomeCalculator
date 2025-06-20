@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, TextField, Grid } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import formatService from '../../service/formatService';
+import formatService from '@service/infrastructure/formatService';
 
 interface CustomAmountsSectionProps {
   frequency: string;

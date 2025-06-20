@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, TrendingUp, Calendar, DollarSign, Package, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { PortfolioPosition } from '../../../types/domains/portfolio/position';
-import formatService from '../../../service/formatService';
+import { formatService } from '../../../service';
 import { PriceHistoryView } from '../../../ui/components/PriceHistoryView';
 import { PriceChart } from '../../../ui/components/PriceChart';
 import { featureFlag_Debug_View } from '../../../config/featureFlags';

@@ -2,8 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/domains/assets';
 import { AssetCategoriesState } from '@/types/domains/assets/state';
 import { AssetCategorySystemFields } from '@/types/shared/base/status';
-import Logger from '../../service/Logger/logger';
-import sqliteService from '../../service/sqlLiteService';
+import Logger from '@service/shared/logging/Logger/logger';
+import sqliteService from '@service/infrastructure/sqlLiteService';
 
 const initialState: AssetCategoriesState = {
   categories: [],

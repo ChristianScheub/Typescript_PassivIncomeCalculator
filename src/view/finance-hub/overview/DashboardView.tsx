@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { CiSettings } from "react-icons/ci";
-import formatService from "../../../service/formatService";
-import { useDeviceCheck } from "../../../service/helper/useDeviceCheck";
+import formatService from "@service/infrastructure/formatService";
+import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
 import { IconButton } from "../../../ui/common/IconButton";
 import {
   TrendingUp,
@@ -20,7 +20,7 @@ import { MiniAnalyticsCard } from "../../../ui/dashboard/MiniAnalyticsCard";
 import { MilestoneCard } from "../../../ui/dashboard/MilestoneCard";
 import { AlertsCard } from "../../../ui/dashboard/AlertsCard";
 import { PullToRefresh } from "../../../ui/common/PullToRefresh";
-import { FinancialSummary } from "../../../service/analyticsService/interfaces/IAnalyticsService";
+import { FinancialSummary } from "../../../service/analytics/financialAnalyticsService/interfaces/IAnalyticsService";
 import { UIAlert } from "../../../service/alertsService/interfaces/IAlertsService";
 
 interface QuickAction {

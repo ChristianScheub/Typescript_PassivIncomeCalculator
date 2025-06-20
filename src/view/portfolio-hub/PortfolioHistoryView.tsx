@@ -2,8 +2,8 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
-import { PortfolioHistoryPoint } from '../../service/portfolioHistoryService';
-import { formatCurrency } from '../../service/formatService/methods/formatCurrency';
+import { PortfolioHistoryPoint } from '@service/domain/portfolio/history/portfolioHistoryService/interfaces/IPortfolioHistoryService';
+import { formatService } from '../../service';
 import { ChartTooltip } from '../../ui/charts/ChartTooltips';
 import { TabButton, TabGroup } from '../../ui/common';
 import { ChartEmptyState } from '../../ui/feedback/EnhancedEmptyState';
@@ -176,7 +176,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
                 {t('portfolio.currentValue')}
               </p>
               <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                {formatCurrency(currentValue)}
+                {formatService.formatCurrency(currentValue)}
               </p>
             </div>
             <DollarSign className="h-8 w-8 text-blue-600 dark:text-blue-400" />
@@ -194,7 +194,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
                   ? 'text-green-600 dark:text-green-400' 
                   : 'text-red-600 dark:text-red-400'
               }`}>
-                {formatCurrency(performanceMetrics.totalReturn)}
+                {formatService.formatCurrency(performanceMetrics.totalReturn)}
               </p>
               <p className={`text-sm ${
                 performanceMetrics.totalReturnPercentage >= 0 
@@ -219,7 +219,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
               {t('portfolio.peakValue')}
             </p>
             <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              {formatCurrency(performanceMetrics.peakValue)}
+              {formatService.formatCurrency(performanceMetrics.peakValue)}
             </p>
           </div>
         </div>
@@ -230,7 +230,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
               {t('portfolio.lowestValue')}
             </p>
             <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-              {formatCurrency(performanceMetrics.lowestValue)}
+              {formatService.formatCurrency(performanceMetrics.lowestValue)}
             </p>
           </div>
         </div>
@@ -253,7 +253,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
               <YAxis 
                 tick={{ fontSize: 12 }}
                 className="text-gray-600 dark:text-gray-400"
-                tickFormatter={(value) => formatCurrency(value)}
+                tickFormatter={(value) => formatService.formatCurrency(value)}
               />
               <Tooltip content={<ChartTooltip chartType="bar" t={t} useCustomFormatting={true} showTransactions={true} />} />
               <Line 

@@ -11,7 +11,9 @@
     "paths": {
       "@/*": ["src/*"],
       "@/types/*": ["src/types/*"],
-      "@/types": ["src/types/index"]
+      "@/types": ["src/types/index"],
+      "@service/*": ["src/service/*"],
+      "@service": ["src/service/index"]
     },
 
     /* Bundler mode */

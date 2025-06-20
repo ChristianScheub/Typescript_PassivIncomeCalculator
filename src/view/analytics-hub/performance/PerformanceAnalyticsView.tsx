@@ -4,7 +4,7 @@ import { Card } from '../../../ui/common/Card';
 import { Button } from '../../../ui/common/Button';
 import { MiniAnalyticsCard } from '../../../ui/dashboard/MiniAnalyticsCard';
 import { ArrowLeft, TrendingUp, TrendingDown } from 'lucide-react';
-import { formatCurrency } from '../../../service/formatService/methods/formatCurrency';
+import { formatCurrency } from "@service/infrastructure/formatService/methods/formatCurrency";
 
 interface PerformanceData {
   currentValue: number;

@@ -6,7 +6,7 @@ import { TranslationProps } from "../../../types/shared/ui/view-props";
 import { Card, CardContent } from "../../../ui/common/Card";
 import { PortfolioPosition } from "../../../types/domains/portfolio/position";
 import { AssetTransactionForm } from "../../shared/forms/AssetTransactionForm";
-import { useDeviceCheck } from "../../../service/helper/useDeviceCheck";
+import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
 import { MobileAssetSummaryCard } from "../../../ui/layout/MobileAssetSummaryCard";
 import { DesktopAssetSummaryCards } from "../../../ui/layout/DesktopAssetSummaryCards";
 import { PortfolioView } from "../PortfolioView";
@@ -17,7 +17,7 @@ import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { Add } from "@mui/icons-material";
 import { MotivationalEmptyState } from "../../../ui/feedback/EnhancedEmptyState";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
-import formatService from "../../../service/formatService";
+import formatService from "@service/infrastructure/formatService";
 import { 
   TrendingUp, 
   Settings,

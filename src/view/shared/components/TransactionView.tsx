@@ -4,7 +4,7 @@ import { ActionButtonGroup } from '../../../ui/common/ActionButtonGroup';
 import { Asset } from '../../../types/domains/financial/';
 import { Transaction } from '../../../types/domains/assets/entities';
 import { PortfolioPosition } from '../../../types/domains/portfolio/position';
-import formatService from '../../../service/formatService';
+import formatService from '@service/infrastructure/formatService';
 import { getCurrentQuantity, getCurrentValue } from '../../../utils/transactionCalculations';
 
 interface TransactionViewProps {
