@@ -1,8 +1,8 @@
 
-import { RecentActivity, ActivityType, ActivityServiceConfig } from '../types';
+import { RecentActivity, ActivityType, ActivityServiceConfig } from '@/types/domains/analytics/reporting';
 import { createStorageManager } from './storageManager';
 import { createActivityFactory } from '../core/activityFactory';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 // Activity Manager for CRUD operations
 export const createActivityManager = (config: ActivityServiceConfig) => {
@@ -35,7 +35,7 @@ export const createActivityManager = (config: ActivityServiceConfig) => {
       // Add new activity at the beginning
       activities.unshift(activity);
       storageManager.saveActivities(activity.type, activities);
-      Logger.info(`Added ${activity.type} activity: ${activity.title}`);
+      Logger.info(`Added ${activity.type} activity: ${activity.titleKey}`);
     } catch (error) {
       Logger.error(`Error adding activity: ${JSON.stringify(error as Error)}`);
     }

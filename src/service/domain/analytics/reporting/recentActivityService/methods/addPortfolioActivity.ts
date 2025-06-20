@@ -1,6 +1,6 @@
-import type { PortfolioCategory, PortfolioSubCategory } from '../types';
+import type { PortfolioCategory, PortfolioSubCategory } from '@/types/domains/analytics/reporting';
 import { sharedActivityManager } from '../core/sharedManager';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 export const addPortfolioActivity = (
   category: PortfolioCategory,

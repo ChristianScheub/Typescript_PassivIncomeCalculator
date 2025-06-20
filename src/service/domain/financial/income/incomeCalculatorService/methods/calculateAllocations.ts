@@ -3,8 +3,9 @@ import { Transaction as Asset } from '@/types/domains/assets/entities';
 import { AssetAllocation, IncomeAllocation } from '@/types/domains/portfolio/allocations';
 import { Income } from '@/types/domains/financial/entities';
 import { AssetType, IncomeType } from '@/types/shared/base/enums';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { calculateMonthlyIncome } from '../methods/calculateIncome';
+import { calculateAssetMonthlyIncome } from '../../../../assets/calculations/assetCalculatorService/methods/calculateAssetIncomeCore';
 
 export const calculateIncomeAllocation = (income: Income[], assets: Asset[]): IncomeAllocation[] => {
   const incomeByType = new Map<IncomeType, number>();
@@ -24,7 +25,7 @@ export const calculateIncomeAllocation = (income: Income[], assets: Asset[]): In
 
   // Asset-Einkommen hinzufügen, wenn es nicht bereits als Income erfasst wurde
   assets.forEach(asset => {
-    const monthlyAmount = calculateMonthlyIncome(asset);
+    const monthlyAmount = calculateAssetMonthlyIncome(asset);
     if (monthlyAmount <= 0) return;
 
     // Prüfen ob dieses Asset-Einkommen bereits als reguläres Einkommen erfasst wurde

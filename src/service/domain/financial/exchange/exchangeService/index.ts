@@ -1,4 +1,4 @@
-import { IExchangeService, ExchangeRate } from './interfaces/IExchangeService';
+import { IExchangeService } from './interfaces/IExchangeService';
 import { refreshExchangeRateMethod } from './methods/refreshExchangeRate';
 import { getExchangeRateMethod } from './methods/getExchangeRate';
 import { getExchangeRateByDateMethod } from './methods/getExchangeRateByDate';
@@ -28,4 +28,4 @@ export default exchangeService;
 
 // Export the service and types for use in other modules
 export { exchangeService };
-export type { IExchangeService, ExchangeRate };
+export type { IExchangeService };

@@ -2,9 +2,9 @@ import {
   AssetDefinition, 
   Transaction as Asset,
   DividendInfo
-} from '../../../types/domains/assets/';
-import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../../types/domains/assets/categories';
-import { PortfolioPosition } from '../../../types/domains/portfolio/position';
+} from '@/types/domains/assets/';
+import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/domains/assets/categories';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
 
 export interface IPortfolioService {
   /**

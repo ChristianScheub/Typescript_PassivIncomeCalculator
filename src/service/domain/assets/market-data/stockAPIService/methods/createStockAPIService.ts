@@ -1,6 +1,6 @@
 import { IStockAPIService } from '../interfaces/IStockAPIService';
 import { StockAPIGateway } from '../gateway/StockAPIGateway';
-import { StockAPIProvider } from '../../../../../../store/slices/apiConfigSlice';
+import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
 
 // Global gateway instance
 let stockAPIGatewayInstance: StockAPIGateway | null = null;

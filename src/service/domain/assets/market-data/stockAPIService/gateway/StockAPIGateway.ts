@@ -1,6 +1,6 @@
 import { IStockAPIService } from '../interfaces/IStockAPIService';
-import { StockAPIProvider } from '../../../../../../store/slices/apiConfigSlice';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 // Import provider implementations
 import { FinnhubAPIService } from '../providers/FinnhubAPIService';

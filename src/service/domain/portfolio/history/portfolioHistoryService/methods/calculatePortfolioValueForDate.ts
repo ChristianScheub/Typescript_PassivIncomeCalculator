@@ -1,7 +1,7 @@
-import { Transaction as Asset, AssetDefinition } from '../../../../../types/domains/assets/entities';
+import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets';
 import { getHistoricalPrice } from './getHistoricalPrice';
-import { AssetPosition, PortfolioTransaction } from '../interfaces/IPortfolioHistoryService';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import { ServiceAssetPosition as AssetPosition, PortfolioServiceTransaction as PortfolioTransaction } from '@/types/domains/portfolio/history';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 /**
  * Calculates the total portfolio value for a specific date

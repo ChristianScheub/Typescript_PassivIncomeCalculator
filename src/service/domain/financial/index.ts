@@ -5,9 +5,3 @@ export { default as liabilityCalculatorService } from './liabilities/liabilityCa
 export { default as financialCalculatorService } from './calculations/financialCalculatorService';
 export { default as compositeCalculatorService } from './calculations/compositeCalculatorService';
 export { default as exchangeService } from './exchange/exchangeService';
-
-// Re-export types and interfaces for convenience
-export type * from './income/incomeCalculatorService/interfaces/IIncomeCalculatorService';
-export type * from './expenses/expenseCalculatorService/interfaces/IExpenseCalculatorService';
-export type * from './liabilities/liabilityCalculatorService/interfaces/ILiabilityCalculatorService';
-export type * from './calculations/financialCalculatorService/interfaces/IFinancialCalculatorService';

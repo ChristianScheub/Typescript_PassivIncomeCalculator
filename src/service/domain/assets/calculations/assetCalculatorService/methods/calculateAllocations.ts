@@ -10,7 +10,7 @@ import {
   Income
 } from '../../../../../../types/domains/financial';
 import { AssetType, IncomeType } from '@/types/shared';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { calculateMonthlyIncome } from '../../../../financial/income/incomeCalculatorService/methods/calculateIncome';
 import { calculateAssetMonthlyIncome } from './calculateAssetIncome';
 

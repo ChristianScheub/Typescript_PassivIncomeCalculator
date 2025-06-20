@@ -1,27 +1,13 @@
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import { 
+  AllocationData, 
+  CategoryBreakdownData, 
+  PortfolioAnalyticsData,
+  IncomeAnalyticsData 
+} from '@/types/domains/analytics/calculations';
+import Logger from "@/service/shared/logging/Logger/logger";
 
-export interface AllocationData {
-  name: string;
-  value: number;
-  percentage: number;
-}
 
-export interface CategoryBreakdownData {
-  categoryName: string;
-  categoryId: string;
-  totalValue: number;
-  totalPercentage: number;
-  options: AllocationData[];
-}
-
-export interface PortfolioAnalyticsData {
-  assetAllocation: AllocationData[];
-  sectorAllocation: AllocationData[];
-  countryAllocation: AllocationData[];
-  categoryAllocation: AllocationData[];
-  categoryBreakdown: CategoryBreakdownData[];
-}
 
 export const calculatePortfolioAnalytics = (positions: PortfolioPosition[]): PortfolioAnalyticsData => {
   Logger.infoService('Calculating portfolio analytics from positions');
@@ -197,13 +183,7 @@ export const calculatePortfolioAnalytics = (positions: PortfolioPosition[]): Por
   };
 };
 
-export interface IncomeAnalyticsData {
-  assetTypeIncome: AllocationData[];
-  sectorIncome: AllocationData[];
-  countryIncome: AllocationData[];
-  categoryIncome: AllocationData[];
-  categoryIncomeBreakdown: CategoryBreakdownData[];
-}
+
 
 export const calculateIncomeAnalytics = (positions: PortfolioPosition[]): IncomeAnalyticsData => {
   Logger.infoService('Calculating income analytics from positions');

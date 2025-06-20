@@ -1,6 +1,6 @@
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
-import Logger from "../../logging/Logger/logger";
+import Logger from "@/service/shared/logging/Logger/logger";
 
 export const handleFileDownload = async (logs: string) => {
   try {

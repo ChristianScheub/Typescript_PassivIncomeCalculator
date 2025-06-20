@@ -1,6 +1,5 @@
 
-import { PortfolioCategory, PortfolioSubCategory, ActivityType } from '../types';
-import { AnalyticsCategory, AnalyticsSubCategory } from '../types/analytics';
+import { PortfolioCategory, PortfolioSubCategory, ActivityType, AnalyticsCategory, AnalyticsSubCategory } from '@/types/domains/analytics/reporting';
 
 // Icon Resolver for different activity types
 export const createIconResolver = () => {

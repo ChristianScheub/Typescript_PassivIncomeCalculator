@@ -1,9 +1,4 @@
-export interface ExchangeRate {
-  id?: number;
-  date: string; // YYYY-MM-DD format
-  usdToEur: number;
-  createdAt?: string;
-}
+import { ExchangeRate } from '@/types/domains/financial/calculations';
 
 export interface IExchangeService {
   /**

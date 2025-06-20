@@ -5,9 +5,10 @@ import type {
   TransactionActivity,
   PortfolioCategory,
   PortfolioSubCategory,
-  ActivityType
-} from '../types';
-import type { AnalyticsCategory, AnalyticsSubCategory } from '../types/analytics';
+  ActivityType,
+  AnalyticsCategory, 
+  AnalyticsSubCategory
+} from '@/types/domains/analytics/reporting';
 import { createIconResolver } from '../resolvers/iconResolver';
 
 // Activity Factory for creating different activity types

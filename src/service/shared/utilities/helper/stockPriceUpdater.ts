@@ -1,9 +1,9 @@
-import { AssetDefinition } from '../../../../types/domains/assets';
-import Logger from '../../logging/Logger/logger';
+import { AssetDefinition } from '@/types/domains/assets';
+import Logger from '@/service/shared/logging/Logger/logger';
 import stockAPIService from '../../../domain/assets/market-data/stockAPIService';
-import { updateAssetDefinitionPrice, cleanupOldPriceHistory } from '../../../../utils/priceHistoryUtils';
+import { updateAssetDefinitionPrice, cleanupOldPriceHistory } from '@/utils/priceHistoryUtils';
 import { IStockAPIService } from '../../../domain/assets/market-data/stockAPIService/interfaces/IStockAPIService';
-import { StockHistoryEntry } from '../../../../types/domains/assets/market-data';
+import { StockHistoryEntry } from '@/types/domains/assets/market-data';
 
 /**
  * Helper class to update stock prices in batch

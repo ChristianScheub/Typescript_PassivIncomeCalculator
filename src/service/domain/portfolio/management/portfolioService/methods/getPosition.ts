@@ -1,6 +1,6 @@
-import { AssetDefinition, Transaction as Asset } from '../../../types/domains/assets';
-import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../../types/domains/assets/categories';
-import { PortfolioPosition } from '../../../types/domains/portfolio/position';
+import { AssetDefinition, Transaction as Asset } from '@/types/domains/assets';
+import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/domains/assets/categories';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { calculatePortfolioPositions } from '../portfolioCalculations';
 
 export function getPosition(

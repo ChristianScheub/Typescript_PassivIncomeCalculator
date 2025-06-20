@@ -1,4 +1,4 @@
-import { Liability } from '../../../../types/domains/financial/';
+import { Liability } from '@/types/domains/financial/';
 
 export const calculateLiabilityMonthlyPayment = (liability: Liability): number => {
     if (!liability.paymentSchedule) {

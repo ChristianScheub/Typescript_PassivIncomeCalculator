@@ -1,4 +1,4 @@
-import Logger from '../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 export const formatPercentage = (value: number, options?: {
   minimumFractionDigits?: number;

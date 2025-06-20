@@ -1,15 +1,13 @@
 import { PaymentSchedule } from '@/types/shared/base/payments';
 import { PaymentFrequency } from '@/types/shared/base/enums';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import { PaymentResult } from '@/types/domains/financial/calculations';
+import Logger from "@/service/shared/logging/Logger/logger";
 import {
   calculateMonthlyAmountFromFrequency,
   calculateAmountForPaymentMonth,
 } from './paymentHelpers';
 
-export interface PaymentResult {
-  monthlyAmount: number;
-  annualAmount: number;
-}
+
 
 export const calculatePaymentSchedule = (schedule: PaymentSchedule): PaymentResult => {
   Logger.infoService(`calculatePaymentSchedule - frequency: ${schedule?.frequency}, amount: ${schedule?.amount}`);

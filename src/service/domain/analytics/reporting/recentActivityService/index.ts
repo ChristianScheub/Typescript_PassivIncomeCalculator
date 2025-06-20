@@ -1,4 +1,3 @@
-
 import { IRecentActivityService } from './interfaces/IRecentActivityService';
 import { addAnalyticsActivity } from './methods/addAnalyticsActivity';
 import { addPortfolioActivity } from './methods/addPortfolioActivity';
@@ -19,6 +18,4 @@ const recentActivityService: IRecentActivityService = {
 export type { IRecentActivityService };
 export default recentActivityService;
 
-// Re-export types for external use
-export * from './types';
-export * from './types/analytics';
+// Keine fachlichen Types mehr exportieren, nur noch Service-Interface falls vorhanden.

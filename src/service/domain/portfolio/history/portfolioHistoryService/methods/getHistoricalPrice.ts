@@ -1,5 +1,5 @@
-import { AssetDefinition } from '../../../types/domains/assets/';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import { AssetDefinition } from '@/types/domains/assets/';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 /**
  * Gets the most appropriate price for a given date from asset definition

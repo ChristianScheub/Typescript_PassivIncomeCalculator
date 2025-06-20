@@ -1,5 +1,5 @@
 import { FinancialMetrics, FinancialAlert } from '../interfaces/IAlertsService';
-import { v4 as uuidv4 } from '../../../../../utils/uuid';
+import { v4 as uuidv4 } from '@/utils/uuid';
 
 export const generateEmergencyFundAlerts = (metrics: FinancialMetrics): FinancialAlert[] => {
   const alerts: FinancialAlert[] = [];

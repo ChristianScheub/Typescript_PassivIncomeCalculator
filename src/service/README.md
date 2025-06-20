@@ -253,3 +253,48 @@ The architecture is designed to support future enhancements:
 - **Database Domain**: Advanced database schema services
 - **Real-time Features**: Event sourcing and CQRS patterns
 - **Microservices**: Easy transition to microservices architecture
+
+---
+
+## Service Pattern: Functional Object Wrapper (Hybrid Functional/OOP)
+
+### What pattern is used?
+
+This codebase uses a **Functional Object Wrapper** pattern for almost all services. Each service is defined as a plain object that implements a TypeScript interface, where each property is a pure function or a reference to a function. This is sometimes called the "functional service object" or "hybrid functional/OOP" pattern.
+
+**Example:**
+```typescript
+const incomeCalculatorService: IIncomeCalculatorService = {
+  calculateMonthlyIncome,
+  calculateTotalMonthlyIncome,
+  calculatePassiveIncome,
+  // ...
+};
+```
+
+### How does it work?
+- Each service is a singleton object, not a class instance.
+- All logic is implemented as stateless, pure functions (no `this` context).
+- Services are imported and used directly, e.g. `import { incomeCalculatorService } from ...`.
+- For simple services, this pattern is extremely lightweight and easy to maintain.
+
+### Why do we use this pattern?
+- **Simplicity:** No boilerplate, no constructors, no `this` context.
+- **Consistency:** All services follow the same structure, making the codebase easy to navigate.
+- **Testability:** Pure functions are easy to test in isolation.
+- **Performance:** No class instantiation overhead, no hidden state.
+- **Tree-shaking:** Unused service methods can be removed by bundlers.
+
+### When is this pattern sufficient?
+- For stateless, functional business logic (calculations, formatting, etc.)
+- When you do not need runtime configuration, dependency injection, or service state
+- When you want maximum code clarity and minimal complexity
+
+### When should you consider OOP/DI instead?
+- If you need to inject dependencies (e.g. for testing, logging, or configuration)
+- If your service needs to manage internal state or lifecycle
+- If you have complex cross-service dependencies
+
+**In this project, almost all services use the functional object pattern. Only a few infrastructure or provider classes (e.g. Logger, API clients) use classic OOP.**
+
+---

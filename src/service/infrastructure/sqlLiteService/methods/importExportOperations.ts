@@ -1,6 +1,6 @@
 import { StoreNames } from '../interfaces/ISQLiteService';
 import { dbOperations } from './dbOperations';
-import Logger from '../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { ExportData, ImportDataFlags } from '@/types/domains/database/import-export';
 
 // Helper function to determine import data flags

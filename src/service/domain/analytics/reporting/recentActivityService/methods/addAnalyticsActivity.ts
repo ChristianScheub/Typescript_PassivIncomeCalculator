@@ -1,6 +1,6 @@
 import type { AnalyticsCategory, AnalyticsSubCategory } from '../types/analytics';
 import { sharedActivityManager } from '../core/sharedManager';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 export const addAnalyticsActivity = (
   category: AnalyticsCategory,

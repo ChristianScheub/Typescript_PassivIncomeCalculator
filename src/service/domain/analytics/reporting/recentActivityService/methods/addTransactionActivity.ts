@@ -1,6 +1,6 @@
-import type { ActivityType } from '../types';
+import type { ActivityType } from '@/types/domains/analytics/reporting';
 import { sharedActivityManager } from '../core/sharedManager';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 export const addTransactionActivity = (
   type: Exclude<ActivityType, 'analytics' | 'portfolio'>,

@@ -16,7 +16,7 @@ const alertsService: IAlertsService = {
 };
 
 // Export types
-export type { IAlertsService, FinancialAlert, UIAlert };
+export type { IAlertsService } from './interfaces/IAlertsService';
 
 // Export the service
 export { alertsService };

@@ -2,6 +2,6 @@
 export { default } from './StockAPIService';
 export { stockAPIService } from './StockAPIService';
 
-// Export types for use in other modules
-export type { IStockAPIService, IStockAPIServiceManager } from './StockAPIService';
-export type { StockAPIProvider } from '../../store/slices/apiConfigSlice';
+// Only export service interfaces
+export type { IStockAPIService } from './interfaces/IStockAPIService';
+export type { IStockAPIServiceManager } from './StockAPIService';

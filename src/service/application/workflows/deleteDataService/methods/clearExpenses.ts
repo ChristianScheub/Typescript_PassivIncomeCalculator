@@ -1,6 +1,6 @@
 import { store } from '../../../../../store';
-import { clearAllExpenses } from '../../../../../store/slices/expensesSlice';
-import Logger from '../../../../shared/logging/Logger/logger';
+import { clearAllExpenses } from '@/store/slices/expensesSlice';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { StoreNames } from '../../../../infrastructure/sqlLiteService';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';
 

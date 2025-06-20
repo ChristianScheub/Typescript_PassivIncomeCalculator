@@ -1,7 +1,7 @@
-import { AssetDefinition, Transaction as Asset } from '../../../types/domains/assets';
-import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../../types/domains/assets/categories';
+import { AssetDefinition, Transaction as Asset } from '@/types/domains/assets';
+import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/domains/assets/categories';
 import { calculatePortfolioPositions, calculatePortfolioTotals } from '../portfolioCalculations';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 export function calculatePortfolio(
   assets: Asset[], 

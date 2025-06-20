@@ -13,7 +13,11 @@
       "@/types/*": ["src/types/*"],
       "@/types": ["src/types/index"],
       "@service/*": ["src/service/*"],
-      "@service": ["src/service/index"]
+      "@service": ["src/service/index"],
+      "@/utils/*": ["src/utils/*"],
+      "@/utils": ["src/utils/index"],
+      "@/store/*": ["src/store/*"],
+      "@/store": ["src/store/index"]
     },
 
     /* Bundler mode */

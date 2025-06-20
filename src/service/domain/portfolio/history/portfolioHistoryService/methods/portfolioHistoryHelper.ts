@@ -1,12 +1,12 @@
 import { Transaction as Asset, AssetDefinition } from '../../../../../../types/domains/assets';
-import { getCurrentQuantity } from '../../../../../../utils/transactionCalculations';
+import { getCurrentQuantity } from '@/utils/transactionCalculations';
 import { calculatePortfolioValueForDate } from './calculatePortfolioValueForDate';
 import { 
   PortfolioHistoryPoint, 
   PortfolioTransaction, 
   AssetPosition 
 } from '../interfaces/IPortfolioHistoryService';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 /**
  * Helper class containing shared functionality for portfolio history calculations

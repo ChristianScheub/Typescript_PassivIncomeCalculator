@@ -1,6 +1,6 @@
-import Logger from "../../../../../shared/logging/Logger/logger";
+import Logger from "@/service/shared/logging/Logger/logger";
 import { CapacitorHttp } from '@capacitor/core';
-import exchangeService from "../../../../financial/exchange/exchangeService/index";
+import exchangeService from "@/service/domain/financial/exchange/exchangeService/index";
 
 const BASE_URL = 'https://finnhub.io/api/v1';
 

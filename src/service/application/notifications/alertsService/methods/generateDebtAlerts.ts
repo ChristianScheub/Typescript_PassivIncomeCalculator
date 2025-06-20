@@ -1,5 +1,5 @@
 import { FinancialMetrics, FinancialAlert } from '../interfaces/IAlertsService';
-import { v4 as uuidv4 } from '../../../../../utils/uuid';
+import { v4 as uuidv4 } from '@/utils/uuid';
 
 const createHighDebtRatioAlert = (debtToAssetRatio: number): FinancialAlert => {
   const isCritical = debtToAssetRatio > 0.7;

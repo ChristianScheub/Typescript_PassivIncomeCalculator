@@ -75,3 +75,176 @@ export interface UserPreferences {
   numberFormat: string;
   refreshInterval: number;
 }
+
+// === Activity & Portfolio Analytics Types (moved from service layer) ===
+
+export type AnalyticsCategory = 
+  | 'overview' 
+  | 'forecasting' 
+  | 'milestones' 
+  | 'distributions' 
+  | 'performance' 
+  | 'custom';
+
+export type AnalyticsSubCategory = 
+  | 'dashboard' 
+  | 'summary'
+  | 'cashflow' 
+  | 'portfolio' 
+  | 'scenarios'
+  | 'fire' 
+  | 'debt' 
+  | 'savings' 
+  | 'customMilestones'
+  | 'assets' 
+  | 'income' 
+  | 'expenses' 
+  | 'geographic'
+  | 'portfolioPerformance' 
+  | 'returns' 
+  | 'historical'
+  | 'calendar' 
+  | 'history' 
+  | 'timeline';
+
+export type PortfolioCategory = 
+  | 'overview' | 'assets' | 'liabilities' | 'income' | 'expenses' | 'transactions';
+
+export type PortfolioSubCategory = 
+  | 'dashboard' | 'summary' | 'allocations'
+  | 'portfolio' | 'definitions' | 'categories' | 'calendar' | 'history' | 'addTransaction'
+  | 'debts' | 'payments' | 'liabilityProjections' | 'addDebt'
+  | 'sources' | 'streams' | 'incomeProjections' | 'addIncome'
+  | 'budgets' | 'tracking' | 'addExpense'
+  | 'recent' | 'import' | 'export';
+
+export type ActivityType = 'analytics' | 'portfolio' | 'asset' | 'transaction' | 'income' | 'expense' | 'liability';
+
+export interface BaseActivity {
+  id: string;
+  type: ActivityType;
+  timestamp: number;
+  titleKey: string;
+  subtitleKey?: string;
+  icon: string;
+  date?: string;
+}
+
+export interface AnalyticsActivity extends BaseActivity {
+  type: 'analytics';
+  category: AnalyticsCategory;
+  subCategory: AnalyticsSubCategory;
+}
+
+export interface PortfolioActivity extends BaseActivity {
+  type: 'portfolio';
+  category: PortfolioCategory;
+  subCategory?: PortfolioSubCategory;
+}
+
+export interface TransactionActivity extends BaseActivity {
+  type: 'asset' | 'transaction' | 'income' | 'expense' | 'liability';
+  entityId?: string;
+  amount?: number;
+  currency?: string;
+}
+
+export type RecentActivity = AnalyticsActivity | PortfolioActivity | TransactionActivity;
+
+export interface ActivityServiceConfig {
+  maxHistoryEntries: number;
+  storageKeys: {
+    analytics: string;
+    portfolio: string;
+    transactions: string;
+  };
+}
+
+// === Financial Analytics Types (moved from service layer) ===
+
+export interface FinancialSummary {
+  netWorth: number;
+  totalAssets: number;
+  totalLiabilities: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  monthlyLiabilityPayments: number;
+  monthlyAssetIncome: number;
+  passiveIncome: number;
+  monthlyCashFlow: number;
+  totalMonthlyIncome: number;
+  totalPassiveIncome: number;
+  totalMonthlyExpenses: number;
+}
+
+export interface FinancialRatios {
+  passiveRatio: number;
+  expenseCoverage: number;
+  debtRatio: number;
+  savingsRate: number;
+}
+
+export type RecommendationPriority = 'high' | 'medium' | 'low';
+export type RecommendationCategory = 'assets' | 'income' | 'expenses' | 'liabilities' | 'planning';
+
+export interface PortfolioRecommendation {
+  id: string;
+  category: RecommendationCategory;
+  priority: RecommendationPriority;
+  titleKey: string;
+  descriptionKey: string;
+  actionCategory?: string;
+  actionSubCategory?: string;
+  metadata?: Record<string, any>;
+}
+
+// === Application Notifications Types (moved from service layer) ===
+
+export interface FinancialMetrics {
+  netWorth: number;
+  totalAssets: number;
+  totalLiabilities: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  monthlyLiabilityPayments: number;
+  monthlyAssetIncome: number;
+  passiveIncome: number;
+  monthlyCashFlow: number;
+}
+
+export interface UIAlert {
+  type: 'warning' | 'info' | 'success';
+  title: string;
+  description: string;
+  action: () => void;
+  actionLabel: string;
+}
+
+export interface FinancialAlert {
+  id: string;
+  type: 'warning' | 'info' | 'success' | 'critical';
+  category: 'cashflow' | 'debt' | 'passive_income' | 'savings' | 'emergency_fund' | 'diversification' | 'general';
+  titleKey: string;
+  descriptionKey: string;
+  priority: number;
+  actionType: 'navigate' | 'external' | 'none';
+  actionData?: {
+    route?: string;
+    url?: string;
+    params?: Record<string, any>;
+  };
+  actionLabelKey?: string;
+  thresholds?: {
+    warning?: number;
+    critical?: number;
+  };
+  calculatedValue?: number;
+  metadata?: Record<string, any>;
+}
+
+export interface AlertGenerationOptions {
+  maxAlerts?: number;
+  includeSuccess?: boolean;
+  priorityThreshold?: number;
+  excludeCategories?: string[];
+}

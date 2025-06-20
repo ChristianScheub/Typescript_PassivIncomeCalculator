@@ -1,20 +1,9 @@
-import { Asset, AssetDefinition } from '../../../types';
+import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
 import { calculatePortfolioHistoryForDays } from './calculatePortfolioHistoryForDays';
-import { PortfolioHistoryPoint } from '../interfaces/IPortfolioHistoryService';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import { PortfolioHistoryPoint, TimeRange } from '@/types/domains/portfolio/history';
+import Logger from "@/service/shared/logging/Logger/logger";
 
-/**
- * Common time range options for portfolio history calculations
- */
-export enum TimeRange {
-  WEEK = 7,
-  MONTH = 30,
-  QUARTER = 90,
-  HALF_YEAR = 180,
-  YEAR = 365,
-  TWO_YEARS = 730,
-  FIVE_YEARS = 1825
-}
+
 
 /**
  * Calculates portfolio history for common time ranges

@@ -1,4 +1,4 @@
-import { StockAPIProvider } from '../../../../../../store/slices/apiConfigSlice';
+import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
 
 /**
  * Get available API providers with their configuration status

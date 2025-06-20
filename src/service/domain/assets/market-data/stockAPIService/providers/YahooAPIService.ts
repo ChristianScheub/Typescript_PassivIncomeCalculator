@@ -4,8 +4,8 @@ import {
   StockPrice,
   StockHistory,
   StockHistoryEntry
-} from '../../../types/domains/assets/';
-import Logger from '../../../../../shared/logging/Logger/logger';
+} from '@/types/domains/assets/';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { CapacitorHttp } from '@capacitor/core';
 
 /**

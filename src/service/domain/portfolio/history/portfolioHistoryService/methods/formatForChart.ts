@@ -1,5 +1,5 @@
 import { ChartDataPoint, PortfolioHistoryPoint } from '../interfaces/IPortfolioHistoryService';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 /**
  * Formats portfolio history points for chart display

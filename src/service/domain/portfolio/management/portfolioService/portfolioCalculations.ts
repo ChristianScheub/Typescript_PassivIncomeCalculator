@@ -1,9 +1,9 @@
-import { AssetDefinition, Transaction as Asset } from '../../../../../types/domains/assets';
-import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../../../../types/domains/assets/categories';
-import { PortfolioPosition } from '../../../../../types/domains/portfolio/position';
-import Logger from '../../../../shared/logging/Logger/logger';
+import { AssetDefinition, Transaction as Asset } from '@/types/domains/assets';
+import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/domains/assets/categories';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { calculatorService } from '../../../../index';
-import { getCurrentQuantity, getCurrentValue } from '../../../../../utils/transactionCalculations';
+import { getCurrentQuantity, getCurrentValue } from '@/utils/transactionCalculations';
 import { formatCurrency } from '../../../../infrastructure/formatService/methods/formatCurrency';
 import { formatPercentage } from '../../../../infrastructure/formatService/methods/formatPercentage';
 

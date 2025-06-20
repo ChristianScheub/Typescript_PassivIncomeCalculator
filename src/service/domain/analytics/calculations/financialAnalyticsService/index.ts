@@ -9,5 +9,5 @@ const analyticsService: IAnalyticsService = {
   generateRecommendations,
 };
 
-export type { IAnalyticsService, PortfolioRecommendation, RecommendationPriority, RecommendationCategory } from './interfaces/IAnalyticsService';
+export type { IAnalyticsService } from './interfaces/IAnalyticsService';
 export default analyticsService;

@@ -6,9 +6,9 @@ import IncomeDistributionView from './IncomeDistributionView';
 import CustomAnalyticsView from './CustomAnalyticsView';
 import { ViewHeader } from '../../../ui/layout/ViewHeader';
 import { AssetTypeFilterCard } from '../../../ui/specialized/AssetTypeFilterCard';
-import { AllocationData } from '../../../service/calculatorService/methods/analytics/calculatePortfolioAnalytics';
-import { AssetType } from '../../../types';
 import { getAssetTypeOptions } from '../../../constants';
+import { AllocationData } from '@/service/domain/analytics/calculations/financialAnalyticsService/methods/calculatePortfolioAnalytics';
+import { AssetType } from '@/types/shared';
 
 type AnalyticsTab = 'asset_distribution' | 'income_distribution' | 'custom';
 

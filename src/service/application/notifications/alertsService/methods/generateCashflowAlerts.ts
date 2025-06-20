@@ -1,5 +1,5 @@
 import { FinancialMetrics, FinancialAlert } from '../interfaces/IAlertsService';
-import { v4 as uuidv4 } from '../../../../../utils/uuid';
+import { v4 as uuidv4 } from '@/utils/uuid';
 
 const createNegativeCashFlowAlert = (monthlyCashFlow: number): FinancialAlert => {
   const isCritical = monthlyCashFlow < -1000;

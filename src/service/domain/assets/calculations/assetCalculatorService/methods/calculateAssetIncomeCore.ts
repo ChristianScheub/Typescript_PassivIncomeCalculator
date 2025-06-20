@@ -1,8 +1,8 @@
 import { Asset } from "@/types/domains/assets/entities";
-import Logger from "../../../../../shared/logging/Logger/logger";
+import Logger from "@/service/shared/logging/Logger/logger";
 import { calculateDividendSchedule } from "../../../../financial/income/incomeCalculatorService/methods/calculatePayment";
-import { getCachedDividendData } from "../../../../../../utils/dividendCacheUtils";
-import { getCurrentQuantity } from "../../../../../../utils/transactionCalculations";
+import { getCachedDividendData } from "@/utils/dividendCacheUtils";
+import { getCurrentQuantity } from "@/utils/transactionCalculations";
 
 // Helper: Calculate stock dividend income
 const getStockDividendIncome = (asset: Asset): number => {

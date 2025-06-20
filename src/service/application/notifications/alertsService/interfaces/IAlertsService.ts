@@ -1,51 +1,9 @@
-export interface FinancialMetrics {
-  netWorth: number;
-  totalAssets: number;
-  totalLiabilities: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  monthlyLiabilityPayments: number;
-  monthlyAssetIncome: number;
-  passiveIncome: number;
-  monthlyCashFlow: number;
-}
-
-export interface UIAlert {
-  type: 'warning' | 'info' | 'success';
-  title: string;
-  description: string;
-  action: () => void;
-  actionLabel: string;
-}
-
-export interface FinancialAlert {
-  id: string;
-  type: 'warning' | 'info' | 'success' | 'critical';
-  category: 'cashflow' | 'debt' | 'passive_income' | 'savings' | 'emergency_fund' | 'diversification' | 'general';
-  titleKey: string; // Translation key instead of translated text
-  descriptionKey: string; // Translation key instead of translated text
-  priority: number; // 1-10, higher = more important
-  actionType: 'navigate' | 'external' | 'none';
-  actionData?: {
-    route?: string;
-    url?: string;
-    params?: Record<string, any>;
-  };
-  actionLabelKey?: string; // Translation key for action label
-  thresholds?: {
-    warning?: number;
-    critical?: number;
-  };
-  calculatedValue?: number;
-  metadata?: Record<string, any>; // Additional data for the alert
-}
-
-export interface AlertGenerationOptions {
-  maxAlerts?: number;
-  includeSuccess?: boolean;
-  priorityThreshold?: number;
-  excludeCategories?: string[];
-}
+import { 
+  FinancialMetrics, 
+  UIAlert, 
+  FinancialAlert, 
+  AlertGenerationOptions 
+} from '@/types/domains/analytics/reporting';
 
 export interface IBaseAlertsService {
   generateFinancialAlerts: (

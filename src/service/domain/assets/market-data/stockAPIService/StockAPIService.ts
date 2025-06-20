@@ -1,10 +1,10 @@
 import { IStockAPIService } from './interfaces/IStockAPIService';
-import { StockAPIProvider } from '../../store/slices/apiConfigSlice';
+import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
 import { createStockAPIServiceMethod, getStockAPIServiceMethod } from './methods/createStockAPIService';
 import { getAvailableProvidersMethod } from './methods/getAvailableProviders';
 
 // Definition der Typ-Signatur für den StockAPIService
-interface IStockAPIServiceManager {
+export interface IStockAPIServiceManager {
   /**
    * Create or update the Stock API Gateway with current configuration
    */
@@ -46,6 +46,4 @@ export default stockAPIService;
 // Export the service
 export { stockAPIService };
 
-// Export types for use in other modules
-export type { IStockAPIService, IStockAPIServiceManager };
-export type { StockAPIProvider };
+// Only export service interfaces, no fachliche types

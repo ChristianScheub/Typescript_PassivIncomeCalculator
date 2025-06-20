@@ -1,5 +1,4 @@
 import { DBSchema } from 'idb';
-// Neue Domain-Driven Types
 import { 
   Transaction as Asset, 
   AssetDefinition, 
@@ -12,7 +11,7 @@ import {
   Expense, 
   Income 
 } from '@/types/domains/financial/';
-import { ExchangeRate } from '@service/domain/financial/exchange/exchangeService/interfaces/IExchangeService';
+import { ExchangeRate } from '@/types/domains/financial/calculations';
 
 export interface FinanceDB extends DBSchema {
   transactions: {
@@ -60,7 +59,7 @@ export interface FinanceDB extends DBSchema {
   };
 }
 
-export type StoreNames = 'transactions' | 'assetDefinitions' | 'assetCategories' | 'assetCategoryOptions' | 'assetCategoryAssignments' | 'liabilities' | 'expenses' | 'income' | 'exchangeRates';
+export type StoreNames = import('@/types/domains/database/config').StoreNames;
 
 export interface ISQLiteService {
   getAll<K extends StoreNames>(storeName: K): Promise<FinanceDB[K]['value'][]>;

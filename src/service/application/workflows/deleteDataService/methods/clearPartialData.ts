@@ -1,9 +1,9 @@
 import { store } from '../../../../../store';
-import { clearAllTransactions } from '../../../../../store/slices/transactionsSlice';
-import { clearAllLiabilities } from '../../../../../store/slices/liabilitiesSlice';
-import { clearAllExpenses } from '../../../../../store/slices/expensesSlice';
-import { clearAllIncome } from '../../../../../store/slices/incomeSlice';
-import Logger from '../../../../shared/logging/Logger/logger';
+import { clearAllTransactions } from '@/store/slices/transactionsSlice';
+import { clearAllLiabilities } from '@/store/slices/liabilitiesSlice';
+import { clearAllExpenses } from '@/store/slices/expensesSlice';
+import { clearAllIncome } from '@/store/slices/incomeSlice';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { StoreNames } from '../../../../infrastructure/sqlLiteService';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';
 

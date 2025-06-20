@@ -4,7 +4,7 @@ import {
   AssetPosition 
 } from '../interfaces/IPortfolioHistoryService';
 import { PortfolioHistoryHelper } from './portfolioHistoryHelper';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 function calculatePortfolioHistoryForDays(
   assets: Asset[], 

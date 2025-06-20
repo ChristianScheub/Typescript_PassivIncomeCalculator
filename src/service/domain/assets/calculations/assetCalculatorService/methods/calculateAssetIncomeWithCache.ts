@@ -1,11 +1,11 @@
 import { Asset } from "@/types/domains/assets/entities";
-import Logger from "../../../../../shared/logging/Logger/logger";
-import { getCachedDividendData } from "../../../../../../utils/dividendCacheUtils";
+import Logger from "@/service/shared/logging/Logger/logger";
+import { getCachedDividendData } from "@/utils/dividendCacheUtils";
 import {
   calculateDividendSchedule,
   calculateDividendForMonth,
 } from "../../../../financial/income/incomeCalculatorService/methods/calculatePayment";
-import { getCurrentQuantity } from "../../../../../../utils/transactionCalculations";
+import { getCurrentQuantity } from "@/utils/transactionCalculations";
 
 // Helper: Stock dividend calculation with breakdown
 function getStockDividendBreakdown(asset: Asset) {

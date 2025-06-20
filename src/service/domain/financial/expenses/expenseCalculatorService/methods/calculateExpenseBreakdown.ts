@@ -1,6 +1,6 @@
 import { Expense, ExpenseBreakdown } from '@/types/domains/financial';
 import { ExpenseCategory } from '@/types/shared';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { calculateMonthlyExpense } from './calculateExpenses';
 
 export const calculateExpenseBreakdown = (expenses: Expense[]): ExpenseBreakdown[] => {

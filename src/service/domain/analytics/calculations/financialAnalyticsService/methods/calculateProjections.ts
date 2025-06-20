@@ -5,7 +5,7 @@ import {
 } from '@/types/domains/financial';
 import { Transaction as Asset } from '@/types/domains/assets';
 import { CalculatorProjection } from '@/types/domains/analytics/calculations';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { calculateTotalMonthlyExpenses } from '../../../../financial/expenses/expenseCalculatorService/methods/calculateExpenses';
 import { calculateTotalMonthlyLiabilityPayments } from '../../../../financial/liabilities/liabilityCalculatorService/methods/calculateLiabilities';
 import { calculatePassiveIncome, calculateTotalMonthlyIncome } from '../../../../financial/income/incomeCalculatorService/methods/calculateIncome';

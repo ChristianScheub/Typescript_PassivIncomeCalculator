@@ -1,6 +1,6 @@
 import { 
   Liability
-} from '../../../../types/domains/financial/';
+} from '@/types/domains/financial/';
 
 export interface ILiabilityCalculatorService {
   // Liability calculations

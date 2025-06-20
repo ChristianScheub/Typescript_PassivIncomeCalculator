@@ -8,7 +8,7 @@ import {
   MonthlyProjection 
 } from '@/types/domains/analytics/';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
-import { PortfolioAnalyticsData, IncomeAnalyticsData } from '../../../analytics/analytics/calculatePortfolioAnalytics';
+import { IncomeAnalyticsData, PortfolioAnalyticsData } from '@/types/domains/analytics/calculations';
 
 export interface IFinancialCalculatorService {
   // Cash flow calculations

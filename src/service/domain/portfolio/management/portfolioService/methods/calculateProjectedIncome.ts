@@ -1,6 +1,6 @@
-import { AssetDefinition, Transaction as Asset, DividendInfo } from '../../../types/domains/assets';
-import { getCurrentQuantity } from '../../../utils/transactionCalculations';
-import { calculatorService } from '../../calculatorService';
+import { AssetDefinition, Transaction as Asset, DividendInfo } from '@/types/domains/assets';
+import { getCurrentQuantity } from '@/utils/transactionCalculations';
+import compositeCalculatorService from '@service/domain/financial/calculations/compositeCalculatorService';
 
 export function calculateProjectedIncome(
   assets: Asset[], 
@@ -17,8 +17,8 @@ export function calculateProjectedIncome(
     return 0;
   }
 
-  // Use calculatorService instead of direct import to avoid circular dependency
-  const result = calculatorService.calculateDividendSchedule(newDividendInfo as any, totalQuantity);
+  // Use compositeCalculatorService instead of direct import to avoid circular dependency
+  const result = compositeCalculatorService.calculateDividendSchedule(newDividendInfo as any, totalQuantity);
   
   return isFinite(result.monthlyAmount) ? result.monthlyAmount : 0;
 }

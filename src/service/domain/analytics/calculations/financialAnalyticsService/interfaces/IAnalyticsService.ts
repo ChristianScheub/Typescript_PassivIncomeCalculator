@@ -9,42 +9,6 @@ import {
   Income 
 } from '@/types/domains/financial/';
 
-export interface FinancialSummary {
-  netWorth: number;
-  totalAssets: number;
-  totalLiabilities: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  monthlyLiabilityPayments: number;
-  monthlyAssetIncome: number;
-  passiveIncome: number;
-  monthlyCashFlow: number;
-  totalMonthlyIncome: number;
-  totalPassiveIncome: number;
-  totalMonthlyExpenses: number;
-}
-
-export interface FinancialRatios {
-  passiveRatio: number;
-  expenseCoverage: number;
-  debtRatio: number;
-  savingsRate: number;
-}
-
-export type RecommendationPriority = 'high' | 'medium' | 'low';
-export type RecommendationCategory = 'assets' | 'income' | 'expenses' | 'liabilities' | 'planning';
-
-export interface PortfolioRecommendation {
-  id: string;
-  category: RecommendationCategory;
-  priority: RecommendationPriority;
-  titleKey: string;
-  descriptionKey: string;
-  actionCategory?: string; // Portfolio category for navigation
-  actionSubCategory?: string; // Portfolio subcategory for navigation
-  metadata?: Record<string, any>; // Additional data for the recommendation
-}
-
 export interface IAnalyticsService {
   calculateFinancialSummary: (
     assets: Asset[],
@@ -52,9 +16,9 @@ export interface IAnalyticsService {
     expenses: Expense[],
     income: Income[],
     assetDefinitions?: AssetDefinition[]
-  ) => FinancialSummary;
+  ) => import('@/types/domains/analytics/reporting').FinancialSummary;
 
-  calculateRatios: (summary: FinancialSummary) => FinancialRatios;
+  calculateRatios: (summary: import('@/types/domains/analytics/reporting').FinancialSummary) => import('@/types/domains/analytics/reporting').FinancialRatios;
 
   generateRecommendations: (
     assets: Asset[],
@@ -62,5 +26,5 @@ export interface IAnalyticsService {
     expenses: Expense[],
     income: Income[],
     assetDefinitions?: AssetDefinition[]
-  ) => PortfolioRecommendation[];
+  ) => import('@/types/domains/analytics/reporting').PortfolioRecommendation[];
 }

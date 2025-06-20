@@ -1,5 +1,5 @@
 import sqliteService from '../../../../../infrastructure/sqlLiteService';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 import { refreshExchangeRateMethod } from './refreshExchangeRate';
 
 /**

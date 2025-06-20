@@ -3,22 +3,22 @@ import {
     invalidatePortfolioCache, 
     calculatePortfolioData,
     fetchTransactions 
-} from '../../../../../store/slices/transactionsSlice';
-import { fetchAssetDefinitions } from '../../../../../store/slices/assetDefinitionsSlice';
+} from '@/store/slices/transactionsSlice';
+import { fetchAssetDefinitions } from '@/store/slices/assetDefinitionsSlice';
 import { 
     fetchAssetCategories,
     fetchAssetCategoryOptions,
     fetchAssetCategoryAssignments 
-} from '../../../../../store/slices/assetCategoriesSlice';
-import { fetchLiabilities } from '../../../../../store/slices/liabilitiesSlice';
-import { fetchExpenses } from '../../../../../store/slices/expensesSlice';
-import { fetchIncome } from '../../../../../store/slices/incomeSlice';
-import { updateDashboardValues } from '../../../../../store/slices/dashboardSlice';
-import { calculate30DayHistory } from '../../../../../store/slices/portfolioHistorySlice';
-import { updateForecastValues } from '../../../../../store/slices/forecastSlice';
+} from '@/store/slices/assetCategoriesSlice';
+import { fetchLiabilities } from '@/store/slices/liabilitiesSlice';
+import { fetchExpenses } from '@/store/slices/expensesSlice';
+import { fetchIncome } from '@/store/slices/incomeSlice';
+import { updateDashboardValues } from '@/store/slices/dashboardSlice';
+import { calculate30DayHistory } from '@/store/slices/portfolioHistorySlice';
+import { updateForecastValues } from '@/store/slices/forecastSlice';
 import { PortfolioHistoryHelper } from '../../../../domain/portfolio/history/portfolioHistoryService/methods/portfolioHistoryHelper';
 import recentActivityService from '../../../../domain/analytics/reporting/recentActivityService';
-import Logger from '../../../../shared/logging/Logger/logger';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 /**
  * Refreshes all caches in the application

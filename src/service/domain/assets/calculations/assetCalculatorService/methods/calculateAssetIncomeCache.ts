@@ -1,9 +1,9 @@
 import { Transaction as Asset } from "@/types/domains/assets/entities";
-import Logger from "../../../../../shared/logging/Logger/logger";
+import Logger from "@/service/shared/logging/Logger/logger";
 import { 
   getCachedDividendData,
   createCachedDividends
-} from "../../../../../../utils/dividendCacheUtils";
+} from "@/utils/dividendCacheUtils";
 import { calculateAssetMonthlyIncomeWithCache } from "./calculateAssetIncomeWithCache";
 
 // Optimized function: Check if all assets have cached data

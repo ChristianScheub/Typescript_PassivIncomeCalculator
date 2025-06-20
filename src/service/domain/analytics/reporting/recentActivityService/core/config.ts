@@ -1,5 +1,5 @@
 
-import { ActivityServiceConfig } from '../types';
+import { ActivityServiceConfig } from '@/types/domains/analytics/reporting';
 
 // Default Configuration for Recent Activity Service
 export const DEFAULT_CONFIG: ActivityServiceConfig = {

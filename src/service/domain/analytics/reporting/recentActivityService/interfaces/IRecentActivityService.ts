@@ -5,7 +5,7 @@ import type {
   AnalyticsSubCategory,
   PortfolioCategory,
   PortfolioSubCategory 
-} from '../types';
+} from '@/types/domains/analytics/reporting';
 
 export interface IRecentActivityService {
   // Analytics Methods

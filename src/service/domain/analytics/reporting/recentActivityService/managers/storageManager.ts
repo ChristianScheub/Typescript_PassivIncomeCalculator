@@ -1,6 +1,6 @@
 
-import { RecentActivity, ActivityType, ActivityServiceConfig } from '../types';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import { RecentActivity, ActivityType, ActivityServiceConfig } from '@/types/domains/analytics/reporting';
+import Logger from "@/service/shared/logging/Logger/logger";
 
 // Storage Manager for Recent Activities
 export const createStorageManager = (config: ActivityServiceConfig) => {

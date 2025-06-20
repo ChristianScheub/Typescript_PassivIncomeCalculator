@@ -35,4 +35,4 @@ const sqliteService: ISQLiteService = {
 };
 
 export default sqliteService;
-export type { ISQLiteService, StoreNames, FinanceDB };
+export type { ISQLiteService } from './interfaces/ISQLiteService';
