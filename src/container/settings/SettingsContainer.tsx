@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { setApiEnabled, setApiKey, setSelectedProvider, StockAPIProvider } from "../../store/slices/apiConfigSlice";
-import { clearAllAssets } from "../../store/slices/transactionsSlice";
+import { clearAllTransactions } from "../../store/slices/transactionsSlice";
 import { clearAllLiabilities } from "../../store/slices/liabilitiesSlice";
 import { clearAllExpenses } from "../../store/slices/expensesSlice";
 import { clearAllIncome } from "../../store/slices/incomeSlice";
@@ -45,11 +45,6 @@ const SettingsContainer: React.FC = () => {
   const [clearExpensesStatus, setClearExpensesStatus] = useState<ClearOperationStatus>("idle");
   const [clearIncomeStatus, setClearIncomeStatus] = useState<ClearOperationStatus>("idle");
   const [clearAllDataStatus, setClearAllDataStatus] = useState<ClearOperationStatus>("idle");
-
-  const [isApiExpanded, setIsApiExpanded] = useState(false);
-  const [isDataManagementExpanded, setIsDataManagementExpanded] =
-    useState(false);
-  const [isClearDataExpanded, setIsClearDataExpanded] = useState(false);
 
   // Confirmation Dialog State
   const [confirmDialog, setConfirmDialog] = useState<ConfirmationDialogState>({
@@ -292,7 +287,7 @@ const SettingsContainer: React.FC = () => {
       Logger.infoService("Starting to clear all data");
 
       // 1. Clear Redux store first
-      dispatch(clearAllAssets());
+      dispatch(clearAllTransactions());
       dispatch(clearAllLiabilities());
       dispatch(clearAllExpenses());
       dispatch(clearAllIncome());
@@ -510,17 +505,7 @@ const SettingsContainer: React.FC = () => {
       clearIncomeStatus={clearIncomeStatus}
       clearAllDataStatus={clearAllDataStatus}
       isApiEnabled={apiConfig.isEnabled}
-      isApiExpanded={isApiExpanded}
-      isDataManagementExpanded={isDataManagementExpanded}
-      isClearDataExpanded={isClearDataExpanded}
       onApiToggle={handleApiToggle}
-      onApiExpandedChange={() => setIsApiExpanded(!isApiExpanded)}
-      onDataManagementExpandedChange={() =>
-        setIsDataManagementExpanded(!isDataManagementExpanded)
-      }
-      onClearDataExpandedChange={() =>
-        setIsClearDataExpanded(!isClearDataExpanded)
-      }
       onExportData={handleExportData}
       onImportData={handleImportData}
       onToggleLogs={() => setShowLogs(!showLogs)}

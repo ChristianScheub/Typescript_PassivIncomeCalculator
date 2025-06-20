@@ -21,7 +21,6 @@ function simpleHash(str: string): string {
  * Generates a hash for dividend calculation parameters to detect changes
  */
 export function generateDividendCalculationHash(asset: Asset): string {
-  // Use assetDefinition data only (legacy fields have been removed from Asset interface)
   const dividendInfo = asset.assetDefinition?.dividendInfo;
   const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
   const rentalInfo = asset.assetDefinition?.rentalInfo;

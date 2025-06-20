@@ -32,28 +32,6 @@ export interface TypedPortfolioCache {
   isValid: boolean;
 }
 
-// Legacy cache structure for backwards compatibility
-export interface LegacyPortfolioCache {
-  positions: Array<{
-    formatted?: {
-      currentValue: string;
-    };
-  }>;
-  totals: {
-    totalValue: number;
-    monthlyIncome: number;
-    annualIncome: number;
-    totalInvestment: number;
-    totalReturn: number;
-    totalReturnPercentage: number;
-    [key: string]: number;
-  };
-  metadata: {
-    lastCalculated: string;
-    combinedHash: string;
-  };
-}
-
 // Transaction with proper typing
 export interface TypedTransaction {
   id: string;

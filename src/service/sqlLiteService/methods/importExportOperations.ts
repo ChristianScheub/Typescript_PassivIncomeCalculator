@@ -16,7 +16,7 @@ const getImportDataFlags = (data: ExportData): ImportDataFlags => ({
 // Helper function to create validation log message
 const createValidationLogMessage = (data: ExportData, flags: ImportDataFlags): string => {
   const baseCounts = [
-    `Transactions: ${(data.transactions || data.assets || []).length}`, // Support both new and legacy format
+    `Transactions: ${data.transactions.length}`,
     `Liabilities: ${data.liabilities.length}`,
     `Expenses: ${data.expenses.length}`,
     `Income: ${data.income.length}`
@@ -31,21 +31,6 @@ const createValidationLogMessage = (data: ExportData, flags: ImportDataFlags): s
   ].filter(Boolean);
 
   return `Data validation passed - ${[...baseCounts, ...optionalCounts].join(', ')}`;
-};
-
-// Helper function to migrate legacy "assets" data to "transactions" during import
-const migrateLegacyAssetsToTransactions = async (data: ExportData): Promise<void> => {
-  // Check if this is a legacy format with "assets" instead of "transactions"
-  if (data.assets && Array.isArray(data.assets) && !data.transactions) {
-    Logger.infoService(`Found legacy 'assets' data (${data.assets.length} items) - migrating to 'transactions'`);
-    
-    // Migrate assets to transactions
-    for (const asset of data.assets) {
-      await dbOperations.update('transactions', asset as any);
-    }
-    
-    Logger.infoService(`Legacy assets migration completed - ${data.assets.length} transactions imported`);
-  }
 };
 
 // Helper function to import core data stores
@@ -97,11 +82,11 @@ const importExistingDataStore = async (
   }
 };
 
-// Helper function to log when data is missing (legacy format)
+// Helper function to log when data is missing
 const logMissingDataStore = (
   displayName: string
 ): void => {
-  Logger.infoService(`No ${displayName} found in backup (legacy format)`);
+  Logger.infoService(`No ${displayName} found in backup`);
 };
 
 // Helper function to create export log message
@@ -160,17 +145,12 @@ export const importExportOperations = {
 
     const exportData = data as Record<string, unknown>;
 
-    // Check for transactions array OR legacy assets array
+    // Check for transactions array
     const hasTransactions = Array.isArray(exportData.transactions);
-    const hasLegacyAssets = Array.isArray(exportData.assets);
     
-    if (!hasTransactions && !hasLegacyAssets) {
-      Logger.error('Invalid data structure - neither transactions nor legacy assets array found');
-      throw new Error('Invalid backup file format: neither transactions nor assets array found');
-    }
-    
-    if (hasLegacyAssets && !hasTransactions && Array.isArray(exportData.assets)) {
-      Logger.infoService(`Detected legacy backup format with ${exportData.assets.length} assets - will be migrated to transactions`);
+    if (!hasTransactions) {
+      Logger.error('Invalid data structure - transactions array not found');
+      throw new Error('Invalid backup file format: transactions array not found');
     }
     
     const requiredArrays = ['liabilities', 'expenses', 'income'];
@@ -202,14 +182,11 @@ export const importExportOperations = {
       const data = parsedData as ExportData;
       const flags = getImportDataFlags(data);
       
-      Logger.infoService(`Import format: ${flags.isV2Format ? 'v2.x (complete)' : 'v1.x (legacy)'}`);
+      Logger.infoService(`Import format: ${flags.isV2Format ? 'v2.x (complete)' : 'v1.x (partial)'}`);
       Logger.infoService(createValidationLogMessage(data, flags));
 
       // Import core data stores
       await importCoreDataStores(data);
-
-      // Migrate legacy assets to transactions if necessary
-      await migrateLegacyAssetsToTransactions(data);
 
       // Import optional data stores
       if (flags.hasAssetDefinitions) {

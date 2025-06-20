@@ -71,7 +71,7 @@ export const calculatePortfolioAnalytics = (positions: PortfolioPosition[]): Por
         sectorMap.set(sectorName, currentValue + proportionalValue);
       });
     } else {
-      // Single sector asset (legacy or no sectors)
+      // Single sector asset
       const sector = position.sector || 'Unknown';
       const currentValue = sectorMap.get(sector) || 0;
       sectorMap.set(sector, currentValue + position.currentValue);
@@ -255,7 +255,7 @@ export const calculateIncomeAnalytics = (positions: PortfolioPosition[]): Income
           sectorIncomeMap.set(sectorName, currentIncome + proportionalIncome);
         });
       } else {
-        // Single sector asset (legacy or no sectors)
+        // Single sector asset
         const sector = position.sector || 'Unknown';
         const currentIncome = sectorIncomeMap.get(sector) || 0;
         sectorIncomeMap.set(sector, currentIncome + position.monthlyIncome);

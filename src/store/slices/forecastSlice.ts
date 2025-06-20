@@ -117,19 +117,16 @@ export const updateForecastValues = createAsyncThunk(
     // Cache Asset-Einkommen für jeden Monat (berücksichtigt Dividendentermine)
     const monthlyAssetIncomeCache: Record<number, number> = {};
     
-    // Use portfolio cache if available (new transaction-based system)
+    // Use portfolio cache for monthly asset income calculations
     const portfolioCache = transactions.portfolioCache;
-    if (portfolioCache && transactions.portfolioCacheValid) {
-      Logger.infoRedux('Using portfolio positions for monthly asset income cache');
-      for (let month = 1; month <= 12; month++) {
-        monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
-      }
-    } else {
-      // Fallback to legacy asset-based calculations
-      Logger.infoRedux('Using legacy assets for monthly asset income cache');
-      for (let month = 1; month <= 12; month++) {
-        monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(transactions.items, month);
-      }
+    if (!portfolioCache || !transactions.portfolioCacheValid) {
+      Logger.infoRedux('Portfolio cache not available for forecast calculation');
+      throw new Error('Portfolio cache required for forecast calculations');
+    }
+
+    Logger.infoRedux('Using portfolio positions for monthly asset income cache');
+    for (let month = 1; month <= 12; month++) {
+      monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
     }
 
     // Verwende die gecachten Werte für Projektionen
@@ -163,19 +160,16 @@ export const updateMonthlyAssetIncomeCache = createAsyncThunk<
 
     const monthlyAssetIncomeCache: Record<number, number> = {};
     
-    // Use portfolio cache if available (new transaction-based system)
+    // Use portfolio cache for monthly asset income calculations
     const portfolioCache = transactions.portfolioCache;
-    if (portfolioCache && transactions.portfolioCacheValid) {
-      Logger.infoRedux('Using portfolio positions for cache update');
-      for (let month = 1; month <= 12; month++) {
-        monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
-      }
-    } else {
-      // Fallback to legacy asset-based calculations
-      Logger.infoRedux('Using legacy assets for cache update');
-      for (let month = 1; month <= 12; month++) {
-        monthlyAssetIncomeCache[month] = calculatorService.calculateTotalAssetIncomeForMonth(transactions.items, month);
-      }
+    if (!portfolioCache || !transactions.portfolioCacheValid) {
+      Logger.infoRedux('Portfolio cache not available for cache update');
+      throw new Error('Portfolio cache required for monthly asset income calculations');
+    }
+
+    Logger.infoRedux('Using portfolio positions for cache update');
+    for (let month = 1; month <= 12; month++) {
+      monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
     }
 
     Logger.infoRedux('Monthly asset income cache updated');

@@ -22,7 +22,7 @@ export interface IncomeAllocation {
 
 export interface SectorAllocation {
   sector: string;
-  sectorName?: string; // Legacy compatibility
+  sectorName?: string; // Backward compatibility
   value: number;
   percentage: number;
   count: number;

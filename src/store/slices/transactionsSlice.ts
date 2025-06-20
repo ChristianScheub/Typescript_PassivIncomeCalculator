@@ -225,16 +225,7 @@ export const selectLastPortfolioCalculation = (state: { transactions: Transactio
 // Derived selectors
 export const selectPortfolioTotals = (state: { transactions: TransactionsState }) => 
   state.transactions.portfolioCache?.totals;
-export const selectSortedAssets = (state: { transactions: TransactionsState }) => 
+export const selectSortedTransactions = (state: { transactions: TransactionsState }) => 
   [...state.transactions.items].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-// Legacy exports for backward compatibility
-export const fetchAssets = fetchTransactions;
-export const addAsset = addTransaction;
-export const updateAsset = updateTransaction;
-export const deleteAsset = deleteTransaction;
-export const selectAssets = selectTransactions;
-export const selectAssetsStatus = selectTransactionsStatus;
-export const clearAllAssets = clearAllTransactions;
 
 export default transactionsSlice.reducer;

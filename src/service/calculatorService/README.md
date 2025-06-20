@@ -41,7 +41,7 @@ const cashFlow = calculatorService.calculateMonthlyCashFlow(totalIncome, totalEx
 - **Financial Analysis**: Asset allocation, income allocation, expense breakdown calculations
 - **Projections**: Monthly financial projections with detailed breakdowns
 - **Utility Methods**: Net worth, cash flow, and ratio calculations
-- **Integration**: Works with dividendCacheService for performance optimization
+- **Performance Optimization**: Integrated caching for improved calculation performance
 
 ## Key Methods
 - `calculateAssetMonthlyIncome(asset)` - Calculate monthly income from any asset type
@@ -70,7 +70,6 @@ classDiagram
         +calculateDividendSchedule()
         +calculatePaymentSchedule()
     }
-    CalculatorService --> DividendCacheService
     CalculatorService --> Logger
 ```
 
@@ -88,12 +87,10 @@ flowchart TD
 sequenceDiagram
     participant UI
     participant CalculatorService
-    participant DividendCacheService
     participant Logger
     UI->>CalculatorService: calculateProjections()
-    CalculatorService->>DividendCacheService: calculateTotalMonthlyAssetIncomeWithCache()
-    DividendCacheService->>Logger: cache()
-    DividendCacheService-->>CalculatorService: assetIncome
+    CalculatorService->>CalculatorService: calculateTotalMonthlyAssetIncomeWithCache()
+    CalculatorService->>Logger: cache()
     CalculatorService-->>UI: projections
 ```
 

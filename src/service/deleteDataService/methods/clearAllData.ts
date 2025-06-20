@@ -1,5 +1,5 @@
 import { store } from '../../../store';
-import { clearAllAssets } from '../../../store/slices/transactionsSlice';
+import { clearAllTransactions } from '../../../store/slices/transactionsSlice';
 import { clearAllLiabilities } from '../../../store/slices/liabilitiesSlice';
 import { clearAllExpenses } from '../../../store/slices/expensesSlice';
 import { clearAllIncome } from '../../../store/slices/incomeSlice';
@@ -13,7 +13,7 @@ export async function clearAllData(): Promise<void> {
     Logger.infoService("Starting to clear all data");
 
     // Clear Redux store
-    store.dispatch(clearAllAssets());
+    store.dispatch(clearAllTransactions());
     store.dispatch(clearAllLiabilities());
     store.dispatch(clearAllExpenses());
     store.dispatch(clearAllIncome());
@@ -21,7 +21,7 @@ export async function clearAllData(): Promise<void> {
 
     // Clear SQLite data
     await clearSQLiteStores([
-        "assets",
+        "transactions",
         "assetDefinitions",
         "assetCategories",
         "assetCategoryOptions",

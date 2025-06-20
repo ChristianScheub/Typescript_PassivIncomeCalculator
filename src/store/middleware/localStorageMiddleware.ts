@@ -11,9 +11,6 @@ function isActionWithType(action: unknown): action is AnyAction {
 
 // Aktionen, die wir nicht persistieren wollen
 const BLACKLISTED_ACTIONS = [
-  'assets/updateAssetDividendCache',
-  'assets/invalidateAssetDividendCache',
-  'assets/invalidateAllDividendCaches',
   HYDRATE
 ];
 

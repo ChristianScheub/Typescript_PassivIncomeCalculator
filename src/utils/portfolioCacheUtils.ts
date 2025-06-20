@@ -1,11 +1,11 @@
 import Logger from '../service/Logger/logger';
-import { LegacyPortfolioCache } from '../types/domains/portfolio/cache';
+import { PortfolioCache } from '../store/slices/transactionsSlice';
 
 /**
  * Validates if a portfolio cache from localStorage is still valid
  */
 export const validatePortfolioCache = (
-  cache: LegacyPortfolioCache | undefined,
+  cache: PortfolioCache | undefined,
   cacheValid: boolean
 ): boolean => {
   if (!cache || !cacheValid) {
@@ -13,54 +13,32 @@ export const validatePortfolioCache = (
     return false;
   }
 
-  // Check if cache is too old (older than 24 hours)
-  const cacheAge = Date.now() - new Date(cache.metadata.lastCalculated).getTime();
-  const maxAge = 24 * 60 * 60 * 1000; // 24 hours
+  // Check cache age (max 1 hour)
+  const cacheAge = Date.now() - new Date(cache.lastCalculated).getTime();
+  const maxAge = 60 * 60 * 1000; // 1 hour in milliseconds
   
   if (cacheAge > maxAge) {
-    Logger.info(`Portfolio cache is too old: ${cacheAge / 1000 / 60 / 60} hours`);
+    Logger.info(`Portfolio cache is too old: ${Math.round(cacheAge / 1000 / 60)} minutes`);
     return false;
   }
 
-  // Check if cache has required data structure
-  if (!cache.positions || !cache.totals || !cache.metadata) {
-    Logger.info('Portfolio cache has invalid structure');
+  // Check cache structure
+  if (!cache.positions || !cache.totals) {
+    Logger.info('Portfolio cache has invalid structure - missing positions or totals');
     return false;
   }
 
-  // Check if positions have formatted values (new requirement)
-  const hasFormattedValues = cache.positions.every(position => 
-    position.formatted && 
-    typeof position.formatted.currentValue === 'string'
-  );
-
-  if (!hasFormattedValues) {
-    Logger.info('Portfolio cache missing formatted values, needs recalculation');
+  // Additional validation
+  if (!Array.isArray(cache.positions)) {
+    Logger.info('Portfolio cache positions is not an array');
     return false;
   }
 
-  Logger.info(`Portfolio cache is valid: ${cache.positions.length} positions, calculated at ${cache.metadata.lastCalculated}`);
+  if (typeof cache.totals !== 'object') {
+    Logger.info('Portfolio cache totals is not an object');
+    return false;
+  }
+
+  Logger.info(`Portfolio cache is valid: ${cache.positions.length} positions, calculated at ${cache.lastCalculated}`);
   return true;
 };
-
-/**
- * Gets the cache validity based on data hashes
- */
-export const getCacheValidityFromHashes = (
-  cache: LegacyPortfolioCache | undefined,
-  currentAssetHash: string,
-  currentDefinitionHash: string,
-  currentCategoryHash: string
-): boolean => {
-  if (!cache?.metadata) return false;
-
-  const combinedCurrentHash = generateCombinedHash(currentAssetHash, currentDefinitionHash, currentCategoryHash);
-  return cache.metadata.combinedHash === combinedCurrentHash;
-};
-
-/**
- * Simple hash generation for comparison
- */
-function generateCombinedHash(assetHash: string, definitionHash: string, categoryHash: string): string {
-  return btoa(`${assetHash}-${definitionHash}-${categoryHash}`).slice(0, 16);
-}

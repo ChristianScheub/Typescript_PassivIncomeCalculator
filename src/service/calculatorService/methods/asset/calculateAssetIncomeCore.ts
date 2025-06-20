@@ -1,4 +1,4 @@
-import { Asset } from "../../../../types";
+import { Asset } from "../../../../types/domains/assets/";
 import Logger from "../../../Logger/logger";
 import { calculateDividendSchedule } from "../income/calculatePayment";
 import { getCachedDividendData } from "../../../../utils/dividendCacheUtils";
@@ -7,7 +7,6 @@ import { getCurrentQuantity } from "../../../../utils/transactionCalculations";
 // Helper: Calculate stock dividend income
 const getStockDividendIncome = (asset: Asset): number => {
   if (asset.type === "stock") {
-    // Use assetDefinition.dividendInfo (legacy fields have been removed from Asset interface)
     const dividendInfo = asset.assetDefinition?.dividendInfo;
 
     if (dividendInfo?.frequency) {
@@ -40,7 +39,6 @@ const getStockDividendIncome = (asset: Asset): number => {
 // Helper: Calculate bond/cash interest income
 const getInterestIncome = (asset: Asset): number => {
   if (asset.type === "bond" || asset.type === "cash") {
-    // Use assetDefinition.bondInfo (legacy fields have been removed from Asset interface)
     const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
 
     if (interestRate !== undefined && asset.value) {
@@ -62,7 +60,6 @@ const getInterestIncome = (asset: Asset): number => {
 // Helper: Calculate real estate rental income
 const getRentalIncome = (asset: Asset): number => {
   if (asset.type === "real_estate") {
-    // Use assetDefinition.rentalInfo (legacy fields have been removed from Asset interface)
     const definitionRentalInfo = asset.assetDefinition?.rentalInfo;
 
     let monthlyRental: number | undefined;

@@ -51,20 +51,9 @@ const apiConfigSlice = createSlice({
         delete state.apiKeys[provider];
         localStorage.removeItem(`${provider}_api_key`);
       }
-    },
-    // Legacy support for backwards compatibility
-    setApiKeyLegacy: (state, action: PayloadAction<string | null>) => {
-      const apiKey = action.payload;
-      if (apiKey) {
-        state.apiKeys[StockAPIProvider.FINNHUB] = apiKey;
-        localStorage.setItem('finnhub_api_key', apiKey);
-      } else {
-        delete state.apiKeys[StockAPIProvider.FINNHUB];
-        localStorage.removeItem('finnhub_api_key');
-      }
     }
   }
 });
 
-export const { setApiEnabled, setSelectedProvider, setApiKey, setApiKeyLegacy } = apiConfigSlice.actions;
+export const { setApiEnabled, setSelectedProvider, setApiKey } = apiConfigSlice.actions;
 export default apiConfigSlice.reducer;

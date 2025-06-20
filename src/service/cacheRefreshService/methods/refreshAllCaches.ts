@@ -2,7 +2,7 @@ import { store } from '../../../store';
 import { 
     invalidatePortfolioCache, 
     calculatePortfolioData,
-    fetchAssets 
+    fetchTransactions 
 } from '../../../store/slices/transactionsSlice';
 import { fetchAssetDefinitions } from '../../../store/slices/assetDefinitionsSlice';
 import { 
@@ -57,7 +57,7 @@ export async function refreshAllCaches(): Promise<void> {
         // Fetch ALL core data in parallel
         await Promise.all([
             // Asset-related data
-            store.dispatch(fetchAssets()),
+            store.dispatch(fetchTransactions()),
             store.dispatch(fetchAssetDefinitions()),
             store.dispatch(fetchAssetCategories()),
             store.dispatch(fetchAssetCategoryOptions()),

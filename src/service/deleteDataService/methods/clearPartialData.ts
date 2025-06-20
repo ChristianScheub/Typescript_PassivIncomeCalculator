@@ -1,5 +1,5 @@
 import { store } from '../../../store';
-import { clearAllAssets } from '../../../store/slices/transactionsSlice';
+import { clearAllTransactions } from '../../../store/slices/transactionsSlice';
 import { clearAllLiabilities } from '../../../store/slices/liabilitiesSlice';
 import { clearAllExpenses } from '../../../store/slices/expensesSlice';
 import { clearAllIncome } from '../../../store/slices/incomeSlice';
@@ -11,21 +11,21 @@ export async function clearPartialData(): Promise<void> {
     Logger.infoService("Starting to clear financial data");
 
     // Clear Redux store
-    store.dispatch(clearAllAssets());
+    store.dispatch(clearAllTransactions());
     store.dispatch(clearAllLiabilities());
     store.dispatch(clearAllExpenses());
     store.dispatch(clearAllIncome());
 
     // Clear SQLite data
     await clearSQLiteStores([
-        "assets",
+        "transactions",
         "liabilities",
         "expenses",
         "income"
     ] as StoreNames[]);
 
     // Clear localStorage
-    clearLocalStorageData(['assets', 'liabilities', 'expenses', 'income']);
+    clearLocalStorageData(['transactions', 'liabilities', 'expenses', 'income']);
 
     Logger.infoService("Financial data cleared successfully");
 }

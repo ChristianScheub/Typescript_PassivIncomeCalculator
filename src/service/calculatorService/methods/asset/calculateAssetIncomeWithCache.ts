@@ -1,4 +1,4 @@
-import { Asset } from "../../../../types";
+import { Asset } from "../../../../types/domains/assets/";
 import Logger from "../../../Logger/logger";
 import { getCachedDividendData } from "../../../../utils/dividendCacheUtils";
 import {
@@ -11,7 +11,6 @@ import { getCurrentQuantity } from "../../../../utils/transactionCalculations";
 function getStockDividendBreakdown(asset: Asset) {
   if (asset.type !== "stock") return null;
   
-  // Use assetDefinition.dividendInfo (legacy fields have been removed from Asset interface)
   const dividendInfo = asset.assetDefinition?.dividendInfo;
   
   if (!dividendInfo) return null;
@@ -35,7 +34,6 @@ function getStockDividendBreakdown(asset: Asset) {
 function getInterestBreakdown(asset: Asset) {
   if ((asset.type !== "bond" && asset.type !== "cash")) return null;
   
-  // Use assetDefinition.bondInfo (legacy fields have been removed from Asset interface)
   const interestRate = asset.assetDefinition?.bondInfo?.interestRate;
   
   if (interestRate === undefined || !asset.value) return null;
@@ -54,7 +52,6 @@ function getInterestBreakdown(asset: Asset) {
 function getRealEstateBreakdown(asset: Asset) {
   if (asset.type !== "real_estate") return null;
   
-  // Use assetDefinition.rentalInfo (legacy fields have been removed from Asset interface)
   const definitionRentalInfo = asset.assetDefinition?.rentalInfo;
   
   let monthlyAmount: number | undefined;

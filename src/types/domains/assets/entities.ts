@@ -43,7 +43,7 @@ export interface AssetDefinition extends BaseEntity {
   country?: string;
   continent?: string;
   currency?: string;
-  sector?: string; // Legacy single sector for backward compatibility
+  sector?: string; // Single sector for backward compatibility
   sectors?: SectorAllocation[]; // New multi-sector support
   exchange?: string;
   isin?: string;
@@ -55,7 +55,7 @@ export interface AssetDefinition extends BaseEntity {
   autoUpdatePrice?: boolean;
   autoUpdateHistoricalPrices?: boolean;
   
-  // Market data (legacy support)
+  // Market data
   marketData?: MarketData;
   priceHistory?: PriceHistoryEntry[];
   

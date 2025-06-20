@@ -2,7 +2,6 @@ import { IStockAPIService } from './interfaces/IStockAPIService';
 import { StockAPIProvider } from '../../store/slices/apiConfigSlice';
 import { createStockAPIServiceMethod, getStockAPIServiceMethod } from './methods/createStockAPIService';
 import { getAvailableProvidersMethod } from './methods/getAvailableProviders';
-import { createStockAPIServiceLegacyMethod } from './methods/createStockAPIServiceLegacy';
 
 // Definition der Typ-Signatur für den StockAPIService
 interface IStockAPIServiceManager {
@@ -29,12 +28,6 @@ interface IStockAPIServiceManager {
     isConfigured: boolean;
     isImplemented: boolean;
   }>;
-
-  /**
-   * Legacy support: Create a Stock API Service using the old interface
-   * This maintains backwards compatibility with existing code
-   */
-  createStockAPIServiceLegacy: () => IStockAPIService;
 }
 
 /**
@@ -44,8 +37,7 @@ interface IStockAPIServiceManager {
 const stockAPIService: IStockAPIServiceManager = {
   createStockAPIService: createStockAPIServiceMethod,
   getStockAPIService: getStockAPIServiceMethod,
-  getAvailableProviders: getAvailableProvidersMethod,
-  createStockAPIServiceLegacy: createStockAPIServiceLegacyMethod
+  getAvailableProviders: getAvailableProvidersMethod
 };
 
 // Export default instance for direct use

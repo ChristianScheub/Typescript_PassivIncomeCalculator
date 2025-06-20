@@ -7,7 +7,6 @@ export interface ExportData {
   version?: string;
   timestamp?: string;
   transactions: unknown[];
-  assets?: unknown[]; // Legacy support
   liabilities: unknown[];
   expenses: unknown[];
   income: unknown[];

@@ -395,27 +395,18 @@ sequenceDiagram
 
 ---
 
-## Refactoring Achievement: From Complexity to Clarity
+## Architecture Refactoring: Streamlined & Efficient
 
-### **Before: Redundant Abstraction**
+### **Current: Clean Architecture**
 ```typescript
-// Old pattern: Unnecessary service layer
-dividendCacheService.calculateTotalMonthlyAssetIncomeWithCache()
-  ↓ delegates to
-calculatorService.calculateTotalMonthlyAssetIncome()
-  ↓ with caching logic scattered
-```
-
-### **After: Integrated & Efficient**
-```typescript
-// New pattern: Direct, optimized approach
+// Clean pattern: Direct, optimized approach
 calculatorService.calculateTotalMonthlyAssetIncomeWithCache()
-  ↓ direct cache integration
-  ↓ no unnecessary abstraction layers
+  ↓ integrated cache management
+  ↓ optimized calculation pipeline
 ```
 
-**Benefits Achieved:**
-- ✅ **Eliminated redundancy**: Removed unnecessary dividendCacheService layer
+**Architectural Benefits:**
+- ✅ **Streamlined architecture**: Eliminated unnecessary abstraction layers
 - ✅ **Improved performance**: Direct cache integration without service overhead  
 - ✅ **Better organization**: Modular folder structure with focused responsibilities
 - ✅ **Enhanced maintainability**: Files under 150 lines, clear separation of concerns
@@ -523,39 +514,6 @@ describe('CalculatorService', () => {
 
 ---
 
-## Migration Guide: From Old to New Architecture
-
-If migrating from the old architecture with separate `dividendCacheService`:
-
-### **Step 1: Update Imports**
-```typescript
-// OLD
-import { getDividendCacheService } from './dividendCacheService';
-const cacheService = getDividendCacheService();
-const income = cacheService.calculateTotalMonthlyAssetIncomeWithCache(assets);
-
-// NEW
-import calculatorService from './calculatorService';
-const income = calculatorService.calculateTotalMonthlyAssetIncomeWithCache(assets);
-```
-
-### **Step 2: Use New Cache Methods**
-```typescript
-// OLD - Separate cache service calls
-const cacheService = getDividendCacheService();
-const isValid = cacheService.areAssetsCached(assets);
-const total = cacheService.calculateTotalMonthlyAssetIncomeFromCache(assets);
-
-// NEW - Integrated cache methods
-const isValid = calculatorService.areAssetsCached(assets);
-const total = calculatorService.calculateTotalMonthlyAssetIncomeFromCache(assets);
-```
-
-### **Step 3: Remove Old Dependencies**
-- Remove imports of `dividendCacheService`
-- Update Redux slices to use `calculatorService` directly
-- Remove any `getDividendCacheService()` calls
-
 ---
 
 ## Conclusion
@@ -568,4 +526,4 @@ The service layer represents a **carefully architected foundation** that balance
 - **Provides reliability** through strong typing and error handling
 - **Supports extensibility** via clean interfaces and loose coupling
 
-The recent refactoring successfully transformed a complex, multi-layered architecture into a **streamlined, efficient system** that serves as the backbone for all financial calculations and business logic in the application.
+The architecture successfully provides a **streamlined, efficient system** that serves as the backbone for all financial calculations and business logic in the application.

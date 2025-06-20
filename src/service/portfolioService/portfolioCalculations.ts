@@ -155,7 +155,6 @@ const calculatePositionMonthlyIncome = (
   sampleTransaction: Asset,
   totalQuantity: number
 ): number => {
-  // Use AssetDefinition data only (legacy fields have been removed from Transaction interface)
   const dividendInfo = assetDefinition?.dividendInfo;
   const assetType = assetDefinition?.type || sampleTransaction.type;
   const interestRate = assetDefinition?.bondInfo?.interestRate;
@@ -192,7 +191,6 @@ const calculatePositionMonthlyIncome = (
 
   // Real estate rental income
   if (assetType === 'real_estate') {
-    // Use AssetDefinition rental info only (legacy fields have been removed from Transaction interface)
     const baseRent = rentalInfo?.baseRent || 0;
     Logger.infoService(
       `Real estate rental calculation: baseRent=${baseRent}, fromDefinition=${!!rentalInfo}`

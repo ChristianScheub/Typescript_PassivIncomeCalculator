@@ -26,5 +26,4 @@ export const COLORS_DARK = [
   '#a3e635', // lime-400
 ];
 
-// Legacy export for backward compatibility
 export const COLORS = COLORS_LIGHT;

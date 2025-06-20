@@ -6,6 +6,23 @@ import { Income, Expense, Liability } from './entities';
 import { StoreStatus } from '../../shared/base/status';
 import { Transaction as Asset } from '../assets/entities';
 import { AssetCategoryAssignment } from '../assets';
+import { PortfolioPosition } from '../portfolio/position';
+
+// Portfolio cache interface matching the one used in transactionsSlice
+export interface PortfolioCache {
+  positions: PortfolioPosition[];
+  totals: {
+    totalValue: number;
+    totalInvestment: number;
+    totalReturn: number;
+    totalReturnPercentage: number;
+    monthlyIncome: number;
+    annualIncome: number;
+    positionCount: number;
+    transactionCount: number;
+  };
+  lastCalculated: string;
+}
 
 export interface IncomeState {
   items: Income[];
@@ -29,7 +46,7 @@ export interface TransactionsState {
   items: Asset[];
   status: StoreStatus;
   error: string | null;
-  portfolioCache?: any; // Legacy type for backwards compatibility
+  portfolioCache?: PortfolioCache;
   portfolioCacheValid: boolean;
   lastPortfolioCalculation?: string;
   calculationMetadata: {

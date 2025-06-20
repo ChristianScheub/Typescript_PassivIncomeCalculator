@@ -1,17 +1,17 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { 
-  fetchAssets, 
-  addAsset, 
-  updateAsset, 
-  deleteAsset, 
+  fetchTransactions, 
+  addTransaction, 
+  updateTransaction, 
+  deleteTransaction, 
   calculatePortfolioData,
-  selectAssets,
-  selectAssetsStatus,
+  selectTransactions,
+  selectTransactionsStatus,
   selectPortfolioCache,
   selectPortfolioCacheValid,
   selectPortfolioTotals,
-  selectSortedAssets
+  selectSortedTransactions
 } from '../../store/slices/transactionsSlice';
 import { fetchAssetDefinitions } from '../../store/slices/assetDefinitionsSlice';
 import { AssetsView } from '../../view/portfolio-hub/assets/AssetsView';
@@ -31,13 +31,13 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   const dispatch = useAppDispatch();
   const { executeAsyncOperation } = useAsyncOperation();
   
-  // Use new selectors for better performance
-  const assets = useAppSelector(selectAssets);
-  const status = useAppSelector(selectAssetsStatus);
+  // Use new selectors for transactions
+  const assets = useAppSelector(selectTransactions);
+  const status = useAppSelector(selectTransactionsStatus);
   const portfolioCache = useAppSelector(selectPortfolioCache);
   const portfolioCacheValid = useAppSelector(selectPortfolioCacheValid);
   const portfolioTotals = useAppSelector(selectPortfolioTotals);
-  const sortedAssets = useAppSelector(selectSortedAssets);
+  const sortedAssets = useAppSelector(selectSortedTransactions);
   
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions || { items: [] });
   
@@ -65,8 +65,8 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
 
   useEffect(() => {
     if (status === 'idle') {
-      Logger.info('Fetching assets');
-      dispatch(fetchAssets());
+      Logger.info('Fetching transactions');
+      dispatch(fetchTransactions());
     }
     
     // Also fetch asset definitions
@@ -143,8 +143,8 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     };
     
     executeAsyncOperation(
-      'add asset',
-      () => dispatch(addAsset(transactionData)),
+      'add transaction',
+      () => dispatch(addTransaction(transactionData)),
       () => setIsAddingAsset(false)
     );
   };
@@ -176,8 +176,8 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     updateStockValueFields(transactionData);
     
     executeAsyncOperation(
-      'update asset',
-      () => dispatch(updateAsset({ ...transactionData, id: editingAsset.id })),
+      'update transaction',
+      () => dispatch(updateTransaction({ ...transactionData, id: editingAsset.id })),
       () => setEditingAsset(null)
     );
   };
@@ -185,8 +185,8 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   const handleDeleteAsset = (id: string) => {
     if (window.confirm(t('common.deleteConfirm'))) {
       executeAsyncOperation(
-        'delete asset',
-        () => dispatch(deleteAsset(id))
+        'delete transaction',
+        () => dispatch(deleteTransaction(id))
       );
     }
   };

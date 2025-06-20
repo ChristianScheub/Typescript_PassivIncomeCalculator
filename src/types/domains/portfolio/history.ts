@@ -28,7 +28,7 @@ export interface PortfolioTransaction {
 }
 
 // Portfolio cache for performance optimization
-export interface PortfolioCache {
+export interface PortfolioHistoryCache {
   totalValue: number;
   totalInvested: number;
   totalReturn: number;
