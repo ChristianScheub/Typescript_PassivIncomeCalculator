@@ -10,7 +10,7 @@ function isActionWithType(action: unknown): action is AnyAction {
 }
 
 // Middleware um automatisch Forecast und Dashboard zu aktualisieren wenn sich relevante Daten ändern
-export const dataChangeMiddleware: Middleware<object, StoreState> = (store: MiddlewareAPI<any, StoreState>) => (next) => (action) => {
+export const dataChangeMiddleware: Middleware<object, StoreState> = (store: MiddlewareAPI<any, StoreState>) => (next) => (action: unknown) => {
   const result = next(action);
   
   // Listen for successful data changes (but not fetch operations)

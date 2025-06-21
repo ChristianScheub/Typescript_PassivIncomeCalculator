@@ -2,10 +2,23 @@ import React, { useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import IncomeAnalyticsView from '../../view/analytics-hub/income/IncomeAnalyticsView';
 import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
-import { Income } from '../../types';
+import { Income } from '../../types/domains/financial/entities';
 import Logger from '../../service/shared/logging/Logger/logger';
 
 type IncomeAnalyticsTab = 'monthly' | 'annual';
+
+interface IncomeAnalyticsData {
+  name: string;
+  amount: number;
+  category: string;
+  percentage: number;
+}
+
+interface IncomeBreakdownData {
+  category: string;
+  amount: number;
+  percentage: number;
+}
 
 interface IncomeAnalyticsContainerProps {
   onBack: () => void;
@@ -51,7 +64,7 @@ const IncomeAnalyticsContainer: React.FC<IncomeAnalyticsContainerProps> = ({ onB
         amount,
         percentage: totalMonthlyIncome > 0 ? (amount / totalMonthlyIncome) * 100 : 0
       }))
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .sort((a: IncomeBreakdownData, b: IncomeBreakdownData) => b.amount - a.amount);
     
     // Calculate annual breakdown (same categories, but annual amounts)
     const annualBreakdown = monthlyBreakdown.map(category => ({
@@ -68,8 +81,8 @@ const IncomeAnalyticsContainer: React.FC<IncomeAnalyticsContainerProps> = ({ onB
         category: income.type,
         percentage: 0 // Will be calculated below
       }))
-      .filter((income: any) => income.amount > 0)
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .filter((income: IncomeAnalyticsData) => income.amount > 0)
+      .sort((a: IncomeAnalyticsData, b: IncomeAnalyticsData) => b.amount - a.amount);
     
     // Calculate individual incomes for annual view
     const annualIndividualIncomes = incomes
@@ -79,21 +92,21 @@ const IncomeAnalyticsContainer: React.FC<IncomeAnalyticsContainerProps> = ({ onB
         category: income.type,
         percentage: 0 // Will be calculated below
       }))
-      .filter((income: any) => income.amount > 0)
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .filter((income: IncomeAnalyticsData) => income.amount > 0)
+      .sort((a: IncomeAnalyticsData, b: IncomeAnalyticsData) => b.amount - a.amount);
     
     // Calculate totals
     const totalAnnualIncome = totalMonthlyIncome * 12;
     
     // Calculate percentages for individual incomes
     if (totalMonthlyIncome > 0) {
-      monthlyIndividualIncomes.forEach((income: any) => {
+      monthlyIndividualIncomes.forEach((income: IncomeAnalyticsData) => {
         income.percentage = (income.amount / totalMonthlyIncome) * 100;
       });
     }
     
     if (totalAnnualIncome > 0) {
-      annualIndividualIncomes.forEach((income: any) => {
+      annualIndividualIncomes.forEach((income: IncomeAnalyticsData) => {
         income.percentage = (income.amount / totalAnnualIncome) * 100;
       });
     }

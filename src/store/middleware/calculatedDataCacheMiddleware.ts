@@ -1,12 +1,17 @@
-import { Middleware } from '@reduxjs/toolkit';
+import { Middleware, AnyAction } from '@reduxjs/toolkit';
 import { StoreState } from '..';
 import { invalidateAllCache } from '../slices/calculatedDataSlice';
 import Logger from '../../service/shared/logging/Logger/logger';
 
+// Type guard to check if action has a type property
+function isActionWithType(action: unknown): action is AnyAction {
+  return typeof action === 'object' && action !== null && 'type' in action && typeof (action as AnyAction).type === 'string';
+}
+
 /**
  * Middleware that automatically invalidates calculated data cache when underlying data changes
  */
-const calculatedDataCacheMiddleware: Middleware<{}, StoreState> = (store) => (next) => (action: any) => {
+const calculatedDataCacheMiddleware: Middleware<object, StoreState> = (store) => (next) => (action: unknown) => {
   const result = next(action);
   
   // Actions that should invalidate cache
@@ -42,7 +47,7 @@ const calculatedDataCacheMiddleware: Middleware<{}, StoreState> = (store) => (ne
   ];
   
   // Check if the action should invalidate cache
-  if (action.type && cacheInvalidationActions.some(actionType => action.type.startsWith(actionType))) {
+  if (isActionWithType(action) && cacheInvalidationActions.some(actionType => action.type.startsWith(actionType))) {
     Logger.cache(`Cache invalidation triggered by action: ${action.type}`);
     store.dispatch(invalidateAllCache());
   }

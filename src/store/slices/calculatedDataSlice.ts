@@ -16,8 +16,8 @@ export interface CachedPortfolioHistory {
 }
 
 export interface CachedAssetFocusData {
-  assetsWithValues: any[]; // ReturnType of assetFocusService.calculateAssetFocusData
-  portfolioSummary: any;
+  assetsWithValues: unknown[]; // ReturnType of assetFocusService.calculateAssetFocusData
+  portfolioSummary: unknown;
   lastCalculated: string;
   inputHash: string;
 }
@@ -64,7 +64,7 @@ const initialState: CalculatedDataState = {
 };
 
 // Helper function to create input hash for cache invalidation
-const createInputHash = (data: any): string => {
+const createInputHash = (data: unknown): string => {
   return JSON.stringify(data);
 };
 

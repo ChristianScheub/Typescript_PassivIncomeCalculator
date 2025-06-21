@@ -21,7 +21,7 @@ interface PortfolioHubRecommendationsProps {
 
 const PortfolioHubRecommendations: React.FC<
   PortfolioHubRecommendationsProps
-> = ({ className, onCategoryChange }) => {
+> = ({ className }) => {
   const { t } = useTranslation();
 
   // Get data from Redux store

@@ -1,6 +1,8 @@
 import { PriceHistoryEntry, AssetDefinition, Transaction, Asset } from '@/types/domains/assets';
 import { getCurrentQuantity } from './transactionCalculations';
 
+type PriceSource = 'manual' | 'api' | 'import';
+
 /**
  * Utility functions for managing price history data
  */
@@ -38,7 +40,7 @@ export function addPriceToHistory(
   price: number,
   currentHistory: PriceHistoryEntry[] = [],
   date?: string,
-  source: 'manual' | 'api' | 'import' = 'manual'
+  source: PriceSource = 'manual'
 ): PriceHistoryEntry[] {
   const entryDate = date || new Date().toISOString();
   
@@ -74,7 +76,7 @@ export function addOrUpdateDailyPrice(
   price: number,
   currentHistory: PriceHistoryEntry[] = [],
   date?: string,
-  source: 'manual' | 'api' | 'import' = 'manual'
+  source: PriceSource = 'manual'
 ): PriceHistoryEntry[] {
   const entryDate = date || new Date().toISOString();
   const dateOnly = entryDate.split('T')[0];
@@ -113,9 +115,9 @@ export function addIntradayPriceHistory(
   );
   
   // Take only the most recent intraday entries if we exceed the limit
-  const limitedIntradayEntries = intradayEntries
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, maxIntradayEntries);
+  const intradayCopy = [...intradayEntries];
+  const sortedIntraday = intradayCopy.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const limitedIntradayEntries = sortedIntraday.slice(0, maxIntradayEntries);
   
   // Combine with existing history and sort by date (newest first)
   return [...filteredHistory, ...limitedIntradayEntries].sort((a, b) => 
@@ -215,7 +217,7 @@ export function cleanupOldPriceHistory(
 export function updateAssetDefinitionPrice(
   definition: AssetDefinition,
   newPrice: number,
-  source: 'manual' | 'api' | 'import' = 'manual'
+  source: PriceSource = 'manual'
 ): AssetDefinition {
   const currentDate = new Date().toISOString();
   

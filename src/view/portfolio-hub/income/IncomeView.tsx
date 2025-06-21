@@ -142,7 +142,7 @@ const IncomeView: React.FC<IncomeViewProps> = ({
       >
         <MaterialIncomeForm
           initialData={editingIncome || undefined}
-          onSubmit={(data: any) => {
+          onSubmit={(data) => {
             const income: Income = {
               id: editingIncome?.id || Date.now().toString(),
               name: data.name,

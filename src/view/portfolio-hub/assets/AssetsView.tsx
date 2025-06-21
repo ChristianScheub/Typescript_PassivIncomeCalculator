@@ -86,29 +86,37 @@ const HeaderButtons: React.FC<{
   onNavigateToCategories?: () => void;
   onNavigateToAnalytics: () => void;
 }> = ({ isDesktop, t, onNavigateToDefinitions, onNavigateToCategories, onNavigateToAnalytics }) => {
-  const buttons = [
+  const baseButtons = [
     {
       id: 'definitions',
       icon: Settings,
       label: t("assets.manageDefinitions"),
       onClick: onNavigateToDefinitions,
       tooltip: t("assets.manageDefinitions")
-    },
-    ...(onNavigateToCategories ? [{
-      id: 'categories',
-      icon: Tag,
-      label: t("categories.management"),
-      onClick: onNavigateToCategories,
-      tooltip: t("categories.management")
-    }] : []),
-    {
-      id: 'analytics',
-      icon: BarChart3,
-      label: t("analytics.portfolioAnalytics"),
-      onClick: onNavigateToAnalytics,
-      tooltip: t("analytics.portfolioAnalytics")
     }
   ];
+
+  const categoriesButton = {
+    id: 'categories',
+    icon: Tag,
+    label: t("categories.management"),
+    onClick: onNavigateToCategories,
+    tooltip: t("categories.management")
+  };
+
+  const analyticsButton = {
+    id: 'analytics',
+    icon: BarChart3,
+    label: t("analytics.portfolioAnalytics"),
+    onClick: onNavigateToAnalytics,
+    tooltip: t("analytics.portfolioAnalytics")
+  };
+
+  const buttons = [...baseButtons];
+  if (onNavigateToCategories) {
+    buttons.push(categoriesButton);
+  }
+  buttons.push(analyticsButton);
 
   return <HeaderButtonGroup buttons={buttons} isDesktop={isDesktop} />;
 };
@@ -431,14 +439,14 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
 
   // Sort portfolio positions by current value (highest to lowest)
   const sortedPortfolioAssets = useMemo(() => {
-    return [...portfolioData.positions].sort(
-      (a, b) => b.currentValue - a.currentValue
-    );
+    const positionsCopy = [...portfolioData.positions];
+    return positionsCopy.sort((a, b) => b.currentValue - a.currentValue);
   }, [portfolioData.positions]);
 
   // Sort assets by purchase date (newest first) for transaction view
   const sortedAssets = useMemo(() => {
-    return [...assets].sort(
+    const assetsCopy = [...assets];
+    return assetsCopy.sort(
       (a, b) =>
         new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime()
     );

@@ -60,7 +60,7 @@ export interface AssetFormData extends FieldValues {
   type: string;
   value: number;
   assetDefinitionId?: string;
-  assetDefinition?: any; // AssetDefinition
+  assetDefinition?: unknown; // AssetDefinition
   transactionType: 'buy' | 'sell';
   purchaseDate: string;
   purchasePrice: number; // For both buy and sell transactions
@@ -73,5 +73,5 @@ export interface AssetFormData extends FieldValues {
   totalReturn?: number;
   totalReturnPercentage?: number;
   notes?: string;
-  cachedDividends?: any;
+  cachedDividends?: unknown;
 }

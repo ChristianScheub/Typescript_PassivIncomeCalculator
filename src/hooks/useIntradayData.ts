@@ -64,7 +64,8 @@ export function useIntradayData(): PriceHistoryEntry[] {
     });
 
     // Sort by timestamp (newest first)
-    const sortedEntries = intradayEntries.sort((a, b) => 
+    const entriesCopy = [...intradayEntries];
+    const sortedEntries = entriesCopy.sort((a, b) => 
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
@@ -169,7 +170,8 @@ export function useIntradayPortfolioData(): Array<{ date: string; value: number;
     });
 
     // Sort by timestamp (newest first)
-    const sortedData = portfolioIntradayData.sort((a, b) => 
+    const dataCopy = [...portfolioIntradayData];
+    const sortedData = dataCopy.sort((a, b) => 
       new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
 

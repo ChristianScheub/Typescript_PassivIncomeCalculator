@@ -16,7 +16,7 @@ export interface CacheUpdateHandler {
  * Simple in-memory cache update handler for testing or standalone use
  */
 export class InMemoryCacheUpdateHandler implements CacheUpdateHandler {
-  private cache = new Map<string, CachedDividends>();
+  private readonly cache = new Map<string, CachedDividends>();
 
   updateAssetCache(assetId: string, cachedDividends: CachedDividends): void {
     this.cache.set(assetId, cachedDividends);

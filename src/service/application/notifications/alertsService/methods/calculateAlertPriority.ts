@@ -37,6 +37,7 @@ const calculatePriorityAdjustment = (
 
 export const calculateAlertPriority = (
   alert: FinancialAlert, 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _metrics: FinancialMetrics
 ): number => {
   let priority = alert.priority;

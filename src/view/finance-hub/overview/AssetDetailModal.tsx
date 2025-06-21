@@ -79,9 +79,7 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
       case 'annually' as DividendFrequency:
         annualMultiplier = 1;
         break;
-      // Add other cases as needed
-      default:
-        annualMultiplier = 0;
+      // Other frequencies default to 0 (already initialized)
     }
     
     annualIncome = amount * totalQuantity * annualMultiplier;

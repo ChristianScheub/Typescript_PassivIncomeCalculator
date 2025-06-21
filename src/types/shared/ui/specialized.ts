@@ -2,23 +2,23 @@
  * Specialized UI component types
  */
 
-import { UseFormSetValue } from 'react-hook-form';
+import { UseFormSetValue, FieldErrors } from 'react-hook-form';
 
 // Generic field change handler
-export type FieldChangeHandler = (field: string, value: any) => void;
+export type FieldChangeHandler = (field: string, value: unknown) => void;
 
 // Basic asset information props
 export interface BasicAssetInformationProps {
-  selectedAsset: any; // TODO: Type this as Asset when available
-  onAssetSelect: (asset: any) => void; // TODO: Type this as Asset when available
+  selectedAsset: unknown; // TODO: Type this as Asset when available
+  onAssetSelect: (asset: unknown) => void; // TODO: Type this as Asset when available
   onChange: FieldChangeHandler;
-  errors: Record<string, any>; // TODO: Type this properly with react-hook-form error types
+  errors: FieldErrors; // Properly typed react-hook-form errors
 }
 
 // Additional information section props
 export interface AdditionalInformationSectionProps {
-  setValue: UseFormSetValue<any> | ((name: string, value: any) => void);
-  errors: Record<string, any>; // TODO: Type this properly with react-hook-form error types
+  setValue: UseFormSetValue<Record<string, unknown>> | ((name: string, value: unknown) => void);
+  errors: FieldErrors; // Properly typed react-hook-form errors
 }
 
 // Form field value type
@@ -47,7 +47,7 @@ export type PortfolioActivityEntry = {
   name: string;
   amount?: number;
   date?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 export interface PortfolioRecentActivitiesProps {

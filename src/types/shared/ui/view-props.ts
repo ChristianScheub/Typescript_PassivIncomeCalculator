@@ -54,12 +54,12 @@ export interface OptionFormData {
 
 export interface CategoryManagerProps extends TranslationProps {
   categoryForm: {
-    control: any; // TODO: Type this properly with react-hook-form
+    control: unknown; // TODO: Type this properly with react-hook-form
     handleSubmit: (callback: (data: CategoryFormData) => void) => (e?: React.BaseSyntheticEvent) => Promise<void>;
     reset: () => void;
   };
   optionForm: {
-    control: any; // TODO: Type this properly with react-hook-form
+    control: unknown; // TODO: Type this properly with react-hook-form
     handleSubmit: (callback: (data: OptionFormData) => void) => (e?: React.BaseSyntheticEvent) => Promise<void>;
     reset: () => void;
   };
@@ -78,11 +78,13 @@ export interface ChartInteractionProps {
 // Calendar view props
 export interface CalendarViewProps extends ChartInteractionProps {
   // Add specific calendar props here
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 }
 
 // Loading view props
 export interface LoadingViewProps extends TranslationProps {
   // Additional loading-specific props can be added here
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 }
 
 // Generic list view props
@@ -94,7 +96,11 @@ export interface ListViewProps<T> extends TranslationProps {
 }
 
 // Specific list view props
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface AssetListViewProps extends ListViewProps<Asset> {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface ExpenseListViewProps extends ListViewProps<Expense> {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface IncomeListViewProps extends ListViewProps<Income> {}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface LiabilityListViewProps extends ListViewProps<Liability> {}

@@ -383,9 +383,11 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                 }
               } else {
                 // For new definitions, just pass the form data
-                onAddDefinitionWithCategories 
-                  ? onAddDefinitionWithCategories(transformedData, transformedCategoryAssignments)
-                  : onAddDefinition(transformedData);
+                if (onAddDefinitionWithCategories) {
+                  onAddDefinitionWithCategories(transformedData, transformedCategoryAssignments);
+                } else {
+                  onAddDefinition(transformedData);
+                }
               }
             }}
             editingDefinition={editingDefinition}

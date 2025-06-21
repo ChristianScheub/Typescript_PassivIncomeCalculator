@@ -26,8 +26,8 @@ export interface PortfolioPosition {
 }
 
 // Analytics data mappers
-export type AssetTypeDataMapper = (items: any[]) => BaseChartData[];
-export type GenericDataMapper = (items: any[]) => BaseChartData[];
+export type AssetTypeDataMapper = (items: unknown[]) => BaseChartData[];
+export type GenericDataMapper = (items: unknown[]) => BaseChartData[];
 
 // Chart tooltip props for analytics
 export interface AnalyticsTooltipProps {
@@ -39,7 +39,7 @@ export interface AnalyticsTooltipProps {
     color?: string;
     fill?: string;
     stroke?: string;
-    payload?: any;
+    payload?: unknown;
   }>;
   label?: string;
 }
@@ -86,5 +86,5 @@ export interface RechartsDotProps {
   fill: string;
   strokeWidth: number;
   r: number;
-  payload?: any;
+  payload?: unknown;
 }

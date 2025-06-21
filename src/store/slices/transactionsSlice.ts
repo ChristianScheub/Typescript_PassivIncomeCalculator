@@ -3,6 +3,7 @@ import {
   Transaction as Asset
 } from '../../types/domains/assets/';
 import { AssetDefinition, AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../types/domains/assets';
+import { CachedDividends } from '../../types/domains/assets/calculations';
 import { PortfolioPosition } from '../../types/domains/portfolio/position';
 import { TransactionsState } from '../../types/domains/financial/state';
 import { calculatePortfolioPositions, calculatePortfolioTotals } from '@service/domain/portfolio/management/portfolioService/portfolioCalculations';
@@ -156,7 +157,7 @@ const transactionsSlice = createSlice({
       state.portfolioCacheValid = true;
       state.lastPortfolioCalculation = action.payload.timestamp;
     },
-    updateAssetCache: (state, action: PayloadAction<{ assetId: string; cachedDividends: any }>) => {
+    updateAssetCache: (state, action: PayloadAction<{ assetId: string; cachedDividends: CachedDividends }>) => {
       const { assetId, cachedDividends } = action.payload;
       const assetIndex = state.items.findIndex(item => item.id === assetId);
       if (assetIndex !== -1) {

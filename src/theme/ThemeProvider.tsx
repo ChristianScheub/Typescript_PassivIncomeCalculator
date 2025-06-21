@@ -34,6 +34,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useThemeProvider = () => {
   const context = useContext(ThemeProviderContext);
   if (context === undefined) {

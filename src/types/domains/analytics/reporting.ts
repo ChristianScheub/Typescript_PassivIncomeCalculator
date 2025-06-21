@@ -14,7 +14,7 @@ export interface CustomAnalyticsConfig {
   dataSource: AnalyticsDataSource;
   groupBy: GroupBy;
   specificCategoryId?: string; // Only used when groupBy is 'specificCategory'
-  filters?: Record<string, any>;
+  filters?: Record<string, unknown>;
   isActive: boolean;
   sortOrder: number;
 }
@@ -56,7 +56,7 @@ export interface DashboardWidget {
   type: 'chart' | 'metric' | 'list' | 'summary';
   title: string;
   position: WidgetPosition;
-  config: any;
+  config: Record<string, unknown>;
   isVisible: boolean;
 }
 
@@ -204,7 +204,7 @@ export interface PortfolioRecommendation {
   actionSubCategory?: string; // e.g., 'passive', 'management', 'sources'
   
   // Metadata and context
-  metadata?: Record<string, any>; // Flexible metadata object
+  metadata?: Record<string, unknown>; // Flexible metadata object
   
   // Optional properties for enhanced recommendations
   impact?: number; // Expected impact score (0-100)
@@ -253,7 +253,7 @@ export interface FinancialAlert {
   actionData?: {
     route?: string;
     url?: string;
-    params?: Record<string, any>;
+    params?: Record<string, unknown>;
   };
   actionLabelKey?: string;
   thresholds?: {
@@ -261,7 +261,7 @@ export interface FinancialAlert {
     critical?: number;
   };
   calculatedValue?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface AlertGenerationOptions {

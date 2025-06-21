@@ -56,7 +56,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     theme,
     toggleTheme,
     isMobile
-  }), [theme, isMobile]);
+  }), [theme, isMobile, toggleTheme]);
 
   return (
     <AppContext.Provider value={value}>

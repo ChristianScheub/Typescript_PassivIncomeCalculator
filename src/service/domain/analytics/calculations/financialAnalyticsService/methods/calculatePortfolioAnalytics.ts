@@ -1,7 +1,5 @@
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
-import { 
-  AllocationData, 
-  CategoryBreakdownData, 
+import {
   PortfolioAnalyticsData,
   IncomeAnalyticsData 
 } from '@/types/domains/analytics/calculations';

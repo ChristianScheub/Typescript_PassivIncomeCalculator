@@ -55,9 +55,9 @@ export interface TransactionsState {
     totalInvestment: number;
     totalReturn: number;
     totalReturnPercentage: number;
-    assetDefinitions: any[];
-    categories: any[];
-    categoryOptions: any[];
+    assetDefinitions: unknown[];
+    categories: unknown[];
+    categoryOptions: unknown[];
     categoryAssignments: AssetCategoryAssignment[];
   };
 }

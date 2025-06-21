@@ -20,6 +20,7 @@ interface NavigationHistoryItem {
 
 interface PortfolioHubContainerProps {
   // Currently no props needed - could add future props here
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 }
 
 const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
@@ -63,7 +64,7 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
     const monthlyIncome = portfolioCache?.totals?.monthlyIncome || 0;
     
     // Standard calculations for non-cached data
-    const totalLiabilities = liabilities.reduce((sum: any, liability: { currentBalance: any; }) => sum + (liability.currentBalance || 0), 0);
+    const totalLiabilities = liabilities.reduce((sum: number, liability: { currentBalance: number }) => sum + (liability.currentBalance || 0), 0);
     const netWorth = totalAssetValue - totalLiabilities;
     const monthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
     const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
@@ -80,7 +81,7 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
       assetsCount: assets.length,
       liabilitiesCount: liabilities.length,
       incomeSourcesCount: income.length,
-      expenseCategoriesCount: new Set(expenses.map((e: { category: any; }) => e.category)).size
+      expenseCategoriesCount: new Set(expenses.map((e: { category: string }) => e.category)).size
     };
   }, [portfolioCache, assets.length, liabilities, income.length, expenses]);
 

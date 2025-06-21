@@ -96,6 +96,16 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
         return;
       }
 
+      // Determine transaction date based on type
+      let transactionDate: string;
+      if (data.transactionType === 'buy' && data.purchaseDate) {
+        transactionDate = new Date(data.purchaseDate).toISOString();
+      } else if (data.transactionType === 'sell' && data.saleDate) {
+        transactionDate = new Date(data.saleDate).toISOString();
+      } else {
+        transactionDate = new Date().toISOString();
+      }
+
       const assetData = {
         ...data,
         // Store only the reference ID, not the full object
@@ -119,11 +129,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
         saleQuantity: undefined,
         
         // Set dates properly
-        purchaseDate: data.transactionType === 'buy' && data.purchaseDate 
-          ? new Date(data.purchaseDate).toISOString()
-          : data.transactionType === 'sell' && data.saleDate
-          ? new Date(data.saleDate).toISOString() // Use saleDate for sell transactions
-          : new Date().toISOString(),
+        purchaseDate: transactionDate,
         saleDate: undefined, // Always clear sale date since we use purchaseDate for both types
       };
 
@@ -296,10 +302,14 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                 onChange={(value: FormFieldValue) => handleDefinitionSelect(value as string)}
                 options={[
                   { value: '', label: t('assets.selectAssetOption') },
-                  ...filteredDefinitions.map((definition: AssetDefinition) => ({
-                    value: definition.id,
-                    label: `${definition.fullName}${definition.ticker ? ` (${definition.ticker})` : ''}${definition.sector ? ` - ${definition.sector}` : ''}`
-                  }))
+                  ...filteredDefinitions.map((definition: AssetDefinition) => {
+                    const tickerPart = definition.ticker ? ` (${definition.ticker})` : '';
+                    const sectorPart = definition.sector ? ` - ${definition.sector}` : '';
+                    return {
+                      value: definition.id,
+                      label: `${definition.fullName}${tickerPart}${sectorPart}`
+                    };
+                  })
                 ]}
               />
 

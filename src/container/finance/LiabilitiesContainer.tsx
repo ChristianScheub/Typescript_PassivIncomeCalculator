@@ -39,7 +39,7 @@ const LiabilitiesContainer: React.FC<{ onBack?: () => void; initialAction?: stri
     return sortLiabilitiesByPayment(liabilities, SortOrder.DESC);
   }, [liabilities]);
 
-  const handleAddLiability = (data: any) => {
+  const handleAddLiability = (data: Liability) => {
     executeAsyncOperation(
       'add liability',
       () => dispatch(addLiability(data)),
@@ -47,7 +47,7 @@ const LiabilitiesContainer: React.FC<{ onBack?: () => void; initialAction?: stri
     );
   };
 
-  const handleUpdateLiability = (data: any) => {
+  const handleUpdateLiability = (data: Liability) => {
     if (editingLiability) {
       executeAsyncOperation(
         'update liability',

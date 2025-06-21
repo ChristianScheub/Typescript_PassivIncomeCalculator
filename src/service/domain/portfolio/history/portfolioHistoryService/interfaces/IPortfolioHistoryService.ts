@@ -1,8 +1,6 @@
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
 import { 
-  PortfolioHistoryPoint, 
-  PortfolioServiceTransaction as PortfolioTransaction,
-  ServiceAssetPosition as AssetPosition,
+  PortfolioHistoryPoint,
   PerformanceMetrics,
   ChartDataPoint 
 } from '@/types/domains/portfolio/history';

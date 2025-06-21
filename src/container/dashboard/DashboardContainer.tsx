@@ -25,7 +25,6 @@ const DashboardContainer: React.FC = () => {
 
   // Redux state
   const { items: assets } = useAppSelector(state => state.transactions);
-  const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: income } = useAppSelector(state => state.income);
@@ -50,14 +49,14 @@ const DashboardContainer: React.FC = () => {
   }, [shouldCalculateFinancialSummary, dispatch]);
 
   // Get financial summary from cache or provide fallback
-  const financialSummary = financialSummaryCache || {
+  const financialSummary = useMemo(() => financialSummaryCache || {
     netWorth: 0,
     totalAssets: 0,
     totalLiabilities: 0,
     monthlyIncome: 0,
     monthlyExpenses: 0,
     monthlyCashFlow: 0
-  };
+  }, [financialSummaryCache]);
 
   const ratios = useMemo(() => 
     analyticsService.calculateRatios(financialSummary),

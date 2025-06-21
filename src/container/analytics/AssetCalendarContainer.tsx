@@ -109,7 +109,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
     };
   }, [selectedMonth, filteredAssets]);
 
-  const handleBarClick = (data: any) => {
+  const handleBarClick = (data: ChartData) => {
     if (data.monthNumber) {
       setSelectedMonth(data.monthNumber);
     }

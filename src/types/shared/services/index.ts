@@ -10,7 +10,7 @@ export interface LoggerMethods {
   warn: (message: string) => void;
   error: (message: string, error?: Error) => void;
   debug: (message: string) => void;
-  infoAPI: (message: string, requestData?: any, responseData?: any) => void;
+  infoAPI: (message: string, requestData?: unknown, responseData?: unknown) => void;
 }
 
 // Stock API service types
@@ -45,7 +45,7 @@ export interface YahooAPIResponse {
 // Database operation types
 export type DatabaseStoreName = 'transactions' | 'expenses' | 'income' | 'liabilities' | 'assets';
 
-export interface DatabaseOperation<T = any> {
+export interface DatabaseOperation<T = unknown> {
   update: (storeName: DatabaseStoreName, item: T) => Promise<void>;
   delete: (storeName: DatabaseStoreName, id: string) => Promise<void>;
   getAll: (storeName: DatabaseStoreName) => Promise<T[]>;
@@ -53,12 +53,12 @@ export interface DatabaseOperation<T = any> {
 
 // Import/Export operation types
 export interface ImportExportData {
-  assets?: any[];
-  expenses?: any[];
-  income?: any[];
-  liabilities?: any[];
-  transactions?: any[];
-  [key: string]: any[] | undefined;
+  assets?: unknown[];
+  expenses?: unknown[];
+  income?: unknown[];
+  liabilities?: unknown[];
+  transactions?: unknown[];
+  [key: string]: unknown[] | undefined;
 }
 
 // Calculator service types  

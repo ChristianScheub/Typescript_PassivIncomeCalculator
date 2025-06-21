@@ -12,9 +12,12 @@ export const clearDatabase = async (): Promise<void> => {
     return new Promise((resolve, reject) => {
       request.onerror = () => {
         console.error('Error deleting database:', request.error);
-        const error = request.error instanceof Error 
-          ? request.error 
-          : new Error(request.error ? String(request.error) : 'Failed to delete database');
+        let error: Error;
+        if (request.error instanceof Error) {
+          error = request.error;
+        } else {
+          error = new Error(request.error ? String(request.error) : 'Failed to delete database');
+        }
         reject(error);
       };
       

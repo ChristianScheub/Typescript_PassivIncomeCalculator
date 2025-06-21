@@ -32,7 +32,7 @@ export const calculate30DayHistory = createAsyncThunk(
   'portfolioHistory/calculate30Days',
   async (_, { getState }) => {
     const state = getState() as StoreState;
-    const { transactions } = state;
+    const { transactions, liabilities } = state;
     Logger.infoRedux('Calculating 30-day portfolio history using portfolio system');
     
     const portfolioCache = transactions.portfolioCache;
@@ -40,12 +40,15 @@ export const calculate30DayHistory = createAsyncThunk(
       throw new Error('Portfolio cache not available for history calculation');
     }
     
-    return calculateHistoryFromPortfolio(portfolioCache);
+    // Calculate total liabilities from current state
+    const totalLiabilities = liabilities.items.reduce((sum: number, liability: { value: number }) => sum + liability.value, 0);
+    
+    return calculateHistoryFromPortfolio(portfolioCache, totalLiabilities);
   }
 );
 
 // Function for portfolio-based history calculation with proper typing
-const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache): PortfolioHistoryDay[] => {
+const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache, totalLiabilities: number): PortfolioHistoryDay[] => {
   Logger.infoRedux('Portfolio-based history calculation - analyzing positions');
   
   // Get all unique asset definitions from portfolio positions
@@ -124,7 +127,7 @@ const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache): Portfoli
 
     // Get current liabilities (simplified approach - using current liabilities for all dates)
     // In a real implementation, you'd want to track liability history over time
-    const totalLiabilities = (portfolioCache as any)?.liabilities || 0;
+    // totalLiabilities is passed as parameter from the current state
     
     // Calculate net worth (total assets - total liabilities)
     const totalValue = totalAssetValue - totalLiabilities;

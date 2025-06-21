@@ -22,45 +22,45 @@ export interface DatabaseMigration {
 export interface FinanceDBSchema {
   transactions: {
     key: string;
-    value: any; // Will be Asset
+    value: unknown; // Will be Asset
     indexes: { 'by-type': string };
   };
   assetDefinitions: {
     key: string;
-    value: any; // Will be AssetDefinition
+    value: unknown; // Will be AssetDefinition
     indexes: { 'by-type': string };
   };
   assetCategories: {
     key: string;
-    value: any; // Will be AssetCategory
+    value: unknown; // Will be AssetCategory
     indexes: { 'by-name': string };
   };
   assetCategoryOptions: {
     key: string;
-    value: any; // Will be AssetCategoryOption
+    value: unknown; // Will be AssetCategoryOption
     indexes: { 'by-category': string, 'by-name': string };
   };
   assetCategoryAssignments: {
     key: string;
-    value: any; // Will be AssetCategoryAssignment
+    value: unknown; // Will be AssetCategoryAssignment
     indexes: { 'by-asset': string, 'by-category': string };
   };
   liabilities: {
     key: string;
-    value: any; // Will be Liability
+    value: unknown; // Will be Liability
   };
   expenses: {
     key: string;
-    value: any; // Will be Expense
+    value: unknown; // Will be Expense
     indexes: { 'by-category': string };
   };
   income: {
     key: string;
-    value: any; // Will be Income
+    value: unknown; // Will be Income
   };
   exchangeRates: {
     key: string;
-    value: any; // Will be ExchangeRate
+    value: unknown; // Will be ExchangeRate
     indexes: { 'by-date': string };
   };
 }

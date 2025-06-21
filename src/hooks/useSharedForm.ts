@@ -78,6 +78,7 @@ export function useSharedForm<T extends FieldValues>({
     return handleSubmit(onValidSubmit, onInvalidSubmit)(e);
   }, [handleSubmit, onSubmit, onError, form]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { handleSubmit: _, ...restForm } = form;
 
   return {

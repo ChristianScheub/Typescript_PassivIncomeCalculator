@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Snackbar, Alert, IconButton, Button } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
@@ -21,9 +21,9 @@ const GlobalSnackbar: React.FC = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [currentMessage]);
+  }, [currentMessage, handleClose]);
 
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+  const handleClose = useCallback((_event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -36,7 +36,7 @@ const GlobalSnackbar: React.FC = () => {
         dispatch(removeSnackbar(currentMessage.id));
       }
     }, 300); // Material-UI transition duration
-  };
+  }, [dispatch, currentMessage]);
 
   const handleActionClick = () => {
     if (currentMessage?.action?.onClick) {

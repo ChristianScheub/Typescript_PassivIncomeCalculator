@@ -2,10 +2,17 @@ import React, { useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import ExpenseAnalyticsView from '../../view/analytics-hub/expenses/ExpenseAnalyticsView';
 import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
-import { Expense } from '../../types';
+import { Expense } from '../../types/domains/financial/entities';
 import Logger from '../../service/shared/logging/Logger/logger';
 
 type ExpenseAnalyticsTab = 'monthly' | 'annual';
+
+interface ExpenseAnalyticsData {
+  name: string;
+  amount: number;
+  category: string;
+  percentage: number;
+}
 
 interface ExpenseAnalyticsContainerProps {
   onBack: () => void;
@@ -51,8 +58,8 @@ const ExpenseAnalyticsContainer: React.FC<ExpenseAnalyticsContainerProps> = ({ o
         category: expense.category,
         percentage: 0 // Will be calculated below
       }))
-      .filter((expense: any) => expense.amount > 0)
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .filter((expense: ExpenseAnalyticsData) => expense.amount > 0)
+      .sort((a: ExpenseAnalyticsData, b: ExpenseAnalyticsData) => b.amount - a.amount);
     
     // Calculate individual expenses for annual view
     const annualIndividualExpenses = expenses
@@ -62,8 +69,8 @@ const ExpenseAnalyticsContainer: React.FC<ExpenseAnalyticsContainerProps> = ({ o
         category: expense.category,
         percentage: 0 // Will be calculated below
       }))
-      .filter((expense: any) => expense.amount > 0)
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .filter((expense: ExpenseAnalyticsData) => expense.amount > 0)
+      .sort((a: ExpenseAnalyticsData, b: ExpenseAnalyticsData) => b.amount - a.amount);
     
     // Calculate totals
     const totalMonthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
@@ -71,13 +78,13 @@ const ExpenseAnalyticsContainer: React.FC<ExpenseAnalyticsContainerProps> = ({ o
     
     // Calculate percentages for individual expenses
     if (totalMonthlyExpenses > 0) {
-      monthlyIndividualExpenses.forEach((expense: any) => {
+      monthlyIndividualExpenses.forEach((expense: ExpenseAnalyticsData) => {
         expense.percentage = (expense.amount / totalMonthlyExpenses) * 100;
       });
     }
     
     if (totalAnnualExpenses > 0) {
-      annualIndividualExpenses.forEach((expense: any) => {
+      annualIndividualExpenses.forEach((expense: ExpenseAnalyticsData) => {
         expense.percentage = (expense.amount / totalAnnualExpenses) * 100;
       });
     }
