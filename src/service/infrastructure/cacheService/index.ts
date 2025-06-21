@@ -1,7 +1,5 @@
 import { ICacheService } from './interfaces/ICacheService';
-import { 
-  calculateAssetMonthlyIncomeWithCache
-} from './methods/calculateAssetIncomeWithCache';
+import { calculateAssetMonthlyIncomeWithCache } from '../../shared/calculations/assetIncomeCalculations';
 
 /**
  * Cache Service that provides centralized caching functionality

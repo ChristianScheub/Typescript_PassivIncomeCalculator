@@ -2,14 +2,16 @@ import { IAssetCalculatorService } from './interfaces/IAssetCalculatorService';
 import { 
   calculateAssetMonthlyIncome, 
   calculateAssetIncomeForMonth, 
-  calculateTotalAssetIncomeForMonth,
-  calculateTotalMonthlyAssetIncomeFromCache,
-  calculateTotalAssetIncomeForMonthFromCache,
-  calculateTotalAssetIncomeForMonthWithCache,
-  areAssetsCached,
-  calculateAssetMonthlyIncomeWithCache
+  calculateTotalAssetIncomeForMonth
 } from './methods/calculateAssetIncome';
+import { calculateTotalAssetIncomeForMonthWithCache } from './methods/calculateAssetIncomeCache';
 import { calculateAssetAllocation } from './methods/calculateAllocations';
+import { 
+  areAssetsCached, 
+  calculateTotalMonthlyAssetIncomeFromCache,
+  calculateTotalAssetIncomeForMonthFromCache
+} from '../../../../shared/cache/assetIncomeCacheUtils';
+import { calculateAssetMonthlyIncomeWithCache } from '../../../../shared/calculations/assetIncomeCalculations';
 
 /**
  * Asset Calculator Service that provides all asset-related calculations

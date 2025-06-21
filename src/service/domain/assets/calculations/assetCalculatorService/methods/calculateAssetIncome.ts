@@ -17,14 +17,5 @@ export {
   calculateTotalAssetIncomeForMonth
 } from './calculateAssetIncomeMonthly';
 
-// Re-export from cache-enabled calculation module
-export { calculateAssetMonthlyIncomeWithCache } from './calculateAssetIncomeWithCache';
-
 // Re-export from dedicated cache module
-export {
-  areAssetsCached,
-  calculateTotalMonthlyAssetIncomeFromCache,
-  calculateTotalAssetIncomeForMonthFromCache,
-  calculateTotalAssetIncomeForMonthWithCache,
-  updateAssetCacheData
-} from './calculateAssetIncomeCache';
+export { calculateTotalAssetIncomeForMonthWithCache } from './calculateAssetIncomeCache';

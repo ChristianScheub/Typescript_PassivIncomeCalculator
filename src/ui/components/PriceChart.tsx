@@ -287,7 +287,82 @@ export const PriceChart: React.FC<PriceChartProps> = ({
                     </g>
                   );
                 })}
-                {/* ...rest of your SVG chart code... */}
+
+                {/* Area fill using gradient */}
+                <path
+                  d={createAreaPath()}
+                  fill={isPositive ? "url(#gradient-positive)" : "url(#gradient-negative)"}
+                  opacity="0.6"
+                />
+
+                {/* Price line */}
+                <path
+                  d={createPath()}
+                  fill="none"
+                  stroke={isPositive ? "#10b981" : "#ef4444"}
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+
+                {/* Data points */}
+                {sortedHistory.map((entry, index) => {
+                  const x = 50 + (index / (sortedHistory.length - 1)) * 500;
+                  const y = 200 - ((entry.price - paddedMin) / (paddedRange || 1)) * 150;
+                  
+                  return (
+                    <g key={`point-${index}`}>
+                      <circle
+                        cx={x}
+                        cy={y}
+                        r="3"
+                        fill={isPositive ? "#10b981" : "#ef4444"}
+                        stroke="white"
+                        strokeWidth="2"
+                        className="opacity-0 hover:opacity-100 transition-opacity cursor-pointer"
+                      />
+                      {/* Tooltip on hover would go here */}
+                    </g>
+                  );
+                })}
+
+                {/* X-axis labels */}
+                <g>
+                  {/* First date */}
+                  <text
+                    x="50"
+                    y="240"
+                    fontSize="12"
+                    textAnchor="start"
+                    className="text-gray-400 dark:text-gray-500"
+                  >
+                    {new Date(sortedHistory[0].date).toLocaleDateString()}
+                  </text>
+                  
+                  {/* Last date */}
+                  <text
+                    x="550"
+                    y="240"
+                    fontSize="12"
+                    textAnchor="end"
+                    className="text-gray-400 dark:text-gray-500"
+                  >
+                    {new Date(sortedHistory[sortedHistory.length - 1].date).toLocaleDateString()}
+                  </text>
+                  
+                  {/* Middle date if enough data points */}
+                  {sortedHistory.length > 10 && (
+                    <text
+                      x="300"
+                      y="240"
+                      fontSize="12"
+                      textAnchor="middle"
+                      className="text-gray-400 dark:text-gray-500"
+                    >
+                      {new Date(sortedHistory[Math.floor(sortedHistory.length / 2)].date).toLocaleDateString()}
+                    </text>
+                  )}
+                </g>
               </svg>
             </div>
           </div>
