@@ -7,13 +7,13 @@ import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
 import { Add } from "@mui/icons-material";
 import { Wallet, RefreshCw, History } from "lucide-react";
-import { ActionButtonGroup } from "../../../ui/common/ActionButtonGroup";
 import { IconButton } from "../../../ui/common";
 import { Tooltip } from "@mui/material";
 import { formatService } from "../../../service";
 import { TimeRangeSelectionDialog } from "../../../ui/dialog/TimeRangeSelectionDialog";
 import { TimeRangePeriod } from "../../../types/shared/time";
 import { AddPriceEntryDialog, PriceEntry } from "../../../ui/dialog/AddPriceEntryDialog";
+import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 
 /**
  * Type for creating new asset definitions, omits metadata fields like id, createdAt, updatedAt.
@@ -201,8 +201,10 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
           {assetDefinitions.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {assetDefinitions.map((definition) => (
-                <div
+                <SwipeableCard
                   key={definition.id}
+                  onEdit={() => onSetEditingDefinition(definition)}
+                  onDelete={() => onDeleteDefinition(definition.id)}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-md transition-all duration-300"
                 >
                   <div className="p-4">
@@ -307,19 +309,19 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                         </div>
                       )}
                     </div>
-                  </div>
 
-                  <div className="border-t border-gray-100 dark:border-gray-700 p-3 flex justify-end">
-                    <ActionButtonGroup
-                      onEdit={() => onSetEditingDefinition(definition)}
-                      onDelete={() => onDeleteDefinition(definition.id)}
-                      showAddPrice={true}
-                      onAddPrice={() => handleAddPriceClick(definition)}
-                      size="sm"
-                      variant="outline"
-                    />
+                    {/* Add Price Button */}
+                    {onAddPriceEntry && (
+                      <button
+                        className="mt-4 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-xs rounded transition-colors"
+                        onClick={() => handleAddPriceClick(definition)}
+                        type="button"
+                      >
+                        {t("assets.addPriceEntry")}
+                      </button>
+                    )}
                   </div>
-                </div>
+                </SwipeableCard>
               ))}
             </div>
           ) : (
@@ -346,7 +348,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
               const transformedData = {
                 ...data,
                 sectors: data.sectors?.map(sector => ({
-                  sector: sector.sectorName,
+                  sector: sector.sectorName || "", // Ensure string, never undefined
                   sectorName: sector.sectorName,
                   value: 0, // Will be calculated later
                   percentage: sector.percentage,

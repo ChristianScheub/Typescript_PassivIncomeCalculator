@@ -527,13 +527,14 @@
     "transactionNamePlaceholder": "z.B. Apple Aktien Kauf 2024",
     "noDefinitionsAvailable": "Keine Asset-Definitionen verfügbar",
     "types": {
-      "STOCK": "Aktie",
-      "BOND": "Anleihe",
-      "REAL_ESTATE": "Immobilie",
-      "COMMODITY": "Rohstoff",
-      "CRYPTO": "Kryptowährung",
-      "CASH": "Bargeld",
-      "OTHER": "Sonstiges"
+      "stock": "Aktie",
+      "bond": "Anleihe",
+      "realestate": "Immobilie",
+      "real_estate": "Immobilie",
+      "commodity": "Rohstoff",
+      "crypto": "Kryptowährung",
+      "cash": "Bargeld",
+      "other": "Sonstiges"
     },
     "totalValue": "Gesamtwert",
     "monthlyIncome": "Monatliches Einkommen",

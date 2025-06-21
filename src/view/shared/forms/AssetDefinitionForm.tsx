@@ -1,13 +1,8 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  AssetDefinition,
-  AssetType,
-  DividendFrequency,
-  PaymentFrequency,
-  AssetCategoryAssignment,
-} from "../../../types";
+import { AssetDefinition, AssetCategoryAssignment } from "@/types/domains/assets";
+import { AssetType, DividendFrequency, PaymentFrequency } from "@/types/shared/base/enums";
 import { updateAssetDefinitionPrice } from "../../../utils/priceHistoryUtils";
 import {
   StandardFormWrapper,
@@ -70,7 +65,7 @@ const assetDefinitionSchema = z.object({
   hasRental: z.boolean().optional(),
   rentalAmount: z.number().min(0).optional(),
   rentalFrequency: z
-    .enum(["monthly", "quarterly", "annually", "custom"])
+    .enum(["monthly", "quarterly", "annually", "custom", "none"])
     .optional(),
   rentalMonths: z.array(z.number().min(1).max(12)).optional(),
   rentalCustomAmounts: z.record(z.string(), z.number()).optional(),
@@ -94,7 +89,7 @@ interface AssetDefinitionFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (
-    data: AssetDefinitionFormData,
+    data: Omit<AssetDefinition, "id" | "createdAt" | "updatedAt">,
     categoryAssignments: CategoryAssignmentFormData[]
   ) => void;
   editingDefinition?: OptionalAssetDefinition;
@@ -275,7 +270,12 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     if (editingDefinition) {
       // Initialize sectors state based on editing definition
       if (editingDefinition.sectors && editingDefinition.sectors.length > 0) {
-        setSectors(editingDefinition.sectors);
+        // Convert SectorAllocation to local state format
+        const convertedSectors = editingDefinition.sectors.map(sector => ({
+          sectorName: sector.sectorName || sector.sector || "",
+          percentage: sector.percentage
+        }));
+        setSectors(convertedSectors);
       } else if (editingDefinition.sector) {
         // If only single sector exists, convert to multi-sector format but keep toggle off
         setSectors([{ sectorName: editingDefinition.sector, percentage: 100 }]);
@@ -369,7 +369,13 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       continent: data.continent || undefined,
       sector: data.useMultipleSectors ? undefined : data.sector || undefined, // Only use single sector if multi-sector is disabled
       sectors: data.useMultipleSectors
-        ? data.sectors?.filter((s) => s.sectorName.trim() !== "")
+        ? data.sectors?.filter((s) => s.sectorName.trim() !== "").map(s => ({
+            sector: s.sectorName,
+            sectorName: s.sectorName,
+            percentage: s.percentage,
+            value: 0, // Will be calculated later
+            count: 0, // Will be calculated later
+          }))
         : undefined, // Only use sectors if multi-sector is enabled
       exchange: data.exchange || undefined,
       isin: data.isin || undefined,
@@ -429,6 +435,15 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     definitionData: AssetDefinitionDataType,
     data: AssetDefinitionFormData
   ): AssetDefinitionDataType => {
+    // If hasDividend is explicitly false, ensure dividendInfo is undefined (disabled)
+    if (data.hasDividend === false) {
+      return {
+        ...definitionData,
+        dividendInfo: undefined
+      };
+    }
+    
+    // Skip adding dividend info if no valid amount or not enabled
     if (!data.hasDividend || !data.dividendAmount || data.dividendAmount <= 0) {
       return definitionData;
     }
@@ -541,7 +556,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
               name="currentPrice"
               type="number"
               value={watch("currentPrice") || ""}
-              onChange={(value) => setValue("currentPrice", value ? parseFloat(value) : undefined)}
+              onChange={(value) => setValue("currentPrice", value ? parseFloat(value as string) : undefined)}
               step={0.01}
               min={0}
               error={errors.currentPrice?.message}
@@ -642,7 +657,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                     name="interestRate"
                     type="number"
                     value={watch("interestRate")}
-                    onChange={(value) => setValue("interestRate", value)}
+                    onChange={(value) => setValue("interestRate", typeof value === 'string' ? parseFloat(value) : value as number)}
                     step={0.01}
                     min={0}
                   />
@@ -652,7 +667,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                     name="maturityDate"
                     type="date"
                     value={watch("maturityDate")}
-                    onChange={(value) => setValue("maturityDate", value)}
+                    onChange={(value) => setValue("maturityDate", value as string)}
                   />
 
                   <StandardFormField
@@ -660,7 +675,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                     name="nominalValue"
                     type="number"
                     value={watch("nominalValue")}
-                    onChange={(value) => setValue("nominalValue", value)}
+                    onChange={(value) => setValue("nominalValue", typeof value === 'string' ? parseFloat(value) : value as number)}
                     step={0.01}
                     min={0}
                   />

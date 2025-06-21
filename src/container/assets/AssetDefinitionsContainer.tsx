@@ -16,7 +16,8 @@ import { AssetType } from '../../types/shared';
 import Logger from '../../service/shared/logging/Logger/logger';
 import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { StockPriceUpdater, HistoricalDataPeriod } from '../../service/shared/utilities/helper/stockPriceUpdater';
+import { StockPriceUpdater } from '../../service/shared/utilities/helper/stockPriceUpdater';
+import { TimeRangePeriod } from '../../types/shared/time';
 import { PriceEntry } from '../../ui/dialog/AddPriceEntryDialog';
 import { addPriceToHistory } from '../../utils/priceHistoryUtils';
 
@@ -82,6 +83,10 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       Logger.info('Updating asset definition' + " - " + JSON.stringify({ id: editingDefinition.id, data }));
       // Merge the partial data with the existing definition to ensure all required fields are present
       const updatedDefinition = { ...editingDefinition, ...data };
+      
+      const dividendStatus = updatedDefinition.dividendInfo?.amount && updatedDefinition.dividendInfo.amount > 0 ? 'pays dividends' : 'does not pay dividends';
+      Logger.info(`Updating asset definition - ${updatedDefinition.name} (${dividendStatus})`);
+      
       await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(updatedDefinition));
       
       // Update category assignments
@@ -170,7 +175,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     }
   };
 
-  const handleUpdateHistoricalData = async (period?: HistoricalDataPeriod) => {
+  const handleUpdateHistoricalData = async (period?: TimeRangePeriod) => {
     setIsUpdatingHistoricalData(true);
     try {
       Logger.info(`Starting historical data update for asset definitions with period: ${period || 'default (30 days)'}`);

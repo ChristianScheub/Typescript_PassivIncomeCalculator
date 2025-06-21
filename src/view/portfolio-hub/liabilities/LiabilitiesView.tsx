@@ -91,7 +91,6 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
             >
               <Card>
                 <CardContent className="p-4">
-                  {/* Liability content without ActionButtonGroup */}
                   <div className="flex flex-col space-y-2">
                     <div className="flex items-center justify-between">
                       <h3 className="font-semibold text-lg">{liability.name}</h3>

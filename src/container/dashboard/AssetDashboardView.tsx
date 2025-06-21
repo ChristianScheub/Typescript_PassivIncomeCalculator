@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { setAssetFocusTimeRange, AssetFocusTimeRange } from '../../store/slices/dashboardSettingsSlice';
@@ -7,16 +7,25 @@ import { updateAssetDefinition } from '../../store/slices/assetDefinitionsSlice'
 import { usePortfolioHistory, useAssetFocusData, useFinancialSummary } from '../../hooks/useCalculatedDataCache';
 import { useIntradayPortfolioData } from '../../hooks/useIntradayData';
 import AssetDashboardView from '../../view/finance-hub/overview/AssetDashboardView';
+import AssetDetailModal from '../../view/finance-hub/overview/AssetDetailModal';
+import { Asset, AssetDefinition } from '../../types/domains/assets/entities';
 import stockAPIService from '../../service/domain/assets/market-data/stockAPIService';
 import { useAsyncOperation } from '../../utils/containerUtils';
 import cacheRefreshService from '../../service/application/orchestration/cacheRefreshService';
 import { addIntradayPriceHistory } from '../../utils/priceHistoryUtils';
 import Logger from '../../service/shared/logging/Logger/logger';
+import { useTranslation } from 'react-i18next';
 
 const AssetFocusDashboardContainer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { executeAsyncOperation } = useAsyncOperation();
+  const { t } = useTranslation();
+
+  // State for modal
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
+  const [selectedAssetDefinition, setSelectedAssetDefinition] = useState<AssetDefinition | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   // Redux state
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
@@ -72,6 +81,32 @@ const AssetFocusDashboardContainer: React.FC = () => {
   const handleNavigateToSettings = useCallback(() => {
     navigate('/settings');
   }, [navigate]);
+
+  // Asset detail modal handlers
+  const handleAssetClick = useCallback((asset: Asset, assetDefinition: AssetDefinition) => {
+    setSelectedAsset(asset);
+    setSelectedAssetDefinition(assetDefinition);
+    setIsModalOpen(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+  }, []);
+
+  // Helper function to get asset type label
+  const getAssetTypeLabel = useCallback((type: string): string => {
+    const assetTypeMap: Record<string, string> = {
+      stock: t('assets.types.stock') || 'Aktie',
+      bond: t('assets.types.bond') || 'Anleihe',
+      crypto: t('assets.types.crypto') || 'Kryptowährung',
+      cash: t('assets.types.cash') || 'Bargeld',
+      commodity: t('assets.types.commodity') || 'Rohstoff',
+      realestate: t('assets.types.realestate') || 'Immobilie',
+      other: t('assets.types.other') || 'Sonstiges'
+    };
+
+    return assetTypeMap[type] || type;
+  }, [t]);
 
   // Time range handlers
   const handleTimeRangeChange = useCallback((timeRange: AssetFocusTimeRange) => {
@@ -184,22 +219,34 @@ const AssetFocusDashboardContainer: React.FC = () => {
   }, [executeAsyncOperation, assetDefinitions, dispatch]);
 
   return (
-    <AssetDashboardView
-      portfolioHistory={enhancedPortfolioHistory}
-      assetsWithValues={assetsWithValues}
-      portfolioSummary={portfolioSummary}
-      selectedTimeRange={assetFocus.timeRange}
-      onTimeRangeChange={handleTimeRangeChange}
-      onRefresh={handleRefresh}
-      onNavigateToForecast={handleNavigateToForecast}
-      onNavigateToSettings={handleNavigateToSettings}
-      netWorth={financialSummary.netWorth}
-      totalAssets={financialSummary.totalAssets}
-      totalLiabilities={financialSummary.totalLiabilities}
-      isApiEnabled={isApiEnabled}
-      onUpdateIntradayHistory={handleUpdateIntradayHistory}
-      isIntradayView={((assetFocus.timeRange === '1D' || assetFocus.timeRange === '1W') && intradayData.length > 0)}
-    />
+    <>
+      <AssetDashboardView
+        portfolioHistory={enhancedPortfolioHistory}
+        assetsWithValues={assetsWithValues}
+        portfolioSummary={portfolioSummary}
+        selectedTimeRange={assetFocus.timeRange}
+        onTimeRangeChange={handleTimeRangeChange}
+        onRefresh={handleRefresh}
+        onNavigateToForecast={handleNavigateToForecast}
+        onNavigateToSettings={handleNavigateToSettings}
+        onNavigateToAssetDetail={handleAssetClick}
+        netWorth={financialSummary.netWorth}
+        totalAssets={financialSummary.totalAssets}
+        totalLiabilities={financialSummary.totalLiabilities}
+        isApiEnabled={isApiEnabled}
+        onUpdateIntradayHistory={handleUpdateIntradayHistory}
+        isIntradayView={((assetFocus.timeRange === '1D' || assetFocus.timeRange === '1W') && intradayData.length > 0)}
+      />
+      
+      {/* Asset Detail Modal */}
+      <AssetDetailModal
+        asset={selectedAsset}
+        assetDefinition={selectedAssetDefinition}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        getAssetTypeLabel={getAssetTypeLabel}
+      />
+    </>
   );
 };
 

@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import PortfolioAnalyticsView from '../../view/analytics-hub/assets/PortfolioAnalyticsView';
 import { calculatorService } from '../../service';
-import { AssetType } from '@/types/shared/base';
+import { AssetType } from '../../types/shared/base/enums';
 import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/transactionsSlice';
 import Logger from '../../service/shared/logging/Logger/logger';
 
@@ -85,13 +85,13 @@ const PortfolioAnalyticsContainer: React.FC<PortfolioAnalyticsContainerProps> = 
     <PortfolioAnalyticsView
       selectedTab={selectedTab}
       selectedAssetType={selectedAssetType}
-      assetAllocation={portfolioAnalytics.assetAllocation.map(item => ({ ...item, type: item.name }))}
-      sectorAllocation={portfolioAnalytics.sectorAllocation}
-      countryAllocation={portfolioAnalytics.countryAllocation}
-      assetTypeIncome={incomeAnalytics.assetTypeIncome}
-      sectorIncome={incomeAnalytics.sectorIncome}
-      countryIncome={incomeAnalytics.countryIncome}
-      portfolioPositions={filteredPositions}
+      assetAllocation={(portfolioAnalytics.assetAllocation || []).map((item: { name: string; value: number; percentage: number }) => ({ ...item, type: item.name }))}
+      sectorAllocation={portfolioAnalytics.sectorAllocation || []}
+      countryAllocation={portfolioAnalytics.countryAllocation || []}
+      assetTypeIncome={incomeAnalytics.assetTypeIncome || []}
+      sectorIncome={incomeAnalytics.sectorIncome || []}
+      countryIncome={incomeAnalytics.countryIncome || []}
+      portfolioPositions={filteredPositions || []}
       onTabChange={handleTabChange}
       onAssetTypeFilterChange={handleAssetTypeFilterChange}
       onBack={onBack}

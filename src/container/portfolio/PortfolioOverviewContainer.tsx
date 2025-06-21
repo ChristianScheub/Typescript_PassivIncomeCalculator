@@ -7,6 +7,7 @@ import { getAssetAllocationFromCache } from '../../utils/portfolioCacheHelpers';
 import Logger from '../../service/shared/logging/Logger/logger';
 import { Income, Expense, Liability } from '../../types/domains/financial/entities';
 import { CategoryBreakdown } from '../../types/domains/portfolio/allocations';
+import { PortfolioCategory, PortfolioSubCategory } from '../../types/domains/analytics/reporting';
 
 interface PortfolioSummary {
   totalAssetValue: number;
@@ -24,7 +25,7 @@ interface PortfolioSummary {
 
 interface PortfolioOverviewContainerProps {
   portfolioSummary: PortfolioSummary;
-  onCategoryChange: (category: string, subCategory?: string) => void;
+  onCategoryChange: (category: PortfolioCategory, subCategory?: PortfolioSubCategory) => void;
 }
 
 const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({

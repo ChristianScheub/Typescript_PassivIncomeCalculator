@@ -15,7 +15,6 @@ import TabSelector from "../../../ui/navigation/TabSelector";
 import { HeaderButtonGroup } from "../../../ui/common/HeaderButtonGroup";
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { Add } from "@mui/icons-material";
-import { MotivationalEmptyState } from "../../../ui/feedback/EnhancedEmptyState";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
 import formatService from "@service/infrastructure/formatService";
 import { 
@@ -25,6 +24,7 @@ import {
   BarChart3
 } from "lucide-react";
 import { SwipeableCard } from "../../../ui/common/SwipeableCard";
+import { EmptyStateView } from "./EmptyStateAssetView";
 
 interface PortfolioData {
   positions: PortfolioPosition[];
@@ -76,33 +76,6 @@ const LoadingView: React.FC<TranslationProps> = ({ t }) => (
       <div className="text-lg">{t("common.loading")}</div>
     </div>
   </div>
-);
-
-const EmptyStateView: React.FC<{ 
-  t: TranslationProps['t']; 
-  onSetIsAddingAsset: (isAdding: boolean) => void;
-  onNavigateToDefinitions: () => void;
-}> = ({ 
-  t, 
-  onSetIsAddingAsset,
-  onNavigateToDefinitions
-}) => (
-  <MotivationalEmptyState
-    icon={<TrendingUp className="h-8 w-8" />}
-    title={t("emptyStates.assets.title")}
-    description={t("emptyStates.assets.description")}
-    motivationalText={t("emptyStates.assets.motivationalText")}
-    primaryAction={{
-      label: t("emptyStates.assets.primaryAction"),
-      onClick: () => onSetIsAddingAsset(true),
-      variant: 'primary'
-    }}
-    secondaryAction={{
-      label: t("emptyStates.assets.secondaryAction"),
-      onClick: onNavigateToDefinitions
-    }}
-    tips={t("emptyStates.assets.tips", { returnObjects: true }) as string[]}
-  />
 );
 
 //der component for header buttons

@@ -6,20 +6,11 @@ import { Button } from '../../../ui/common/Button';
 import { ButtonGroup } from '../../../ui/common/ButtonGroup';
 import { IconButton } from '../../../ui/common/IconButton';
 import { History } from 'lucide-react';
-import formatService from '../../../service/infrastructure/formatService';
+import { AssetPositionsList, AssetWithValue } from '../../../ui/components/AssetPositionsList';
 import { AssetFocusTimeRange } from '../../../store/slices/dashboardSettingsSlice';
 import { PortfolioHistoryPoint } from '../../../types/domains/portfolio/history';
 import { Asset, AssetDefinition } from '../../../types/domains/assets/entities';
 import PortfolioHistoryCard from './PortfolioHistoryCard';
-
-interface AssetWithValue {
-  asset: Asset;
-  currentValue: number;
-  totalInvestment: number;
-  dayChange: number;
-  dayChangePercent: number;
-  assetDefinition: AssetDefinition;
-}
 
 interface PortfolioSummary {
   totalValue: number;
@@ -36,6 +27,7 @@ interface AssetDashboardViewProps {
   onRefresh: () => Promise<void>;
   onNavigateToForecast: () => void;
   onNavigateToSettings: () => void;
+  onNavigateToAssetDetail: (asset: Asset, assetDefinition: AssetDefinition) => void;
   netWorth: number;
   totalAssets: number;
   totalLiabilities: number;
@@ -53,6 +45,7 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
   onRefresh,
   onNavigateToForecast,
   onNavigateToSettings,
+  onNavigateToAssetDetail,
   netWorth,
   totalAssets,
   totalLiabilities,
@@ -149,82 +142,10 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
         </div>
 
         {/* Assets List */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {t('assetFocus.positions') || 'Positionen'}
-            </h3>
-          </div>
-          
-          {assetsWithValues.length === 0 ? (
-            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-              <p>{t('assetFocus.noAssets') || 'Keine Assets gefunden'}</p>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
-              {/* Table Header */}
-              <div className="px-4 py-3 bg-gray-50 dark:bg-gray-900 grid grid-cols-4 gap-4 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                <div>{t('common.asset') || 'Asset'}</div>
-                <div className="text-right">{t('common.position') || 'Position'}</div>
-                <div className="text-right">{t('common.value') || 'Wert'}</div>
-                <div className="text-right">{t('common.change') || 'Änderung'}</div>
-              </div>
-
-              {/* Assets Rows */}
-              {assetsWithValues.map((assetWithValue, index) => {
-                const { asset, assetDefinition, currentValue, dayChange, dayChangePercent } = assetWithValue;
-                const quantity = asset.purchaseQuantity || 0;
-                
-                return (
-                  <div key={`${assetDefinition.ticker || assetDefinition.id}-${index}`} className="px-4 py-4 grid grid-cols-4 gap-4 items-center hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    {/* Asset Info */}
-                    <div className="flex flex-col">
-                      <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {assetDefinition.ticker || assetDefinition.name}
-                      </span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                        {assetDefinition.fullName || assetDefinition.name}
-                      </span>
-                    </div>
-
-                    {/* Position */}
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {quantity.toFixed(4)}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
-                        @ {formatService.formatCurrency(assetDefinition.currentPrice || 0)}
-                      </div>
-                    </div>
-
-                    {/* Value */}
-                    <div className="text-right">
-                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                        {formatService.formatCurrency(currentValue)}
-                      </div>
-                    </div>
-
-                    {/* Day Change */}
-                    <div className="text-right">
-                      <div className={`text-sm font-medium ${
-                        dayChange >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                      }`}>
-                        {dayChange >= 0 ? '+' : ''}
-                        {formatService.formatCurrency(dayChange)}
-                      </div>
-                      <div className={`text-xs ${
-                        dayChangePercent >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-                      }`}>
-                        {dayChangePercent >= 0 ? '+' : ''}
-                        {dayChangePercent.toFixed(2)}%
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+        <AssetPositionsList
+          assetsWithValues={assetsWithValues}
+          onAssetClick={onNavigateToAssetDetail}
+        />
       </div>
     </PullToRefresh>
   );

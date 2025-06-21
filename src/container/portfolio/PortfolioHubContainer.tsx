@@ -6,11 +6,12 @@ import AssetsContainer from '../assets/AssetsContainer';
 import LiabilitiesContainer from '../finance/LiabilitiesContainer';
 import IncomeContainer from '../finance/IncomeContainer';
 import ExpensesContainer from '../finance/ExpensesContainer';
-import TransactionCenterContainer from '../transactions/TransactionCenterContainer';
-import recentActivityService, { PortfolioCategory, PortfolioSubCategory } from '../../service/domain/analytics/reporting/recentActivityService';
+import recentActivityService from '../../service/domain/analytics/reporting/recentActivityService';
 import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
 import Logger from '../../service/shared/logging/Logger/logger';
 import PortfolioOverviewContainer from './PortfolioOverviewContainer';
+import { PortfolioCategory, PortfolioSubCategory } from "../../types/domains/analytics/reporting";
+
 
 interface NavigationHistoryItem {
   category: PortfolioCategory;
@@ -35,7 +36,7 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
     const categoryParam = searchParams.get('category') as PortfolioCategory | null;
     const actionParam = searchParams.get('action') as PortfolioSubCategory | null;
     
-    if (categoryParam && ['overview', 'assets', 'liabilities', 'income', 'expenses', 'transactions'].includes(categoryParam)) {
+    if (categoryParam && ['overview', 'assets', 'liabilities', 'income', 'expenses'].includes(categoryParam)) {
       setSelectedCategory(categoryParam);
       
       if (actionParam) {
@@ -62,7 +63,7 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
     const monthlyIncome = portfolioCache?.totals?.monthlyIncome || 0;
     
     // Standard calculations for non-cached data
-    const totalLiabilities = liabilities.reduce((sum, liability) => sum + (liability.currentBalance || 0), 0);
+    const totalLiabilities = liabilities.reduce((sum: any, liability: { currentBalance: any; }) => sum + (liability.currentBalance || 0), 0);
     const netWorth = totalAssetValue - totalLiabilities;
     const monthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
     const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
@@ -79,7 +80,7 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
       assetsCount: assets.length,
       liabilitiesCount: liabilities.length,
       incomeSourcesCount: income.length,
-      expenseCategoriesCount: new Set(expenses.map(e => e.category)).size
+      expenseCategoriesCount: new Set(expenses.map((e: { category: any; }) => e.category)).size
     };
   }, [portfolioCache, assets.length, liabilities, income.length, expenses]);
 
@@ -145,9 +146,6 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
         
       case 'expenses':
         return <ExpensesContainer onBack={handleBackToHub} initialAction={selectedSubCategory} />;
-        
-      case 'transactions':
-        return <TransactionCenterContainer onBack={handleBackToHub} />;
         
       default:
         // Fallback to overview for any unknown category

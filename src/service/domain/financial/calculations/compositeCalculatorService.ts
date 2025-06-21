@@ -49,27 +49,15 @@ const compositeCalculatorService = {
   calculateMonthlyCashFlow: financialCalculatorService.calculateMonthlyCashFlow,
   calculateNetWorth: financialCalculatorService.calculateNetWorth,
 
-  // Real implementations for the functions that exist!
   calculateIncomeAllocation: incomeCalculatorService.calculateIncomeAllocation,
   calculateExpenseBreakdown: expenseCalculatorService.calculateExpenseBreakdown,
   
-  // Placeholder implementations for missing functions
-  calculateProjections: (income, expenses, liabilities, assets, months) => {
-    // TODO: Implement in financialCalculatorService
-    return [];
-  },
-  calculateProjectionsWithCache: (baseValues, monthlyAssetIncomeCache, months) => {
-    // TODO: Implement in financialCalculatorService
-    return [];
-  },
-  calculatePortfolioAnalytics: (positions) => {
-    // TODO: Implement in financialAnalyticsService
-    return {} as any;
-  },
-  calculateIncomeAnalytics: (positions) => {
-    // TODO: Implement in financialAnalyticsService
-    return {} as any;
-  },
+  calculateProjections: financialCalculatorService.calculateProjections,
+
+  calculateProjectionsWithCache: financialCalculatorService.calculateProjectionsWithCache,
+
+  calculatePortfolioAnalytics: financialCalculatorService.calculatePortfolioAnalytics,
+  calculateIncomeAnalytics: financialCalculatorService.calculateIncomeAnalytics,
 };
 
 export default compositeCalculatorService;

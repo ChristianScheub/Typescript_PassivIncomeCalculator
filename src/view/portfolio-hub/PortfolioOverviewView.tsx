@@ -8,7 +8,6 @@ import {
   CreditCard,
   ReceiptText,
   BarChart3,
-  Activity,
   ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../ui/common/Card";
@@ -17,11 +16,8 @@ import { ViewHeader } from "../../ui/layout/ViewHeader";
 import { PortfolioRecentActivities } from "../../ui/portfolio/PortfolioRecentActivities";
 import formatService from "@service/infrastructure/formatService";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
-import {
-  PortfolioCategory,
-  PortfolioSubCategory,
-} from "@service/domain/analytics/reporting/recentActivityService";
 import PortfolioHubRecommendations from "./hub/PortfolioHubRecommendations";
+import { PortfolioCategory, PortfolioSubCategory } from "../../types/domains/analytics/reporting";
 
 interface PortfolioSummary {
   totalAssetValue: number;
@@ -359,40 +355,6 @@ const PortfolioOverviewView: React.FC<PortfolioOverviewViewProps> = ({
                     >
                       {t("portfolio.manage", "Manage")}
                     </Button>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Transactions Center */}
-          <Card
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => onCategoryChange("transactions")}
-          >
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center text-lg">
-                <Activity className="w-5 h-5 mr-2 text-purple-500" />
-                {t("portfolio.categories.transactions", "Transactions Center")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {t(
-                    "portfolio.transactionsDesc",
-                    "Unified transaction management across all categories"
-                  )}
-                </p>
-                <div className="flex items-center justify-between pt-2">
-                  <div className="flex space-x-2">
-                    <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
-                      {t("portfolio.available", "Available")}
-                    </span>
-                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
-                      {t("portfolio.unified", "Unified View")}
-                    </span>
                   </div>
                   <ArrowRight className="w-4 h-4 text-gray-400" />
                 </div>

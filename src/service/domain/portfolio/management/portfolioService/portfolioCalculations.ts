@@ -166,6 +166,11 @@ const calculatePositionMonthlyIncome = (
   );
 
   // Stock dividends
+  if (assetType === 'stock' && (!dividendInfo || dividendInfo.frequency === 'none')) {
+    Logger.infoService(`Stock position has dividends disabled, skipping dividend calculation`);
+    return 0;
+  }
+
   if (assetType === 'stock' && dividendInfo?.frequency && dividendInfo.frequency !== 'none') {
     if (totalQuantity <= 0) {
       Logger.infoService(`Stock position has no valid quantity (${totalQuantity}), skipping dividend calculation`);
