@@ -134,6 +134,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   }, [portfolioCache, portfolioTotals, assets.length, assetDefinitions.length]);
 
   const handleAddAsset = (data: any) => {
+    console.log('AssetsContainer: handleAddAsset called with data:', data);
     Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
     
     // Ensure transactionType is set, default to 'buy'
@@ -141,6 +142,8 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
       ...data,
       transactionType: data.transactionType || 'buy'
     };
+    
+    console.log('AssetsContainer: Final transaction data:', transactionData);
     
     executeAsyncOperation(
       'add transaction',

@@ -3,7 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { calculate30DayHistory } from '../../store/slices/portfolioHistorySlice';
+import { loadDashboardSettingsFromStorage } from '../../store/slices/dashboardSettingsSlice';
+import { 
+  calculateFinancialSummary,
+  selectFinancialSummary
+} from '../../store/slices/calculatedDataSlice';
 import DashboardView from '../../view/finance-hub/overview/DashboardView';
+import AssetFocusContainer from './AssetFocusContainer';
 import analyticsService from '../../service/domain/analytics/calculations/financialAnalyticsService';
 import alertsService from '../../service/application/notifications/alertsService';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
@@ -24,12 +30,34 @@ const DashboardContainer: React.FC = () => {
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: income } = useAppSelector(state => state.income);
   const { history30Days = [], status } = useAppSelector(state => state.portfolioHistory || {});
+  const { mode: dashboardMode } = useAppSelector(state => state.dashboardSettings);
+  
+  // Cached financial summary from Redux
+  const financialSummaryCache = useAppSelector(selectFinancialSummary);
 
-  // Financial calculations using analyticsService
-  const financialSummary = useMemo(() => 
-    analyticsService.calculateFinancialSummary(assets, liabilities, expenses, income, assetDefinitions),
-    [assets, liabilities, expenses, income, assetDefinitions]
-  );
+  // Trigger financial summary calculation if cache is empty
+  const shouldCalculateFinancialSummary = useMemo(() => {
+    return !financialSummaryCache || 
+           assets.length > 0 || liabilities.length > 0 || 
+           expenses.length > 0 || income.length > 0;
+  }, [financialSummaryCache, assets.length, liabilities.length, expenses.length, income.length]);
+
+  React.useEffect(() => {
+    if (shouldCalculateFinancialSummary) {
+      Logger.cache('Dashboard: Dispatching calculateFinancialSummary');
+      dispatch(calculateFinancialSummary());
+    }
+  }, [shouldCalculateFinancialSummary, dispatch]);
+
+  // Get financial summary from cache or provide fallback
+  const financialSummary = financialSummaryCache || {
+    netWorth: 0,
+    totalAssets: 0,
+    totalLiabilities: 0,
+    monthlyIncome: 0,
+    monthlyExpenses: 0,
+    monthlyCashFlow: 0
+  };
 
   const ratios = useMemo(() => 
     analyticsService.calculateRatios(financialSummary),
@@ -76,6 +104,16 @@ const DashboardContainer: React.FC = () => {
     }
   }, [dispatch, status]);
 
+  // Load dashboard settings from localStorage on mount
+  useEffect(() => {
+    dispatch(loadDashboardSettingsFromStorage());
+  }, [dispatch]);
+
+  // Debug: Log dashboard mode changes
+  useEffect(() => {
+    Logger.infoService(`DashboardContainer: Dashboard mode is '${dashboardMode}'`);
+  }, [dashboardMode]);
+
   // Pull to refresh handler - only works when user is at the top of the page
   const handleRefresh = useCallback(async () => {
     // Check if user is at the top of the page (with small tolerance for mobile)
@@ -94,6 +132,14 @@ const DashboardContainer: React.FC = () => {
     );
   }, [executeAsyncOperation]);
 
+  // Dashboard mode routing
+  if (dashboardMode === 'assetFocus') {
+    Logger.infoService("DashboardContainer: Rendering AssetFocusContainer");
+    return <AssetFocusContainer />;
+  }
+
+  // Default: Smart Summary Dashboard
+  Logger.infoService("DashboardContainer: Rendering DashboardView (Smart Summary)");
   return (
     <DashboardView
       financialSummary={financialSummary}

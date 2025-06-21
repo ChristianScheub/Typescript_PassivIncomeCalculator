@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { StoreState } from '..';
 import Logger from '@service/shared/logging/Logger/logger';
 import { getPriceHistoryForRange } from '../../utils/priceHistoryUtils';
+import { getCurrentQuantity } from '../../utils/transactionCalculations';
 import { PortfolioCache } from './transactionsSlice';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { AssetDefinition } from '@/types/domains/assets/entities';
@@ -31,7 +32,7 @@ export const calculate30DayHistory = createAsyncThunk(
   'portfolioHistory/calculate30Days',
   async (_, { getState }) => {
     const state = getState() as StoreState;
-    const { transactions, liabilities } = state;
+    const { transactions } = state;
     Logger.infoRedux('Calculating 30-day portfolio history using portfolio system');
     
     const portfolioCache = transactions.portfolioCache;
@@ -39,7 +40,7 @@ export const calculate30DayHistory = createAsyncThunk(
       throw new Error('Portfolio cache not available for history calculation');
     }
     
-    return calculateHistoryFromPortfolio(portfolioCache, liabilities.items);
+    return calculateHistoryFromPortfolio(portfolioCache);
   }
 );
 
@@ -106,13 +107,13 @@ const calculateHistoryFromPortfolio = (portfolioCache: PortfolioCache): Portfoli
         price = definition.currentPrice || 0;
       }
 
-      // Calculate position value considering only transactions that occurred before or on this date
+      // Calculate position value considering all transactions (buy and sell) that occurred before or on this date
       const validTransactions = position.transactions.filter((transaction) => 
-        transaction.transactionType === 'buy' && new Date(transaction.purchaseDate) <= new Date(date)
+        new Date(transaction.purchaseDate) <= new Date(date)
       );
 
       const positionQuantity = validTransactions.reduce((sum: number, transaction) => {
-        return sum + (transaction.purchaseQuantity || 0);
+        return sum + getCurrentQuantity(transaction); // This handles buy/sell correctly
       }, 0);
 
       const positionValue = positionQuantity * price;

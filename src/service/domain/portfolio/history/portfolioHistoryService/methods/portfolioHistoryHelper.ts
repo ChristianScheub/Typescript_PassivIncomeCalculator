@@ -1,19 +1,15 @@
 import { Transaction as Asset, AssetDefinition } from '../../../../../../types/domains/assets';
 import { getCurrentQuantity } from '@/utils/transactionCalculations';
 import { calculatePortfolioValueForDate } from './calculatePortfolioValueForDate';
-import { 
-  PortfolioHistoryPoint, 
-  PortfolioTransaction, 
-  AssetPosition 
-} from '../interfaces/IPortfolioHistoryService';
 import Logger from "@/service/shared/logging/Logger/logger";
+import { PortfolioHistoryPoint, PortfolioServiceTransaction, ServiceAssetPosition } from '@/types/domains/portfolio';
 
 /**
  * Helper class containing shared functionality for portfolio history calculations
  */
 export class PortfolioHistoryHelper {
   // Cache für berechnete Werte
-  private static readonly transactionsCache = new Map<string, PortfolioTransaction[]>();
+  private static readonly transactionsCache = new Map<string, PortfolioServiceTransaction[]>();
   private static readonly portfolioValueCache = new Map<string, number>();
   private static readonly datesCache = new Map<string, string[]>();
   private static readonly assetDefMapCache = new Map<string, Map<string, AssetDefinition>>();
@@ -53,7 +49,7 @@ export class PortfolioHistoryHelper {
     const cachedMap = this.assetDefMapCache.get(cacheKey);
     
     if (cachedMap) {
-      Logger.infoService('Cache hit: Using cached asset definition map');
+      Logger.cache('Cache hit: Using cached asset definition map');
       const validAssets = this.validateAssets(assets, cachedMap);
       return { validAssets, assetDefMap: cachedMap };
     }
@@ -105,12 +101,12 @@ export class PortfolioHistoryHelper {
     assets: Asset[], 
     assetDefMap: Map<string, AssetDefinition>, 
     date: string
-  ): PortfolioTransaction[] {
+  ): PortfolioServiceTransaction[] {
     const cacheKey = this.getCacheKey(assets, date);
     const cachedTransactions = this.transactionsCache.get(cacheKey);
     
     if (cachedTransactions) {
-      Logger.infoService(`Cache hit: Using cached transactions for ${date}`);
+      Logger.cache(`Cache hit: Using cached transactions for ${date}`);
       return cachedTransactions;
     }
 
@@ -120,8 +116,9 @@ export class PortfolioHistoryHelper {
       .map(asset => {
         const assetDef = asset.assetDefinitionId ? assetDefMap.get(asset.assetDefinitionId) : undefined;
         const transactionType = asset.transactionType || 'buy';
-        const quantity = transactionType === 'buy' ? (asset.purchaseQuantity || 0) : (asset.saleQuantity || 0);
-        const price = transactionType === 'sell' ? (asset.salePrice || 0) : (asset.purchasePrice || 0);
+        // Use absolute values for amount - the transaction type determines the sign behavior
+        const quantity = Math.abs(asset.purchaseQuantity || 0);
+        const price = asset.purchasePrice || 0; // Both buy and sell use purchasePrice
         
         Logger.infoService(
           `Transaction on ${normalizedDate}: ${transactionType} ${quantity} ${assetDef?.ticker || asset.name} at €${price}`
@@ -153,7 +150,7 @@ export class PortfolioHistoryHelper {
     const cachedDates = this.datesCache.get(cacheKey);
     
     if (cachedDates) {
-      Logger.infoService(`Cache hit: Using cached dates for range ${startDate} to ${endDate}`);
+      Logger.cache(`Cache hit: Using cached dates for range ${startDate} to ${endDate}`);
       return cachedDates;
     }
 
@@ -259,13 +256,13 @@ export class PortfolioHistoryHelper {
     validAssets: Asset[],
     assetDefMap: Map<string, AssetDefinition>,
     date: string,
-    positions: Map<string, AssetPosition>
+    positions: Map<string, ServiceAssetPosition>
   ): PortfolioHistoryPoint {
     const cacheKey = this.getCacheKey(validAssets, date);
     const cachedValue = this.portfolioValueCache.get(cacheKey);
     
     if (cachedValue !== undefined) {
-      Logger.infoService(`Cache hit: Using cached portfolio value for ${date}`);
+      Logger.cache(`Cache hit: Using cached portfolio value for ${date}`);
       return {
         date,
         value: cachedValue,

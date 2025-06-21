@@ -67,7 +67,12 @@
     "notes": "Notes",
     "notesPlaceholder": "Additional information or notes...",
     "income": "Income",
-    "expenses": "Expenses"
+    "expenses": "Expenses",
+    "asset": "Asset",
+    "position": "Position",
+    "value": "Value", 
+    "change": "Change",
+    "all": "All"
   },
   "alerts": {
     "cashflow": {
@@ -589,7 +594,10 @@
     "goToSettingsToConfigureApiKey": "Go to settings to configure API key",
     "assets": "Assets",
     "portfolioHistory": "Portfolio History",
+    "portfolioHistoryIntraday": "Portfolio History (Intraday)",
     "last30Days": "Last 30 Days",
+    "last5DaysIntraday": "Last 5 Days (Intraday)",
+    "todayIntraday": "Today (Intraday)",
     "quickActions": "Quick Actions",
     "addIncome": "Add Income",
     "addExpense": "Add Expense",
@@ -768,6 +776,12 @@
     "settings": "Settings"
   },
   "settings": {
+    "dashboardSettings": "Dashboard Settings",
+    "dashboardMode": "Dashboard Mode",
+    "dashboardModeDescription": "Choose between Smart Summary and Asset Focus dashboard",
+    "smartSummary": "Smart Summary",
+    "assetFocus": "Asset Focus",
+    "currentDashboardMode": "Current mode: {{mode}}",
     "appearance": "Appearance",
     "theme": "Theme",
     "themeDescription": "Choose between light and dark mode",
@@ -849,7 +863,25 @@
     "usdOriginal": "USD (original)",
     "currentCurrency": "Current: {{currency}}",
     "appName": "Passive Income Calculator",
-    "version": "Version {{version}}"
+    "version": "Version {{version}}",
+    "assetManagement": "Asset Management",
+    "financialManagement": "Financial Management",
+    "cacheManagement": "Cache Management",
+    "completeReset": "Complete Reset",
+    "clearAssetDefinitions": "Clear Asset Definitions",
+    "clearAssetDefinitionsDesc": "Remove all asset definitions and their associated market data",
+    "clearPriceHistory": "Clear Price History",
+    "clearPriceHistoryDesc": "Remove all historical price data for assets",
+    "clearAssetTransactions": "Clear Asset Transactions",
+    "clearAssetTransactionsDesc": "Remove all buy/sell transactions for assets",
+    "clearDebts": "Clear Debts",
+    "clearDebtsDesc": "Remove all liability and debt records",
+    "clearExpenses": "Clear Expenses",
+    "clearExpensesDesc": "Remove all expense tracking data",
+    "clearIncome": "Clear Income",
+    "clearIncomeDesc": "Remove all income source records",
+    "clearReduxCache": "Clear Redux Cache",
+    "clearReduxCacheDesc": "Reset all cached calculations and temporary data in memory"
   },
   "milestones": {
     "title": "Financial Milestones",
@@ -1196,5 +1228,12 @@
     "title": "Smart Recommendations",
     "noRecommendations": "No recommendations available at this time. Add more financial data to receive personalized insights.",
     "totalRecommendations": "Showing {{count}} recommendations"
+  },
+  "assetFocus": {
+    "portfolioValue": "Portfolio Value",
+    "portfolioHistory": "Portfolio History",
+    "updateIntradayHistory": "Update Intraday History",
+    "positions": "Positions",
+    "noAssets": "No assets found"
   }
 }

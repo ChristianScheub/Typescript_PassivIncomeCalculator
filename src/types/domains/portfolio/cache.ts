@@ -37,12 +37,13 @@ export interface TypedTransaction {
   id: string;
   transactionType: 'buy' | 'sell';
   purchaseDate: string;
-  purchasePrice: number;
-  purchaseQuantity: number;
+  purchasePrice: number; // For both buy and sell transactions
+  purchaseQuantity: number; // For both buy and sell transactions (quantity being bought/sold)
   transactionCosts?: number;
-  saleDate?: string;  
-  salePrice?: number;
-  saleQuantity?: number;
+  // DEPRECATED: Legacy sale-specific fields - use purchasePrice and purchaseQuantity instead
+  saleDate?: string; // @deprecated Use purchaseDate instead
+  salePrice?: number; // @deprecated Use purchasePrice instead
+  saleQuantity?: number; // @deprecated Use purchaseQuantity instead
 }
 
 // Portfolio History calculation types

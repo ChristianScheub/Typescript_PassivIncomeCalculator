@@ -12,8 +12,11 @@ import apiConfigReducer, { StockAPIProvider } from './slices/apiConfigSlice';
 import customAnalyticsReducer from './slices/customAnalyticsSlice';
 import portfolioHistoryReducer from './slices/portfolioHistorySlice';
 import snackbarReducer from './slices/snackbarSlice';
+import dashboardSettingsReducer from './slices/dashboardSettingsSlice';
+import calculatedDataReducer, { markStoreHydrated, validateCacheOnStartup } from './slices/calculatedDataSlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
 import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
+import calculatedDataCacheMiddleware from './middleware/calculatedDataCacheMiddleware';
 import Logger from '@service/shared/logging/Logger/logger';
 import { validatePortfolioCache } from '../utils/portfolioCacheUtils';
 
@@ -103,6 +106,22 @@ const loadState = () => {
           yahoo: localStorage.getItem('yahoo_api_key') || undefined,
           alpha_vantage: localStorage.getItem('alpha_vantage_api_key') || undefined,
         }
+      },
+      dashboardSettings: {
+        mode: (localStorage.getItem('dashboard_mode') as any) || 'smartSummary',
+        assetFocus: {
+          timeRange: (localStorage.getItem('asset_focus_time_range') as any) || '1W'
+        }
+      },
+      calculatedData: {
+        portfolioHistory: state.calculatedData?.portfolioHistory || {},
+        assetFocusData: state.calculatedData?.assetFocusData || null,
+        financialSummary: state.calculatedData?.financialSummary || null,
+        status: 'idle',
+        error: null,
+        cacheValidityDuration: state.calculatedData?.cacheValidityDuration || 5 * 60 * 1000,
+        enableConditionalLogging: state.calculatedData?.enableConditionalLogging ?? true,
+        isHydrated: false // Will be set to true after store creation
       }
     };
   } catch (err) {
@@ -129,6 +148,8 @@ export const store = configureStore({
     customAnalytics: customAnalyticsReducer,
     portfolioHistory: portfolioHistoryReducer,
     snackbar: snackbarReducer,
+    dashboardSettings: dashboardSettingsReducer,
+    calculatedData: calculatedDataReducer,
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   preloadedState: persistedState as any,
@@ -140,9 +161,22 @@ export const store = configureStore({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       dataChangeMiddleware as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      portfolioCacheMiddleware as any
+      portfolioCacheMiddleware as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      calculatedDataCacheMiddleware as any
     ),
 } as any);
+
+// Mark store as hydrated and validate cache if we loaded persisted state
+if (persistedState) {
+  Logger.infoRedux('Store created with persisted state, marking as hydrated and validating cache');
+  store.dispatch(markStoreHydrated());
+  store.dispatch(validateCacheOnStartup());
+} else {
+  // If no persisted state, still mark as hydrated (empty state is also hydrated)
+  Logger.infoRedux('Store created without persisted state, marking as hydrated');
+  store.dispatch(markStoreHydrated());
+}
 
 // Subscribe to store changes and save to localStorage
 let isClearing = false;
@@ -183,7 +217,17 @@ store.subscribe(() => {
       },
       dashboard: state.dashboard,
       forecast: state.forecast,
-      apiConfig: state.apiConfig
+      apiConfig: state.apiConfig,
+      calculatedData: {
+        portfolioHistory: state.calculatedData.portfolioHistory,
+        assetFocusData: state.calculatedData.assetFocusData,
+        financialSummary: state.calculatedData.financialSummary,
+        // Don't persist status, error, or settings
+        status: 'idle',
+        error: null,
+        cacheValidityDuration: state.calculatedData.cacheValidityDuration,
+        enableConditionalLogging: state.calculatedData.enableConditionalLogging
+      }
     };
     
     // Check if we're clearing data (all arrays are empty)

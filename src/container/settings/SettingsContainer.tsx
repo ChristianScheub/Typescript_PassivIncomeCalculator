@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { setApiEnabled, setApiKey, setSelectedProvider, StockAPIProvider } from "../../store/slices/apiConfigSlice";
+import { setDashboardMode, DashboardMode, loadDashboardSettingsFromStorage } from "../../store/slices/dashboardSettingsSlice";
 import { clearAllTransactions } from "../../store/slices/transactionsSlice";
 import { clearAllLiabilities } from "../../store/slices/liabilitiesSlice";
 import { clearAllExpenses } from "../../store/slices/expensesSlice";
 import { clearAllIncome } from "../../store/slices/incomeSlice";
 import { clearAllAssetCategories } from "../../store/slices/assetCategoriesSlice";
-import sqliteService, { StoreNames } from "../../service/infrastructure/sqlLiteService";
+import { clearAllCache } from "../../store/slices/calculatedDataSlice";
+import { clearAllCharts } from "../../store/slices/customAnalyticsSlice";
+import sqliteService from "../../service/infrastructure/sqlLiteService";
+import { StoreNames } from "../../service/infrastructure/sqlLiteService/interfaces/ISQLiteService";
 import Logger from "../../service/shared/logging/Logger/logger";
 import SettingsView from "../../view/settings/general/SettingsView";
 import { handleFileDownload } from "../../service/shared/utilities/helper/downloadFile";
@@ -26,6 +30,7 @@ type ApiKeyStatus = "idle" | "saving" | "success" | "error";
 const SettingsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
   const apiConfig = useAppSelector((state) => state.apiConfig);
+  const dashboardSettings = useAppSelector((state) => state.dashboardSettings);
 
   const [exportStatus, setExportStatus] = useState<AsyncOperationStatus>("idle");
   const [importStatus, setImportStatus] = useState<AsyncOperationStatus>("idle");
@@ -45,6 +50,7 @@ const SettingsContainer: React.FC = () => {
   const [clearExpensesStatus, setClearExpensesStatus] = useState<ClearOperationStatus>("idle");
   const [clearIncomeStatus, setClearIncomeStatus] = useState<ClearOperationStatus>("idle");
   const [clearAllDataStatus, setClearAllDataStatus] = useState<ClearOperationStatus>("idle");
+  const [clearReduxCacheStatus, setClearReduxCacheStatus] = useState<ClearOperationStatus>("idle");
 
   // Confirmation Dialog State
   const [confirmDialog, setConfirmDialog] = useState<ConfirmationDialogState>({
@@ -74,7 +80,10 @@ const SettingsContainer: React.FC = () => {
     // We just need to load the currency
     const storedCurrency = getCurrency();
     setCurrency(storedCurrency);
-  }, []);
+    
+    // Load dashboard settings from localStorage
+    dispatch(loadDashboardSettingsFromStorage());
+  }, [dispatch]);
 
   const loadLogs = () => {
     const storedLogs = localStorage.getItem("app_logs");
@@ -280,6 +289,11 @@ const SettingsContainer: React.FC = () => {
     Logger.info(`Currency changed to ${newCurrency}`);
   };
 
+  const handleDashboardModeChange = (mode: DashboardMode) => {
+    dispatch(setDashboardMode(mode));
+    Logger.info(`Dashboard mode changed to ${mode}`);
+  };
+
   // Handle clearing all data
   const handleClearAllData = async () => {
     try {
@@ -427,6 +441,25 @@ const SettingsContainer: React.FC = () => {
     }
   };
 
+  // Handle clearing Redux cache only
+  const handleClearReduxCache = async () => {
+    try {
+      setClearReduxCacheStatus("clearing");
+      Logger.info("Starting to clear Redux cache");
+
+      // Clear all cached data from Redux store
+      dispatch(clearAllCache());
+      dispatch(clearAllCharts());
+      
+      Logger.info("Redux cache cleared successfully");
+      setClearReduxCacheStatus("success");
+      setTimeout(() => setClearReduxCacheStatus("idle"), 2000);
+    } catch (error) {
+      Logger.error("Failed to clear Redux cache: " + JSON.stringify(error));
+      setClearReduxCacheStatus("idle");
+    }
+  };
+
   // Handle clear operations with confirmation dialogs
   const handleClearAssetDefinitionsWithConfirm = () => {
     showConfirmDialog(
@@ -476,6 +509,14 @@ const SettingsContainer: React.FC = () => {
     );
   };
 
+  const handleClearReduxCacheWithConfirm = () => {
+    showConfirmDialog(
+      t("settings.clearReduxCacheTitle"),
+      t("settings.clearReduxCacheConfirm"),
+      handleClearReduxCache
+    );
+  };
+
   const handleClearAllDataWithConfirm = () => {
     showConfirmDialog(
       t("settings.clearAllDataTitle"),
@@ -504,7 +545,9 @@ const SettingsContainer: React.FC = () => {
       clearExpensesStatus={clearExpensesStatus}
       clearIncomeStatus={clearIncomeStatus}
       clearAllDataStatus={clearAllDataStatus}
+      clearReduxCacheStatus={clearReduxCacheStatus}
       isApiEnabled={apiConfig.isEnabled}
+      dashboardMode={dashboardSettings.mode}
       onApiToggle={handleApiToggle}
       onExportData={handleExportData}
       onImportData={handleImportData}
@@ -517,6 +560,7 @@ const SettingsContainer: React.FC = () => {
       onApiKeyRemove={handleApiKeyRemove}
       onProviderChange={handleProviderChange}
       onCurrencyChange={handleCurrencyChange}
+      onDashboardModeChange={handleDashboardModeChange}
       onClearAllData={handleClearAllDataWithConfirm}
       onClearAssetDefinitions={handleClearAssetDefinitionsWithConfirm}
       onClearPriceHistory={handleClearPriceHistoryWithConfirm}
@@ -524,6 +568,7 @@ const SettingsContainer: React.FC = () => {
       onClearDebts={handleClearDebtsWithConfirm}
       onClearExpenses={handleClearExpensesWithConfirm}
       onClearIncome={handleClearIncomeWithConfirm}
+      onClearReduxCache={handleClearReduxCacheWithConfirm}
       confirmDialog={confirmDialog}
       onCloseConfirmDialog={closeConfirmDialog}
       formatLogEntry={formatLogEntry}

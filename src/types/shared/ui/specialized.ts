@@ -32,10 +32,11 @@ export interface AssetTransactionFieldHandlers {
   onNameChange: FormChangeHandler<string>;
   onPurchaseDateChange: FormChangeHandler<string>;
   onPurchasePriceChange: FormChangeHandler<number>;
-  onPurchaseQuantityChange: FormChangeHandler<number>;
-  onSaleDateChange: FormChangeHandler<string>;
-  onSalePriceChange: FormChangeHandler<number>;
-  onSaleQuantityChange: FormChangeHandler<number>;
+  onPurchaseQuantityChange: FormChangeHandler<number>; // For both buy and sell transactions
+  // DEPRECATED: Legacy sale-specific handlers - use purchase handlers instead
+  onSaleDateChange: FormChangeHandler<string>; // @deprecated Use onPurchaseDateChange instead
+  onSalePriceChange: FormChangeHandler<number>; // @deprecated Use onPurchasePriceChange instead
+  onSaleQuantityChange: FormChangeHandler<number>; // @deprecated Use onPurchaseQuantityChange instead
   onTransactionCostsChange: FormChangeHandler<number>;
   onNotesChange: FormChangeHandler<string>;
 }

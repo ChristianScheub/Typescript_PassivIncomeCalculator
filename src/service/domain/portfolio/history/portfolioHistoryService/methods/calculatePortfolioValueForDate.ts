@@ -31,7 +31,7 @@ export function calculatePortfolioValueForDate(
   let totalPortfolioValue = 0;
 
   positions.forEach((position, assetDefinitionId) => {
-    if (position.quantity <= 0) {
+    if (position.quantity === 0) {
       Logger.infoService(`Skipping position ${assetDefinitionId} with zero quantity`);
       return;
     }
@@ -105,8 +105,9 @@ function findAssetForTransaction(
   return assets.find(a => {
     const assetDate = a.purchaseDate.split('T')[0];
     const transactionType = a.transactionType || 'buy';
-    const quantity = transactionType === 'buy' ? (a.purchaseQuantity || 0) : (a.saleQuantity || 0);
-    const price = transactionType === 'sell' ? (a.salePrice || 0) : (a.purchasePrice || 0);
+    // Use absolute values for matching - the transaction type determines behavior
+    const quantity = Math.abs(a.purchaseQuantity || 0);
+    const price = a.purchasePrice || 0; // Both buy and sell use purchasePrice
     
     return assetDate === normalizedDate && 
            quantity === transaction.amount && 
@@ -157,7 +158,7 @@ function updateOrCreatePosition(
       );
     }
   } else if (transaction.type === 'sell' && existingPosition) {
-    // Handle sell transactions
+    // Handle sell transactions - subtract the positive amount
     const newQuantity = Math.max(0, existingPosition.quantity - transaction.amount);
     existingPosition.quantity = newQuantity;
     

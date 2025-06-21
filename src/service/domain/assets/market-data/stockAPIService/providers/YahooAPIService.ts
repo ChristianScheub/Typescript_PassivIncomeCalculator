@@ -38,10 +38,16 @@ export class YahooAPIService implements IStockAPIService {
         },
       });
 
-      Logger.infoAPI(`Received chart data response for ${symbol}`, null, res.data);
+      Logger.infoAPI(`Received chart data response for ${symbol}`, null, { 
+        status: res.status, 
+        hasData: !!res.data,
+        hasChart: !!res.data?.chart,
+        hasResult: !!res.data?.chart?.result,
+        resultLength: res.data?.chart?.result?.length || 0
+      });
 
       if (res.status !== 200 || !res.data.chart?.result?.[0]) {
-        Logger.error(`No chart data available for ${symbol} - Status: ${res.status}`+ JSON.stringify(res.data));
+        Logger.error(`No chart data available for ${symbol} - Status: ${res.status}, Data: ${JSON.stringify(res.data)}`);
         throw new Error(`No chart data available for ${symbol}`);
       }
 
@@ -183,5 +189,75 @@ export class YahooAPIService implements IStockAPIService {
 
   async getHistory30Days(symbol: string): Promise<StockHistory> {
     return this.getHistory(symbol, 30);
+  }
+
+  async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
+    // Clamp days to valid range (1-5)
+    const validDays = Math.max(1, Math.min(5, days));
+    const period = `${validDays}d`;
+    
+    Logger.infoAPI(`Getting intraday history (1-minute intervals) from Yahoo Finance for ${validDays} days`, { symbol, days: validDays });
+
+    try {
+      Logger.infoAPI(`Fetching chart data for ${symbol} with 1m interval for ${period} period`);
+      const chart = await this.fetchChart(symbol, '1m', period);
+      Logger.infoAPI(`Received chart data for ${symbol}`, null, { 
+        hasData: !!chart, 
+        hasTimestamp: !!chart?.timestamp, 
+        timestampLength: chart?.timestamp?.length || 0,
+        hasIndicators: !!chart?.indicators,
+        hasQuote: !!chart?.indicators?.quote?.[0]
+      });
+      
+      if (!chart || !chart.timestamp || !chart.indicators || !chart.indicators.quote || chart.timestamp.length === 0) {
+        Logger.warn(`No intraday data available for ${symbol}`);
+        return {
+          symbol,
+          entries: [],
+          data: [],
+          currency: chart?.meta?.currency ?? 'USD',
+        };
+      }
+
+      const timestamps: number[] = chart.timestamp;
+      const quote = chart.indicators.quote[0];
+      const currency = chart.meta.currency ?? 'USD';
+
+      // Erstelle 1-Minuten-Daten für die letzten X Tage
+      const data: StockHistoryEntry[] = timestamps.map((t, i) => {
+        const open = quote.open[i];
+        const close = quote.close[i];
+        const midday = (open + close) / 2;
+        return {
+          date: new Date(t * 1000).toISOString(), // Keep full timestamp for intraday data
+          timestamp: t * 1000,
+          open,
+          high: quote.high ? quote.high[i] : open, // Yahoo liefert high/low bei 1m Daten
+          low: quote.low ? quote.low[i] : close,
+          close,
+          midday,
+          volume: quote.volume ? quote.volume[i] : undefined,
+        };
+      }).filter(entry => entry.open !== null && entry.close !== null); // Filter out null values
+
+      const history: StockHistory = {
+        symbol,
+        entries: data,
+        data, // For API compatibility
+        currency,
+      };
+
+      Logger.infoAPI(`Intraday data for ${symbol}`, null, {
+        entriesCount: data.length,
+        firstTimestamp: data[0]?.timestamp,
+        lastTimestamp: data[data.length - 1]?.timestamp,
+        sampleEntry: data[0],
+      });
+
+      return history;
+    } catch (error) {
+      Logger.error(`Error getting intraday history for ${symbol}: ${JSON.stringify(error)}`);
+      throw error;
+    }
   }
 }

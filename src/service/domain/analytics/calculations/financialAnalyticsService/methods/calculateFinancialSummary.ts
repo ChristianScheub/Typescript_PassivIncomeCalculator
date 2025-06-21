@@ -1,12 +1,11 @@
 import { Asset, AssetDefinition } from '@/types/domains/assets/';
 import { Liability, Expense, Income } from '@/types/domains/financial/';
-import { FinancialSummary } from '../interfaces/IAnalyticsService';
 import { incomeCalculatorService } from '@service/domain/financial/income/incomeCalculatorService';
 import { expenseCalculatorService } from '@service/domain/financial/expenses/expenseCalculatorService';
 import { liabilityCalculatorService } from '@service/domain/financial/liabilities/liabilityCalculatorService';
-import { assetCalculatorService } from '@service/domain/assets/calculations/assetCalculatorService';
 import { financialCalculatorService } from '@service/domain/financial/calculations/financialCalculatorService';
 import { calculatePortfolioPositions } from '@service/domain/portfolio/management/portfolioService/portfolioCalculations';
+import { FinancialSummary } from '@/types/domains/analytics';
 
 export const calculateFinancialSummary = (
   assets: Asset[],
@@ -15,13 +14,15 @@ export const calculateFinancialSummary = (
   income: Income[],
   assetDefinitions: AssetDefinition[] = []
 ): FinancialSummary => {
-  const totalAssets = assetCalculatorService.calculateTotalAssetValue(assets);
+  // Calculate portfolio positions to get the correct asset values (considering buy/sell transactions)
+  const portfolioPositions = calculatePortfolioPositions(assets, assetDefinitions);
+  const totalAssets = portfolioPositions.reduce((sum: number, pos: any) => sum + pos.currentValue, 0);
+  
   const totalLiabilities = liabilityCalculatorService.calculateTotalDebt(liabilities);
   const netWorth = financialCalculatorService.calculateNetWorth(totalAssets, totalLiabilities);
   const monthlyIncome = incomeCalculatorService.calculateTotalMonthlyIncome(income);
   const monthlyExpenses = expenseCalculatorService.calculateTotalMonthlyExpenses(expenses);
   const monthlyLiabilityPayments = liabilityCalculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
-  const portfolioPositions = calculatePortfolioPositions(assets, assetDefinitions);
   const monthlyAssetIncome = portfolioPositions.reduce((sum: number, pos: any) => sum + pos.monthlyIncome, 0);
   
   const passiveIncome = incomeCalculatorService.calculatePassiveIncome(income);

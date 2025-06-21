@@ -6,8 +6,8 @@ import { clearAllIncome } from '@/store/slices/incomeSlice';
 import { clearAllAssetCategories } from '@/store/slices/assetCategoriesSlice';
 import { setApiKey, StockAPIProvider, setApiEnabled } from '@/store/slices/apiConfigSlice';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { StoreNames } from '../../../../infrastructure/sqlLiteService';
 import { clearSQLiteStores } from './utils';
+import { StoreNames } from '@/types/domains/database';
 
 export async function clearAllData(): Promise<void> {
     Logger.infoService("Starting to clear all data");

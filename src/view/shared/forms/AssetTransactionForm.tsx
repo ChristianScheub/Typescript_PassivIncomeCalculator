@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../../hooks/redux';
+import { useSharedForm } from '../../../hooks/useSharedForm';
 import { AssetDefinition,Asset } from '../../../types/domains/assets/entities';
 import { AssetFormData } from '../../../types/domains/forms/form-data';
 import { createAssetTransactionSchema } from '../../../utils/validationSchemas';
@@ -14,7 +13,7 @@ import {
   FormGrid,
   StandardFormField
 } from '../../../ui/forms/StandardFormWrapper';
-import { AssetSearchBar, AssetSelectionDropdown, SelectedAssetInfo } from '../../../ui/components';
+import { AssetSearchBar, SelectedAssetInfo } from '../../../ui/components';
 import { FormFieldValue } from '../../../types/shared/ui/specialized';
 import { formatService } from '../../../service';
 
@@ -39,21 +38,97 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDefinition, setSelectedDefinition] = useState<AssetDefinition | null>(null);
+  const formRef = React.useRef<HTMLFormElement>(null);
 
-  const { register, handleSubmit, watch, setValue, formState: { errors }, reset } = useForm<AssetTransactionFormData>({
-    resolver: zodResolver(assetTransactionSchema),
-    defaultValues: {
-      assetDefinitionId: '',
-      name: '',
-      transactionType: 'buy',
-      purchaseDate: new Date().toISOString().substring(0, 10),
-      purchasePrice: 0,
-      purchaseQuantity: 1,
-      saleDate: new Date().toISOString().substring(0, 10),
-      salePrice: 0,
-      saleQuantity: 1,
-      transactionCosts: 0,
-      notes: '',
+  const getDefaultValues = (): Partial<AssetTransactionFormData> => {
+    if (editingAsset) {
+      // Find the asset definition to get the current price if needed
+      const assetDefinition = assetDefinitions.find((def: AssetDefinition) => def.id === editingAsset.assetDefinitionId);
+      
+      // Prepare reset data with proper fallbacks
+      return {
+        assetDefinitionId: editingAsset.assetDefinitionId || '',
+        name: editingAsset.name || '',
+        type: editingAsset.type || 'stock',
+        value: editingAsset.value || 0,
+        transactionType: editingAsset.transactionType || 'buy',
+        purchaseDate: editingAsset.purchaseDate?.substring(0, 10) || new Date().toISOString().substring(0, 10),
+        purchasePrice: editingAsset.purchasePrice || assetDefinition?.currentPrice || 0,
+        purchaseQuantity: editingAsset.purchaseQuantity || 1,
+        saleDate: editingAsset.saleDate?.substring(0, 10) || new Date().toISOString().substring(0, 10),
+        // For sell transactions, display purchasePrice/purchaseQuantity as positive values in sale fields
+        salePrice: editingAsset.transactionType === 'sell' ? (editingAsset.purchasePrice || 0) : 0,
+        saleQuantity: editingAsset.transactionType === 'sell' ? Math.abs(editingAsset.purchaseQuantity || 1) : 1,
+        transactionCosts: editingAsset.transactionCosts || 0,
+        notes: editingAsset.notes || '',
+      };
+    } else {
+      // Reset form for new transaction
+      return {
+        assetDefinitionId: '',
+        name: '',
+        type: 'stock',  // Default to stock type until asset definition is selected
+        value: 0,
+        transactionType: 'buy' as const,
+        purchaseDate: new Date().toISOString().substring(0, 10),
+        purchasePrice: 0,
+        purchaseQuantity: 1,
+        saleDate: new Date().toISOString().substring(0, 10),
+        salePrice: 0,
+        saleQuantity: 1,
+        transactionCosts: 0,
+        notes: '',
+      };
+    }
+  };
+
+  const {
+    watch,
+    setValue,
+    formState: { errors },
+    onFormSubmit,
+    reset
+  } = useSharedForm<AssetTransactionFormData>({
+    validationSchema: assetTransactionSchema,
+    defaultValues: getDefaultValues(),
+    onSubmit: (data: AssetTransactionFormData) => {
+      if (!selectedDefinition) {
+        return;
+      }
+
+      const assetData = {
+        ...data,
+        // Store only the reference ID, not the full object
+        assetDefinitionId: selectedDefinition.id,
+        
+        // Asset transaction specific fields
+        type: selectedDefinition.type,
+        value: totalValue,
+        
+        // Convert all transactions to use purchasePrice/purchaseQuantity
+        // For sell transactions: use salePrice as purchasePrice and negative saleQuantity as purchaseQuantity
+        purchasePrice: data.transactionType === 'buy' 
+          ? (data.purchasePrice || 0) 
+          : (data.salePrice || 0),
+        purchaseQuantity: data.transactionType === 'buy' 
+          ? (data.purchaseQuantity || 0) 
+          : -(data.saleQuantity || 0), // Negative for sell transactions
+        
+        // Clear deprecated sale fields
+        salePrice: undefined,
+        saleQuantity: undefined,
+        
+        // Set dates properly
+        purchaseDate: data.transactionType === 'buy' && data.purchaseDate 
+          ? new Date(data.purchaseDate).toISOString()
+          : data.transactionType === 'sell' && data.saleDate
+          ? new Date(data.saleDate).toISOString() // Use saleDate for sell transactions
+          : new Date().toISOString(),
+        saleDate: undefined, // Always clear sale date since we use purchaseDate for both types
+      };
+
+      onSubmit(assetData);
+      handleFormClose();
     }
   });
 
@@ -74,13 +149,16 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
       const resetData = {
         assetDefinitionId: editingAsset.assetDefinitionId || '',
         name: editingAsset.name || '',
+        type: editingAsset.type || assetDefinition?.type || '',
+        value: editingAsset.value || 0,
         transactionType: editingAsset.transactionType || 'buy',
         purchaseDate: editingAsset.purchaseDate?.substring(0, 10) || new Date().toISOString().substring(0, 10),
         purchasePrice: editingAsset.purchasePrice || assetDefinition?.currentPrice || 0,
-        purchaseQuantity: editingAsset.purchaseQuantity || 1,
-        saleDate: editingAsset.saleDate?.substring(0, 10) || new Date().toISOString().substring(0, 10),
-        salePrice: editingAsset.salePrice || 0,
-        saleQuantity: editingAsset.saleQuantity || 1,
+        purchaseQuantity: Math.abs(editingAsset.purchaseQuantity || 1), // Always positive for display
+        saleDate: editingAsset.purchaseDate?.substring(0, 10) || new Date().toISOString().substring(0, 10), // Use purchaseDate for both
+        // For sell transactions, display purchasePrice/purchaseQuantity as positive values in sale fields
+        salePrice: editingAsset.transactionType === 'sell' ? (editingAsset.purchasePrice || 0) : 0,
+        saleQuantity: editingAsset.transactionType === 'sell' ? Math.abs(editingAsset.purchaseQuantity || 1) : 1,
         transactionCosts: editingAsset.transactionCosts || 0,
         notes: editingAsset.notes || '',
       };
@@ -103,6 +181,8 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
       const newTransactionData = {
         assetDefinitionId: '',
         name: '',
+        type: '',
+        value: 0,
         transactionType: 'buy' as const,
         purchaseDate: new Date().toISOString().substring(0, 10),
         purchasePrice: 0,
@@ -131,44 +211,19 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
     ? (purchasePrice || 0) * (purchaseQuantity || 1) + (watch('transactionCosts') || 0)
     : (salePrice || 0) * (saleQuantity || 1) - (watch('transactionCosts') || 0);
 
+  // Update the value field whenever the calculation changes
+  useEffect(() => {
+    setValue('value', totalValue);
+  }, [totalValue, setValue]);
+
   const handleDefinitionSelect = (definitionId: string) => {
     const definition = assetDefinitions.find((def: AssetDefinition) => def.id === definitionId);
     if (definition) {
       setSelectedDefinition(definition);
       setValue('assetDefinitionId', definitionId);
       setValue('name', definition.fullName + (definition.ticker ? ` (${definition.ticker})` : ''));
+      setValue('type', definition.type); // Set the type field
     }
-  };
-
-  const handleFormSubmit = (data: AssetTransactionFormData) => {
-    if (!selectedDefinition) return;
-
-    const assetData = {
-      ...data,
-      // Store only the reference ID, not the full object
-      assetDefinitionId: selectedDefinition.id,
-      
-      // Asset transaction specific fields
-      type: selectedDefinition.type,
-      value: totalValue,
-      
-      // Ensure required fields are set with fallbacks
-      purchasePrice: data.transactionType === 'buy' ? (data.purchasePrice || 0) : 0,
-      purchaseQuantity: data.transactionType === 'buy' ? (data.purchaseQuantity || 0) : 0,
-      salePrice: data.transactionType === 'sell' ? (data.salePrice || 0) : undefined,
-      saleQuantity: data.transactionType === 'sell' ? (data.saleQuantity || 0) : undefined,
-      
-      // Set dates properly
-      purchaseDate: data.transactionType === 'buy' && data.purchaseDate 
-        ? new Date(data.purchaseDate).toISOString()
-        : new Date().toISOString(),
-      saleDate: data.transactionType === 'sell' && data.saleDate 
-        ? new Date(data.saleDate).toISOString()
-        : undefined,
-    };
-
-    onSubmit(assetData);
-    handleFormClose();
   };
 
   const handleFormClose = () => {
@@ -214,7 +269,8 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
     <Modal isOpen={isOpen} onClose={onClose}>
       <StandardFormWrapper
         title={editingAsset ? t('assets.editTransaction') : t('assets.addTransaction')}
-        onSubmit={handleSubmit(handleFormSubmit)}
+        onSubmit={onFormSubmit}
+        formRef={formRef}
       >
         <RequiredSection>
           <FormGrid columns={{ xs: '1fr', sm: '1fr' }}>
@@ -230,11 +286,21 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                 placeholder={t('assets.searchAssets')}
               />
 
-              <AssetSelectionDropdown
-                register={register}
-                handleDefinitionSelect={handleDefinitionSelect}
-                filteredDefinitions={filteredDefinitions}
-                errors={errors}
+              <StandardFormField
+                label=""
+                name="assetDefinitionId"
+                type="select"
+                required
+                error={errors.assetDefinitionId?.message}
+                value={watch('assetDefinitionId')}
+                onChange={(value: FormFieldValue) => handleDefinitionSelect(value as string)}
+                options={[
+                  { value: '', label: t('assets.selectAssetOption') },
+                  ...filteredDefinitions.map((definition: AssetDefinition) => ({
+                    value: definition.id,
+                    label: `${definition.fullName}${definition.ticker ? ` (${definition.ticker})` : ''}${definition.sector ? ` - ${definition.sector}` : ''}`
+                  }))
+                ]}
               />
 
               {selectedDefinition && (
@@ -255,22 +321,19 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
             />
 
             {/* Transaction Type Selector */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
-                {t('assets.form.transactionType')} *
-              </label>
-              <select
-                {...register('transactionType')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                required
-              >
-                <option value="buy">{t('assets.form.buyTransaction')}</option>
-                <option value="sell">{t('assets.form.sellTransaction')}</option>
-              </select>
-              {errors.transactionType && (
-                <p className="mt-1 text-sm text-red-600">{errors.transactionType.message}</p>
-              )}
-            </div>
+            <StandardFormField
+              label={t('assets.form.transactionType')}
+              name="transactionType"
+              type="select"
+              required
+              error={errors.transactionType?.message}
+              value={watch('transactionType')}
+              onChange={(value: FormFieldValue) => setValue('transactionType', value as 'buy' | 'sell')}
+              options={[
+                { value: 'buy', label: t('assets.form.buyTransaction') },
+                { value: 'sell', label: t('assets.form.sellTransaction') }
+              ]}
+            />
 
             {/* Buy Transaction Fields */}
             {transactionType === 'buy' && (
@@ -315,7 +378,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
             {transactionType === 'sell' && (
               <>
                 <StandardFormField
-                  label={t('assets.form.saleDate')}
+                  label={t('assets.purchaseDate')} // Use same label as purchase date
                   name="saleDate"
                   type="date"
                   required
@@ -325,7 +388,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                 />
 
                 <StandardFormField
-                  label={t('assets.form.salePrice')}
+                  label={t('assets.purchasePrice')} // Use same label as purchase price
                   name="salePrice"
                   type="number"
                   required
@@ -337,7 +400,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                 />
 
                 <StandardFormField
-                  label={t('assets.form.saleQuantity')}
+                  label={t('assets.quantity')} // Use same label as purchase quantity
                   name="saleQuantity"
                   type="number"
                   required

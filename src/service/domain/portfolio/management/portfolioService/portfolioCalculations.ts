@@ -59,19 +59,20 @@ export const calculatePortfolioPositions = (
 
     const avgPurchasePrice = totalBuyQuantity > 0 ? totalBuyInvestment / totalBuyQuantity : 0;
 
-    // Now calculate final investment based on remaining quantity and average purchase price
-    const totalInvestment = (totalQuantity * avgPurchasePrice) + transactions.reduce((sum, t) => sum + (t.transactionCosts || 0), 0);
+    // Calculate investment based on remaining quantity (use absolute value for negative positions)
+    const remainingQuantityAbs = Math.abs(totalQuantity);
+    const totalInvestment = (remainingQuantityAbs * avgPurchasePrice) + transactions.reduce((sum, t) => sum + (t.transactionCosts || 0), 0);
 
     // Get current price
     const currentPrice = assetDefinition?.currentPrice || 0;
     
     Logger.infoService(`Position ${assetDefinition?.name || transactions[0].name}: qty=${totalQuantity}, currentPrice=${currentPrice}, avgPrice=${avgPurchasePrice}, assetDefCurrentPrice=${assetDefinition?.currentPrice}, hasAssetDef=${!!assetDefinition}, assetDefId=${transactions[0].assetDefinitionId}`);
 
-    const currentValue = totalQuantity > 0 ? currentPrice * totalQuantity : 0;
+    const currentValue = currentPrice * totalQuantity; // Allow negative values for short positions
     
     Logger.infoService(`  -> currentValue calculated: ${currentValue} (${totalQuantity} * ${currentPrice})`);
 
-    const averagePurchasePrice = totalQuantity > 0 ? Math.abs(totalInvestment / totalQuantity) : 0;
+    const averagePurchasePrice = totalBuyQuantity > 0 ? totalBuyInvestment / totalBuyQuantity : 0;
     const totalReturn = currentValue - totalInvestment;
     const totalReturnPercentage = totalInvestment !== 0 ? (totalReturn / Math.abs(totalInvestment)) * 100 : 0;
 

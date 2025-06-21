@@ -52,11 +52,13 @@ export const createAssetTransactionSchema = () => {
     assetDefinitionId: z.string().min(1, 'Asset definition is required'),
     name: z.string().min(1, 'Name is required'),
     symbol: z.string().optional(),
-    assetType: z.string().min(1, 'Asset type is required'),
+    type: z.string().min(1, 'Asset type is required'), // Keep required to match AssetFormData
+    value: z.number().min(0, 'Value must be positive'), // Keep required to match AssetFormData  
     transactionType: z.enum(['buy', 'sell']),
     purchasePrice: z.number().min(0, 'Purchase price must be positive'),
     purchaseQuantity: z.number().min(0.001, 'Purchase quantity must be positive'),
     purchaseDate: z.string().min(1, 'Purchase date is required'),
+    // Sale fields for UI display only - validation depends on transaction type
     salePrice: z.number().min(0, 'Sale price must be positive').optional(),
     saleQuantity: z.number().min(0.001, 'Sale quantity must be positive').optional(),
     saleDate: z.string().optional(),
@@ -64,6 +66,33 @@ export const createAssetTransactionSchema = () => {
     notes: z.string().optional(),
     currency: z.string().optional(),
     exchange: z.string().optional(),
+  }).superRefine((data, ctx) => {
+    // Custom validation to ensure type is set when assetDefinitionId is provided
+    if (data.assetDefinitionId && !data.type) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Asset type must be set when asset definition is selected",
+        path: ["type"]
+      });
+    }
+    
+    // Validate sale fields are provided for sell transactions
+    if (data.transactionType === 'sell') {
+      if (!data.salePrice || data.salePrice <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Sale price is required for sell transactions",
+          path: ["salePrice"]
+        });
+      }
+      if (!data.saleQuantity || data.saleQuantity <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Sale quantity is required for sell transactions",
+          path: ["saleQuantity"]
+        });
+      }
+    }
   });
 };
 
@@ -253,14 +282,9 @@ export const createLiabilitySchema = () => baseEntitySchema.extend({
 
 // Income Schema
 export const createIncomeSchema = () => baseEntitySchema.extend({
-  amount: z.number().min(0, 'Amount must be positive'),
-  frequency: z.string().min(1, 'Frequency is required'),
-  category: z.string().optional(),
-  description: z.string().optional(),
-  isActive: z.boolean(),
-  type: z.enum(['salary', 'interest', 'dividend', 'rental', 'side_hustle', 'other'] as const).optional(),
-  paymentSchedule: createPaymentScheduleSchema().optional(),
-  isPassive: z.boolean().optional(),
+  type: z.enum(['salary', 'interest', 'dividend', 'rental', 'side_hustle', 'other'] as const),
+  paymentSchedule: createPaymentScheduleSchema(),
+  isPassive: z.boolean(),
   sourceId: z.string().optional(),
 });
 

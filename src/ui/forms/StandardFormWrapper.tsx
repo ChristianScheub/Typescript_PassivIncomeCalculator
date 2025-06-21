@@ -9,7 +9,7 @@ import { CustomScheduleSection } from '../specialized/CustomScheduleSection';
 
 interface StandardFormWrapperProps {
   title: string;
-  onSubmit: () => void;
+  onSubmit: (e?: React.FormEvent) => void;
   backgroundColor?: string;
   children: React.ReactNode;
   formRef?: React.RefObject<HTMLFormElement>;
@@ -30,7 +30,7 @@ export const StandardFormWrapper: React.FC<StandardFormWrapperProps> = ({
         formRef={formRef}
       >
         {children}
-        <FormSubmitButton onSubmit={onSubmit} />
+        <FormSubmitButton onSubmit={onSubmit} formRef={formRef} />
       </MaterialForm>
     </FormContainer>
   );

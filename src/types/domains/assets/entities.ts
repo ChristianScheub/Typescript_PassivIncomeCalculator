@@ -89,14 +89,15 @@ export interface Transaction extends BaseEntity {
   
   // Transaction specific data
   purchaseDate: string;
-  purchasePrice: number;
-  purchaseQuantity?: number;
+  purchasePrice: number; // For both buy and sell transactions
+  purchaseQuantity?: number; // For both buy and sell transactions (quantity being bought/sold)
   transactionCosts?: number;
   
-  // Sale-specific fields (only for sell transactions)
-  saleDate?: string;
-  salePrice?: number;
-  saleQuantity?: number;
+  // DEPRECATED: Legacy sale-specific fields - use purchasePrice and purchaseQuantity instead
+  // These fields are kept for backwards compatibility but should not be used in new code
+  saleDate?: string; // @deprecated Use purchaseDate instead
+  salePrice?: number; // @deprecated Use purchasePrice instead  
+  saleQuantity?: number; // @deprecated Use purchaseQuantity instead
   
   // Calculated fields (derived values - not stored)
   totalReturn?: number;

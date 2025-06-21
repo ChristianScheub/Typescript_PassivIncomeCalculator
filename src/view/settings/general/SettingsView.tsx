@@ -4,10 +4,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '../../../ui/common/Car
 import { CollapsibleSection } from '../../../ui/common/CollapsibleSection';
 import { Button } from '../../../ui/common/Button';
 import { ButtonGroup } from '../../../ui/common/ButtonGroup';
-import { Download, Upload, Eye, EyeOff, Key, ChevronRight, Trash } from 'lucide-react';
+import { Download, Upload, Eye, EyeOff, Key, ChevronRight, Trash, Monitor } from 'lucide-react';
 import DebugSettings from '../../../ui/specialized/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../../../config/featureFlags';
 import { StockAPIProvider } from '../../../store/slices/apiConfigSlice';
+import { DashboardMode } from '../../../store/slices/dashboardSettingsSlice';
 import { ConfirmationDialog } from '../../../ui/dialog/ConfirmationDialog';
 import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '../../../ui/common/ClearButton';
 import clsx from 'clsx';
@@ -44,7 +45,9 @@ interface SettingsViewProps {
   clearExpensesStatus: ClearStatus;
   clearIncomeStatus: ClearStatus;
   clearAllDataStatus: ClearStatus;
+  clearReduxCacheStatus: ClearStatus;
   isApiEnabled: boolean;
+  dashboardMode: DashboardMode;
   confirmDialog: {
     isOpen: boolean;
     title: string;
@@ -64,6 +67,7 @@ interface SettingsViewProps {
   onApiKeyRemove: (provider: StockAPIProvider) => void;
   onProviderChange: (provider: StockAPIProvider) => void;
   onCurrencyChange: (currency: 'EUR' | 'USD') => void;
+  onDashboardModeChange: (mode: DashboardMode) => void;
   onClearAllData: () => void;
   onClearAssetDefinitions: () => void;
   onClearPriceHistory: () => void;
@@ -71,6 +75,7 @@ interface SettingsViewProps {
   onClearDebts: () => void;
   onClearExpenses: () => void;
   onClearIncome: () => void;
+  onClearReduxCache: () => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
   getLogLevelColor: (level: string) => string;
 }
@@ -94,7 +99,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   clearDebtsStatus,
   clearExpensesStatus,
   clearIncomeStatus,
+  clearReduxCacheStatus,
   isApiEnabled,
+  dashboardMode,
   onApiToggle,
   onExportData,
   onImportData,
@@ -107,6 +114,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onApiKeyRemove,
   onProviderChange,
   onCurrencyChange,
+  onDashboardModeChange,
   onClearAllData,
   onClearAssetDefinitions,
   onClearPriceHistory,
@@ -114,6 +122,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onClearDebts,
   onClearExpenses,
   onClearIncome,
+  onClearReduxCache,
   formatLogEntry,
   getLogLevelColor,
   confirmDialog,
@@ -169,6 +178,49 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">{t('navigation.settings')}</h1>
+      
+      {/* Dashboard Settings */}
+      <CollapsibleSection
+        title={t('settings.dashboardSettings')}
+        icon={<Monitor size={20} />}
+        defaultExpanded={false}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">{t('settings.dashboardMode')}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('settings.dashboardModeDescription')}
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <ButtonGroup className="flex space-x-3">
+              <Button
+                onClick={() => onDashboardModeChange('smartSummary')}
+                variant={dashboardMode === 'smartSummary' ? 'default' : 'secondary'}
+                size="sm"
+              >
+                {t('settings.smartSummary')}
+              </Button>
+              <Button
+                onClick={() => onDashboardModeChange('assetFocus')}
+                variant={dashboardMode === 'assetFocus' ? 'default' : 'secondary'}
+                size="sm"
+              >
+                {t('settings.assetFocus')}
+              </Button>
+            </ButtonGroup>
+            
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              {t('settings.currentDashboardMode', {
+                mode: dashboardMode === 'smartSummary' ? t('settings.smartSummary') : t('settings.assetFocus'),
+              })}
+            </p>
+          </div>
+        </div>
+      </CollapsibleSection>
       
       {/* API Configuration */}
       <CollapsibleSection
@@ -479,6 +531,22 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 onClick={onClearIncome}
                 titleKey="settings.clearIncome"
                 descKey="settings.clearIncomeDesc"
+                t={t}
+              />
+            </div>
+          </div>
+
+          {/* Cache Management Section */}
+          <div>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
+              {t("settings.cacheManagement")}
+            </h3>
+            <div className="space-y-3">
+              <ClearButton
+                status={clearReduxCacheStatus}
+                onClick={onClearReduxCache}
+                titleKey="settings.clearReduxCache"
+                descKey="settings.clearReduxCacheDesc"
                 t={t}
               />
             </div>

@@ -40,7 +40,7 @@ const OptionalFieldsSection = styled(Box)(({ theme }) => ({
 export interface MaterialFormProps {
   title: string;
   children: React.ReactNode;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e?: React.FormEvent) => void;
   formRef?: React.RefObject<HTMLFormElement>;
 }
 

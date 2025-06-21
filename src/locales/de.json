@@ -204,6 +204,12 @@
   },
   
   "settings": {
+    "dashboardSettings": "Dashboard Einstellungen",
+    "dashboardMode": "Dashboard Modus",
+    "dashboardModeDescription": "Wählen Sie zwischen Smart Summary und Asset Focus Dashboard",
+    "smartSummary": "Smart Summary",
+    "assetFocus": "Asset Focus",
+    "currentDashboardMode": "Aktueller Modus: {{mode}}",
     "appearance": "Erscheinungsbild",
     "theme": "Farbschema",
     "themeDescription": "Wählen Sie zwischen Hell- und Dunkelmodus",
@@ -295,33 +301,23 @@
     "appName": "Passive Income Calculator",
     "version": "Version {{version}}",
     "assetManagement": "Asset-Verwaltung",
-    "clearAssetDefinitions": "Asset-Definitionen löschen",
-    "clearAssetDefinitionsDesc": "Löscht alle Asset-Definitionen aus dem System",
-    "clearPriceHistory": "Preisverlauf löschen",
-    "clearPriceHistoryDesc": "Löscht den gesamten Preisverlauf aller Assets",
-    "clearAssetTransactions": "Asset-Transaktionen löschen",
-    "clearAssetTransactionsDesc": "Löscht alle Asset-Transaktionen aus dem System",
     "financialManagement": "Finanzverwaltung",
+    "cacheManagement": "Cache-Verwaltung",
+    "completeReset": "Vollständiger Reset",
+    "clearAssetDefinitions": "Asset-Definitionen löschen",
+    "clearAssetDefinitionsDesc": "Alle Asset-Definitionen und deren zugehörige Marktdaten entfernen",
+    "clearPriceHistory": "Preisverlauf löschen",
+    "clearPriceHistoryDesc": "Alle historischen Preisdaten für Assets entfernen",
+    "clearAssetTransactions": "Asset-Transaktionen löschen",
+    "clearAssetTransactionsDesc": "Alle Kauf-/Verkaufstransaktionen für Assets entfernen",
     "clearDebts": "Schulden löschen",
-    "clearDebtsDesc": "Löscht alle erfassten Schulden und Verbindlichkeiten",
+    "clearDebtsDesc": "Alle Verbindlichkeiten und Schuldenaufzeichnungen entfernen",
     "clearExpenses": "Ausgaben löschen",
-    "clearExpensesDesc": "Löscht alle erfassten Ausgaben",
+    "clearExpensesDesc": "Alle Ausgaben-Tracking-Daten entfernen",
     "clearIncome": "Einkommen löschen",
-    "clearIncomeDesc": "Löscht alle erfassten Einkommensquellen",
-    "completeReset": "Vollständiges Zurücksetzen",
-    "clearAssetDefinitionsTitle": "Asset-Definitionen löschen",
-    "clearAssetDefinitionsConfirm": "Sind Sie sicher, dass Sie alle Asset-Definitionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "clearPriceHistoryTitle": "Preisverlauf löschen",
-    "clearPriceHistoryConfirm": "Sind Sie sicher, dass Sie den gesamten Preisverlauf löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "clearAssetTransactionsTitle": "Asset-Transaktionen löschen",
-    "clearAssetTransactionsConfirm": "Sind Sie sicher, dass Sie alle Asset-Transaktionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "clearDebtsTitle": "Schulden löschen",
-    "clearDebtsConfirm": "Sind Sie sicher, dass Sie alle Schulden und Verbindlichkeiten löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "clearExpensesTitle": "Ausgaben löschen",
-    "clearExpensesConfirm": "Sind Sie sicher, dass Sie alle Ausgaben löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "clearIncomeTitle": "Einkommen löschen",
-    "clearIncomeConfirm": "Sind Sie sicher, dass Sie alle Einkommensquellen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "clearAllDataDesc": "Löscht ALLE Daten einschließlich API-Schlüssel und Einstellungen",
+    "clearIncomeDesc": "Alle Einkommensquellen-Aufzeichnungen entfernen",
+    "clearReduxCache": "Redux Cache löschen",
+    "clearReduxCacheDesc": "Alle zwischengespeicherten Berechnungen und temporären Daten im Arbeitsspeicher zurücksetzen",
     "clearAllDataConfirm": "Sind Sie sicher, dass Sie ALLE Daten löschen möchten? Dies wird sämtliche Einstellungen und Daten unwiderruflich entfernen."
   },
   
@@ -637,15 +633,6 @@
       "medium": "Mittel",
       "high": "Hoch"
     },
-    "types": {
-      "stock": "Aktie",
-      "bond": "Anleihe",
-      "real_estate": "Immobilie",
-      "crypto": "Kryptowährung",
-      "cash": "Bargeld",
-      "other": "Sonstiges",
-      "all": "Alle"
-    },
     "return": "Rendite",
     "investmentDetails": "Investitionsdetails",
     "assetInformation": "Asset-Informationen",
@@ -704,7 +691,11 @@
     "noData": "Keine Daten verfügbar",
     "all": "Alle",
     "income": "Einkommen",
-    "expenses": "Ausgaben"
+    "expenses": "Ausgaben",
+    "asset": "Asset",
+    "position": "Position", 
+    "value": "Wert",
+    "change": "Änderung"
   },
   "expenses": {
     "title": "Ausgaben",
@@ -1458,5 +1449,12 @@
     "title": "Intelligente Empfehlungen",
     "noRecommendations": "Derzeit keine Empfehlungen verfügbar. Fügen Sie mehr Finanzdaten hinzu, um personalisierte Einblicke zu erhalten.",
     "totalRecommendations": "{{count}} Empfehlungen werden angezeigt"
+  },
+  "assetFocus": {
+    "portfolioValue": "Portfolio Wert",
+    "portfolioHistory": "Portfolio Verlauf",
+    "updateIntradayHistory": "Intraday Verlauf aktualisieren",
+    "positions": "Positionen",
+    "noAssets": "Keine Assets gefunden"
   }
 }

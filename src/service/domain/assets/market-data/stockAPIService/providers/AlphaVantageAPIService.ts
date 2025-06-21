@@ -37,4 +37,10 @@ export class AlphaVantageAPIService implements IStockAPIService {
     Logger.info(`Alpha Vantage: Getting 30 days history for ${symbol} (not implemented)`);
     throw new Error('Alpha Vantage provider not yet implemented');
   }
+
+  async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
+    Logger.warn(`Alpha Vantage intraday history not implemented for ${symbol} - nothing happened, nothing implemented`);
+    // TODO: Implement Alpha Vantage intraday API call
+    throw new Error('Alpha Vantage intraday provider not yet implemented');
+  }
 }

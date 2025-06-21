@@ -1,6 +1,7 @@
 import React from 'react';
-import { IncomeType } from '../../../types';
+import { IncomeType } from '../../../types/shared/base/enums';
 import { UseFormSetValue } from 'react-hook-form';
+import { FormFieldValue } from '../../../types/shared/ui/specialized';
 import { 
   StandardFormWrapper,
   RequiredSection,
@@ -56,6 +57,36 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
   title
 }) => {
   const { t } = useTranslation();
+  const formRef = React.useRef<HTMLFormElement>(null);
+  
+  // Type-safe onChange handlers
+  const handleNameChange = (value: FormFieldValue) => {
+    setValue('name', String(value));
+  };
+  
+  const handleTypeChange = (value: FormFieldValue) => {
+    setValue('type', String(value) as IncomeType);
+  };
+  
+  const handleFrequencyChange = (value: FormFieldValue) => {
+    setValue('paymentSchedule.frequency', String(value) as 'monthly' | 'quarterly' | 'annually' | 'custom');
+  };
+  
+  const handleAmountChange = (value: FormFieldValue) => {
+    setValue('paymentSchedule.amount', Number(value));
+  };
+  
+  const handleDayOfMonthChange = (value: FormFieldValue) => {
+    setValue('paymentSchedule.dayOfMonth', Number(value));
+  };
+  
+  const handleStartDateChange = (value: FormFieldValue) => {
+    setValue('startDate', String(value));
+  };
+  
+  const handleIsPassiveChange = (value: FormFieldValue) => {
+    setValue('isPassive', Boolean(value));
+  };
 
   // Type options for manual income entry (excludes auto-generated asset income)
   const typeOptions = getIncomeTypeOptions(t);
@@ -66,6 +97,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
       title={title}
       onSubmit={onFormSubmit}
       backgroundColor="linear-gradient(135deg, rgba(76, 175, 80, 0.03) 0%, rgba(139, 195, 74, 0.03) 100%)"
+      formRef={formRef}
     >
       <RequiredSection>
         <FormGrid>
@@ -75,7 +107,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             required
             error={errors.name?.message}
             value={watch('name')}
-            onChange={(value) => setValue('name', value)}
+            onChange={handleNameChange}
             placeholder={t('income.form.enterIncomeName')}
           />
 
@@ -86,7 +118,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             required
             options={typeOptions}
             value={watch('type')}
-            onChange={(value) => setValue('type', value)}
+            onChange={handleTypeChange}
             placeholder={t('income.form.selectIncomeType')}
           />
 
@@ -98,7 +130,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             options={frequencyOptions}
             error={errors.paymentSchedule?.frequency?.message}
             value={watch('paymentSchedule.frequency')}
-            onChange={(value) => setValue('paymentSchedule.frequency', value)}
+            onChange={handleFrequencyChange}
             placeholder={t('income.form.selectFrequency')}
           />
 
@@ -109,7 +141,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             required
             error={errors.paymentSchedule?.amount?.message}
             value={watch('paymentSchedule.amount')}
-            onChange={(value) => setValue('paymentSchedule.amount', value)}
+            onChange={handleAmountChange}
             placeholder="0"
             step={0.01}
             min={0}
@@ -121,7 +153,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             type="number"
             error={errors.paymentSchedule?.dayOfMonth?.message}
             value={watch('paymentSchedule.dayOfMonth')}
-            onChange={(value) => setValue('paymentSchedule.dayOfMonth', value)}
+            onChange={handleDayOfMonthChange}
             placeholder={t('income.form.dayOfMonthPlaceholder')}
             step={1}
             min={1}
@@ -134,7 +166,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             type="date"
             required
             value={watch('startDate')}
-            onChange={(value) => setValue('startDate', value)}
+            onChange={handleStartDateChange}
           />
 
           <StandardFormField
@@ -142,7 +174,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             name="isPassive"
             type="checkbox"
             value={watch('isPassive')}
-            onChange={(value) => setValue('isPassive', value)}
+            onChange={handleIsPassiveChange}
           />
         </FormGrid>
       </RequiredSection>
@@ -157,8 +189,8 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
       <OptionalFieldsSection
         endDateValue={watch('endDate')}
         notesValue={watch('notes')}
-        onEndDateChange={(value) => setValue('endDate', value)}
-        onNotesChange={(value) => setValue('notes', value)}
+        onEndDateChange={(value) => setValue('endDate', String(value))}
+        onNotesChange={(value) => setValue('notes', String(value))}
       />
     </StandardFormWrapper>
   );

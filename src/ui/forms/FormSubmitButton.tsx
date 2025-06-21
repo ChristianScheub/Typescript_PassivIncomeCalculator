@@ -4,16 +4,35 @@ import { Save, Close } from '@mui/icons-material';
 import FloatingBtn, { ButtonAlignment } from '../layout/floatingBtn';
 
 interface FormSubmitButtonProps {
-  onSubmit: () => void;
+  onSubmit: (e?: React.FormEvent) => void;
   onCancel?: () => void;
   alignment?: ButtonAlignment;
+  formRef?: React.RefObject<HTMLFormElement>;
 }
 
 export const FormSubmitButton: React.FC<FormSubmitButtonProps> = ({
   onSubmit,
   onCancel,
-  alignment = ButtonAlignment.RIGHT
+  alignment = ButtonAlignment.RIGHT,
+  formRef
 }) => {
+  const handleSubmit = () => {
+    // Try to submit the form using the form reference
+    if (formRef?.current) {
+      // Use requestSubmit if available (modern browsers)
+      if ('requestSubmit' in formRef.current && typeof formRef.current.requestSubmit === 'function') {
+        formRef.current.requestSubmit();
+      } else {
+        // Fallback for older browsers
+        const submitEvent = new Event('submit', { cancelable: true, bubbles: true });
+        formRef.current.dispatchEvent(submitEvent);
+      }
+    } else {
+      // Fallback to calling onSubmit directly
+      onSubmit();
+    }
+  };
+
   if (onCancel) {
     return (
       <Box sx={{ 
@@ -34,7 +53,7 @@ export const FormSubmitButton: React.FC<FormSubmitButtonProps> = ({
         <FloatingBtn
           alignment={ButtonAlignment.RIGHT}
           icon={Save}
-          onClick={onSubmit}
+          onClick={handleSubmit}
         />
       </Box>
     );
@@ -43,7 +62,7 @@ export const FormSubmitButton: React.FC<FormSubmitButtonProps> = ({
   return (
     <FloatingBtn
       icon={Save}
-      onClick={onSubmit}
+      onClick={handleSubmit}
       alignment={alignment}
     />
   );

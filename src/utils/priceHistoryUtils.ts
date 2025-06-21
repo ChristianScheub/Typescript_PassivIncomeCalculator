@@ -1,12 +1,13 @@
 import { PriceHistoryEntry, AssetDefinition, Transaction, Asset } from '@/types/domains/assets';
+import { getCurrentQuantity } from './transactionCalculations';
 
 /**
  * Utility functions for managing price history data
  */
 
 /**
- * Calculate total value for a given point in time based only on buy transactions
- * that occurred before that date
+ * Calculate total value for a given point in time considering all transactions
+ * (buy and sell) that occurred before that date
  */
 export function calculateHistoricalValue(
   transactions: Array<Asset | Transaction>,
@@ -15,14 +16,14 @@ export function calculateHistoricalValue(
 ): number {
   let totalValue = 0;
   
-  // Only consider buy transactions that occurred before or on target date
+  // Consider all transactions that occurred before or on target date
   const validTransactions = transactions.filter(t => 
-    t.transactionType === 'buy' && new Date(t.purchaseDate) <= new Date(targetDate)
+    new Date(t.purchaseDate) <= new Date(targetDate)
   );
 
-  // Sum up value based on quantity from buy transactions and price at that date
+  // Sum up value based on net quantity (buy - sell) and price at that date
   totalValue = validTransactions.reduce((sum, t) => {
-    const quantity = t.purchaseQuantity || 0;
+    const quantity = getCurrentQuantity(t); // This handles buy/sell correctly
     return sum + (quantity * priceAtDate);
   }, 0);
 
@@ -37,7 +38,7 @@ export function addPriceToHistory(
   price: number,
   currentHistory: PriceHistoryEntry[] = [],
   date?: string,
-  source: string = 'manual'
+  source: 'manual' | 'api' | 'import' = 'manual'
 ): PriceHistoryEntry[] {
   const entryDate = date || new Date().toISOString();
   
@@ -73,7 +74,7 @@ export function addOrUpdateDailyPrice(
   price: number,
   currentHistory: PriceHistoryEntry[] = [],
   date?: string,
-  source: string = 'manual'
+  source: 'manual' | 'api' | 'import' = 'manual'
 ): PriceHistoryEntry[] {
   const entryDate = date || new Date().toISOString();
   const dateOnly = entryDate.split('T')[0];
@@ -91,6 +92,33 @@ export function addOrUpdateDailyPrice(
   
   // Add new entry and sort by date (newest first)
   return [...filteredHistory, newEntry].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+}
+
+/**
+ * Add intraday price entries to history (preserves minute-level timestamps)
+ * This is specifically for intraday data where we want to keep all minute-level prices
+ * Unlike addOrUpdateDailyPrice, this preserves all entries with different timestamps
+ */
+export function addIntradayPriceHistory(
+  intradayEntries: PriceHistoryEntry[],
+  currentHistory: PriceHistoryEntry[] = [],
+  maxIntradayEntries: number = 500 // Limit to prevent excessive storage
+): PriceHistoryEntry[] {
+  // Filter out existing intraday entries for the same day to avoid duplicates
+  const today = new Date().toISOString().split('T')[0];
+  const filteredHistory = currentHistory.filter(entry => 
+    !(entry.date.startsWith(today) && entry.source === 'api')
+  );
+  
+  // Take only the most recent intraday entries if we exceed the limit
+  const limitedIntradayEntries = intradayEntries
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, maxIntradayEntries);
+  
+  // Combine with existing history and sort by date (newest first)
+  return [...filteredHistory, ...limitedIntradayEntries].sort((a, b) => 
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 }
@@ -187,7 +215,7 @@ export function cleanupOldPriceHistory(
 export function updateAssetDefinitionPrice(
   definition: AssetDefinition,
   newPrice: number,
-  source: string = 'manual'
+  source: 'manual' | 'api' | 'import' = 'manual'
 ): AssetDefinition {
   const currentDate = new Date().toISOString();
   
@@ -210,7 +238,7 @@ export function updateAssetDefinitionPrice(
 }
 
 /**
- * Calculate portfolio values for a series of dates based only on buy transactions
+ * Calculate portfolio values for a series of dates considering all transactions (buy and sell)
  */
 export function calculateHistoricalPortfolioValues(
   transactions: Array<Asset | Transaction>,

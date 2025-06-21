@@ -16,6 +16,13 @@ import { fetchIncome } from '@/store/slices/incomeSlice';
 import { updateDashboardValues } from '@/store/slices/dashboardSlice';
 import { calculate30DayHistory } from '@/store/slices/portfolioHistorySlice';
 import { updateForecastValues } from '@/store/slices/forecastSlice';
+import { 
+    clearAllCache as clearCalculatedDataCache,
+    calculatePortfolioHistory,
+    calculateAssetFocusData,
+    calculateFinancialSummary
+} from '@/store/slices/calculatedDataSlice';
+import { AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
 import { PortfolioHistoryHelper } from '../../../../domain/portfolio/history/portfolioHistoryService/methods/portfolioHistoryHelper';
 import recentActivityService from '../../../../domain/analytics/reporting/recentActivityService';
 import Logger from "@/service/shared/logging/Logger/logger";
@@ -26,9 +33,11 @@ import Logger from "@/service/shared/logging/Logger/logger";
  * - Clearing all dividend caches
  * - Clearing portfolio cache  
  * - Clearing portfolio history cache
+ * - Clearing calculated data cache (new caching system)
  * - Invalidating ALL Redux caches
  * - Recalculating ALL data from SQL database (assets, liabilities, income, expenses, etc.)
  * - Updating all derived calculations (dashboard, forecast, analytics)
+ * - Recalculating new calculated data cache (portfolio history, asset focus, financial summary)
  */
 export async function refreshAllCaches(): Promise<void> {
     Logger.infoService("Starting COMPLETE cache refresh for ALL data");
@@ -47,11 +56,15 @@ export async function refreshAllCaches(): Promise<void> {
         Logger.infoService("Clearing portfolio history caches");
         PortfolioHistoryHelper.clearCaches();
 
-        // Step 4: Clear ALL service caches and activity histories
+        // Step 4: Clear calculated data cache (new caching system)
+        Logger.infoService("Clearing calculated data cache");
+        store.dispatch(clearCalculatedDataCache());
+
+        // Step 5: Clear ALL service caches and activity histories
         Logger.infoService("Clearing recent activity history");
         recentActivityService.clearActivities(); // Clear all activity types
 
-        // Step 5: Refetch ALL data from SQL database
+        // Step 6: Refetch ALL data from SQL database
         Logger.infoService("Refetching ALL data from SQL database");
         
         // Fetch ALL core data in parallel
@@ -69,7 +82,7 @@ export async function refreshAllCaches(): Promise<void> {
             store.dispatch(fetchIncome())
         ]);
 
-        // Step 6: Wait for data to be available, then recalculate derived data
+        // Step 7: Wait for data to be available, then recalculate derived data
         Logger.infoService("Recalculating ALL derived data");
         
         // Get fresh data from store
@@ -91,12 +104,23 @@ export async function refreshAllCaches(): Promise<void> {
             }));
         }
 
-        // Step 7: Update ALL calculated values and derived data
+        // Step 8: Update ALL calculated values and derived data
         Logger.infoService("Updating ALL dashboard, forecast, and analytics values");
         await Promise.all([
             store.dispatch(updateDashboardValues()),
             store.dispatch(updateForecastValues()),
             store.dispatch(calculate30DayHistory())
+        ]);
+
+        // Step 9: Recalculate new calculated data cache
+        Logger.infoService("Recalculating calculated data cache");
+        const dashboardSettings = state.dashboardSettings;
+        const currentTimeRange: AssetFocusTimeRange = dashboardSettings.assetFocus.timeRange || '1W';
+        
+        await Promise.all([
+            store.dispatch(calculateFinancialSummary()),
+            store.dispatch(calculateAssetFocusData()),
+            store.dispatch(calculatePortfolioHistory({ timeRange: currentTimeRange }))
         ]);
 
         Logger.infoService("COMPLETE cache refresh completed successfully - ALL data refreshed from SQL database");

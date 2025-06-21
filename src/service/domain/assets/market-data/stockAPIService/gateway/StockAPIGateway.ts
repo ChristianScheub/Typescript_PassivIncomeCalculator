@@ -90,4 +90,16 @@ export class StockAPIGateway implements IStockAPIService {
   async getHistory30Days(symbol: string) {
     return this.currentProvider.getHistory30Days(symbol);
   }
+
+  async getIntradayHistory(symbol: string, days: number = 1) {
+    Logger.info(`StockAPIGateway: Delegating getIntradayHistory for ${symbol} (${days} days) to ${this.selectedProvider}`);
+    try {
+      const result = await this.currentProvider.getIntradayHistory(symbol, days);
+      Logger.info(`StockAPIGateway: Received intraday history for ${symbol}: ${result.entries?.length || 0} entries`);
+      return result;
+    } catch (error) {
+      Logger.error(`StockAPIGateway: Error getting intraday history for ${symbol}: ${JSON.stringify(error)}`);
+      throw error;
+    }
+  }
 }

@@ -72,12 +72,13 @@ export type Asset = {
     fullName?: string;
   };
   transactionType: 'buy' | 'sell';
-  purchasePrice: number;
-  purchaseQuantity: number;
+  purchasePrice: number; // For both buy and sell transactions
+  purchaseQuantity: number; // For both buy and sell transactions (quantity being bought/sold)
   purchaseDate: string;
-  salePrice?: number;
-  saleQuantity?: number;
-  saleDate?: string;
+  // DEPRECATED: Legacy sale-specific fields - use purchasePrice and purchaseQuantity instead
+  salePrice?: number; // @deprecated Use purchasePrice instead
+  saleQuantity?: number; // @deprecated Use purchaseQuantity instead
+  saleDate?: string; // @deprecated Use purchaseDate instead
   transactionCosts?: number;
   currency?: string;
   exchange?: string;

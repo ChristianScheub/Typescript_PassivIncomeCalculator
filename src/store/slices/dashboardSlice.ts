@@ -3,6 +3,7 @@ import { StoreState } from '..';
 import calculatorService from '@service/domain/financial/calculations/compositeCalculatorService';
 import Logger from '@service/shared/logging/Logger/logger';
 import { DashboardState } from '@/types/domains/dashboard/state';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
 
 const initialState: DashboardState = {
   netWorth: 0,
@@ -68,7 +69,7 @@ export const updateDashboardValues = createAsyncThunk(
     let assetAllocation: Array<{name: string; type: string; value: number; percentage: number}> = [];
     if (portfolioCache && assets.portfolioCacheValid) {
       const typeMap = new Map<string, number>();
-      portfolioCache.positions.forEach(position => {
+      portfolioCache.positions.forEach((position: PortfolioPosition) => {
         const currentValue = typeMap.get(position.type) || 0;
         typeMap.set(position.type, currentValue + position.currentValue);
       });
@@ -86,18 +87,24 @@ export const updateDashboardValues = createAsyncThunk(
       Logger.infoRedux('Portfolio cache invalid, using empty asset allocation');
     }
 
-    // Calculate total asset gain and percentage directly in the thunk
-    const totalInitialInvestment = assets.items.reduce((sum, asset) => {
-      if (asset.type === 'stock') {
-        return sum + (asset.purchasePrice || 0) * (asset.purchaseQuantity || 0);
-      }
-      return sum + (asset.purchasePrice || 0);
-    }, 0);
+    // Calculate total asset gain and percentage using portfolio cache
+    let totalAssetGain = 0;
+    let totalAssetGainPercentage = 0;
+    
+    if (portfolioCache && assets.portfolioCacheValid) {
+      const totalInitialInvestment = portfolioCache.positions.reduce((sum: number, position: PortfolioPosition) => {
+        return sum + position.totalInvestment; // Already accounts for buy/sell transactions correctly
+      }, 0);
 
-    const totalAssetGain = totalAssets - totalInitialInvestment;
-    const totalAssetGainPercentage = totalInitialInvestment > 0 
-      ? (totalAssetGain / totalInitialInvestment) * 100 
-      : 0;
+      totalAssetGain = totalAssets - totalInitialInvestment;
+      totalAssetGainPercentage = totalInitialInvestment > 0 
+        ? (totalAssetGain / totalInitialInvestment) * 100 
+        : 0;
+      
+      Logger.infoRedux(`Asset gain calculation - totalAssets: ${totalAssets}, totalInvestment: ${totalInitialInvestment}, gain: ${totalAssetGain} (${totalAssetGainPercentage}%)`);
+    } else {
+      Logger.infoRedux('Portfolio cache invalid, using zero values for asset gain calculation');
+    }
 
     Logger.infoRedux(`Dashboard values updated: ${JSON.stringify({
       monthlyIncome,

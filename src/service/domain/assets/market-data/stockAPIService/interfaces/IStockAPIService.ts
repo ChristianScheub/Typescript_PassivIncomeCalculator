@@ -37,4 +37,12 @@ export interface IStockAPIService {
    * @returns 30 days of historical data
    */
   getHistory30Days: (symbol: string) => Promise<StockHistory>;
+
+  /**
+   * Get intraday stock data (1-minute intervals for specified days)
+   * @param symbol - Stock symbol with exchange suffix (e.g., "AAPL.US")
+   * @param days - Number of days to retrieve (default: 1, max: 5)
+   * @returns Intraday data with 1-minute resolution
+   */
+  getIntradayHistory: (symbol: string, days?: number) => Promise<StockHistory>;
 }

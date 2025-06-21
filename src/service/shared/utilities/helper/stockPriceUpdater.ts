@@ -19,7 +19,7 @@ export class StockPriceUpdater {
       .filter(definition => 
         definition.type === 'stock' && 
         definition.ticker && 
-        definition.marketData?.autoUpdatePrice === true  // Only update if auto-update is enabled
+        definition.autoUpdatePrice === true  // Only update if auto-update is enabled
       )
       .slice(0, 30);
 
@@ -84,7 +84,7 @@ export class StockPriceUpdater {
       .filter(definition => 
         definition.type === 'stock' && 
         definition.ticker && 
-        definition.marketData?.autoUpdateHistoricalPrices === true  // Only update if auto-update is enabled
+        definition.autoUpdateHistoricalPrices === true  // Only update if auto-update is enabled
       )
       .slice(0, 10); // Limit to prevent API overload
 

@@ -47,6 +47,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
   title
 }) => {
   const { t } = useTranslation();
+  const formRef = React.useRef<HTMLFormElement>(null);
   
   // Type-safe onChange handlers
   const handleNameChange = (value: FormFieldValue) => {
@@ -81,6 +82,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
       title={title}
       onSubmit={onFormSubmit}
       backgroundColor="linear-gradient(135deg, rgba(244, 67, 54, 0.03) 0%, rgba(255, 87, 34, 0.03) 100%)"
+      formRef={formRef}
     >
       <RequiredSection>
         <FormGrid>

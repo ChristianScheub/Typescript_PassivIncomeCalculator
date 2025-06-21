@@ -13,24 +13,38 @@ interface PortfolioHistoryCardProps {
     change: number;
     changePercentage: number;
   }>;
+  isIntradayView?: boolean; // New prop to determine if showing minute-level data
 }
 
 // Custom tooltip component moved outside parent component for better performance
 interface PortfolioHistoryTooltipProps {
   active?: boolean;
   payload?: any[];
+  isIntradayView?: boolean;
 }
 
-const PortfolioHistoryTooltip: React.FC<PortfolioHistoryTooltipProps> = ({ active, payload }) => {
+const PortfolioHistoryTooltip: React.FC<PortfolioHistoryTooltipProps> = ({ active, payload, isIntradayView }) => {
   if (!active || !payload?.length) return null;
   
   const data = payload[0].payload;
   const changeColor = data.change >= 0 ? 'text-green-600' : 'text-red-600';
 
+  // Format date/time based on whether it's intraday view
+  const formatDateTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    if (isIntradayView) {
+      // For intraday, show date and time
+      return format(date, 'MMM d, HH:mm');
+    } else {
+      // For daily view, show just date
+      return format(date, 'MMM d, yyyy');
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 p-3 shadow-lg rounded border border-gray-200 dark:border-gray-700">
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
-        {format(new Date(data.date), 'MMM d, yyyy')}
+        {formatDateTime(data.date)}
       </p>
       <p className="font-medium">
         {formatService.formatCurrency(data.value)}
@@ -44,7 +58,7 @@ const PortfolioHistoryTooltip: React.FC<PortfolioHistoryTooltipProps> = ({ activ
   );
 };
 
-const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Days }) => {
+const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Days, isIntradayView = false }) => {
   const { t } = useTranslation();
   
   // Find the overall change
@@ -56,15 +70,42 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Da
   const gradientColor = totalChange >= 0 ? '#22C55E' : '#EF4444';
   const changeColor = totalChange >= 0 ? 'text-green-600' : 'text-red-600';
 
+  // Format X-axis labels based on whether it's intraday view
+  const formatXAxisLabel = (dateStr: string) => {
+    const date = new Date(dateStr);
+    if (isIntradayView) {
+      // For intraday, show date and time (MMM d, HH:mm)
+      return format(date, 'MMM d, HH:mm');
+    } else {
+      // For daily view, show date (MMM d)
+      return format(date, 'MMM d');
+    }
+  };
+
+  // Update title and subtitle based on view type
+  const getTitle = () => {
+    if (isIntradayView) {
+      return t('dashboard.portfolioHistoryIntraday') || 'Portfolio Verlauf (Intraday)';
+    }
+    return t('dashboard.portfolioHistory') || 'Portfolio Verlauf';
+  };
+
+  const getSubtitle = () => {
+    if (isIntradayView) {
+      return t('dashboard.last5DaysIntraday') || 'Letzte 5 Tage (Intraday)';
+    }
+    return t('dashboard.last30Days') || 'Letzte 30 Tage';
+  };
+
   return (
     <Card className="bg-white dark:bg-gray-800">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div className="space-y-1">
           <CardTitle className="text-xl">
-            {t('dashboard.portfolioHistory')}
+            {getTitle()}
           </CardTitle>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {t('dashboard.last30Days')}
+            {getSubtitle()}
           </p>
         </div>
         <div className="flex flex-col items-end">
@@ -92,9 +133,10 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Da
                 <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.3} />
                 <XAxis 
                   dataKey="date"
-                  tickFormatter={(date) => format(new Date(date), 'MMM d')}
+                  tickFormatter={formatXAxisLabel}
                   tick={{ fontSize: 12 }}
                   stroke="#6B7280"
+                  interval={isIntradayView ? Math.floor(history30Days.length / 10) : 'preserveStart'}
                 />
                 <YAxis 
                   tickFormatter={(value) => formatService.formatCurrency(value)}
@@ -102,13 +144,15 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Da
                   stroke="#6B7280"
                   width={80}
                 />
-                <Tooltip content={<PortfolioHistoryTooltip />} />
+                <Tooltip content={<PortfolioHistoryTooltip isIntradayView={isIntradayView} />} />
                 <Area 
                   type="monotone"
                   dataKey="value"
                   stroke={gradientColor}
                   fill="url(#portfolioGradient)"
                   strokeWidth={2}
+                  dot={false}
+                  connectNulls={false}
                 />
               </AreaChart>
             </ResponsiveContainer>

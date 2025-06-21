@@ -63,6 +63,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
   title
 }) => {
   const { t } = useTranslation();
+  const formRef = React.useRef<HTMLFormElement>(null);
 
   const liabilityTypeOptions = getLiabilityTypeOptions(t);
   const paymentFrequencyOptions = getPaymentFrequencyOptions(t);
@@ -72,6 +73,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
       title={title}
       onSubmit={onFormSubmit}
       backgroundColor="linear-gradient(135deg, rgba(255, 152, 0, 0.03) 0%, rgba(255, 193, 7, 0.03) 100%)"
+      formRef={formRef}
     >
       <RequiredSection>
         <FormGrid>

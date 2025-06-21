@@ -8,11 +8,13 @@ import { Transaction, Asset } from '@/types/domains/assets';
 /**
  * Gets the current quantity for a transaction
  * For buy transactions: returns purchaseQuantity
- * For sell transactions: returns negative saleQuantity (to subtract from portfolio)
+ * For sell transactions: returns negative purchaseQuantity (to subtract from portfolio)
+ * Note: Both buy and sell transactions use the purchaseQuantity field
  */
 export function getCurrentQuantity(transaction: Transaction | Asset): number {
   if (transaction.transactionType === 'sell') {
-    return -(transaction.saleQuantity || 0);
+    // For sell transactions, return negative purchaseQuantity to subtract from portfolio
+    return -(transaction.purchaseQuantity || 0);
   }
   return transaction.purchaseQuantity || 0;
 }
