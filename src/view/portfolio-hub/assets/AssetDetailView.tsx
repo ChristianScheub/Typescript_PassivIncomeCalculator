@@ -201,9 +201,8 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
           {featureFlag_Debug_View&& asset.assetDefinition?.priceHistory && asset.assetDefinition.priceHistory.length > 0 && (
             <PriceHistoryView
               priceHistory={asset.assetDefinition.priceHistory}
-              transactions={asset.transactions}
               showSourceIcons={true}
-              maxEntries={10}
+              maxEntries={9000}
             />
           )}
 
@@ -390,7 +389,7 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
               {t('assets.transactionHistory')} ({asset.transactions.length})
             </h3>
             <div className="space-y-3 max-h-60 overflow-y-auto">
-              {asset.transactions
+              {[...asset.transactions]
                 .sort((a, b) => new Date(b.purchaseDate).getTime() - new Date(a.purchaseDate).getTime())
                 .map((transaction) => (
                   <div

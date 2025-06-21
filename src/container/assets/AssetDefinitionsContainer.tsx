@@ -16,7 +16,9 @@ import { AssetType } from '../../types/shared';
 import Logger from '../../service/shared/logging/Logger/logger';
 import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { StockPriceUpdater } from '../../service/shared/utilities/helper/stockPriceUpdater';
+import { StockPriceUpdater, HistoricalDataPeriod } from '../../service/shared/utilities/helper/stockPriceUpdater';
+import { PriceEntry } from '../../ui/dialog/AddPriceEntryDialog';
+import { addPriceToHistory } from '../../utils/priceHistoryUtils';
 
 interface AssetDefinitionsContainerProps {
   onBack?: () => void;
@@ -168,10 +170,10 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     }
   };
 
-  const handleUpdateHistoricalData = async () => {
+  const handleUpdateHistoricalData = async (period?: HistoricalDataPeriod) => {
     setIsUpdatingHistoricalData(true);
     try {
-      Logger.info('Starting historical data update for asset definitions');
+      Logger.info(`Starting historical data update for asset definitions with period: ${period || 'default (30 days)'}`);
       
       // Filter AssetDefinitions that have stock type and ticker symbols
       const stockDefinitions = assetDefinitions.filter((def: AssetDefinition) => 
@@ -183,7 +185,10 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         return;
       }
       
-      const updatedDefinitions = await StockPriceUpdater.updateStockHistoricalData(stockDefinitions);
+      // Use the new method with period if provided, otherwise fall back to default method
+      const updatedDefinitions = period 
+        ? await StockPriceUpdater.updateStockHistoricalDataWithPeriod(stockDefinitions, period)
+        : await StockPriceUpdater.updateStockHistoricalData(stockDefinitions);
       
       if (updatedDefinitions.length > 0) {
         Logger.info(`Dispatching historical data updates for ${updatedDefinitions.length} stock definitions`);
@@ -206,6 +211,41 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       Logger.error('Failed to update historical data for asset definitions' + ' - ' + JSON.stringify(error as Error));
     } finally {
       setIsUpdatingHistoricalData(false);
+    }
+  };
+
+  const handleAddPriceEntry = async (definitionId: string, entry: PriceEntry) => {
+    try {
+      Logger.info('Adding price entry to asset definition' + " - " + JSON.stringify({ definitionId, entry }));
+      
+      // Find the definition
+      const definition = assetDefinitions.find((def: AssetDefinition) => def.id === definitionId);
+      if (!definition) {
+        Logger.error(`Asset definition not found: ${definitionId}`);
+        return;
+      }
+      
+      // Add the price entry to the history
+      const updatedPriceHistory = addPriceToHistory(
+        entry.price,
+        definition.priceHistory || [],
+        entry.date,
+        'manual'
+      );
+      
+      // Update the definition with the new price history and current price
+      const updatedDefinition = {
+        ...definition,
+        priceHistory: updatedPriceHistory,
+        currentPrice: entry.price,
+        lastPriceUpdate: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(updatedDefinition));
+      Logger.info(`Successfully added price entry to ${definition.fullName}`);
+    } catch (error) {
+      Logger.error('Failed to add price entry' + " - " + JSON.stringify(error as Error));
     }
   };
 
@@ -250,6 +290,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       onBack={onBack}
       onAddDefinitionWithCategories={handleAddDefinition}
       onUpdateDefinitionWithCategories={handleUpdateDefinition}
+      onAddPriceEntry={handleAddPriceEntry}
     />
   );
 };

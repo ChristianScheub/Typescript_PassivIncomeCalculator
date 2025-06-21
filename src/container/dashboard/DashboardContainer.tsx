@@ -9,7 +9,7 @@ import {
   selectFinancialSummary
 } from '../../store/slices/calculatedDataSlice';
 import DashboardView from '../../view/finance-hub/overview/DashboardView';
-import AssetFocusContainer from './AssetFocusContainer';
+import AssetFocusDashboardContainer from './AssetDashboardView';
 import analyticsService from '../../service/domain/analytics/calculations/financialAnalyticsService';
 import alertsService from '../../service/application/notifications/alertsService';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
@@ -134,8 +134,8 @@ const DashboardContainer: React.FC = () => {
 
   // Dashboard mode routing
   if (dashboardMode === 'assetFocus') {
-    Logger.infoService("DashboardContainer: Rendering AssetFocusContainer");
-    return <AssetFocusContainer />;
+    Logger.infoService("DashboardContainer: Rendering AssetFocusDashboardContainer");
+    return <AssetFocusDashboardContainer />;
   }
 
   // Default: Smart Summary Dashboard

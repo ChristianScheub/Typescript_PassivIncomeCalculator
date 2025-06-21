@@ -27,7 +27,7 @@ interface PortfolioSummary {
   totalDayChangePercent: number;
 }
 
-interface AssetFocusViewProps {
+interface AssetDashboardViewProps {
   portfolioHistory: PortfolioHistoryPoint[];
   assetsWithValues: AssetWithValue[];
   portfolioSummary: PortfolioSummary;
@@ -44,7 +44,7 @@ interface AssetFocusViewProps {
   isIntradayView?: boolean; // New prop to indicate if showing intraday data
 }
 
-const AssetFocusView: React.FC<AssetFocusViewProps> = ({
+const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
   portfolioHistory,
   assetsWithValues,
   portfolioSummary: _portfolioSummary, // Renamed to indicate it's intentionally unused
@@ -230,4 +230,4 @@ const AssetFocusView: React.FC<AssetFocusViewProps> = ({
   );
 };
 
-export default AssetFocusView;
+export default AssetDashboardView;

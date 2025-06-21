@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pencil, Trash2, Eye } from 'lucide-react';
+import { Pencil, Trash2, Eye, Plus } from 'lucide-react';
 import { Button } from './Button';
 
 interface ActionButtonGroupProps {
@@ -9,12 +9,16 @@ interface ActionButtonGroupProps {
   showDelete?: boolean;
   /** Show view button */
   showView?: boolean;
+  /** Show add price button */
+  showAddPrice?: boolean;
   /** Edit button click handler */
   onEdit?: () => void;
   /** Delete button click handler */
   onDelete?: () => void;
   /** View button click handler */
   onView?: () => void;
+  /** Add price button click handler */
+  onAddPrice?: () => void;
   /** Size of the buttons */
   size?: 'sm' | 'default' | 'lg';
   /** Button variant */
@@ -27,9 +31,11 @@ export const ActionButtonGroup: React.FC<ActionButtonGroupProps> = ({
   showEdit = true,
   showDelete = true,
   showView = false,
+  showAddPrice = false,
   onEdit,
   onDelete,
   onView,
+  onAddPrice,
   size = 'sm',
   variant = 'outline',
   className = ''
@@ -45,6 +51,18 @@ export const ActionButtonGroup: React.FC<ActionButtonGroupProps> = ({
         >
           <Eye size={14} className="mr-1" />
           View
+        </Button>
+      )}
+      
+      {showAddPrice && onAddPrice && (
+        <Button
+          variant={variant}
+          size={size}
+          onClick={onAddPrice}
+          className="text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/30"
+        >
+          <Plus size={14} className="mr-1" />
+          Add Price
         </Button>
       )}
       

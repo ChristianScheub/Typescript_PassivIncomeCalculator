@@ -6,14 +6,14 @@ import { calculatePortfolioHistory } from '../../store/slices/calculatedDataSlic
 import { updateAssetDefinition } from '../../store/slices/assetDefinitionsSlice';
 import { usePortfolioHistory, useAssetFocusData, useFinancialSummary } from '../../hooks/useCalculatedDataCache';
 import { useIntradayPortfolioData } from '../../hooks/useIntradayData';
-import AssetFocusView from '../../view/finance-hub/overview/AssetFocusView';
+import AssetDashboardView from '../../view/finance-hub/overview/AssetDashboardView';
 import stockAPIService from '../../service/domain/assets/market-data/stockAPIService';
 import { useAsyncOperation } from '../../utils/containerUtils';
 import cacheRefreshService from '../../service/application/orchestration/cacheRefreshService';
 import { addIntradayPriceHistory } from '../../utils/priceHistoryUtils';
 import Logger from '../../service/shared/logging/Logger/logger';
 
-const AssetFocusContainer: React.FC = () => {
+const AssetFocusDashboardContainer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { executeAsyncOperation } = useAsyncOperation();
@@ -33,7 +33,7 @@ const AssetFocusContainer: React.FC = () => {
   const enhancedPortfolioHistory = React.useMemo(() => {
     const baseData = portfolioHistoryData?.data || [];
     
-    Logger.info(`AssetFocusContainer enhancedPortfolioHistory: timeRange=${assetFocus.timeRange}, baseData=${baseData.length}, intradayData=${intradayData.length}`);
+    Logger.info(`AssetFocusDashboardContainer enhancedPortfolioHistory: timeRange=${assetFocus.timeRange}, baseData=${baseData.length}, intradayData=${intradayData.length}`);
     
     // If we have intraday data and we're looking at "1D" or "1W" timeframe, show intraday details
     if ((assetFocus.timeRange === '1D' || assetFocus.timeRange === '1W') && intradayData.length > 0) {
@@ -184,7 +184,7 @@ const AssetFocusContainer: React.FC = () => {
   }, [executeAsyncOperation, assetDefinitions, dispatch]);
 
   return (
-    <AssetFocusView
+    <AssetDashboardView
       portfolioHistory={enhancedPortfolioHistory}
       assetsWithValues={assetsWithValues}
       portfolioSummary={portfolioSummary}
@@ -203,4 +203,4 @@ const AssetFocusContainer: React.FC = () => {
   );
 };
 
-export default AssetFocusContainer;
+export default AssetFocusDashboardContainer;

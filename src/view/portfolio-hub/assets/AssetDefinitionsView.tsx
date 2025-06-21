@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AssetCategoryAssignment } from "../../../types/domains/assets/categories";
 import { AssetDefinition } from "../../../types/domains/assets";
@@ -11,6 +11,9 @@ import { ActionButtonGroup } from "../../../ui/common/ActionButtonGroup";
 import { IconButton } from "../../../ui/common";
 import { Tooltip } from "@mui/material";
 import { formatService } from "../../../service";
+import { TimeRangeSelectionDialog } from "../../../ui/dialog/TimeRangeSelectionDialog";
+import { TimeRangePeriod } from "../../../types/shared/time";
+import { AddPriceEntryDialog, PriceEntry } from "../../../ui/dialog/AddPriceEntryDialog";
 
 /**
  * Type for creating new asset definitions, omits metadata fields like id, createdAt, updatedAt.
@@ -34,7 +37,7 @@ interface AssetDefinitionsViewProps {
   onSetIsAddingDefinition: (isAdding: boolean) => void;
   onSetEditingDefinition: (definition: AssetDefinition | null) => void;
   onUpdateStockPrices: () => void;
-  onUpdateHistoricalData: () => void;
+  onUpdateHistoricalData: (period?: TimeRangePeriod) => void;
   onBack?: () => void;
   onAddDefinitionWithCategories?: (
     data: CreateAssetDefinitionData,
@@ -44,6 +47,7 @@ interface AssetDefinitionsViewProps {
     data: AssetDefinition,
     categoryAssignments: CreateCategoryAssignmentData[]
   ) => void;
+  onAddPriceEntry?: (definitionId: string, entry: PriceEntry) => void;
 }
 
 export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
@@ -65,8 +69,53 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   onBack,
   onAddDefinitionWithCategories,
   onUpdateDefinitionWithCategories,
+  onAddPriceEntry,
 }) => {
   const { t } = useTranslation();
+  
+  // State for the time range selection dialog
+  const [isTimeRangeDialogOpen, setIsTimeRangeDialogOpen] = useState(false);
+  
+  // State for the add price entry dialog
+  const [isAddPriceDialogOpen, setIsAddPriceDialogOpen] = useState(false);
+  const [selectedDefinitionForPrice, setSelectedDefinitionForPrice] = useState<AssetDefinition | null>(null);
+
+  // Handle opening the time range dialog
+  const handleHistoricalDataClick = () => {
+    setIsTimeRangeDialogOpen(true);
+  };
+
+  // Handle time range selection and close dialog
+  const handleTimeRangeConfirm = (period: TimeRangePeriod) => {
+    setIsTimeRangeDialogOpen(false);
+    onUpdateHistoricalData(period);
+  };
+
+  // Handle dialog close without selection
+  const handleTimeRangeClose = () => {
+    setIsTimeRangeDialogOpen(false);
+  };
+
+  // Handle opening the add price dialog
+  const handleAddPriceClick = (definition: AssetDefinition) => {
+    setSelectedDefinitionForPrice(definition);
+    setIsAddPriceDialogOpen(true);
+  };
+
+  // Handle price entry confirmation
+  const handlePriceEntryConfirm = (entry: PriceEntry) => {
+    if (selectedDefinitionForPrice && onAddPriceEntry) {
+      onAddPriceEntry(selectedDefinitionForPrice.id, entry);
+    }
+    setIsAddPriceDialogOpen(false);
+    setSelectedDefinitionForPrice(null);
+  };
+
+  // Handle price entry dialog close
+  const handlePriceEntryClose = () => {
+    setIsAddPriceDialogOpen(false);
+    setSelectedDefinitionForPrice(null);
+  };
 
   if (status === "loading") {
     return (
@@ -134,7 +183,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                   }}
                 >
                   <IconButton
-                    onClick={onUpdateHistoricalData}
+                    onClick={handleHistoricalDataClick}
                     icon={<History className="h-4 w-4" />}
                     aria-label={t("assets.updateHistoricalData")}
                     variant="outline"
@@ -264,6 +313,8 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                     <ActionButtonGroup
                       onEdit={() => onSetEditingDefinition(definition)}
                       onDelete={() => onDeleteDefinition(definition.id)}
+                      showAddPrice={true}
+                      onAddPrice={() => handleAddPriceClick(definition)}
                       size="sm"
                       variant="outline"
                     />
@@ -350,6 +401,22 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
           )}
         </div>
       </div>
+
+      {/* Time Range Selection Dialog */}
+      <TimeRangeSelectionDialog
+        isOpen={isTimeRangeDialogOpen}
+        onClose={handleTimeRangeClose}
+        onConfirm={handleTimeRangeConfirm}
+        title={t("assets.selectTimeRange") || "Zeitraum für historische Daten auswählen"}
+      />
+
+      {/* Add Price Entry Dialog */}
+      <AddPriceEntryDialog
+        isOpen={isAddPriceDialogOpen}
+        onClose={handlePriceEntryClose}
+        onConfirm={handlePriceEntryConfirm}
+        assetName={selectedDefinitionForPrice?.fullName || ""}
+      />
     </div>
   );
 };
