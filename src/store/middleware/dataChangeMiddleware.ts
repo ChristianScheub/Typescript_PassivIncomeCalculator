@@ -36,7 +36,7 @@ export const dataChangeMiddleware: Middleware<object, StoreState> = (store: Midd
       
       // If assets changed, update the monthly asset income cache specifically
       if (type.startsWith('assets/')) {
-        Logger.infoRedux('Assets changed, updating monthly asset income cache');
+        Logger.cache('Assets changed, updating monthly asset income cache');
         store.dispatch(updateMonthlyAssetIncomeCache());
       }
       

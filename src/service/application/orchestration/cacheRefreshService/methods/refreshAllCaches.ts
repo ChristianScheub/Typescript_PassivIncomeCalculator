@@ -40,7 +40,7 @@ import Logger from "@/service/shared/logging/Logger/logger";
  * - Recalculating new calculated data cache (portfolio history, asset focus, financial summary)
  */
 export async function refreshAllCaches(): Promise<void> {
-    Logger.infoService("Starting COMPLETE cache refresh for ALL data");
+    Logger.cache("Starting COMPLETE cache refresh for ALL data");
 
     try {
         // Step 1: Clear all dividend caches

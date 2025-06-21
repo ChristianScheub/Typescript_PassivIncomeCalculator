@@ -64,7 +64,11 @@ export const sortExpenses = (expenses: Expense[], order: SortOrder = SortOrder.D
  * Sort assets by monthly income (highest to lowest by default)
  */
 export const sortAssetsByIncome = (assets: Asset[], order: SortOrder = SortOrder.DESC): Asset[] => {
-  return sortItems(assets, (asset) => calculatorService.calculateAssetMonthlyIncome(asset), order);
+  // Use cache-aware calculation for performance
+  return sortItems(assets, (asset) => {
+    const result = calculatorService.calculateAssetMonthlyIncomeWithCache?.(asset);
+    return result ? result.monthlyAmount : calculatorService.calculateAssetMonthlyIncome(asset);
+  }, order);
 };
 
 /**

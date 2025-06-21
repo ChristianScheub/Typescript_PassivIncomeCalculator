@@ -99,7 +99,7 @@ export const calculateAssetMonthlyIncomeWithCache = (
   const cachedData = getCachedDividendData(asset);
   if (cachedData) {
     Logger.cache(
-      `Cache hit for asset ${asset.name}, returning cached dividend data`
+      `Cache hit for asset ${asset.name}, returning cached income: ${cachedData.monthlyAmount || 0} [CACHE HIT]`
     );
     return {
       monthlyAmount: cachedData.monthlyAmount || 0,
@@ -109,12 +109,17 @@ export const calculateAssetMonthlyIncomeWithCache = (
     };
   }
   
-  Logger.infoService(
-    `Cache miss for asset ${asset.name}, no cached dividend data available`
+  Logger.cache(
+    `Cache miss for asset ${asset.name}, calculating income... [CACHE MISS]`
   );
 
   // Use a helper to calculate all values and reduce complexity
   const { monthlyAmount, annualAmount, monthlyBreakdown } = calculateAssetIncomeBreakdown(asset);
+
+  // Log the calculated result (including 0 values)
+  Logger.cache(
+    `Calculated income for asset ${asset.name}: ${monthlyAmount} (should be cached for future use)`
+  );
 
   return {
     monthlyAmount,

@@ -12,11 +12,12 @@ export const generateRecommendations = (
   liabilities: Liability[],
   expenses: Expense[],
   income: Income[],
-  assetDefinitions: AssetDefinition[] = []
+  assetDefinitions: AssetDefinition[] = [],
+  portfolioCache?: { totals: { monthlyIncome: number } } | null // Optional portfolio cache
 ): PortfolioRecommendation[] => {
   // Collect all recommendations from different categories
   const assetRecommendations = generateAssetRecommendations(assets, assetDefinitions);
-  const incomeRecommendations = generateIncomeRecommendations(assets, income, assetDefinitions);
+  const incomeRecommendations = generateIncomeRecommendations(assets, income, assetDefinitions, portfolioCache);
   const expenseRecommendations = generateExpenseRecommendations(expenses, income);
   const liabilityRecommendations = generateLiabilityRecommendations(assets, liabilities);
   const planningRecommendations = generatePlanningRecommendations(assets, income, expenses, liabilities);

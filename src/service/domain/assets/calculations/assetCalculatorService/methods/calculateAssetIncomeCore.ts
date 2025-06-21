@@ -86,8 +86,17 @@ const getRentalIncome = (asset: Asset): number => {
 
 // Calculate monthly income for an individual asset
 export const calculateAssetMonthlyIncome = (asset: Asset): number => {
-  // Debug logging für Asset-Details
-  Logger.infoService(`=== Calculating income for asset: ${asset.name} ===`);
+  // OPTIMIZATION: Prioritize cached data to avoid expensive recalculations
+  const cachedData = getCachedDividendData(asset);
+  if (cachedData) {
+    Logger.cache(
+      `Cache hit for asset ${asset.name}, returning cached monthly income: ${cachedData.monthlyAmount}`
+    );
+    return cachedData.monthlyAmount || 0;
+  }
+
+  // Only log detailed calculation info if cache miss occurs
+  Logger.cache(`=== Calculating income for asset: ${asset.name} [CACHE MISS] ===`);
   Logger.infoService(
     `Asset type: ${asset.type}, Current quantity: ${getCurrentQuantity(
       asset
@@ -105,18 +114,6 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
     Logger.infoService(`No dividend info found for asset ${asset.name}`);
   }
 
-  // Zuerst prüfen, ob gecachte Daten vorhanden sind
-  const cachedData = getCachedDividendData(asset);
-  if (cachedData) {
-    Logger.cache(
-      `Cache hit for asset ${asset.name}, returning cached monthly income: ${cachedData.monthlyAmount}`
-    );
-    return cachedData.monthlyAmount || 0;
-  }
-
-  Logger.cache(
-    `Cache miss for asset ${asset.name}, calculating monthly income`
-  );
   Logger.infoService(
     `Calculating income for individual asset: ${asset.name} - Type: ${asset.type}`
   );
@@ -130,6 +127,15 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
   Logger.infoService(
     `Final individual income for asset ${asset.name}: ${income}`
   );
+
+  // TODO: Cache extension should be handled by a higher-level service
+  // that has access to store dispatch. For now, just log that cache should be updated.
+  if (income === 0) {
+    Logger.cache(`Asset ${asset.name} has 0 income - this should be cached to avoid repeated calculations`);
+  } else {
+    Logger.cache(`Asset ${asset.name} calculated income ${income} - this should be cached for future use`);
+  }
+  
   return income;
 };
 

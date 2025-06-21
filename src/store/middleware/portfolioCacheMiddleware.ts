@@ -41,7 +41,7 @@ export const portfolioCacheMiddleware: Middleware<object, StoreState> = (store) 
   
   // Invalidate cache if action type matches
   if (cacheInvalidatingActions.includes(action.type)) {
-    Logger.info(`Action ${action.type} detected, invalidating portfolio cache`);
+    Logger.cache(`Action ${action.type} detected, invalidating portfolio cache`);
     try {
       store.dispatch(invalidatePortfolioCache());
     } catch (error) {

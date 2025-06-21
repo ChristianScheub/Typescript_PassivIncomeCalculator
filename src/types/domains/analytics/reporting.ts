@@ -189,13 +189,35 @@ export type RecommendationCategory = 'assets' | 'income' | 'expenses' | 'liabili
 
 export interface PortfolioRecommendation {
   id: string;
+  // Internationalization support
+  titleKey?: string; // i18n key for title
+  title?: string; // Direct title (fallback)
+  descriptionKey?: string; // i18n key for description  
+  description?: string; // Direct description (fallback)
+  
+  // Core properties
   category: RecommendationCategory;
   priority: RecommendationPriority;
-  titleKey: string;
-  descriptionKey: string;
-  actionCategory?: string;
-  actionSubCategory?: string;
-  metadata?: Record<string, any>;
+  
+  // Action properties
+  actionCategory?: string; // e.g., 'income', 'assets', 'expenses'
+  actionSubCategory?: string; // e.g., 'passive', 'management', 'sources'
+  
+  // Metadata and context
+  metadata?: Record<string, any>; // Flexible metadata object
+  
+  // Optional properties for enhanced recommendations
+  impact?: number; // Expected impact score (0-100)
+  confidence?: number; // Confidence level (0-100)
+  actionItems?: string[];
+  relatedAssets?: string[]; // Asset IDs
+  estimatedTimeToImplement?: number; // in days
+  potentialReturn?: number; // Expected return improvement
+  riskLevel?: 'low' | 'medium' | 'high';
+  tags?: string[];
+  createdAt?: string;
+  isRead?: boolean;
+  isImplemented?: boolean;
 }
 
 // === Application Notifications Types (moved from service layer) ===

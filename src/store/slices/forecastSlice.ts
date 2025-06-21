@@ -120,11 +120,11 @@ export const updateForecastValues = createAsyncThunk(
     // Use portfolio cache for monthly asset income calculations
     const portfolioCache = transactions.portfolioCache;
     if (!portfolioCache || !transactions.portfolioCacheValid) {
-      Logger.infoRedux('Portfolio cache not available for forecast calculation');
+      Logger.cache('Portfolio cache not available for forecast calculation');
       throw new Error('Portfolio cache required for forecast calculations');
     }
 
-    Logger.infoRedux('Using portfolio positions for monthly asset income cache');
+    Logger.cache('Using portfolio positions for monthly asset income cache');
     for (let month = 1; month <= 12; month++) {
       monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
     }
@@ -154,7 +154,7 @@ export const updateMonthlyAssetIncomeCache = createAsyncThunk<
 >(
   'forecast/updateAssetIncomeCache',
   async (_, { getState }) => {
-    Logger.infoRedux('Updating monthly asset income cache');
+    Logger.cache('Updating monthly asset income cache');
     const state = getState() as StoreState;
     const { transactions } = state;
 
@@ -163,16 +163,15 @@ export const updateMonthlyAssetIncomeCache = createAsyncThunk<
     // Use portfolio cache for monthly asset income calculations
     const portfolioCache = transactions.portfolioCache;
     if (!portfolioCache || !transactions.portfolioCacheValid) {
-      Logger.infoRedux('Portfolio cache not available for cache update');
+      Logger.cache('Portfolio cache not available for cache update');
       throw new Error('Portfolio cache required for monthly asset income calculations');
     }
 
-    Logger.infoRedux('Using portfolio positions for cache update');
+    Logger.cache('Using portfolio positions for cache update');
     for (let month = 1; month <= 12; month++) {
-      monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);
-    }
-
-    Logger.infoRedux('Monthly asset income cache updated');
+      monthlyAssetIncomeCache[month] = calculatePortfolioMonthlyIncome(portfolioCache.positions, month);    }
+    
+    Logger.cache('Monthly asset income cache updated');
     return { monthlyAssetIncomeCache };
   }
 );
@@ -185,7 +184,7 @@ const forecastSlice = createSlice({
     invalidateCache: (state) => {
       state.monthlyAssetIncomeCache = {};
       state.lastUpdated = null;
-      Logger.infoRedux('Forecast cache invalidated');
+      Logger.cache('Forecast cache invalidated');
     }
   },
   extraReducers: (builder) => {
@@ -207,7 +206,7 @@ const forecastSlice = createSlice({
       })
       .addCase(updateMonthlyAssetIncomeCache.fulfilled, (state, action) => {
         state.monthlyAssetIncomeCache = action.payload.monthlyAssetIncomeCache;
-        Logger.infoRedux('Monthly asset income cache updated');
+        Logger.cache('Monthly asset income cache updated');
       })
       .addCase(hydrateStore, (state, action) => {
         if (action.payload.forecast) {

@@ -1,22 +1,36 @@
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
 import { Income } from '@/types/domains/financial/';
-import { PortfolioRecommendation } from '../interfaces/IAnalyticsService';
 import calculatorService from '../../../../financial/calculations/compositeCalculatorService';
+import Logger from '../../../../../shared/logging/Logger/logger';
+import { PortfolioRecommendation } from '@/types/domains/analytics';
 
 export const generateIncomeRecommendations = (
   assets: Asset[],
   income: Income[],
-  assetDefinitions: AssetDefinition[] = []
+  assetDefinitions: AssetDefinition[] = [],
+  portfolioCache?: { totals: { monthlyIncome: number } } | null // Optional portfolio cache
 ): PortfolioRecommendation[] => {
   const recommendations: PortfolioRecommendation[] = [];
 
   // Calculate income metrics
   const totalMonthlyIncome = calculatorService.calculateTotalMonthlyIncome(income);
-  const passiveIncomeFromAssets = calculatorService.calculateTotalMonthlyAssetIncome(assets);
+  
+  // OPTIMIZATION: Use portfolio cache if available to avoid asset recalculations
+  let passiveIncomeFromAssets: number;
+  if (portfolioCache?.totals?.monthlyIncome !== undefined) {
+    passiveIncomeFromAssets = portfolioCache.totals.monthlyIncome;
+    Logger.cache(`Using portfolio cache for asset income in recommendations: ${passiveIncomeFromAssets} [CACHE HIT]`);
+  } else {
+    Logger.cache(`Portfolio cache not available, falling back to asset calculations [CACHE MISS]`);
+    passiveIncomeFromAssets = calculatorService.calculateTotalMonthlyAssetIncome(assets);
+  }
+  
   const passiveIncomeFromSources = calculatorService.calculatePassiveIncome(income);
   
   const totalPassiveIncome = passiveIncomeFromAssets + passiveIncomeFromSources;
   const passiveRatio = totalMonthlyIncome > 0 ? (totalPassiveIncome / totalMonthlyIncome) * 100 : 0;
+
+  Logger.infoService(`Income recommendations: passiveFromAssets=${passiveIncomeFromAssets}, passiveFromSources=${passiveIncomeFromSources}, ratio=${passiveRatio.toFixed(1)}%`);
 
   // 9. Passive Income Increase
   if (passiveRatio < 30) {

@@ -22,7 +22,7 @@ export class PortfolioHistoryHelper {
     this.portfolioValueCache.clear();
     this.datesCache.clear();
     this.assetDefMapCache.clear();
-    Logger.infoService('Portfolio history caches cleared');
+    Logger.cache('Portfolio history caches cleared');
   }
 
   /**
@@ -207,7 +207,7 @@ export class PortfolioHistoryHelper {
     const cachedDates = this.datesCache.get(cacheKey);
     
     if (cachedDates) {
-      Logger.infoService('Cache hit: Using cached unique dates');
+      Logger.cache('Cache hit: Using cached unique dates');
       return cachedDates;
     }
 

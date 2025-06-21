@@ -17,6 +17,7 @@ import calculatedDataReducer, { markStoreHydrated, validateCacheOnStartup } from
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
 import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
 import calculatedDataCacheMiddleware from './middleware/calculatedDataCacheMiddleware';
+import assetCalculationCacheMiddleware from './middleware/assetCalculationCacheMiddleware';
 import Logger from '@service/shared/logging/Logger/logger';
 import { validatePortfolioCache } from '../utils/portfolioCacheUtils';
 
@@ -41,7 +42,7 @@ const loadState = () => {
       transactionsData?.portfolioCacheValid
     );
     
-    Logger.infoRedux(`Loading state from localStorage - portfolio cache ${cacheValid ? 'valid' : 'invalid/missing'}`);
+    Logger.cache(`Loading state from localStorage - portfolio cache ${cacheValid ? 'valid' : 'invalid/missing'}`);
     
     return {
       transactions: { 
@@ -163,13 +164,15 @@ export const store = configureStore({
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       portfolioCacheMiddleware as any,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      calculatedDataCacheMiddleware as any
+      calculatedDataCacheMiddleware as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      assetCalculationCacheMiddleware as any
     ),
 } as any);
 
 // Mark store as hydrated and validate cache if we loaded persisted state
 if (persistedState) {
-  Logger.infoRedux('Store created with persisted state, marking as hydrated and validating cache');
+  Logger.cache('Store created with persisted state, marking as hydrated and validating cache');
   store.dispatch(markStoreHydrated());
   store.dispatch(validateCacheOnStartup());
 } else {

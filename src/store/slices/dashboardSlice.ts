@@ -40,13 +40,14 @@ export const updateDashboardValues = createAsyncThunk(
     let monthlyAssetIncome: number;
     let totalAssets: number;
     
+    // OPTIMIZATION: Always use portfolio cache if available and valid
     if (portfolioCache && assets.portfolioCacheValid) {
       monthlyAssetIncome = portfolioCache.totals.monthlyIncome;
       totalAssets = portfolioCache.totals.totalValue;
-      Logger.infoRedux(`Using portfolio cache - monthlyIncome: ${monthlyAssetIncome}, totalValue: ${totalAssets}`);
+      Logger.cache(`Using portfolio cache - monthlyIncome: ${monthlyAssetIncome}, totalValue: ${totalAssets} [CACHE HIT]`);
     } else {
       // Cache invalid - trigger recalculation and use 0 as fallback until ready
-      Logger.infoRedux('Portfolio cache invalid, using zero values until recalculation completes');
+      Logger.cache('Portfolio cache invalid, using zero values until recalculation completes [CACHE MISS]');
       monthlyAssetIncome = 0;
       totalAssets = 0;
     }
@@ -66,8 +67,10 @@ export const updateDashboardValues = createAsyncThunk(
     
     const passiveIncomeRatio = calculatorService.calculatePassiveIncomeRatio(monthlyIncome, passiveIncome);
     
+    // OPTIMIZATION: Use pre-computed portfolio cache data for asset allocation
     let assetAllocation: Array<{name: string; type: string; value: number; percentage: number}> = [];
     if (portfolioCache && assets.portfolioCacheValid) {
+      // Use optimized Map-based approach with portfolio cache
       const typeMap = new Map<string, number>();
       portfolioCache.positions.forEach((position: PortfolioPosition) => {
         const currentValue = typeMap.get(position.type) || 0;
@@ -82,18 +85,19 @@ export const updateDashboardValues = createAsyncThunk(
           ? (value / portfolioCache.totals.totalValue) * 100 
           : 0
       }));
-      Logger.infoRedux('Using direct portfolio cache access for asset allocation');
+      Logger.cache(`Using portfolio cache for asset allocation - ${assetAllocation.length} types [CACHE HIT]`);
     } else {
-      Logger.infoRedux('Portfolio cache invalid, using empty asset allocation');
+      Logger.cache('Portfolio cache invalid, using empty asset allocation [CACHE MISS]');
     }
 
-    // Calculate total asset gain and percentage using portfolio cache
+    // OPTIMIZATION: Use portfolio cache for asset gain calculations
     let totalAssetGain = 0;
     let totalAssetGainPercentage = 0;
     
     if (portfolioCache && assets.portfolioCacheValid) {
+      // Use pre-calculated values from portfolio cache
       const totalInitialInvestment = portfolioCache.positions.reduce((sum: number, position: PortfolioPosition) => {
-        return sum + position.totalInvestment; // Already accounts for buy/sell transactions correctly
+        return sum + position.totalInvestment;
       }, 0);
 
       totalAssetGain = totalAssets - totalInitialInvestment;
@@ -101,17 +105,12 @@ export const updateDashboardValues = createAsyncThunk(
         ? (totalAssetGain / totalInitialInvestment) * 100 
         : 0;
       
-      Logger.infoRedux(`Asset gain calculation - totalAssets: ${totalAssets}, totalInvestment: ${totalInitialInvestment}, gain: ${totalAssetGain} (${totalAssetGainPercentage}%)`);
+      Logger.cache(`Asset gain from cache - gain: ${totalAssetGain} (${totalAssetGainPercentage.toFixed(2)}%) [CACHE HIT]`);
     } else {
-      Logger.infoRedux('Portfolio cache invalid, using zero values for asset gain calculation');
+      Logger.cache('Portfolio cache invalid, using zero values for asset gain calculation [CACHE MISS]');
     }
 
-    Logger.infoRedux(`Dashboard values updated: ${JSON.stringify({
-      monthlyIncome,
-      monthlyExpenses,
-      netWorth,
-      passiveIncomeRatio: Math.round(passiveIncomeRatio * 100) / 100
-    })}`);
+    Logger.cache(`Dashboard calculation completed using portfolio cache: ${portfolioCache && assets.portfolioCacheValid ? 'YES' : 'NO'}`);
 
     return {
       netWorth,

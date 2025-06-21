@@ -16,7 +16,7 @@ export const getExchangeRateMethod = async (): Promise<number> => {
     const todayRate = existingRates.find(rate => rate.date === today);
 
     if (todayRate) {
-      Logger.infoService(`Found cached exchange rate for ${today}: ${todayRate.usdToEur}`);
+      Logger.cache(`Found cached exchange rate for ${today}: ${todayRate.usdToEur}`);
       return todayRate.usdToEur;
     }
 

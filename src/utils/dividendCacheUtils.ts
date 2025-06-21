@@ -106,3 +106,26 @@ export function shouldInvalidateCache(oldAsset: Asset, newAsset: Asset): boolean
 export function compareAlphabetically(a: string, b: string): number {
   return a.localeCompare(b);
 }
+
+/**
+ * Updates the cached dividend data for an asset after calculation
+ * Returns a new asset object with updated cache
+ */
+export function updateAssetCache(
+  asset: Asset,
+  monthlyAmount: number,
+  annualAmount: number = monthlyAmount * 12,
+  monthlyBreakdown: Record<number, number> = {}
+): Asset {
+  const cachedDividends = createCachedDividends(
+    monthlyAmount,
+    annualAmount,
+    monthlyBreakdown,
+    asset
+  );
+  
+  return {
+    ...asset,
+    cachedDividends
+  };
+}

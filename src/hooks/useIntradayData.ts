@@ -84,14 +84,14 @@ export function useIntradayPortfolioData(): Array<{ date: string; value: number;
   const intradayData = useIntradayData();
 
   return useMemo(() => {
-    Logger.info(`useIntradayPortfolioData: portfolioCache exists: ${!!portfolioCache}, intradayData length: ${intradayData.length}`);
+    Logger.cache(`useIntradayPortfolioData: portfolioCache exists: ${!!portfolioCache}, intradayData length: ${intradayData.length}`);
     
     if (!portfolioCache || !portfolioCache.positions || intradayData.length === 0) {
-      Logger.info(`useIntradayPortfolioData: Early return - portfolioCache: ${!!portfolioCache}, positions: ${!!portfolioCache?.positions}, intradayData: ${intradayData.length}`);
+      Logger.cache(`useIntradayPortfolioData: Early return - portfolioCache: ${!!portfolioCache}, positions: ${!!portfolioCache?.positions}, intradayData: ${intradayData.length}`);
       return [];
     }
 
-    Logger.info(`useIntradayPortfolioData: Processing ${intradayData.length} intraday entries with ${portfolioCache.positions.length} portfolio positions`);
+    Logger.cache(`useIntradayPortfolioData: Processing ${intradayData.length} intraday entries with ${portfolioCache.positions.length} portfolio positions`);
 
     // Group intraday data by asset ticker/symbol and then by timestamp
     const assetDataMap = new Map<string, Map<string, PriceHistoryEntry>>();

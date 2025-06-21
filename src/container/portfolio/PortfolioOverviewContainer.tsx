@@ -3,7 +3,6 @@ import { useAppSelector } from '../../hooks/redux';
 import { selectPortfolioCache } from '../../store/slices/transactionsSlice';
 import PortfolioOverviewView from '../../view/portfolio-hub/PortfolioOverviewView';
 import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
-import { PortfolioCategory, PortfolioSubCategory } from '../../service/domain/analytics/reporting/recentActivityService';
 import { getAssetAllocationFromCache } from '../../utils/portfolioCacheHelpers';
 import Logger from '../../service/shared/logging/Logger/logger';
 import { Income, Expense, Liability } from '../../types/domains/financial/entities';
@@ -25,7 +24,7 @@ interface PortfolioSummary {
 
 interface PortfolioOverviewContainerProps {
   portfolioSummary: PortfolioSummary;
-  onCategoryChange: (category: PortfolioCategory, subCategory?: PortfolioSubCategory) => void;
+  onCategoryChange: (category: string, subCategory?: string) => void;
 }
 
 const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
@@ -38,9 +37,10 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
   const expenses = useAppSelector(state => state.expenses.items);
   const liabilities = useAppSelector(state => state.liabilities.items);
 
-  // Calculate portfolio analytics for overview charts
+  // Calculate portfolio analytics for overview charts - OPTIMIZED
   const portfolioAnalytics = useMemo(() => {
     if (!portfolioCache?.positions.length) {
+      Logger.cache('Portfolio Overview: No portfolio cache available, returning empty analytics [CACHE MISS]');
       return {
         assetAllocation: [],
         incomeSourcesBreakdown: [],
@@ -49,11 +49,12 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
       };
     }
 
-    Logger.info('Calculating portfolio analytics for overview');
+    Logger.cache('Portfolio Overview: Computing analytics from portfolio cache [CACHE HIT]');
     
+    // OPTIMIZATION: Use pre-computed portfolio cache data instead of recalculating
     const assetAllocation = getAssetAllocationFromCache(portfolioCache.positions);
     
-    // Income sources breakdown
+    // Income sources breakdown - avoiding asset-level recalculations
     const incomeSourcesBreakdown = income.reduce((acc: CategoryBreakdown[], incomeItem: Income) => {
       const type = incomeItem.type;
       const monthlyAmount = calculatorService.calculateMonthlyIncome(incomeItem);
@@ -124,6 +125,8 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
     liabilityTypesBreakdown.forEach((item: CategoryBreakdown) => {
       item.percentage = totalLiabilities > 0 ? (item.value / totalLiabilities) * 100 : 0;
     });
+
+    Logger.cache(`Portfolio Overview: Analytics computed from cache - ${assetAllocation.length} asset types, ${incomeSourcesBreakdown.length} income sources [CACHE HIT]`);
 
     return {
       assetAllocation,

@@ -155,6 +155,17 @@ const transactionsSlice = createSlice({
       state.portfolioCache = action.payload.cache;
       state.portfolioCacheValid = true;
       state.lastPortfolioCalculation = action.payload.timestamp;
+    },
+    updateAssetCache: (state, action: PayloadAction<{ assetId: string; cachedDividends: any }>) => {
+      const { assetId, cachedDividends } = action.payload;
+      const assetIndex = state.items.findIndex(item => item.id === assetId);
+      if (assetIndex !== -1) {
+        state.items[assetIndex] = {
+          ...state.items[assetIndex],
+          cachedDividends
+        };
+        Logger.cache(`Updated dividend cache for asset ${assetId}`);
+      }
     }
   },
   extraReducers: (builder) => {
@@ -212,7 +223,8 @@ const transactionsSlice = createSlice({
 export const {
   clearAllTransactions,
   invalidatePortfolioCache,
-  setPortfolioCache
+  setPortfolioCache,
+  updateAssetCache
 } = transactionsSlice.actions;
 
 // Selectors
