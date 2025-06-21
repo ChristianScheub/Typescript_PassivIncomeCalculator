@@ -61,7 +61,7 @@ interface DashboardViewProps {
   miniAnalytics: MiniAnalytic[];
   milestones: Milestone[];
   alerts: UIAlert[];
-  history30Days: any[];
+  history30Days: Array<{ date: string; value: number; change: number; changePercentage: number }>;
   navigationHandlers: NavigationHandlers;
   onRefresh: () => Promise<void>;
 }

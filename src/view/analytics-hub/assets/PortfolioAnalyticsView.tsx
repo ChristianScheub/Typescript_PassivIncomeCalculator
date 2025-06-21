@@ -7,7 +7,8 @@ import CustomAnalyticsView from './CustomAnalyticsView';
 import { ViewHeader } from '../../../ui/layout/ViewHeader';
 import { AssetTypeFilterCard } from '../../../ui/specialized/AssetTypeFilterCard';
 import { getAssetTypeOptions } from '../../../constants';
-import { AllocationData } from '@/service/domain/analytics/calculations/financialAnalyticsService/methods/calculatePortfolioAnalytics';
+import { AllocationData } from '../../../types/domains/analytics/calculations';
+import { PortfolioPosition } from '../../../types/shared/analytics';
 import { AssetType } from '@/types/shared';
 
 type AnalyticsTab = 'asset_distribution' | 'income_distribution' | 'custom';
@@ -21,7 +22,7 @@ interface PortfolioAnalyticsViewProps {
   assetTypeIncome: AllocationData[];
   sectorIncome: AllocationData[];
   countryIncome: AllocationData[];
-  portfolioPositions: any[];
+  portfolioPositions: PortfolioPosition[];
   onTabChange: (tab: AnalyticsTab) => void;
   onAssetTypeFilterChange: (assetType: AssetType | 'all') => void;
   onBack: () => void;

@@ -39,7 +39,7 @@ interface AssetDashboardViewProps {
 const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
   portfolioHistory,
   assetsWithValues,
-  portfolioSummary: _portfolioSummary, // Renamed to indicate it's intentionally unused
+  portfolioSummary: _portfolioSummary, // eslint-disable-line @typescript-eslint/no-unused-vars
   selectedTimeRange,
   onTimeRangeChange,
   onRefresh,

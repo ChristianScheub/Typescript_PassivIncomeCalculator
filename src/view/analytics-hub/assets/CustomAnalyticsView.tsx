@@ -14,9 +14,25 @@ import {
   ChartType, CustomAnalyticsConfig, DataSource, GroupBy
 } from '../../../store/slices/customAnalyticsSlice';
 import { PortfolioPosition } from '../../../types/shared/analytics';
+import { 
+  AllocationData, 
+  PortfolioAnalyticsData as ServicePortfolioAnalyticsData,
+  IncomeAnalyticsData as ServiceIncomeAnalyticsData
+} from '../../../types/domains/analytics/calculations';
+import { PieChartData } from '../../../types/shared/charts';
 import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
 import { Plus, Trash2, Edit3, X } from 'lucide-react';
 
+/**
+ * Chart data item that extends PieChartData with percentage for analytics views
+ */
+interface ChartDataItem extends PieChartData {
+  percentage: number;
+}
+
+/**
+ * Temporary chart configuration used during creation/editing
+ */
 interface TempChartConfig {
   id?: string;
   title: string;
@@ -27,6 +43,9 @@ interface TempChartConfig {
   selectedCategoryOptionId?: string;
 }
 
+/**
+ * Props for the chart configuration panel
+ */
 interface ConfigPanelProps {
   isOpen: boolean;
   editingChart: CustomAnalyticsConfig | null;
@@ -173,8 +192,12 @@ const ConfigPanel: React.FC<ConfigPanelProps> = ({
   );
 };
 
+/**
+ * Props for the main CustomAnalyticsView component
+ */
 interface CustomAnalyticsViewProps {
-  filteredPositions?: PortfolioPosition[]; // Updated type
+  /** Optional filtered positions to analyze, falls back to portfolio cache if not provided */
+  filteredPositions?: PortfolioPosition[];
 }
 
 const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPositions }) => {
@@ -187,7 +210,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
   const portfolioCache = useAppSelector(state => state.transactions.portfolioCache);
 
   // Calculate portfolio analytics data from portfolio positions
-  const portfolioAnalytics = useMemo(() => {
+  const portfolioAnalytics = useMemo((): ServicePortfolioAnalyticsData => {
     // Use filteredPositions if provided, otherwise fall back to portfolioCache positions
     const positions = filteredPositions && filteredPositions.length > 0 
       ? filteredPositions 
@@ -207,7 +230,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
   }, [filteredPositions, portfolioCache?.positions]);
 
   // Calculate income analytics data from portfolio positions (like IncomeDistributionView)
-  const incomeAnalytics = useMemo(() => {
+  const incomeAnalytics = useMemo((): ServiceIncomeAnalyticsData => {
     // Use filteredPositions if provided, otherwise fall back to portfolioCache positions
     const positions = filteredPositions && filteredPositions.length > 0 
       ? filteredPositions 
@@ -272,14 +295,14 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
   };
 
   // Helper function to get positions data
-  const getPositionsData = () => {
+  const getPositionsData = (): PortfolioPosition[] => {
     return filteredPositions && filteredPositions.length > 0 
       ? filteredPositions 
       : portfolioCache?.positions || [];
   };
 
   // Helper function to map asset type data with translation
-  const mapAssetTypeData = (items: any[]) => {
+  const mapAssetTypeData = (items: AllocationData[]): ChartDataItem[] => {
     return items.map(item => ({
       name: t(`assets.types.${item.name}`),
       value: item.value,
@@ -288,7 +311,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
   };
 
   // Helper function to map generic data
-  const mapGenericData = (items: any[]) => {
+  const mapGenericData = (items: AllocationData[]): ChartDataItem[] => {
     return items.map(item => ({
       name: item.name,
       value: item.value,
@@ -297,12 +320,12 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
   };
 
   // Helper function to get asset definition data (value-based)
-  const getAssetDefinitionValueData = () => {
+  const getAssetDefinitionValueData = (): ChartDataItem[] => {
     const positions = getPositionsData();
     if (positions.length === 0) return [];
     
-    const totalValue = positions.reduce((sum: number, pos: PortfolioPosition) => sum + pos.currentValue, 0);
-    return positions.map((position: PortfolioPosition) => ({
+    const totalValue = positions.reduce((sum, pos) => sum + pos.currentValue, 0);
+    return positions.map(position => ({
       name: position.name,
       value: position.currentValue,
       percentage: totalValue > 0 ? (position.currentValue / totalValue) * 100 : 0
@@ -310,21 +333,21 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
   };
 
   // Helper function to get asset definition data (income-based)
-  const getAssetDefinitionIncomeData = () => {
+  const getAssetDefinitionIncomeData = (): ChartDataItem[] => {
     const positions = getPositionsData();
     if (positions.length === 0) return [];
     
-    const totalIncome = positions.reduce((sum: number, pos: PortfolioPosition) => sum + pos.monthlyIncome, 0);
+    const totalIncome = positions.reduce((sum, pos) => sum + pos.monthlyIncome, 0);
     return positions
-      .filter((position: PortfolioPosition) => position.monthlyIncome > 0)
-      .map((position: PortfolioPosition) => ({
+      .filter(position => position.monthlyIncome > 0)
+      .map(position => ({
         name: position.name,
         value: position.monthlyIncome,
         percentage: totalIncome > 0 ? (position.monthlyIncome / totalIncome) * 100 : 0
       }));
   };
 
-  const getChartData = (chart: CustomAnalyticsConfig) => {
+  const getChartData = (chart: CustomAnalyticsConfig): ChartDataItem[] => {
     switch (chart.dataSource) {
       case 'assetValue': {
         switch (chart.groupBy) {
@@ -339,7 +362,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
           case 'assetDefinition':
             return getAssetDefinitionValueData();
           default:
-            return assetAllocation.map((item: any) => ({
+            return assetAllocation.map((item: AllocationData) => ({
               name: t(`assets.types.${item.name}`),
               value: item.value,
               percentage: item.percentage
@@ -367,11 +390,11 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
       case 'growth': {
         const positions = getPositionsData();
         if (positions.length > 0) {
-          return positions.map((position: PortfolioPosition) => ({
+          return positions.map(position => ({
             name: position.name,
             value: position.totalReturn,
             percentage: position.totalReturnPercentage
-          })).filter((item: any) => item.value !== 0);
+          })).filter((item: ChartDataItem) => item.value !== 0);
         }
         return [];
       }

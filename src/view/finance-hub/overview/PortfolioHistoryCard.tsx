@@ -19,7 +19,15 @@ interface PortfolioHistoryCardProps {
 // Custom tooltip component moved outside parent component for better performance
 interface PortfolioHistoryTooltipProps {
   active?: boolean;
-  payload?: any[];
+  payload?: Array<{
+    payload: {
+      date: string;
+      value: number;
+      change: number;
+      changePercentage: number;
+      timestamp?: string;
+    };
+  }>;
   isIntradayView?: boolean;
 }
 

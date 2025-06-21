@@ -7,18 +7,31 @@ import formatService from '@service/infrastructure/formatService';
 interface LiabilityMoreAnalyticsViewProps {
   debtBalanceBreakdown: Array<{ category: string; amount: number; percentage: number }>;
   annualInterestBreakdown: Array<{ category: string; amount: number; percentage: number }>;
-  debtProjectionData5Years: Array<{ month: string; total: number; [key: string]: any }>;
-  debtProjectionData10Years: Array<{ month: string; total: number; [key: string]: any }>;
-  debtProjectionData30Years: Array<{ month: string; total: number; [key: string]: any }>;
+  debtProjectionData5Years: Array<{ month: string; total: number; [key: string]: unknown }>;
+  debtProjectionData10Years: Array<{ month: string; total: number; [key: string]: unknown }>;
+  debtProjectionData30Years: Array<{ month: string; total: number; [key: string]: unknown }>;
+}
+
+// Define tooltip props interface
+interface TooltipPayloadEntry {
+  dataKey: string;
+  value: number;
+  color: string;
+}
+
+interface DebtProjectionTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadEntry[];
+  label?: string;
 }
 
 // Custom tooltip component moved outside of parent component
-const DebtProjectionTooltip = ({ active, payload, label }: any) => {
+const DebtProjectionTooltip = ({ active, payload, label }: DebtProjectionTooltipProps) => {
   if (active && payload?.length) {
     return (
       <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
         <p className="font-medium text-gray-900 dark:text-gray-100 mb-2">{`${label}`}</p>
-        {payload.map((entry: any) => (
+        {payload.map((entry: TooltipPayloadEntry) => (
           <p key={`${entry.dataKey}-${entry.value}`} style={{ color: entry.color }}>
             {`${entry.dataKey === 'total' ? 'Gesamtschuld' : entry.dataKey}: ${formatService.formatCurrency(entry.value)}`}
           </p>
@@ -56,7 +69,7 @@ const LiabilityMoreAnalyticsView: React.FC<LiabilityMoreAnalyticsViewProps> = ({
   const colors = ['#DC2626', '#2563EB', '#16A34A', '#CA8A04', '#9333EA', '#C2410C', '#0891B2', '#BE123C'];
 
   // Helper function to render debt projection charts
-  const renderDebtProjectionChart = (data: any[], title: string, height: string = 'h-96') => (
+  const renderDebtProjectionChart = (data: Array<{ month: string; total: number; [key: string]: unknown }>, title: string, height: string = 'h-96') => (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
         {title}

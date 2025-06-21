@@ -3,6 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../../hooks/redux';
 import { recentActivityService } from '../../../service';
 import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/common/Card';
+
+// Interface definitions for analytics components
+interface AnalyticsRecommendation {
+  title: string;
+  description: string;
+  priority: 'high' | 'medium' | 'low';
+  icon: React.ComponentType<{ className?: string }>;
+  onClick: () => void;
+}
+
 import { 
   TrendingUp,
   Target,
@@ -41,14 +51,14 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
   const analyticsData = useMemo(() => {
     const totalAssetValue = portfolioCache?.totals?.totalValue || 0;
     const monthlyIncome = portfolioCache?.totals?.monthlyIncome || 0;
-    const totalExpenses = expenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
-    const totalLiabilities = liabilities.reduce((sum, liability) => sum + (liability.currentBalance || 0), 0);
+    const totalExpenses = expenses.reduce((sum: number, expense: any) => sum + (expense.amount || 0), 0);
+    const totalLiabilities = liabilities.reduce((sum: number, liability: any) => sum + (liability.currentBalance || 0), 0);
     
     // Analyze expense trends - check if expenses increased significantly
     const hasHighExpenses = totalExpenses > monthlyIncome * 0.7; // More than 70% of income
     
     // Check portfolio diversification - if more than 60% in one asset type, suggest diversification
-    const assetTypes = new Set(assets.map(asset => asset.type));
+    const assetTypes = new Set(assets.map((asset: any) => asset.type));
     const needsDiversification = assetTypes.size < 3 && assets.length > 5;
     
     // Check if user has financial goals set
@@ -64,7 +74,7 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
       hasGoals,
       assetsCount: assets.length,
       incomeSourcesCount: income.length,
-      expenseCategoriesCount: new Set(expenses.map(e => e.category)).size,
+      expenseCategoriesCount: new Set(expenses.map((e: any) => e.category)).size,
       liabilitiesCount: liabilities.length
     };
   }, [portfolioCache, assets, income, expenses, liabilities]);
@@ -125,7 +135,7 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
 
   // Smart recommendations based on real data analysis
   const recommendations = useMemo(() => {
-    const recs = [];
+    const recs: AnalyticsRecommendation[] = [];
     
     // High expenses recommendation
     if (analyticsData.hasHighExpenses) {
@@ -239,7 +249,7 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          {recommendations.map((item: any) => {
+          {recommendations.map((item: AnalyticsRecommendation) => {
             const IconComponent = item.icon;
             const priorityColor = getPriorityColor(item.priority);
             

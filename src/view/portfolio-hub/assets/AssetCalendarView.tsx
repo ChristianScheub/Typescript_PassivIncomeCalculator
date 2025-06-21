@@ -39,7 +39,7 @@ interface AssetCalendarViewProps {
   assetTypeOptions: AssetTypeOption[];
   filteredAssets: PortfolioPosition[]; // Filtered positions
   positions: PortfolioPosition[]; // All positions
-  onBarClick: (data: any) => void;
+  onBarClick: (data: unknown) => void;
   onAssetTypeChange: (type: AssetType | 'all') => void;
   onBack?: () => void;
 }

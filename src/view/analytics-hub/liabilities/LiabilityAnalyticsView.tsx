@@ -17,9 +17,9 @@ interface LiabilityAnalyticsData {
   annualInterestBreakdown: Array<{ category: string; amount: number; percentage: number }>;
   interestRateComparison: Array<{ name: string; rate: number; type: string }>;
   paymentScheduleData: Array<{ month: string; amount: number; breakdown: Array<{ name: string; amount: number }> }>;
-  debtProjectionData5Years: Array<{ month: string; total: number; [key: string]: any }>;
-  debtProjectionData10Years: Array<{ month: string; total: number; [key: string]: any }>;
-  debtProjectionData30Years: Array<{ month: string; total: number; [key: string]: any }>;
+  debtProjectionData5Years: Array<{ month: string; total: number; [key: string]: unknown }>;
+  debtProjectionData10Years: Array<{ month: string; total: number; [key: string]: unknown }>;
+  debtProjectionData30Years: Array<{ month: string; total: number; [key: string]: unknown }>;
   totalMonthlyPayments: number;
   totalAnnualPayments: number;
   totalDebt: number;

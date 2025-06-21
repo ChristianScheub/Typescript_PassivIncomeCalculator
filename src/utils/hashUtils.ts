@@ -32,8 +32,8 @@ export const simpleHash = (obj: Record<string, unknown> | unknown[]): string => 
 export const generateAssetHash = (assets: Transaction[]): string => {
   const relevantData = assets.map(a => ({
     id: a.id,
-    quantity: a.purchaseQuantity || (a as any).currentQuantity,
-    price: a.purchasePrice || (a as any).currentPrice,
+    quantity: a.purchaseQuantity || (a as unknown as { currentQuantity: number }).currentQuantity,
+    price: a.purchasePrice || (a as unknown as { currentPrice: number }).currentPrice,
     updatedAt: a.updatedAt
   }));
   

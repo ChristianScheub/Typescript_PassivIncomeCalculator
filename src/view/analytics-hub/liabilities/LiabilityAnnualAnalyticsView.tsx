@@ -13,7 +13,7 @@ interface LiabilityAnnualAnalyticsViewProps {
 // Custom tooltip component for the bar chart
 interface CustomTooltipProps extends TooltipProps<number, string> {
   active?: boolean;
-  payload?: Array<any>;
+  payload?: Array<{ name: string; value: number; color: string }>;
   label?: string;
 }
 

@@ -29,26 +29,26 @@ interface AssetCategoryManagerViewProps {
     "id" | "createdAt" | "updatedAt" | "categoryId"
   >[];
   categoryForm: {
-    control: any;
+    control: unknown;
     handleSubmit: (callback: (data: CategoryFormData) => void) => (e?: React.BaseSyntheticEvent) => Promise<void>;
     reset: () => void;
     formState: {
-      errors: Record<string, any>;
+      errors: Record<string, { message?: string }>;
     };
-    watch: (field?: string) => any;
-    setValue: (field: string, value: any) => void;
-    getValues: () => any;
+    watch: (field?: string) => string | boolean;
+    setValue: (field: string, value: unknown) => void;
+    getValues: () => CategoryFormData;
   };
   optionForm: {
-    control: any;
+    control: unknown;
     handleSubmit: (callback: (data: OptionFormData) => void) => (e?: React.BaseSyntheticEvent) => Promise<void>;
     reset: () => void;
     formState: {
-      errors: Record<string, any>;
+      errors: Record<string, { message?: string }>;
     };
-    watch: (field?: string) => any;
-    setValue: (field: string, value: any) => void;
-    getValues: () => any;
+    watch: (field?: string) => string | boolean;
+    setValue: (field: string, value: unknown) => void;
+    getValues: () => OptionFormData;
   }; 
   onSetSelectedCategoryId: (id: string | null) => void;
   onSetIsAddingCategory: (isAdding: boolean) => void;

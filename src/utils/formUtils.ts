@@ -26,7 +26,7 @@ export const paymentScheduleSchema = z.object({
 // Form validation utilities with proper typing
 export type ValidationSchema<T = unknown> = z.ZodType<T>;
 
-export interface ValidationOptions {
+export interface LocalValidationOptions {
   required?: boolean;
   min?: number;
   max?: number;
@@ -127,7 +127,7 @@ export const updateArrayItem = <T>(array: T[] | null | undefined, index: number,
   return (array || []).map((current, i) => (i === index ? item : current));
 };
 
-export const getDefaultValues = <T extends Record<string, any>>(initialData: Partial<T> | undefined | null, defaultValues: Partial<T>): Partial<T> => {
+export const getDefaultValues = <T extends Record<string, unknown>>(initialData: Partial<T> | undefined | null, defaultValues: Partial<T>): Partial<T> => {
   if (initialData) {
     return { ...defaultValues, ...initialData };
   }

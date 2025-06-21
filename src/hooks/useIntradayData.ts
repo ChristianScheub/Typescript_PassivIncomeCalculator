@@ -63,9 +63,8 @@ export function useIntradayData(): PriceHistoryEntry[] {
       }
     });
 
-    // Sort by timestamp (newest first)
-    const entriesCopy = [...intradayEntries];
-    const sortedEntries = entriesCopy.sort((a, b) => 
+    // Sort by timestamp (newest first) using toSorted for immutability
+    const sortedEntries = intradayEntries.toSorted((a, b) => 
       new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
@@ -87,39 +86,90 @@ export function useIntradayPortfolioData(): Array<{ date: string; value: number;
   return useMemo(() => {
     Logger.cache(`useIntradayPortfolioData: portfolioCache exists: ${!!portfolioCache}, intradayData length: ${intradayData.length}`);
     
-    if (!portfolioCache || !portfolioCache.positions || intradayData.length === 0) {
+    if (!portfolioCache?.positions || intradayData.length === 0) {
       Logger.cache(`useIntradayPortfolioData: Early return - portfolioCache: ${!!portfolioCache}, positions: ${!!portfolioCache?.positions}, intradayData: ${intradayData.length}`);
       return [];
     }
 
     Logger.cache(`useIntradayPortfolioData: Processing ${intradayData.length} intraday entries with ${portfolioCache.positions.length} portfolio positions`);
 
+    // Helper function to find matching asset definition
+    const findMatchingAssetDefinition = (entry: PriceHistoryEntry) => {
+      return assetDefinitions.find((definition: AssetDefinition) => 
+        definition.priceHistory?.some((ph: PriceHistoryEntry) => 
+          ph.date === entry.date && ph.price === entry.price
+        )
+      );
+    };
+
+    // Helper function to process intraday entry
+    const processIntradayEntry = (entry: PriceHistoryEntry, assetDataMap: Map<string, Map<string, PriceHistoryEntry>>) => {
+      const definition = findMatchingAssetDefinition(entry);
+      if (definition) {
+        const ticker = definition.ticker || definition.id;
+        if (!assetDataMap.has(ticker)) {
+          assetDataMap.set(ticker, new Map());
+        }
+        assetDataMap.get(ticker)!.set(entry.date, entry);
+      }
+    };
+
+    // Helper function to collect unique timestamps
+    const collectUniqueTimestamps = (assetDataMap: Map<string, Map<string, PriceHistoryEntry>>) => {
+      const allTimestamps = new Set<string>();
+      assetDataMap.forEach(timestampMap => {
+        timestampMap.forEach((_, timestamp) => {
+          allTimestamps.add(timestamp);
+        });
+      });
+      return allTimestamps;
+    };
+
+    // Helper function to calculate portfolio value for timestamp
+    const calculatePortfolioValueForTimestamp = (
+      timestamp: string, 
+      positions: PortfolioPosition[], 
+      assetDataMap: Map<string, Map<string, PriceHistoryEntry>>
+    ) => {
+      let portfolioValue = 0;
+      let assetsWithPrices = 0;
+
+      positions.forEach((position: PortfolioPosition) => {
+        const definition = position.assetDefinition;
+        if (!definition) return;
+
+        const ticker = definition.ticker || definition.id;
+        const assetTimestampMap = assetDataMap.get(ticker);
+        const priceEntry = assetTimestampMap?.get(timestamp);
+
+        if (priceEntry) {
+          const validTransactions = position.transactions.filter((transaction) => 
+            new Date(transaction.purchaseDate) <= new Date(timestamp)
+          );
+
+          const positionQuantity = validTransactions.reduce((sum: number, transaction) => {
+            return sum + getCurrentQuantity(transaction);
+          }, 0);
+
+          portfolioValue += positionQuantity * priceEntry.price;
+          assetsWithPrices++;
+        }
+      });
+
+      return { portfolioValue, assetsWithPrices };
+    };
+
     // Group intraday data by asset ticker/symbol and then by timestamp
     const assetDataMap = new Map<string, Map<string, PriceHistoryEntry>>();
     
     intradayData.forEach(entry => {
-      // We need to find which asset this entry belongs to
-      // Look through all asset definitions to find the one with this entry in its price history
-      assetDefinitions.forEach((definition: AssetDefinition) => {
-        if (definition.priceHistory?.some((ph: PriceHistoryEntry) => ph.date === entry.date && ph.price === entry.price)) {
-          const ticker = definition.ticker || definition.id;
-          if (!assetDataMap.has(ticker)) {
-            assetDataMap.set(ticker, new Map());
-          }
-          assetDataMap.get(ticker)!.set(entry.date, entry);
-        }
-      });
+      processIntradayEntry(entry, assetDataMap);
     });
 
     Logger.info(`useIntradayPortfolioData: Grouped intraday data for ${assetDataMap.size} assets`);
 
     // Get all unique timestamps
-    const allTimestamps = new Set<string>();
-    assetDataMap.forEach(timestampMap => {
-      timestampMap.forEach((_, timestamp) => {
-        allTimestamps.add(timestamp);
-      });
-    });
+    const allTimestamps = collectUniqueTimestamps(assetDataMap);
 
     Logger.info(`useIntradayPortfolioData: Found ${allTimestamps.size} unique timestamps`);
 
@@ -127,37 +177,11 @@ export function useIntradayPortfolioData(): Array<{ date: string; value: number;
     const portfolioIntradayData: Array<{ date: string; value: number; timestamp: string }> = [];
 
     allTimestamps.forEach(timestamp => {
-      let portfolioValue = 0;
-      let assetsWithPrices = 0;
-
-      // For each position in the portfolio, find its price at this timestamp
-      portfolioCache.positions.forEach((position: PortfolioPosition) => {
-        const assetDefinition = position.assetDefinition;
-        if (!assetDefinition) return;
-
-        const ticker = assetDefinition.ticker || assetDefinition.id;
-        const assetTimestampMap = assetDataMap.get(ticker);
-        const priceEntry = assetTimestampMap?.get(timestamp);
-
-        if (priceEntry) {
-          // Calculate position quantity considering all transactions that occurred before or on this timestamp
-          // This ensures that sells are properly reflected in historical intraday data
-          const validTransactions = position.transactions.filter((transaction) => 
-            new Date(transaction.purchaseDate) <= new Date(timestamp)
-          );
-
-          const positionQuantity = validTransactions.reduce((sum: number, transaction) => {
-            return sum + getCurrentQuantity(transaction); // Use imported function to handle buy/sell correctly
-          }, 0);
-
-          // Use the intraday price with the correct historical quantity
-          portfolioValue += positionQuantity * priceEntry.price;
-          assetsWithPrices++;
-        } else {
-          // Fallback to current price or position value (but this should be rare for intraday data)
-          portfolioValue += position.currentValue;
-        }
-      });
+      const { portfolioValue, assetsWithPrices } = calculatePortfolioValueForTimestamp(
+        timestamp, 
+        portfolioCache.positions, 
+        assetDataMap
+      );
 
       // Only add this timestamp if we have at least some intraday prices
       if (assetsWithPrices > 0) {
@@ -169,9 +193,8 @@ export function useIntradayPortfolioData(): Array<{ date: string; value: number;
       }
     });
 
-    // Sort by timestamp (newest first)
-    const dataCopy = [...portfolioIntradayData];
-    const sortedData = dataCopy.sort((a, b) => 
+    // Sort by timestamp (newest first) using toSorted for immutability
+    const sortedData = portfolioIntradayData.toSorted((a, b) => 
       new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
 

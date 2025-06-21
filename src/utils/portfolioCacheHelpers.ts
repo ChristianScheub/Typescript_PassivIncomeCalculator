@@ -33,13 +33,13 @@ export const getAssetAllocationFromCache = (positions: PortfolioPosition[]): Ass
 };
 
 export const getMonthlyIncomeFromCache = (portfolioCache: Partial<TypedPortfolioCache> | null): number => {
-  const monthlyIncome = (portfolioCache as any)?.totals?.monthlyIncome || 0;
+  const monthlyIncome = (portfolioCache as { totals?: { monthlyIncome?: number } })?.totals?.monthlyIncome || 0;
   Logger.cache(`Monthly income from cache: €${monthlyIncome.toFixed(2)}`);
   return monthlyIncome;
 };
 
 export const getTotalValueFromCache = (portfolioCache: Partial<TypedPortfolioCache> | null): number => {
-  const totalValue = portfolioCache?.totalValue || (portfolioCache as any)?.totals?.totalValue || 0;
+  const totalValue = portfolioCache?.totalValue || (portfolioCache as { totals?: { totalValue?: number } })?.totals?.totalValue || 0;
   Logger.cache(`Total value from cache: €${totalValue.toFixed(2)}`);
   return totalValue;
 };
