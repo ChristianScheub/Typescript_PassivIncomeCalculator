@@ -319,7 +319,6 @@ const AssetsList: React.FC<{
 
                   {/* Transaction Type */}
                   <div className="flex flex-col">
-                    <span className="text-gray-600 dark:text-gray-400">{t('assets.transactionType')}</span>
                     <span className={`font-medium ${asset.transactionType === 'buy' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                       {asset.transactionType === 'buy' ? t('assets.buy') : t('assets.sell')}
                     </span>

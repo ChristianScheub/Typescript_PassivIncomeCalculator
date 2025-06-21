@@ -4,6 +4,7 @@ import { AssetDetailView } from '../../portfolio-hub/assets/AssetDetailView';
 import { PortfolioPosition } from '../../../types/domains/portfolio/position';
 import { formatService } from '../../../service';
 import { DividendFrequency } from '../../../types/shared/base/enums';
+import { useAppSelector } from '../../../hooks/redux';
 
 interface AssetDetailModalProps {
   asset: Asset | null;
@@ -25,14 +26,37 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
   onClose,
   getAssetTypeLabel,
 }) => {
+  const allAssets = useAppSelector(state => state.transactions.items);
+  
   if (!asset || !assetDefinition || !isOpen) return null;
 
-  const currentValue = (asset.purchaseQuantity || 0) * (assetDefinition.currentPrice || 0);
-  const totalInvestment = asset.value || 0;
+  // Find all transactions for the same asset definition ID
+  const relatedTransactions = allAssets.filter((a: Asset) => 
+    a.assetDefinitionId === asset.assetDefinitionId
+  );
+
+  // Calculate aggregated values from all transactions (considering buy/sell)
+  const totalQuantity = relatedTransactions.reduce((sum: number, a: Asset) => {
+    const quantity = a.transactionType === 'sell' ? -(a.purchaseQuantity || 0) : (a.purchaseQuantity || 0);
+    return sum + quantity;
+  }, 0);
+  
+  const totalInvestment = relatedTransactions.reduce((sum: number, a: Asset) => {
+    const investment = a.transactionType === 'sell' ? -(a.value || 0) : (a.value || 0);
+    return sum + investment;
+  }, 0);
+  
+  const currentValue = totalQuantity * (assetDefinition.currentPrice || 0);
   const totalReturn = currentValue - totalInvestment;
   const totalReturnPercentage = totalInvestment > 0 
     ? (totalReturn / totalInvestment) * 100 
     : 0;
+  
+  // Calculate average purchase price (only from buy transactions)
+  const buyTransactions = relatedTransactions.filter((a: Asset) => a.transactionType === 'buy');
+  const totalBuyQuantity = buyTransactions.reduce((sum: number, a: Asset) => sum + (a.purchaseQuantity || 0), 0);
+  const totalBuyInvestment = buyTransactions.reduce((sum: number, a: Asset) => sum + (a.value || 0), 0);
+  const averagePurchasePrice = totalBuyQuantity > 0 ? totalBuyInvestment / totalBuyQuantity : 0;
 
   // Initialize income values
   let monthlyIncome = 0;
@@ -42,9 +66,8 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
   if (assetDefinition.dividendInfo) {
     const frequency = assetDefinition.dividendInfo.frequency;
     const amount = assetDefinition.dividendInfo.amount || 0;
-    const quantity = asset.purchaseQuantity || 0;
     
-    // Calculate annual income based on frequency
+    // Calculate annual income based on frequency and total quantity
     let annualMultiplier = 0;
     switch (frequency) {
       case 'monthly' as DividendFrequency:
@@ -61,12 +84,18 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
         annualMultiplier = 0;
     }
     
-    annualIncome = amount * quantity * annualMultiplier;
+    annualIncome = amount * totalQuantity * annualMultiplier;
     monthlyIncome = annualIncome / 12;
   }
 
-  // Determine purchase dates
-  const purchaseDate = asset.purchaseDate;
+  // Determine purchase dates from all transactions
+  const purchaseDates = relatedTransactions.map((a: Asset) => a.purchaseDate).filter(Boolean);
+  const firstPurchaseDate = purchaseDates.length > 0 ? 
+    new Date(Math.min(...purchaseDates.map((d: string) => new Date(d).getTime()))).toISOString() : 
+    asset.purchaseDate;
+  const lastPurchaseDate = purchaseDates.length > 0 ? 
+    new Date(Math.max(...purchaseDates.map((d: string) => new Date(d).getTime()))).toISOString() : 
+    asset.purchaseDate;
 
   // Convert Asset and AssetDefinition to PortfolioPosition format
   // that's expected by the AssetDetailView
@@ -75,23 +104,23 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
     name: assetDefinition.name || assetDefinition.fullName,
     type: asset.type,
     ticker: assetDefinition.ticker || '',
-    totalQuantity: asset.purchaseQuantity || 0,
+    totalQuantity: totalQuantity,
     totalInvestment: totalInvestment,
     currentValue: currentValue,
-    averagePurchasePrice: asset.purchasePrice || 0,
+    averagePurchasePrice: averagePurchasePrice,
     monthlyIncome: monthlyIncome,
     annualIncome: annualIncome,
     totalReturn: totalReturn,
     totalReturnPercentage: totalReturnPercentage,
-    transactions: [asset], // Include the current asset as a transaction
+    transactions: relatedTransactions, // Include ALL related transactions
     assetDefinition, // Include the full asset definition
     sector: assetDefinition.sector || '',
     country: assetDefinition.country || '',
     categoryAssignments: [], // Can be empty or populated if available
     // Add required properties for PortfolioPosition
-    transactionCount: 1,
-    firstPurchaseDate: purchaseDate,
-    lastPurchaseDate: purchaseDate,
+    transactionCount: relatedTransactions.length,
+    firstPurchaseDate: firstPurchaseDate,
+    lastPurchaseDate: lastPurchaseDate,
     // Add formatted values
     formatted: {
       currentValue: formatService.formatCurrency(currentValue),
@@ -100,7 +129,7 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
       totalReturnPercentage: formatService.formatPercentage(totalReturnPercentage),
       monthlyIncome: formatService.formatCurrency(monthlyIncome),
       annualIncome: formatService.formatCurrency(annualIncome),
-      averagePurchasePrice: formatService.formatCurrency(asset.purchasePrice || 0),
+      averagePurchasePrice: formatService.formatCurrency(averagePurchasePrice),
       currentPrice: formatService.formatCurrency(assetDefinition.currentPrice || 0)
     }
   };
