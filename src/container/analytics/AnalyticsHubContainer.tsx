@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import Logger from '@/service/shared/logging/Logger/logger';
-import recentActivityService, { AnalyticsCategory, AnalyticsSubCategory } from '@/service/domain/analytics/reporting/recentActivityService';
+import recentActivityService from '@/service/domain/analytics/reporting/recentActivityService';
+import { AnalyticsCategory, AnalyticsSubCategory } from '@/types/domains/analytics/reporting';
 import DistributionsAnalyticsContainer from './DistributionsAnalyticsContainer';
 import MilestonesContainer from '../forecast/MilestonesContainer';
 import ForecastContainer from '../forecast/ForecastContainer';
 import PerformanceAnalyticsContainer from './PerformanceAnalyticsContainer';
-import AssetCalendarContainer from './AssetCalendarContainer';
+import AssetCalendarContainer from '../assets/AssetCalendarContainer'; // Use the main Asset Calendar Container
 import OverviewAnalyticsContainer from './OverviewAnalyticsContainer';
 import AnalyticsHubView from '@/view/analytics-hub/AnalyticsHubView';
 
@@ -55,8 +56,8 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
   const quickInsights = useMemo(() => {
     const totalAssetValue = portfolioCache?.totals?.totalValue || 0;
     const monthlyIncome = portfolioCache?.totals?.monthlyIncome || 0;
-    const totalExpenses = expenses.reduce((sum, expense) => sum + (expense.amount || 0), 0);
-    const totalLiabilities = liabilities.reduce((sum, liability) => sum + (liability.currentBalance || 0), 0);
+    const totalExpenses = expenses.reduce((sum: number, expense: any) => sum + (expense.amount || 0), 0);
+    const totalLiabilities = liabilities.reduce((sum: number, liability: any) => sum + (liability.currentBalance || 0), 0);
     
     return {
       totalAssetValue,
@@ -67,7 +68,7 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
       monthlyCashFlow: monthlyIncome - totalExpenses,
       assetsCount: assets.length,
       incomeSourcesCount: income.length,
-      expenseCategoriesCount: new Set(expenses.map(e => e.category)).size,
+      expenseCategoriesCount: new Set(expenses.map((e: any) => e.category)).size,
       liabilitiesCount: liabilities.length
     };
   }, [portfolioCache, assets, income, expenses, liabilities]);

@@ -15,10 +15,9 @@ import {
   updateAssetCategoryOption,
   deleteAssetCategoryOption
 } from '@/store/slices/assetCategoriesSlice';
-import { AssetCategory, AssetCategoryOption } from '@/types/domains/assets';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { useAsyncOperation } from '../../utils/containerUtils';
-import { NewAssetCategory, NewAssetCategoryOption, NewAssetCategoryOptionWithCategory, CategoryFormData, CategoryOptionFormData } from '@/types/domains/assets';
+import { AssetCategory, AssetCategoryOption, NewAssetCategory, NewAssetCategoryOption, NewAssetCategoryOptionWithCategory, CategoryFormData, CategoryOptionFormData } from '@/types/domains/assets';
 
 // Schema for validating category and option data
 const categorySchema = z.object({

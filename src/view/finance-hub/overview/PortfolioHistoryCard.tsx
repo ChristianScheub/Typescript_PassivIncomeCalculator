@@ -78,6 +78,48 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Da
   const gradientColor = totalChange >= 0 ? '#22C55E' : '#EF4444';
   const changeColor = totalChange >= 0 ? 'text-green-600' : 'text-red-600';
 
+  // Calculate dynamic Y-axis domain for better visibility of fluctuations
+  const calculateYAxisDomain = () => {
+    if (history30Days.length === 0) return ['auto', 'auto'];
+    
+    const values = history30Days.map(item => item.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const range = maxValue - minValue;
+    
+    // If there's no variation in data, use auto scaling
+    if (range === 0) return ['auto', 'auto'];
+    
+    // Calculate the range as percentage of the average value
+    const avgValue = (minValue + maxValue) / 2;
+    const rangePercentage = (range / avgValue) * 100;
+    
+    let paddingFactor = 0.1; // Default 10% padding
+    
+    if (rangePercentage < 0.5) {
+      // Very small fluctuations (less than 0.5%) - zoom in significantly
+      paddingFactor = 0.01; // 1% padding for maximum zoom
+    } else if (rangePercentage < 2) {
+      // Small fluctuations (less than 2%) - zoom in moderately
+      paddingFactor = 0.02; // 2% padding
+    } else if (rangePercentage < 5) {
+      // Medium fluctuations (less than 5%) - use moderate padding
+      paddingFactor = 0.05; // 5% padding
+    }
+    
+    const padding = range * paddingFactor;
+    const domainMin = Math.max(0, minValue - padding); // Don't go below 0 for portfolio values
+    const domainMax = maxValue + padding;
+    
+    // Round to reasonable values for cleaner display
+    const roundedMin = Math.floor(domainMin / 100) * 100;
+    const roundedMax = Math.ceil(domainMax / 100) * 100;
+    
+    return [roundedMin, roundedMax];
+  };
+
+  const [yAxisMin, yAxisMax] = calculateYAxisDomain();
+
   // Format X-axis labels based on whether it's intraday view
   const formatXAxisLabel = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -147,6 +189,7 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Da
                   interval={isIntradayView ? Math.floor(history30Days.length / 10) : 'preserveStart'}
                 />
                 <YAxis 
+                  domain={[yAxisMin, yAxisMax]}
                   tickFormatter={(value) => formatService.formatCurrency(value)}
                   tick={{ fontSize: 12 }}
                   stroke="#6B7280"

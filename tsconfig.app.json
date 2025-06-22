@@ -19,6 +19,8 @@
       "@/store/*": ["src/store/*"],
       "@/store": ["src/store/index"],
       "@ui/*": ["src/ui/*"],
+      "@container/*": ["src/container/*"],
+      "@view/*": ["src/view/*"],
     },
 
     /* Bundler mode */

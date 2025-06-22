@@ -30,10 +30,14 @@ interface ChartData {
 }
 
 interface AssetCalendarContainerProps {
+  selectedTab?: 'calendar' | 'history' | 'timeline';
   onBack?: () => void;
 }
 
-const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack }) => {
+const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ 
+  selectedTab = 'calendar', 
+  onBack 
+}) => {
   const assets = useSelector((state: StoreState) => state.transactions.items);
   const assetDefinitions = useSelector((state: StoreState) => state.assetDefinitions.items);
   const assetCategories = useSelector((state: StoreState) => state.assetCategories.categories);
@@ -314,8 +318,8 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
 
   // Log when component mounts or key data changes
   useEffect(() => {
-    Logger.info(`AssetCalendarContainer: ${assets.length} total assets, ${filteredPositions.length} filtered positions`);
-  }, [assets.length, filteredPositions.length]);
+    Logger.info(`AssetCalendarContainer: ${assets.length} total assets, ${filteredPositions.length} filtered positions, tab: ${selectedTab}`);
+  }, [assets.length, filteredPositions.length, selectedTab]);
 
   return (
     <AssetCalendarView

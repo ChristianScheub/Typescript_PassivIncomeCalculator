@@ -14,6 +14,7 @@ import portfolioHistoryReducer from './slices/portfolioHistorySlice';
 import snackbarReducer from './slices/snackbarSlice';
 import dashboardSettingsReducer from './slices/dashboardSettingsSlice';
 import calculatedDataReducer, { markStoreHydrated, validateCacheOnStartup } from './slices/calculatedDataSlice';
+import intradayDataReducer from './slices/intradayDataSlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
 import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
 import calculatedDataCacheMiddleware from './middleware/calculatedDataCacheMiddleware';
@@ -123,6 +124,22 @@ const loadState = () => {
         cacheValidityDuration: state.calculatedData?.cacheValidityDuration || 5 * 60 * 1000,
         enableConditionalLogging: state.calculatedData?.enableConditionalLogging ?? true,
         isHydrated: false // Will be set to true after store creation
+      },
+      intradayData: {
+        intradayEntries: state.intradayData?.intradayEntries || [],
+        intradayEntriesStatus: 'idle',
+        intradayEntriesError: null,
+        intradayEntriesCacheKey: state.intradayData?.intradayEntriesCacheKey || null,
+        intradayEntriesLastUpdated: state.intradayData?.intradayEntriesLastUpdated || null,
+        
+        portfolioIntradayData: state.intradayData?.portfolioIntradayData || [],
+        portfolioIntradayStatus: 'idle',
+        portfolioIntradayError: null,
+        portfolioIntradayCacheKey: state.intradayData?.portfolioIntradayCacheKey || null,
+        portfolioIntradayLastUpdated: state.intradayData?.portfolioIntradayLastUpdated || null,
+        
+        assetDataMap: state.intradayData?.assetDataMap || {},
+        assetDataMapCacheKey: state.intradayData?.assetDataMapCacheKey || null,
       }
     };
   } catch (err) {
@@ -151,6 +168,7 @@ export const store = configureStore({
     snackbar: snackbarReducer,
     dashboardSettings: dashboardSettingsReducer,
     calculatedData: calculatedDataReducer,
+    intradayData: intradayDataReducer,
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   preloadedState: persistedState as any,
