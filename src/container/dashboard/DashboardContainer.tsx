@@ -22,7 +22,6 @@ const DashboardContainer: React.FC = () => {
   const { executeAsyncOperation } = useAsyncOperation();
 
   // Redux state
-  const { history30Days = [], status } = useAppSelector(state => state.portfolioHistory || {});
   const { mode: dashboardMode } = useAppSelector(state => state.dashboardSettings);
   
   // Cached financial summary from Redux (should be available after initialization)
@@ -77,12 +76,6 @@ const DashboardContainer: React.FC = () => {
   }, [financialSummary, navigate, t]);
 
   // Effects
-  useEffect(() => {
-    if (status === 'idle') {
-      dispatch(calculate30DayHistory());
-    }
-  }, [dispatch, status]);
-
   // Load dashboard settings from localStorage on mount
   useEffect(() => {
     dispatch(loadDashboardSettingsFromStorage());
@@ -126,7 +119,6 @@ const DashboardContainer: React.FC = () => {
       miniAnalytics={miniAnalytics}
       milestones={milestones}
       alerts={alerts}
-      history30Days={history30Days}
       navigationHandlers={navigationHandlers}
       onRefresh={handleRefresh}
     />

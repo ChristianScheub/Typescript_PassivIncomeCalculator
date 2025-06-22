@@ -1,4 +1,4 @@
-import { Asset } from '../../../types';
+import { Asset } from "@/types/domains/assets";
 
 export function getPositionTransactions(assets: Asset[], positionId: string): Asset[] {
   return assets.filter(asset => {

@@ -120,7 +120,12 @@ Service coordination and cache management.
 
 - **cacheRefreshService**: Manages cache refresh across all domains
 
-### 🔔 Notifications (`application/notifications/`)
+### � Portfolio History (`application/portfolioHistoryCalculation/`)
+Portfolio history calculation and persistence workflows.
+
+- **PortfolioHistoryCalculationService**: Portfolio time series calculations and IndexedDB persistence
+
+### �🔔 Notifications (`application/notifications/`)
 Cross-domain notifications and alerts.
 
 - **alertsService**: Handles notifications across all business domains
@@ -128,10 +133,11 @@ Cross-domain notifications and alerts.
 ## Infrastructure Services
 
 ### 💾 Persistence (`infrastructure/persistence/`)
-Data storage and caching infrastructure.
+Data storage and infrastructure services.
 
-- **sqlLiteService**: Database operations
-- **cacheService**: In-memory caching
+- **sqlLiteService**: Primary database operations (IndexedDB: `finance-tracker`)
+- **sqlLitePortfolioHistory**: Portfolio history database (IndexedDB: `portfolio-history`)
+- **cacheService**: In-memory caching and cache management
 
 ### 🔧 Formatting (`infrastructure/formatting/`)
 Data transformation and formatting.
@@ -192,6 +198,22 @@ import {
 ```typescript
 // Use application services for complex workflows
 import { deleteDataService, cacheRefreshService } from '@/service/application';
+
+// Portfolio history calculations
+import { PortfolioHistoryCalculationService } from '@/service/application/portfolioHistoryCalculation';
+```
+
+### Infrastructure Services
+```typescript
+// Database services
+import sqlLiteService from '@/service/infrastructure/sqlLiteService';
+import portfolioHistoryService from '@/service/infrastructure/sqlLitePortfolioHistory';
+
+// Essential data persistence (finance-tracker DB)
+const assets = await sqlLiteService.getAll('assets');
+
+// Portfolio history (portfolio-history DB)  
+const history = await portfolioHistoryService.getPortfolioHistoryByDateRange(start, end);
 ```
 
 ## Design Principles
@@ -216,6 +238,156 @@ import { deleteDataService, cacheRefreshService } from '@/service/application';
 - High-level modules don't depend on low-level modules
 - Both depend on abstractions (interfaces)
 - Infrastructure depends on domain, not vice versa
+
+## Data Flow Architecture
+
+This application implements a **hybrid data flow architecture** that strategically combines **Redux** and **IndexedDB** based on technical requirements and data characteristics.
+
+### 📊 **Data Flow Patterns**
+
+#### **1. 🟢 Redux Pattern (Primary System)**
+Used for the majority of application state and entities.
+
+```typescript
+// Standard Redux usage in containers
+const { items: expenses } = useAppSelector(state => state.expenses);
+const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
+
+// Redux in orchestration services
+const state = store.getState();
+const { items: assets } = state.transactions;
+```
+
+**Used for:**
+- ✅ All CRUD entities (Assets, Income, Expenses, Liabilities)
+- ✅ Application state (Dashboard Settings, Snackbar)
+- ✅ Calculated data cache (Financial Summary, Asset Focus Data)
+- ✅ UI state management and reactivity
+
+#### **2. 🟡 IndexedDB Pattern (Specialized System)**
+Used for large datasets that exceed localStorage limitations.
+
+```typescript
+// Portfolio history through specialized hooks
+const portfolioHistoryData = usePortfolioHistoryView('1M');
+const intradayData = usePortfolioIntradayView();
+
+// Direct service access for bulk operations
+await portfolioHistoryService.getPortfolioHistoryByDateRange(start, end);
+```
+
+**Used for:**
+- ✅ Portfolio history data (large time series)
+- ✅ Intraday trading data (frequent updates)
+- ✅ Historical calculations (daily snapshots)
+
+#### **3. 🟢 Service Pattern (Pure Business Logic)**
+Framework-agnostic services for domain calculations.
+
+```typescript
+// Pure domain logic - no external dependencies
+export function calculatePortfolio(assets, definitions, categories) {
+  const positions = calculatePortfolioPositions(...);
+  return { positions, totals };
+}
+```
+
+**Used for:**
+- ✅ Domain calculations and business rules
+- ✅ Data transformations and validations
+- ✅ Utilities without side effects
+
+### 🎯 **Technical Rationale**
+
+#### **Why Redux for Standard Data?**
+- **Small datasets**: Typically < 1MB per entity type
+- **Frequent access**: UI needs reactive updates
+- **Cross-component state**: Global state management
+- **Caching**: In-memory performance optimization
+
+#### **Why IndexedDB for Portfolio History?**
+- **Large datasets**: Portfolio history can exceed 10MB over time
+- **localStorage limits**: ~5-10MB quota restrictions
+- **Asynchronous access**: Non-blocking for large queries
+- **Complex data types**: Better than JSON serialization
+- **Offline persistence**: Independent of Redux lifecycle
+
+### 🗄️ **Database Strategy**
+
+#### **IndexedDB: `finance-tracker`**
+Primary database for essential user data persistence.
+
+```typescript
+// Database structure
+finance-tracker/
+├── assets                   # Asset transactions
+├── assetDefinitions        # Asset metadata
+├── assetCategories         # Category system
+├── income                  # Income records
+├── expenses               # Expense records
+├── liabilities            # Debt & liability records
+└── exchangeRates          # Currency data
+```
+
+**Purpose:**
+- 🔒 **Data safety**: Survives app updates and cache clears
+- 💾 **Offline capability**: Full functionality without network
+- 📱 **Cross-session**: Data persists across browser sessions
+- 🔄 **Import/Export**: Backup and restore functionality
+
+#### **IndexedDB: `portfolio-history`**
+Specialized database for portfolio time series data.
+
+```typescript
+// Historical data structure  
+portfolio-history/
+├── portfolioHistory        # Daily snapshots
+└── portfolioIntradayData   # Intraday data points
+```
+
+**Purpose:**
+- 📈 **Time series storage**: Optimized for historical data
+- ⚡ **Performance**: Large dataset queries
+- 🕒 **Temporal queries**: Date range filtering
+
+### 🏗️ **Architecture Benefits**
+
+#### **1. Technical Optimization**
+- **Redux**: Fast synchronous access for UI state
+- **IndexedDB**: Efficient async operations for large data
+- **Service Layer**: Framework-independent business logic
+
+#### **2. Scalability**
+- **Storage limits**: IndexedDB handles unlimited data growth
+- **Performance**: Each pattern optimized for its use case
+- **Maintainability**: Clear separation of concerns
+
+#### **3. Reliability**
+- **Data persistence**: Multiple persistence strategies
+- **Fault tolerance**: Redux fallbacks for IndexedDB failures
+- **Update safety**: Essential data survives app updates
+
+### 🔄 **Integration Pattern**
+
+Containers orchestrate multiple data sources seamlessly:
+
+```typescript
+const AssetDashboardContainer = () => {
+  // Redux for standard entities
+  const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
+  
+  // IndexedDB for large historical data
+  const portfolioHistory = usePortfolioHistoryView('1M');
+  
+  // Services for calculations
+  const analytics = analyticsService.calculateRatios(summary);
+  
+  // Unified presentation to view layer
+  return <AssetDashboardView {...combinedData} />;
+};
+```
+
+This hybrid approach provides the **best of both worlds**: Redux reactivity for UI state and IndexedDB scalability for large datasets, while maintaining clean service layer boundaries.
 
 ## Migration Guide
 
@@ -248,11 +420,14 @@ import { incomeCalculatorService } from '@/service/domain/financial';
 
 The architecture is designed to support future enhancements:
 
-- **Dashboard Domain**: Future dashboard-specific services
-- **Forms Domain**: Form validation and processing services  
-- **Database Domain**: Advanced database schema services
-- **Real-time Features**: Event sourcing and CQRS patterns
-- **Microservices**: Easy transition to microservices architecture
+- **Advanced Analytics**: Real-time performance tracking and AI-powered insights
+- **Multi-Currency Support**: Enhanced exchange rate management and currency analytics
+- **Real-time Features**: WebSocket integration for live market data
+- **Collaboration Features**: Multi-user portfolio sharing and family financial planning
+- **Advanced Reporting**: PDF generation and detailed financial reports
+- **API Integration**: External service integrations (banking APIs, tax software)
+- **Mobile Optimization**: Enhanced mobile-specific features and PWA capabilities
+- **Microservices**: Easy transition to microservices architecture if needed
 
 ---
 

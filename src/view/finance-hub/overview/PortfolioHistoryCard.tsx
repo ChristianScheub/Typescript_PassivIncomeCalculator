@@ -1,19 +1,14 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent } from '@/ui/common/Card';
 import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format } from 'date-fns';
 import formatService from "@service/infrastructure/formatService";
 import { LineChart } from 'lucide-react';
+import { usePortfolioHistoryView } from '@/hooks/usePortfolioHistoryView';
 
 interface PortfolioHistoryCardProps {
-  history30Days: Array<{
-    date: string;
-    value: number;
-    change: number;
-    changePercentage: number;
-  }>;
-  isIntradayView?: boolean; // New prop to determine if showing minute-level data
+  isIntradayView?: boolean; // Optional prop to determine if showing minute-level data
 }
 
 // Custom tooltip component moved outside parent component for better performance
@@ -66,23 +61,68 @@ const PortfolioHistoryTooltip: React.FC<PortfolioHistoryTooltipProps> = ({ activ
   );
 };
 
-const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Days, isIntradayView = false }) => {
+const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ isIntradayView = false }) => {
   const { t } = useTranslation();
   
-  // Find the overall change
-  const firstDay = history30Days[0];
-  const lastDay = history30Days[history30Days.length - 1];
-  const totalChange = lastDay.value - firstDay.value;
-  const totalChangePercentage = firstDay.value ? (totalChange / firstDay.value) * 100 : 0;
+  // Load 30-day portfolio history from IndexedDB
+  const history30Days = usePortfolioHistoryView('1M');
+  
+  // Show empty state if no data
+  if (!history30Days || history30Days.length === 0) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <LineChart className="h-5 w-5" />
+            {t('dashboard.portfolioHistory')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-gray-500">
+            {t('dashboard.noPortfolioHistory')}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Transform the data to include change and changePercentage
+  const transformedHistory = useMemo(() => {
+    if (!history30Days || history30Days.length === 0) return [];
+    
+    return history30Days.map((item, index) => {
+      let change = 0;
+      let changePercentage = 0;
+      
+      if (index > 0) {
+        const previousValue = history30Days[index - 1].value;
+        change = item.value - previousValue;
+        changePercentage = previousValue ? (change / previousValue) * 100 : 0;
+      }
+      
+      return {
+        date: item.date,
+        value: item.value,
+        change,
+        changePercentage
+      };
+    });
+  }, [history30Days]);
+  
+  // Find the overall change using transformed data
+  const firstDay = transformedHistory[0];
+  const lastDay = transformedHistory[transformedHistory.length - 1];
+  const totalChange = lastDay?.value - firstDay?.value || 0;
+  const totalChangePercentage = firstDay?.value ? (totalChange / firstDay.value) * 100 : 0;
 
   const gradientColor = totalChange >= 0 ? '#22C55E' : '#EF4444';
   const changeColor = totalChange >= 0 ? 'text-green-600' : 'text-red-600';
 
   // Calculate dynamic Y-axis domain for better visibility of fluctuations
   const calculateYAxisDomain = () => {
-    if (history30Days.length === 0) return ['auto', 'auto'];
+    if (transformedHistory.length === 0) return ['auto', 'auto'];
     
-    const values = history30Days.map(item => item.value);
+    const values = transformedHistory.map(item => item.value);
     const minValue = Math.min(...values);
     const maxValue = Math.max(...values);
     const range = maxValue - minValue;
@@ -160,7 +200,7 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Da
         </div>
         <div className="flex flex-col items-end">
           <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-            {formatService.formatCurrency(lastDay.value)}
+            {formatService.formatCurrency(lastDay?.value || 0)}
           </p>
           <p className={`text-sm font-medium ${changeColor}`}>
             {totalChange >= 0 ? '+' : ''}{formatService.formatCurrency(totalChange)}
@@ -173,7 +213,7 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Da
         <div className="h-64">
           {history30Days.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={history30Days} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+              <AreaChart data={transformedHistory} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="portfolioGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor={gradientColor} stopOpacity={0.2} />
@@ -186,7 +226,7 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history30Da
                   tickFormatter={formatXAxisLabel}
                   tick={{ fontSize: 12 }}
                   stroke="#6B7280"
-                  interval={isIntradayView ? Math.floor(history30Days.length / 10) : 'preserveStart'}
+                  interval={isIntradayView ? Math.floor(transformedHistory.length / 10) : 'preserveStart'}
                 />
                 <YAxis 
                   domain={[yAxisMin, yAxisMax]}

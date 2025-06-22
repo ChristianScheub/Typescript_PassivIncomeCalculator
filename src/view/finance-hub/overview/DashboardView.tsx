@@ -61,7 +61,6 @@ interface DashboardViewProps {
   miniAnalytics: MiniAnalytic[];
   milestones: Milestone[];
   alerts: UIAlert[];
-  history30Days: Array<{ date: string; value: number; change: number; changePercentage: number }>;
   navigationHandlers: NavigationHandlers;
   onRefresh: () => Promise<void>;
 }
@@ -72,7 +71,6 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   miniAnalytics,
   milestones,
   alerts,
-  history30Days,
   navigationHandlers,
   onRefresh,
 }) => {
@@ -176,15 +174,13 @@ const DashboardView: React.FC<DashboardViewProps> = ({
         </CollapsibleSection>
 
         {/* Portfolio History */}
-        {history30Days.length > 0 && (
-          <CollapsibleSection
-            title={t("dashboard.portfolioHistory")}
-            icon={<BarChart3 className="h-5 w-5 text-indigo-500" />}
-            defaultExpanded={false}
-          >
-            <PortfolioHistoryCard history30Days={history30Days} />
-          </CollapsibleSection>
-        )}
+        <CollapsibleSection
+          title={t("dashboard.portfolioHistory")}
+          icon={<BarChart3 className="h-5 w-5 text-indigo-500" />}
+          defaultExpanded={false}
+        >
+          <PortfolioHistoryCard />
+        </CollapsibleSection>
 
         {/* Alerts & Recommendations */}
         <CollapsibleSection
