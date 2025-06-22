@@ -13,13 +13,13 @@ import {
   closeConfigPanel,
   ChartType, CustomAnalyticsConfig, DataSource, GroupBy
 } from '../../../store/slices/customAnalyticsSlice';
-import { PortfolioPosition } from '../../../types/shared/analytics';
+import { PortfolioPosition } from '@/types/shared/analytics';
 import { 
   AllocationData, 
   PortfolioAnalyticsData as ServicePortfolioAnalyticsData,
   IncomeAnalyticsData as ServiceIncomeAnalyticsData
-} from '../../../types/domains/analytics/calculations';
-import { PieChartData } from '../../../types/shared/charts';
+} from '@/types/domains/analytics/calculations';
+import { PieChartData } from '@/types/shared/charts';
 import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
 import { Plus, Trash2, Edit3, X } from 'lucide-react';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Chip } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { MonthSelector } from '../forms/MonthSelector';
-import { PaymentFrequency } from '../../types/shared/';
+import { PaymentFrequency } from '@/types/shared/';
 
 interface CustomScheduleSectionProps {
   frequency: PaymentFrequency;

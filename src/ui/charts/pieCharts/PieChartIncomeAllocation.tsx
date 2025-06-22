@@ -2,11 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { Card } from '../../common/Card';
-import { IncomeAllocation } from '../../../types/domains/financial/entities';
+import { IncomeAllocation } from '@/types/domains/financial/entities';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
-import formatService from '../../../service/formatService';
+import formatService from '@/service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
-import { RechartsPayload } from '../../../types/shared/charts';
+import { RechartsPayload } from '@/types/shared/charts';
 
 interface PieChartIncomeAllocationProps {
   readonly incomeAllocation: ReadonlyArray<IncomeAllocation>;

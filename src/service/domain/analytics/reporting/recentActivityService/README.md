@@ -35,7 +35,7 @@ recentActivityService/
 ## Usage
 
 ```typescript
-import recentActivityService from '../service/recentActivityService';
+import recentActivityService from '@/service/recentActivityService';
 
 // Add portfolio navigation activity
 recentActivityService.addPortfolioActivity('assets', 'portfolio');

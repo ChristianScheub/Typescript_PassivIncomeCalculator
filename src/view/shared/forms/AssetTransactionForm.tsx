@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../../hooks/redux';
 import { useSharedForm } from '../../../hooks/useSharedForm';
-import { AssetDefinition,Asset } from '../../../types/domains/assets/entities';
-import { AssetFormData } from '../../../types/domains/forms/form-data';
+import { AssetDefinition,Asset } from '@/types/domains/assets/entities';
+import { AssetFormData } from '@/types/domains/forms/form-data';
 import { createAssetTransactionSchema } from '../../../utils/validationSchemas';
 import { Modal } from '../../../ui/common/Modal';
 import { 
@@ -14,7 +14,7 @@ import {
   StandardFormField
 } from '../../../ui/forms/StandardFormWrapper';
 import { AssetSearchBar, SelectedAssetInfo } from '../../../ui/components';
-import { FormFieldValue } from '../../../types/shared/ui/specialized';
+import { FormFieldValue } from '@/types/shared/ui/specialized';
 import { formatService } from '../../../service';
 
 const assetTransactionSchema = createAssetTransactionSchema();
@@ -96,6 +96,9 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
         return;
       }
 
+      // Remove assetDefinition if present (to avoid type error)
+      const { assetDefinition, ...cleanedData } = data as any;
+
       // Determine transaction date based on type
       let transactionDate: string;
       if (data.transactionType === 'buy' && data.purchaseDate) {
@@ -107,14 +110,12 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
       }
 
       const assetData = {
-        ...data,
+        ...cleanedData,
         // Store only the reference ID, not the full object
         assetDefinitionId: selectedDefinition.id,
-        
         // Asset transaction specific fields
         type: selectedDefinition.type,
         value: totalValue,
-        
         // Convert all transactions to use purchasePrice/purchaseQuantity
         // For sell transactions: use salePrice as purchasePrice and negative saleQuantity as purchaseQuantity
         purchasePrice: data.transactionType === 'buy' 
@@ -123,11 +124,9 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
         purchaseQuantity: data.transactionType === 'buy' 
           ? (data.purchaseQuantity || 0) 
           : -(data.saleQuantity || 0), // Negative for sell transactions
-        
         // Clear deprecated sale fields
         salePrice: undefined,
         saleQuantity: undefined,
-        
         // Set dates properly
         purchaseDate: transactionDate,
         saleDate: undefined, // Always clear sale date since we use purchaseDate for both types

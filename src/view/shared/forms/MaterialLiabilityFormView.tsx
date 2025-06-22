@@ -1,5 +1,5 @@
 import React from 'react';
-import { LiabilityType, PaymentFrequency } from '../../../types';
+import { LiabilityType, PaymentFrequency } from '@/types/shared/base/enums';
 import { UseFormSetValue } from 'react-hook-form';
 import { 
   StandardFormWrapper,
@@ -35,10 +35,12 @@ interface LiabilityFormData {
 interface MaterialLiabilityFormViewProps {
   // Form state props
   paymentFrequency: PaymentFrequency;
-  errors: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors: any; // Complex form with nested types, keeping flexible for now
   
   // Form handlers
-  watch: (field: string) => any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  watch: (field: string) => any; // Complex form interface, using any for compatibility
   setValue: UseFormSetValue<LiabilityFormData>;
   onFormSubmit: () => void;
   
@@ -64,6 +66,10 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
+
+  // Helper function to safely cast watch values
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const watchValue = (field: string) => watch(field) as string | number | boolean | undefined;
 
   const liabilityTypeOptions = getLiabilityTypeOptions(t);
   const paymentFrequencyOptions = getPaymentFrequencyOptions(t);

@@ -2,10 +2,11 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { StoreState } from '../../store';
-import { AssetType } from '../../types/shared/';
+import { AssetType } from '@/types/shared/';
+import { RechartsClickData } from '@/types/shared/charts';
 import AssetCalendarView from '../../view/portfolio-hub/assets/AssetCalendarView';
-import Logger from '../../service/shared/logging/Logger/logger';
-import { PortfolioPosition } from '../../types/domains/portfolio/position';
+import Logger from '@/service/shared/logging/Logger/logger';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { calculatorService } from '../../service';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/transactionsSlice';
@@ -286,7 +287,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({ onBack 
   }, [monthsData, selectedMonth, t]);
 
   // Handle bar click for month selection with memoized callback
-  const handleBarClick = useCallback((data: any) => {
+  const handleBarClick = useCallback((data: RechartsClickData) => {
     // Early exit if no valid click data
     if (!data?.activePayload?.[0]?.payload?.month) {
       return;

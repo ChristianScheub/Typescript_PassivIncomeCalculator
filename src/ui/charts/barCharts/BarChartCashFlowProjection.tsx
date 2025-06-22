@@ -4,7 +4,7 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } fro
 import { Card } from '../../common/Card';
 import { MonthlyProjection } from '@/types/domains/analytics';
 import { formatService } from '../../../service';
-import { CashFlowTooltipPayload, CashFlowPayload } from '../../../types/shared/charts';
+import { CashFlowTooltipPayload, CashFlowPayload } from '@/types/shared/charts';
 
 interface BarChartCashFlowProjectionProps {
   projections: MonthlyProjection[];

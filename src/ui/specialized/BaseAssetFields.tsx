@@ -3,7 +3,7 @@ import { AssetType } from '@/types/shared/base';
 import { UseFormSetValue } from 'react-hook-form';
 import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { useTranslation } from 'react-i18next';
-import formatService from '../../service/formatService';
+import formatService from '@/service/formatService';
 
 interface BaseAssetFieldsProps {
   assetType: AssetType;

@@ -1,6 +1,7 @@
 import React from 'react';
-import { AssetType } from '../../../types';
-import { UseFormSetValue } from 'react-hook-form';
+import { AssetType } from '@/types/shared/base/enums';
+import { UseFormSetValue, FieldErrors } from 'react-hook-form';
+import { MaterialAssetFormData } from '@/types/domains/assets';
 import { 
   StandardFormWrapper,
   RequiredSection,
@@ -11,13 +12,14 @@ import { BasicAssetInformation } from '../../../ui/sections';
 import { AssetSpecificFields } from '../../../ui/specialized/AssetSpecificFields';
 import { AdditionalInformationSection } from '../../../ui/specialized/AdditionalInformationSection';
 import { useTranslation } from 'react-i18next';
+
 interface MaterialAssetFormViewProps {
   assetType: AssetType;
   quantity?: number;
   currentPrice?: number;
-  errors: any;
-  watch: (field: string) => any;
-  setValue: UseFormSetValue<any>;
+  errors: FieldErrors<MaterialAssetFormData>;
+  watch: (field: string) => unknown;
+  setValue: UseFormSetValue<MaterialAssetFormData>;
   onFormSubmit: () => void;
   title: string;
 }
@@ -43,8 +45,9 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
       formRef={formRef}
     >
       <RequiredSection>
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         <BasicAssetInformation 
-          watch={watch}
+          watch={watch as any}
           setValue={setValue}
           errors={errors}
           isDefinition={false}
@@ -57,8 +60,8 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
             type="number"
             required
             error={errors.value?.message}
-            value={watch('value')}
-            onChange={(value) => setValue('value', value)}
+            value={watch('value') as number | undefined}
+            onChange={(value) => setValue('value', value as number)}
             placeholder={t('common.zeroAmountPlaceholder')}
             step={0.01}
             min={0}

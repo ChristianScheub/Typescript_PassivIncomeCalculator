@@ -4,7 +4,7 @@ import {
   FieldValidation, 
   ValidationOptions, 
   FieldConfig 
-} from '../types/shared/utils/form-validation';
+} from '@/types/shared/utils/form-validation';
 
 // Basic field types
 const baseFields = {

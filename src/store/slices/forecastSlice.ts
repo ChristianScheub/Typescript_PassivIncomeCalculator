@@ -4,7 +4,7 @@ import calculatorService from '@service/domain/financial/calculations/compositeC
 import { StoreState } from '..';
 import Logger from '@service/shared/logging/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
-import { PortfolioPosition } from '../../types/domains/portfolio/position';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
 
 // Helper functions to calculate income for different asset types
 const calculateStockDividendIncome = (position: PortfolioPosition, month: number): number => {

@@ -14,7 +14,7 @@ The `formatService` provides consistent formatting functions for displaying fina
 Import and use the service in UI components, containers, or anywhere data needs formatting:
 
 ```typescript
-import formatService from '../service/formatService';
+import formatService from '@/service/formatService';
 
 // Currency formatting
 const formatted = formatService.formatCurrency(1234.56); // "€1,234.56"

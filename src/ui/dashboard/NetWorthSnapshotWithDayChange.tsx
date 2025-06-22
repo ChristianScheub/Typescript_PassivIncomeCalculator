@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { CiSettings } from 'react-icons/ci';
 import { TrendingUp, TrendingDown } from 'lucide-react';
-import formatService from '../../service/infrastructure/formatService';
+import formatService from '@/service/infrastructure/formatService';
 import { IconButton } from '../common/IconButton';
 
 interface NetWorthSnapshotWithDayChangeProps {

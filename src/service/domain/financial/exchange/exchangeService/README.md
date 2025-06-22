@@ -14,7 +14,7 @@ The `exchangeService` manages USD to EUR exchange rate data by fetching rates fr
 Import and use the service in modules that need currency conversion:
 
 ```typescript
-import exchangeService from '../service/exchangeService';
+import exchangeService from '@/service/exchangeService';
 
 // Get today's exchange rate (auto-refreshes if needed)
 const currentRate = await exchangeService.getExchangeRate();

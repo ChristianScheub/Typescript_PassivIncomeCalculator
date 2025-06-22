@@ -1,8 +1,8 @@
 import React from 'react';
 import { UseFormSetValue, FieldErrors } from 'react-hook-form';
-import { ExpenseFormData } from '../../../types/domains/forms';
-import { FormFieldValue } from '../../../types/shared/ui/specialized';
-import { ExpenseCategory } from '../../../types/shared/base/enums';
+import { ExpenseFormData } from '@/types/domains/forms';
+import { FormFieldValue } from '@/types/shared/ui/specialized';
+import { ExpenseCategory } from '@/types/shared/base/enums';
 import { 
   StandardFormWrapper,
   RequiredSection,

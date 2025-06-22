@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { AssetSelectionDropdownProps } from '../../types/shared/ui/asset-selection';
+import { AssetSelectionDropdownProps } from '@/types/shared/ui/asset-selection';
 
 export const AssetSelectionDropdown: React.FC<AssetSelectionDropdownProps> = ({
   register,

@@ -10,7 +10,7 @@ import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { CreditCard } from "lucide-react";
 import { Add } from "@mui/icons-material";
 import formatService from "@service/infrastructure/formatService";
-import { Income } from '../../../types/domains/financial';
+import { Income } from '@/types/domains/financial';
 import { LoadingSpinner } from "../../../ui/feedback/LoadingSpinner";
 
 interface IncomeViewProps {

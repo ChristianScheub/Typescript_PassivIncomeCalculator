@@ -6,9 +6,9 @@ import AssetsContainer from '../assets/AssetsContainer';
 import LiabilitiesContainer from '../finance/LiabilitiesContainer';
 import IncomeContainer from '../finance/IncomeContainer';
 import ExpensesContainer from '../finance/ExpensesContainer';
-import recentActivityService from '../../service/domain/analytics/reporting/recentActivityService';
-import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
-import Logger from '../../service/shared/logging/Logger/logger';
+import recentActivityService from '@/service/domain/analytics/reporting/recentActivityService';
+import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
+import Logger from '@/service/shared/logging/Logger/logger';
 import PortfolioOverviewContainer from './PortfolioOverviewContainer';
 import { PortfolioCategory, PortfolioSubCategory } from "../../types/domains/analytics/reporting";
 

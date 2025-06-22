@@ -15,15 +15,12 @@ import {
   updateAssetCategoryOption,
   deleteAssetCategoryOption
 } from '../../store/slices/assetCategoriesSlice';
-import { AssetCategory, AssetCategoryOption } from '../../types/domains/assets';
-import Logger from '../../service/shared/logging/Logger/logger';
+import { AssetCategory, AssetCategoryOption } from '@/types/domains/assets';
+import Logger from '@/service/shared/logging/Logger/logger';
 import { useAsyncOperation } from '../../utils/containerUtils';
+import { NewAssetCategory, NewAssetCategoryOption, NewAssetCategoryOptionWithCategory, CategoryFormData, CategoryOptionFormData } from '@/types/domains/assets';
 
-// Type aliases for complex union types
-type NewAssetCategory = Omit<AssetCategory, 'id' | 'createdAt' | 'updatedAt'>;
-type NewAssetCategoryOption = Omit<AssetCategoryOption, 'id' | 'createdAt' | 'updatedAt' | 'categoryId'>;
-type NewAssetCategoryOptionWithCategory = Omit<AssetCategoryOption, 'id' | 'createdAt' | 'updatedAt'>;
-
+// Schema for validating category and option data
 const categorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
   isActive: z.boolean().optional(),
@@ -36,9 +33,6 @@ const categoryOptionSchema = z.object({
   sortOrder: z.number().min(0).optional(),
 });
 
-type CategoryFormData = z.infer<typeof categorySchema>;
-type CategoryOptionFormData = z.infer<typeof categoryOptionSchema>;
-
 // Form adapter to bridge React Hook Form with view expectations
 const createFormAdapter = <T extends Record<string, any>>(form: UseFormReturn<T>) => ({
   control: form.control,
@@ -46,7 +40,8 @@ const createFormAdapter = <T extends Record<string, any>>(form: UseFormReturn<T>
   reset: form.reset,
   formState: form.formState,
   watch: form.watch,
-  setValue: (field: string, value: any) => form.setValue(field as any, value),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setValue: (field: string, value: unknown) => form.setValue(field as any, value as any),
   getValues: form.getValues,
 });
 

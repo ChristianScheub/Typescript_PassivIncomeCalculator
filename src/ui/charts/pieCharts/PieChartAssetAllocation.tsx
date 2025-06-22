@@ -8,7 +8,7 @@ import { ChartTooltip } from '../ChartTooltips';
 import { AssetAllocation } from '@/types/domains/analytics';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
 import { LineChart } from 'lucide-react';
-import formatService from '../../../service/formatService';
+import formatService from '@/service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
 
 interface AssetAllocationChartProps {

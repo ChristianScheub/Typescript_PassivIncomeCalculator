@@ -2,9 +2,9 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import PortfolioAnalyticsView from '../../view/analytics-hub/assets/PortfolioAnalyticsView';
 import { calculatorService } from '../../service';
-import { AssetType } from '../../types/shared/base/enums';
+import { AssetType } from '@/types/shared/base/enums';
 import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/transactionsSlice';
-import Logger from '../../service/shared/logging/Logger/logger';
+import Logger from '@/service/shared/logging/Logger/logger';
 
 type AnalyticsTab = 'asset_distribution' | 'income_distribution' | 'custom';
 

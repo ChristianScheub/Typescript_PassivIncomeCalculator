@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import formatService from '../../service/formatService';
-import { ChartTooltipPayload, BaseChartData } from '../../types/shared/charts';
+import formatService from '@/service/formatService';
+import { ChartTooltipPayload, BaseChartData } from '@/types/shared/charts';
 
 interface TypedChartTooltipProps extends ChartTooltipPayload {
   // Chart type specific props

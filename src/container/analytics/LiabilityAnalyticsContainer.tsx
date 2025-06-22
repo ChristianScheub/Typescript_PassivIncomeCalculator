@@ -1,9 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import LiabilityAnalyticsView from '../../view/analytics-hub/liabilities/LiabilityAnalyticsView';
-import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
-import { Liability } from '../../types';
-import Logger from '../../service/shared/logging/Logger/logger';
+import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
+import { Liability } from '@/types/domains/financial/entities';
+import { 
+  LiabilityBreakdownItem, 
+  LiabilityItem, 
+  InterestRateComparisonItem,
+  PaymentScheduleItem,
+  DebtProjectionItem,
+  LiabilityAnalyticsData
+} from '@/types/domains/analytics/reporting';
+import Logger from '@/service/shared/logging/Logger/logger';
 
 type LiabilityAnalyticsTab = 'monthly' | 'annual' | 'more';
 
@@ -37,7 +45,7 @@ const LiabilityAnalyticsContainer: React.FC<LiabilityAnalyticsContainerProps> = 
         totalAnnualPayments: 0,
         totalDebt: 0,
         totalAnnualInterest: 0
-      };
+      } as LiabilityAnalyticsData;
     }
     
     Logger.info(`Calculating liability analytics for ${liabilities.length} liabilities`);
@@ -74,91 +82,91 @@ const LiabilityAnalyticsContainer: React.FC<LiabilityAnalyticsContainerProps> = 
     });
 
     // Monthly breakdown by type
-    const monthlyBreakdown = Array.from(liabilityTypeMap.entries())
+    const monthlyBreakdown: LiabilityBreakdownItem[] = Array.from(liabilityTypeMap.entries())
       .map(([type, amount]) => ({
         category: type,
         amount,
         percentage: totalMonthlyPayments > 0 ? (amount / totalMonthlyPayments) * 100 : 0
       }))
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .sort((a: LiabilityBreakdownItem, b: LiabilityBreakdownItem) => b.amount - a.amount);
     
     // Annual breakdown (same categories, but annual amounts)
-    const annualBreakdown = monthlyBreakdown.map(category => ({
+    const annualBreakdown: LiabilityBreakdownItem[] = monthlyBreakdown.map(category => ({
       ...category,
       amount: category.amount * 12,
     }));
     
     // Debt balance breakdown by type
-    const debtBalanceBreakdown = Array.from(debtBalanceTypeMap.entries())
+    const debtBalanceBreakdown: LiabilityBreakdownItem[] = Array.from(debtBalanceTypeMap.entries())
       .map(([type, amount]) => ({
         category: type,
         amount,
         percentage: totalDebt > 0 ? (amount / totalDebt) * 100 : 0
       }))
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .sort((a: LiabilityBreakdownItem, b: LiabilityBreakdownItem) => b.amount - a.amount);
     
     // Annual interest breakdown by type
-    const annualInterestBreakdown = Array.from(interestTypeMap.entries())
+    const annualInterestBreakdown: LiabilityBreakdownItem[] = Array.from(interestTypeMap.entries())
       .map(([type, amount]) => ({
         category: type,
         amount,
         percentage: totalAnnualInterest > 0 ? (amount / totalAnnualInterest) * 100 : 0
       }))
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .sort((a: LiabilityBreakdownItem, b: LiabilityBreakdownItem) => b.amount - a.amount);
     
     // Individual liabilities for monthly view
-    const monthlyIndividualLiabilities = liabilities
+    const monthlyIndividualLiabilities: LiabilityItem[] = liabilities
       .map((liability: Liability) => ({
         name: liability.name,
         amount: calculatorService.calculateLiabilityMonthlyPayment(liability),
         category: liability.type,
         percentage: 0 // Will be calculated below
       }))
-      .filter((liability: any) => liability.amount > 0)
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .filter((liability: LiabilityItem) => liability.amount > 0)
+      .sort((a: LiabilityItem, b: LiabilityItem) => b.amount - a.amount);
     
     // Individual liabilities for annual view
-    const annualIndividualLiabilities = liabilities
+    const annualIndividualLiabilities: LiabilityItem[] = liabilities
       .map((liability: Liability) => ({
         name: liability.name,
         amount: calculatorService.calculateLiabilityMonthlyPayment(liability) * 12,
         category: liability.type,
         percentage: 0 // Will be calculated below
       }))
-      .filter((liability: any) => liability.amount > 0)
-      .sort((a: any, b: any) => b.amount - a.amount);
+      .filter((liability: LiabilityItem) => liability.amount > 0)
+      .sort((a: LiabilityItem, b: LiabilityItem) => b.amount - a.amount);
     
     // Interest rate comparison data
-    const interestRateComparison = liabilities
+    const interestRateComparison: InterestRateComparisonItem[] = liabilities
       .filter((liability: Liability) => liability.interestRate && liability.interestRate > 0)
       .map((liability: Liability) => ({
         name: liability.name,
         rate: liability.interestRate || 0,
         type: liability.type
       }))
-      .sort((a, b) => b.rate - a.rate);
+      .sort((a: InterestRateComparisonItem, b: InterestRateComparisonItem) => b.rate - a.rate);
     
     // Payment schedule data for annual view (monthly payments throughout the year)
-    const paymentScheduleData = Array.from({length: 12}, (_, month) => {
+    const paymentScheduleData: PaymentScheduleItem[] = Array.from({length: 12}, (_, month) => {
       const monthName = new Date(2024, month, 1).toLocaleDateString('de-DE', { month: 'short' });
-      const totalPayment = liabilities.reduce((sum, liability) => {
+      const totalPayment = liabilities.reduce((sum: number, liability: Liability) => {
         return sum + calculatorService.calculateLiabilityMonthlyPayment(liability);
       }, 0);
       
       return {
         month: monthName,
         amount: totalPayment,
-        breakdown: liabilities.map(liability => ({
+        breakdown: liabilities.map((liability: Liability) => ({
           name: liability.name,
           amount: calculatorService.calculateLiabilityMonthlyPayment(liability)
-        })).filter(item => item.amount > 0)
+        })).filter((item: { name: string; amount: number }) => item.amount > 0)
       };
     });
     
     // Helper function to calculate debt projection for any time period
-    const calculateDebtProjection = (months: number, labelPrefix: string) => {
-      const projectionData = [];
-      const projectionLiabilities = liabilities.map(liability => ({
+    const calculateDebtProjection = (months: number): DebtProjectionItem[] => {
+      const projectionData: DebtProjectionItem[] = [];
+      const projectionLiabilities = liabilities.map((liability: Liability) => ({
         ...liability,
         remainingBalance: liability.currentBalance || 0
       }));
@@ -188,7 +196,7 @@ const LiabilityAnalyticsContainer: React.FC<LiabilityAnalyticsContainerProps> = 
         let totalBalance = 0;
         const liabilityBalances: { [key: string]: number } = {};
         
-        projectionLiabilities.forEach(liability => {
+        projectionLiabilities.forEach((liability: typeof projectionLiabilities[0]) => {
           if (month === 0) {
             liabilityBalances[liability.name] = liability.remainingBalance;
             totalBalance += liability.remainingBalance;
@@ -219,22 +227,22 @@ const LiabilityAnalyticsContainer: React.FC<LiabilityAnalyticsContainerProps> = 
     };
 
     // Calculate debt projections for different time periods
-    const debtProjectionData5Years = calculateDebtProjection(60, '5-Jahr');
-    const debtProjectionData10Years = calculateDebtProjection(120, '10-Jahr');  
-    const debtProjectionData30Years = calculateDebtProjection(360, '30-Jahr');
+    const debtProjectionData5Years = calculateDebtProjection(60);
+    const debtProjectionData10Years = calculateDebtProjection(120);  
+    const debtProjectionData30Years = calculateDebtProjection(360);
     
     // Calculate totals
     const totalAnnualPayments = totalMonthlyPayments * 12;
     
     // Calculate percentages for individual liabilities
     if (totalMonthlyPayments > 0) {
-      monthlyIndividualLiabilities.forEach((liability: any) => {
+      monthlyIndividualLiabilities.forEach((liability: LiabilityItem) => {
         liability.percentage = (liability.amount / totalMonthlyPayments) * 100;
       });
     }
     
     if (totalAnnualPayments > 0) {
-      annualIndividualLiabilities.forEach((liability: any) => {
+      annualIndividualLiabilities.forEach((liability: LiabilityItem) => {
         liability.percentage = (liability.amount / totalAnnualPayments) * 100;
       });
     }
@@ -257,7 +265,7 @@ const LiabilityAnalyticsContainer: React.FC<LiabilityAnalyticsContainerProps> = 
       totalAnnualPayments,
       totalDebt,
       totalAnnualInterest
-    };
+    } as LiabilityAnalyticsData;
   }, [liabilities]);
 
   const handleTabChange = (tab: LiabilityAnalyticsTab) => {

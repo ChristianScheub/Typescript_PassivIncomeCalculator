@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { RequiredSection } from '../forms/StandardFormWrapper';
 import { getAssetTypeOptions } from '../../constants';
-import { BasicAssetInformationProps } from '../../types/shared/ui/asset-sections';
+import { BasicAssetInformationProps } from '@/types/shared/ui/asset-sections';
 
 export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
   watch,

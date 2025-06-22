@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
-import Logger from '../../service/shared/logging/Logger/logger';
+import Logger from '@/service/shared/logging/Logger/logger';
 import AssetCalendarView from '../../view/portfolio-hub/assets/AssetCalendarView';
-import { AssetType } from '../../types/shared';
-import { PortfolioPosition } from '../../types/domains/portfolio/position';
+import { AssetType } from '@/types/shared';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import { RechartsClickData } from '@/types/shared/charts';
 
 interface AssetCalendarContainerProps {
   selectedTab?: 'calendar' | 'history' | 'timeline';
@@ -109,9 +110,11 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
     };
   }, [selectedMonth, filteredAssets]);
 
-  const handleBarClick = (data: ChartData) => {
-    if (data.monthNumber) {
-      setSelectedMonth(data.monthNumber);
+  const handleBarClick = (data: RechartsClickData) => {
+    // Extract the monthNumber from the clicked bar's payload
+    const monthNumber = data.activePayload?.[0]?.payload?.monthNumber;
+    if (monthNumber && typeof monthNumber === 'number') {
+      setSelectedMonth(monthNumber);
     }
   };
 

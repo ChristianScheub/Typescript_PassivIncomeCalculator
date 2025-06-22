@@ -13,6 +13,14 @@ import {
 } from '../../../../shared/cache/assetIncomeCacheUtils';
 import { calculateAssetMonthlyIncomeWithCache } from '../../../../shared/calculations/assetIncomeCalculations';
 import Logger from '../../../../shared/logging/Logger/logger';
+import type { Asset } from '../../../../../types/domains/assets/entities';
+
+// Type for cache data that needs to be updated
+interface CacheUpdateData {
+  monthlyAmount: number;
+  annualAmount: number;
+  monthlyBreakdown: Record<number, number>;
+}
 
 /**
  * Asset Calculator Service that provides all asset-related calculations
@@ -39,7 +47,7 @@ const assetCalculatorService: IAssetCalculatorService = {
     Logger.cache(`Cache miss: falling back to individual calculations for ${assets.length} assets`);
     // Priority 2: Individual calculations with cache-aware approach
     // Use the cache-aware function that checks and can potentially extend cache
-    let assetsNeedingCacheUpdate: Array<{asset: any, cacheData: any}> = [];
+    let assetsNeedingCacheUpdate: Array<{asset: Asset, cacheData: CacheUpdateData}> = [];
     
     const total = assets.reduce((sum, asset) => {
       const result = calculateAssetMonthlyIncomeWithCache(asset);

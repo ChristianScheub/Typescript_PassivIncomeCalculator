@@ -17,7 +17,7 @@ The `stockAPIService` provides a simplified interface for essential stock data o
 Import and use the service in containers, Redux slices, or other modules that need stock data:
 
 ```typescript
-import { createStockAPIService } from '../service/stockAPIService';
+import { createStockAPIService } from '@/service/stockAPIService';
 
 // Create service instance
 const stockAPI = createStockAPIService();

@@ -8,6 +8,14 @@ import {
 import Logger from "@/service/shared/logging/Logger/logger";
 import { CapacitorHttp } from '@capacitor/core';
 
+// Yahoo API response interfaces
+interface YahooExchangeItem {
+  symbol: string;
+  exchange?: string;
+  market?: string;
+  currency?: string;
+}
+
 /**
  * Yahoo Finance API Service Provider (Capacitor + Typescript)
  * Implementiert das IStockAPIService Interface mit echten API-Aufrufen (ohne API-Key)
@@ -79,8 +87,8 @@ export class YahooAPIService implements IStockAPIService {
       }
 
       const exchanges: StockExchange[] = res.data.items
-        .filter((item: any) => item.symbol.toLowerCase().startsWith(symbol.toLowerCase()))
-        .map((item: any) => ({
+        .filter((item: YahooExchangeItem) => item.symbol.toLowerCase().startsWith(symbol.toLowerCase()))
+        .map((item: YahooExchangeItem) => ({
           code: item.symbol,
           name: item.exchange ?? '',
           country: item.market ?? '',

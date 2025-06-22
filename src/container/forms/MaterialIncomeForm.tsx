@@ -4,7 +4,7 @@ import { Income } from '@/types/domains/financial';
 import { IncomeType } from '@/types/shared/base';
 import { useSharedForm } from '../../hooks/useSharedForm';
 import { createIncomeSchema } from '../../utils/validationSchemas';
-import Logger from '../../service/shared/logging/Logger/logger';
+import Logger from '@/service/shared/logging/Logger/logger';
 import { z } from 'zod';
 import { MaterialIncomeFormView } from '../../view/shared/forms/MaterialIncomeFormView';
 

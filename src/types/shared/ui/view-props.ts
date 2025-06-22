@@ -44,6 +44,9 @@ export interface CategoryFormData {
   name: string;
   description?: string;
   color?: string;
+  isActive?: boolean;
+  sortOrder?: number;
+  [key: string]: any; // Index signature to allow additional properties
 }
 
 export interface OptionFormData {

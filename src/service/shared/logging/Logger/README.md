@@ -15,7 +15,7 @@ The `Logger` service provides a comprehensive logging system with multiple log l
 Import and use the Logger throughout the application for debugging and monitoring:
 
 ```typescript
-import Logger from '../service/Logger/logger';
+import Logger from '@/service/Logger/logger';
 
 // Basic logging
 Logger.log('Basic log message');

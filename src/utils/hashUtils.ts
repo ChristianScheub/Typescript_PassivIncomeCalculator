@@ -2,7 +2,7 @@
  * Utility functions for generating hashes for caching purposes
  */
 
-import { AssetDefinition, Transaction } from '../types/domains/assets';
+import { AssetDefinition, Transaction } from '@/types/domains/assets';
 
 /**
  * Simple hash function for generating consistent hash strings from objects

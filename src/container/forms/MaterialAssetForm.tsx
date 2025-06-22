@@ -1,43 +1,14 @@
 import React, { useEffect } from 'react';
-import { Asset } from '../../types/domains/assets/entities';
-import { AssetType } from '../../types/shared/base/enums';
+import { Asset } from '@/types/domains/assets/entities';
+import { AssetType } from '@/types/shared/base/enums';
+import { MaterialAssetFormData } from '@/types/domains/assets';
 import { useSharedForm } from '../../hooks/useSharedForm';
 import { useTranslation } from 'react-i18next';
-import Logger from '../../service/shared/logging/Logger/logger';
+import Logger from '@/service/shared/logging/Logger/logger';
 import { createMaterialAssetSchema } from '../../utils/validationSchemas';
 import { MaterialAssetFormView } from '../../view/shared/forms/MaterialAssetFormView';
 import { getCurrentQuantity } from '../../utils/transactionCalculations';
 
-interface MaterialAssetFormData {
-  // Required fields
-  name: string;
-  type: AssetType;
-  value?: number;
-  purchaseDate?: string;
-  
-  // Stock specific fields
-  ticker?: string;
-  quantity?: number;
-  purchasePrice?: number;
-  currentPrice?: number;
-
-  // Real estate specific fields
-  propertyValue?: number;
-
-  // Crypto specific fields
-  symbol?: string;
-  acquisitionCost?: number;
-
-  // Transaction notes
-  notes?: string;
-
-  // System fields
-  id?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-// Create asset validation schema using shared utilities
 const assetSchema = createMaterialAssetSchema();
 
 interface AssetFormProps {

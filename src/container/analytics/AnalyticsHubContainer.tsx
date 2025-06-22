@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
-import Logger from '../../service/shared/logging/Logger/logger';
-import recentActivityService, { AnalyticsCategory, AnalyticsSubCategory } from '../../service/domain/analytics/reporting/recentActivityService';
+import Logger from '@/service/shared/logging/Logger/logger';
+import recentActivityService, { AnalyticsCategory, AnalyticsSubCategory } from '@/service/domain/analytics/reporting/recentActivityService';
 import DistributionsAnalyticsContainer from './DistributionsAnalyticsContainer';
 import MilestonesContainer from '../forecast/MilestonesContainer';
 import ForecastContainer from '../forecast/ForecastContainer';

@@ -1,4 +1,4 @@
-import type { AnalyticsCategory, AnalyticsSubCategory } from '../types/analytics';
+import type { AnalyticsCategory, AnalyticsSubCategory } from '@/types/analytics';
 import { sharedActivityManager } from '../core/sharedManager';
 import Logger from "@/service/shared/logging/Logger/logger";
 

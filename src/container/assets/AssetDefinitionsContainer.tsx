@@ -11,13 +11,17 @@ import {
   deleteAssetCategoryAssignmentsByAssetId
 } from '../../store/slices/assetCategoriesSlice';
 import { AssetDefinitionsView } from '../../view/portfolio-hub/assets/AssetDefinitionsView';
-import { AssetDefinition, AssetCategoryAssignment } from '../../types/domains/assets';
-import { AssetType } from '../../types/shared';
-import Logger from '../../service/shared/logging/Logger/logger';
+import { AssetDefinition, AssetCategoryAssignment } from '@/types/domains/assets';
+import { AssetType } from '@/types/shared';
+import Logger from '@/service/shared/logging/Logger/logger';
 import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { StockPriceUpdater } from '../../service/shared/utilities/helper/stockPriceUpdater';
-import { TimeRangePeriod } from '../../types/shared/time';
+import { StockPriceUpdater } from '@/service/shared/utilities/helper/stockPriceUpdater';
+import { TimeRangePeriod } from '@/types/shared/time';
+import { CreateAssetDefinitionData } from '@/types/domains/assets';
+
+// Type for the asset definition data when creating
+// type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
 import { PriceEntry } from '../../ui/dialog/AddPriceEntryDialog';
 import { addPriceToHistory } from '../../utils/priceHistoryUtils';
 
@@ -53,10 +57,17 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     fetchData();
   }, [dispatch]);
 
-  const handleAddDefinition = async (data: any, categoryAssignments: Omit<AssetCategoryAssignment, 'id' | 'createdAt' | 'updatedAt'>[]) => {
+  const handleAddDefinition = async (data: CreateAssetDefinitionData, categoryAssignments: Omit<AssetCategoryAssignment, 'id' | 'createdAt' | 'updatedAt'>[]) => {
     try {
       Logger.info('Adding new asset definition' + " - " + JSON.stringify(data));
-      const action = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetDefinition(data));
+      
+      // Convert CreateAssetDefinitionData to the format expected by addAssetDefinition
+      const definitionData: Omit<AssetDefinition, 'id' | 'createdAt' | 'updatedAt'> = {
+        ...data,
+        name: data.name || data.fullName || 'Unnamed Asset' // Ensure name is always a string
+      };
+      
+      const action = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetDefinition(definitionData));
       const newDefinition = addAssetDefinition.fulfilled.match(action) ? action.payload : null;
       
       // Add category assignments if any

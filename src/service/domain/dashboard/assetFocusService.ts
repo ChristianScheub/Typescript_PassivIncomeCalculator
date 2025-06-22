@@ -1,4 +1,4 @@
-import { Asset, AssetDefinition } from '../../../types/domains/assets/entities';
+import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
 import Logger from '../../shared/logging/Logger/logger';
 
 export interface AssetWithValue {
@@ -35,8 +35,8 @@ class AssetFocusService {
 
     try {
       // Group assets by assetDefinitionId and calculate totals
-      assets.forEach((asset: any) => {
-        const assetDef = assetDefinitions.find((def: any) => def.id === asset.assetDefinitionId);
+      assets.forEach((asset: Asset) => {
+        const assetDef = assetDefinitions.find((def: AssetDefinition) => def.id === asset.assetDefinitionId);
         if (!assetDef) {
           Logger.info(`Asset definition not found for asset ${asset.id}`);
           return;

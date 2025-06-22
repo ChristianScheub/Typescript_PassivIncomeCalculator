@@ -7,8 +7,8 @@ import CustomAnalyticsView from './CustomAnalyticsView';
 import { ViewHeader } from '../../../ui/layout/ViewHeader';
 import { AssetTypeFilterCard } from '../../../ui/specialized/AssetTypeFilterCard';
 import { getAssetTypeOptions } from '../../../constants';
-import { AllocationData } from '../../../types/domains/analytics/calculations';
-import { PortfolioPosition } from '../../../types/shared/analytics';
+import { AllocationData } from '@/types/domains/analytics/calculations';
+import { PortfolioPosition } from '@/types/shared/analytics';
 import { AssetType } from '@/types/shared';
 
 type AnalyticsTab = 'asset_distribution' | 'income_distribution' | 'custom';

@@ -10,7 +10,7 @@ import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { Landmark } from "lucide-react";
 import { Add } from "@mui/icons-material";
 import formatService from "@service/infrastructure/formatService";
-import { Liability } from '../../../types/domains/financial';
+import { Liability } from '@/types/domains/financial';
 import { LoadingSpinner } from '../../../ui/feedback/LoadingSpinner';
 
 interface LiabilitiesViewProps {
@@ -20,8 +20,8 @@ interface LiabilitiesViewProps {
   totalMonthlyPayment: number;
   isAddingLiability: boolean;
   editingLiability: Liability | null;
-  onAddLiability: (data: any) => void;
-  onUpdateLiability: (data: any) => void;
+  onAddLiability: (data: unknown) => void; // Form sends Liability object, not LiabilityFormData
+  onUpdateLiability: (data: unknown) => void; // Form sends Liability object, not LiabilityFormData
   onDeleteLiability: (id: string) => void;
   onSetIsAddingLiability: (isAdding: boolean) => void;
   onSetEditingLiability: (liability: Liability | null) => void;

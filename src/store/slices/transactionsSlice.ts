@@ -1,11 +1,11 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { 
   Transaction as Asset
-} from '../../types/domains/assets/';
-import { AssetDefinition, AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '../../types/domains/assets';
-import { CachedDividends } from '../../types/domains/assets/calculations';
-import { PortfolioPosition } from '../../types/domains/portfolio/position';
-import { TransactionsState } from '../../types/domains/financial/state';
+} from '@/types/domains/assets/';
+import { AssetDefinition, AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/domains/assets';
+import { CachedDividends } from '@/types/domains/assets/calculations';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import { TransactionsState } from '@/types/domains/financial/state';
 import { calculatePortfolioPositions, calculatePortfolioTotals } from '@service/domain/portfolio/management/portfolioService/portfolioCalculations';
 import sqliteService from '@service/infrastructure/sqlLiteService';
 import { v4 as uuidv4 } from '../../utils/uuid';

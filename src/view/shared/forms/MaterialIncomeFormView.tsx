@@ -1,7 +1,7 @@
 import React from 'react';
-import { IncomeType } from '../../../types/shared/base/enums';
-import { UseFormSetValue } from 'react-hook-form';
-import { FormFieldValue } from '../../../types/shared/ui/specialized';
+import { IncomeType, PaymentFrequency } from '@/types/shared/base/enums';
+import { UseFormSetValue, FieldErrors } from 'react-hook-form';
+import { FormFieldValue } from '@/types/shared/ui/specialized';
 import { 
   StandardFormWrapper,
   RequiredSection,
@@ -34,11 +34,11 @@ interface IncomeFormData {
 
 interface MaterialIncomeFormViewProps {
   // Form state props
-  errors: any;
+  errors: FieldErrors<IncomeFormData>;
   watchedPaymentMonths: number[];
   
   // Form handlers
-  watch: (field: string) => any;
+  watch: (field: string) => unknown;
   setValue: UseFormSetValue<IncomeFormData>;
   onFormSubmit: () => void;
   handleCustomScheduleChange: (month: number, checked: boolean) => void;
@@ -58,6 +58,9 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
+  
+  // Helper function to safely cast watch values
+  const watchValue = (field: string) => watch(field) as string | number | boolean | undefined;
   
   // Type-safe onChange handlers
   const handleNameChange = (value: FormFieldValue) => {
@@ -106,7 +109,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             name="name"
             required
             error={errors.name?.message}
-            value={watch('name')}
+            value={watchValue('name')}
             onChange={handleNameChange}
             placeholder={t('income.form.enterIncomeName')}
           />
@@ -117,7 +120,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             type="select"
             required
             options={typeOptions}
-            value={watch('type')}
+            value={watchValue('type')}
             onChange={handleTypeChange}
             placeholder={t('income.form.selectIncomeType')}
           />
@@ -129,7 +132,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             required
             options={frequencyOptions}
             error={errors.paymentSchedule?.frequency?.message}
-            value={watch('paymentSchedule.frequency')}
+            value={watchValue('paymentSchedule.frequency')}
             onChange={handleFrequencyChange}
             placeholder={t('income.form.selectFrequency')}
           />
@@ -140,7 +143,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             type="number"
             required
             error={errors.paymentSchedule?.amount?.message}
-            value={watch('paymentSchedule.amount')}
+            value={watchValue('paymentSchedule.amount')}
             onChange={handleAmountChange}
             placeholder="0"
             step={0.01}
@@ -152,7 +155,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             name="paymentSchedule.dayOfMonth"
             type="number"
             error={errors.paymentSchedule?.dayOfMonth?.message}
-            value={watch('paymentSchedule.dayOfMonth')}
+            value={watchValue('paymentSchedule.dayOfMonth')}
             onChange={handleDayOfMonthChange}
             placeholder={t('income.form.dayOfMonthPlaceholder')}
             step={1}
@@ -165,7 +168,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             name="startDate"
             type="date"
             required
-            value={watch('startDate')}
+            value={watchValue('startDate')}
             onChange={handleStartDateChange}
           />
 
@@ -173,22 +176,22 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             label={t('income.form.passiveIncome')}
             name="isPassive"
             type="checkbox"
-            value={watch('isPassive')}
+            value={watchValue('isPassive')}
             onChange={handleIsPassiveChange}
           />
         </FormGrid>
       </RequiredSection>
 
       <CustomScheduleSection
-        frequency={watch('paymentSchedule.frequency')}
+        frequency={watch('paymentSchedule.frequency') as PaymentFrequency}
         selectedMonths={watchedPaymentMonths}
         onMonthChange={handleCustomScheduleChange}
         title={t('income.form.paymentMonths')}
       />
 
       <OptionalFieldsSection
-        endDateValue={watch('endDate')}
-        notesValue={watch('notes')}
+        endDateValue={watch('endDate') as string | undefined}
+        notesValue={watch('notes') as string | undefined}
         onEndDateChange={(value) => setValue('endDate', String(value))}
         onNotesChange={(value) => setValue('notes', String(value))}
       />

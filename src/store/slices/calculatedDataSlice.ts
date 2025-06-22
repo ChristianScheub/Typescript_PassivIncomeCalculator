@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { StoreState } from '..';
-import Logger from '../../service/shared/logging/Logger/logger';
-import portfolioHistoryService from '../../service/domain/portfolio/history/portfolioHistoryService';
-import assetFocusService from '../../service/domain/dashboard/assetFocusService';
-import analyticsService from '../../service/domain/analytics/calculations/financialAnalyticsService';
-import { PortfolioHistoryPoint } from '../../types/domains/portfolio/history';
+import Logger from '@/service/shared/logging/Logger/logger';
+import portfolioHistoryService from '@/service/domain/portfolio/history/portfolioHistoryService';
+import assetFocusService from '@/service/domain/dashboard/assetFocusService';
+import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
+import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
 import { AssetFocusTimeRange } from './dashboardSettingsSlice';
 
 // Types for cached data

@@ -8,12 +8,12 @@ import { usePortfolioHistory, useAssetFocusData, useFinancialSummary } from '../
 import { useIntradayPortfolioData } from '../../hooks/useIntradayData';
 import AssetDashboardView from '../../view/finance-hub/overview/AssetDashboardView';
 import AssetDetailModal from '../../view/finance-hub/overview/AssetDetailModal';
-import { Asset, AssetDefinition } from '../../types/domains/assets/entities';
-import stockAPIService from '../../service/domain/assets/market-data/stockAPIService';
+import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
+import stockAPIService from '@/service/domain/assets/market-data/stockAPIService';
 import { useAsyncOperation } from '../../utils/containerUtils';
-import cacheRefreshService from '../../service/application/orchestration/cacheRefreshService';
+import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 import { addIntradayPriceHistory } from '../../utils/priceHistoryUtils';
-import Logger from '../../service/shared/logging/Logger/logger';
+import Logger from '@/service/shared/logging/Logger/logger';
 import { useTranslation } from 'react-i18next';
 
 const AssetFocusDashboardContainer: React.FC = () => {

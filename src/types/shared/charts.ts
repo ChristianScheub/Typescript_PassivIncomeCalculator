@@ -49,6 +49,20 @@ export interface ChartTooltipPayload {
   label?: string;
 }
 
+// Recharts click event structure
+export interface RechartsClickData {
+  activePayload?: {
+    payload: BaseChartData;
+    dataKey: string;
+    value: number;
+  }[];
+  activeLabel?: string;
+  activeCoordinate?: {
+    x: number;
+    y: number;
+  };
+}
+
 // Cash flow tooltip props with specific payload typing
 export interface CashFlowTooltipPayload {
   active?: boolean;

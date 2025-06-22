@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import formatService from "@service/infrastructure/formatService";
 import { AssetType } from '../../../types';
-import { PortfolioPosition } from '../../../service/portfolioService/portfolioCalculations';
+import { RechartsClickData } from '@/types/shared/charts';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { ViewHeader } from '../../../ui/layout/ViewHeader';
 import { AssetTypeFilterCard } from '../../../ui/specialized/AssetTypeFilterCard';
 import { CollapsibleSection } from '../../../ui/common/CollapsibleSection';
@@ -39,7 +40,7 @@ interface AssetCalendarViewProps {
   assetTypeOptions: AssetTypeOption[];
   filteredAssets: PortfolioPosition[]; // Filtered positions
   positions: PortfolioPosition[]; // All positions
-  onBarClick: (data: unknown) => void;
+  onBarClick: (data: RechartsClickData) => void;
   onAssetTypeChange: (type: AssetType | 'all') => void;
   onBack?: () => void;
 }

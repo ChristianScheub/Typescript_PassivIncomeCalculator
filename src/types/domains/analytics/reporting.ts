@@ -48,7 +48,6 @@ export interface FinancialSummary {
 export interface DashboardConfig {
   layout: 'desktop' | 'mobile';
   widgets: DashboardWidget[];
-  preferences: UserPreferences;
 }
 
 export interface DashboardWidget {
@@ -264,9 +263,52 @@ export interface FinancialAlert {
   metadata?: Record<string, unknown>;
 }
 
-export interface AlertGenerationOptions {
-  maxAlerts?: number;
-  includeSuccess?: boolean;
-  priorityThreshold?: number;
-  excludeCategories?: string[];
+// Liability Analytics specific types
+export interface LiabilityBreakdownItem {
+  category: string;
+  amount: number;
+  percentage: number;
+}
+
+export interface LiabilityItem {
+  name: string;
+  amount: number;
+  category: string;
+  percentage: number;
+}
+
+export interface InterestRateComparisonItem {
+  name: string;
+  rate: number;
+  type: string;
+}
+
+export interface PaymentScheduleItem {
+  month: string;
+  amount: number;
+  breakdown: { name: string; amount: number }[];
+}
+
+export interface DebtProjectionItem {
+  month: string;
+  total: number;
+  [liabilityName: string]: string | number;
+}
+
+export interface LiabilityAnalyticsData {
+  monthlyBreakdown: LiabilityBreakdownItem[];
+  annualBreakdown: LiabilityBreakdownItem[];
+  monthlyIndividualLiabilities: LiabilityItem[];
+  annualIndividualLiabilities: LiabilityItem[];
+  debtBalanceBreakdown: LiabilityBreakdownItem[];
+  annualInterestBreakdown: LiabilityBreakdownItem[];
+  interestRateComparison: InterestRateComparisonItem[];
+  paymentScheduleData: PaymentScheduleItem[];
+  debtProjectionData5Years: DebtProjectionItem[];
+  debtProjectionData10Years: DebtProjectionItem[];
+  debtProjectionData30Years: DebtProjectionItem[];
+  totalMonthlyPayments: number;
+  totalAnnualPayments: number;
+  totalDebt: number;
+  totalAnnualInterest: number;
 }

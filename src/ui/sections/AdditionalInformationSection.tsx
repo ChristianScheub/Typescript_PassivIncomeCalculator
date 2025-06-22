@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { OptionalSection } from '../forms/StandardFormWrapper';
-import { AdditionalInformationSectionProps } from '../../types/shared/ui/asset-sections';
+import { AdditionalInformationSectionProps } from '@/types/shared/ui/asset-sections';
 
 export const AdditionalInformationSection: React.FC<AdditionalInformationSectionProps> = ({
   watch,

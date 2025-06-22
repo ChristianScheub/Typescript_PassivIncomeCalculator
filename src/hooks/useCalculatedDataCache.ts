@@ -12,7 +12,7 @@ import {
   invalidateAllCache
 } from '../store/slices/calculatedDataSlice';
 import { AssetFocusTimeRange } from '../store/slices/dashboardSettingsSlice';
-import Logger from '../service/shared/logging/Logger/logger';
+import Logger from '@/service/shared/logging/Logger/logger';
 
 /**
  * Custom hook for managing calculated data cache

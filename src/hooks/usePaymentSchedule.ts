@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { PaymentSchedule } from '@/types/shared/base/payments';
 import { PaymentScheduleFields } from '@/types/shared/hooks/payment-schedule';
 import { createPaymentScheduleSchema } from '../utils/validationSchemas';
-import Logger from '../service/shared/logging/Logger/logger';
+import Logger from '@/service/shared/logging/Logger/logger';
 
 export function usePaymentSchedule(initialData?: PaymentSchedule): {
   fields: PaymentScheduleFields;

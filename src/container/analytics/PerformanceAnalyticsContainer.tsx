@@ -1,6 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppSelector } from '../../hooks/redux';
-import Logger from '../../service/shared/logging/Logger/logger';
+import { Transaction as Asset } from '@/types/domains/assets/';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import Logger from '@/service/shared/logging/Logger/logger';
 import PerformanceAnalyticsView from '../../view/analytics-hub/performance/PerformanceAnalyticsView';
 import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
 
@@ -53,13 +55,13 @@ const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps
     const totalReturnPercent = totals.totalReturnPercentage;
     
     // Calculate simple performance metrics from positions
-    const positionValues = portfolioCache.positions.map((position: any) => position.currentValue);
+    const positionValues = portfolioCache.positions.map((position: PortfolioPosition) => position.currentValue);
     const peakValue = Math.max(...positionValues, currentValue);
     const lowestValue = Math.min(...positionValues.filter((v: number) => v > 0), currentValue);
     
     // Calculate basic volatility from position returns
     const positionReturns = portfolioCache.positions
-      .map((position: any) => position.totalReturnPercentage)
+      .map((position: PortfolioPosition) => position.totalReturnPercentage)
       .filter((ret: number) => isFinite(ret));
     
     let volatility = 0;
@@ -95,7 +97,18 @@ const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps
 
   // Asset performance data using proper utility functions
   const assetPerformance = useMemo(() => {
-    return assets.map((asset: any) => {
+    interface AssetPerformanceItem {
+      id: string;
+      name: string;
+      symbol?: string;
+      currentValue: number;
+      purchaseValue: number;
+      invested: number;
+      gain: number;
+      gainPercent: number;
+    }
+
+    return assets.map((asset: Asset): AssetPerformanceItem => {
       const currentValue = getCurrentValue(asset);
       const quantity = getCurrentQuantity(asset);
       const purchaseValue = (quantity * (asset.purchasePrice || 0)) + (asset.transactionCosts || 0);
@@ -105,14 +118,14 @@ const PerformanceAnalyticsContainer: React.FC<PerformanceAnalyticsContainerProps
       return {
         id: asset.id,
         name: asset.name,
-        symbol: asset.symbol,
+        symbol: asset.assetDefinition?.ticker,
         currentValue,
         purchaseValue,
         invested: purchaseValue,
         gain,
         gainPercent
       };
-    }).sort((a: any, b: any) => b.gainPercent - a.gainPercent);
+    }).sort((a: AssetPerformanceItem, b: AssetPerformanceItem) => b.gainPercent - a.gainPercent);
   }, [assets]);
 
   const handleTabChange = (tab: 'portfolio' | 'returns' | 'historical') => {

@@ -4,8 +4,8 @@ import { fetchExpenses, addExpense, updateExpense, deleteExpense } from '../../s
 import { Expense } from '@/types/domains/financial';
 import { ExpenseFormData } from '@/types/domains/forms/form-data';
 import { useTranslation } from 'react-i18next';
-import Logger from '../../service/shared/logging/Logger/logger';
-import calculatorService from '../../service/domain/financial/calculations/compositeCalculatorService';
+import Logger from '@/service/shared/logging/Logger/logger';
+import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import ExpensesView from '../../view/portfolio-hub/expenses/ExpensesView';
 import { sortExpenses, SortOrder } from '../../utils/sortingUtils';
 import { useAsyncOperation } from '../../utils/containerUtils';

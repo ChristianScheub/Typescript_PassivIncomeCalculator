@@ -10,11 +10,11 @@ import {
 } from '../../store/slices/calculatedDataSlice';
 import DashboardView from '../../view/finance-hub/overview/DashboardView';
 import AssetFocusDashboardContainer from './AssetDashboardView';
-import analyticsService from '../../service/domain/analytics/calculations/financialAnalyticsService';
-import alertsService from '../../service/application/notifications/alertsService';
+import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
+import alertsService from '@/service/application/notifications/alertsService';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
-import cacheRefreshService from '../../service/application/orchestration/cacheRefreshService';
-import Logger from '../../service/shared/logging/Logger/logger';
+import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
+import Logger from '@/service/shared/logging/Logger/logger';
 import { useAsyncOperation } from '../../utils/containerUtils';
 
 const DashboardContainer: React.FC = () => {

@@ -265,7 +265,7 @@ const AssetsList: React.FC<{
   sortedPortfolioAssets,
   assets,
   sortedAssets,
-  portfolioData,
+  portfolioData: _portfolioData, // Intentionally unused, but kept for interface compatibility
   getAssetTypeLabel,
   handleAssetClick,
   onSetEditingAsset,

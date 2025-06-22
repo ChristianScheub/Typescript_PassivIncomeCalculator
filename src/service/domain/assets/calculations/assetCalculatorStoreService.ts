@@ -3,13 +3,14 @@ import { calculateAssetMonthlyIncomeWithCache } from "@/service/shared/calculati
 import { updateAssetCache } from "@/store/slices/transactionsSlice";
 import { createCachedDividends } from "@/utils/dividendCacheUtils";
 import Logger from "@/service/shared/logging/Logger/logger";
+import type { AppDispatch } from "@/store";
 
 /**
  * Asset calculation service that integrates with the store to handle cache updates
  * This service should be used when you want automatic cache extension after calculations
  */
 export class AssetCalculationStoreService {
-  constructor(private dispatch: any) {}
+  constructor(private dispatch: AppDispatch) {}
 
   /**
    * Calculate asset monthly income with automatic cache updates

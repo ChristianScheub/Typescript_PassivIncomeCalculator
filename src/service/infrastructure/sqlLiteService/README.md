@@ -14,7 +14,7 @@ The `sqlLiteService` provides local data persistence using IndexedDB through the
 Import and use the service in containers, Redux slices, or other modules that need data persistence:
 
 ```typescript
-import sqlLiteService from '../service/sqlLiteService';
+import sqlLiteService from '@/service/sqlLiteService';
 
 // Create operations
 const transactionId = await sqlLiteService.add('transactions', newTransaction);

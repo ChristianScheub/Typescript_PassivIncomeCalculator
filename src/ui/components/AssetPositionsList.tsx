@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import formatService from '../../service/infrastructure/formatService';
-import { Asset, AssetDefinition } from '../../types/domains/assets/entities';
+import formatService from '@/service/infrastructure/formatService';
+import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
 
 export interface AssetWithValue {
   asset: Asset;

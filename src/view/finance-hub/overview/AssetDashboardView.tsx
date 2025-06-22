@@ -8,8 +8,8 @@ import { IconButton } from '../../../ui/common/IconButton';
 import { History } from 'lucide-react';
 import { AssetPositionsList, AssetWithValue } from '../../../ui/components/AssetPositionsList';
 import { AssetFocusTimeRange } from '../../../store/slices/dashboardSettingsSlice';
-import { PortfolioHistoryPoint } from '../../../types/domains/portfolio/history';
-import { Asset, AssetDefinition } from '../../../types/domains/assets/entities';
+import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
+import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
 import PortfolioHistoryCard from './PortfolioHistoryCard';
 
 interface PortfolioSummary {

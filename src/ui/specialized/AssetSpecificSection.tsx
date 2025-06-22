@@ -1,5 +1,5 @@
 import React from 'react';
-import { AssetType, DividendFrequency } from '../../types/shared/';
+import { AssetType, DividendFrequency } from '@/types/shared/';
 import { UseFormSetValue } from 'react-hook-form';
 import { FormSection, SectionTitle } from '../forms/MaterialForm';
 import { useTranslation } from 'react-i18next';

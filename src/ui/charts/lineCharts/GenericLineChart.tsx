@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Card } from '../../common/Card';
 import { COLORS_LIGHT, COLORS_DARK } from '../../../utils/constants';
-import formatService from '../../../service/formatService';
+import formatService from '@/service/formatService';
 import { useTheme } from '../../../hooks/useTheme';
 import { ChartEmptyState } from '../../feedback/EnhancedEmptyState';
-import { LineChartData, ChartTooltipPayload } from '../../../types/shared/charts';
+import { LineChartData, ChartTooltipPayload } from '@/types/shared/charts';
 
 interface GenericLineChartProps {
   title: string;
