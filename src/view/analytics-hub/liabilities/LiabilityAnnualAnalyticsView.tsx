@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
+import GenericPieChart from '@/ui/charts/pieCharts/GenericPieChart';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, TooltipProps } from 'recharts';
 import formatService from '@service/infrastructure/formatService';
 

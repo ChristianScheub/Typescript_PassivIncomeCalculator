@@ -4,9 +4,9 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { PortfolioHistoryPoint } from '@service/domain/portfolio/history/portfolioHistoryService/interfaces/IPortfolioHistoryService';
 import { formatService } from '../../service';
-import { ChartTooltip } from '../../ui/charts/ChartTooltips';
-import { TabButton, TabGroup } from '../../ui/common';
-import { ChartEmptyState } from '../../ui/feedback/EnhancedEmptyState';
+import { ChartTooltip } from '@/ui/charts/ChartTooltips';
+import { TabButton, TabGroup } from '@/ui/common';
+import { ChartEmptyState } from '@/ui/feedback/EnhancedEmptyState';
 
 interface PortfolioHistoryViewProps {
   historyData: PortfolioHistoryPoint[];

@@ -1,14 +1,14 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import TabSelector from '../../../ui/navigation/TabSelector';
+import TabSelector from '@/ui/navigation/TabSelector';
 import PortfolioDistributionView from './PortfolioDistributionView';
 import IncomeDistributionView from './IncomeDistributionView';
 import CustomAnalyticsView from './CustomAnalyticsView';
-import { ViewHeader } from '../../../ui/layout/ViewHeader';
-import { AssetTypeFilterCard } from '../../../ui/specialized/AssetTypeFilterCard';
+import { ViewHeader } from '@/ui/layout/ViewHeader';
+import { AssetTypeFilterCard } from '@/ui/specialized/AssetTypeFilterCard';
 import { getAssetTypeOptions } from '../../../constants';
 import { AllocationData } from '@/types/domains/analytics/calculations';
-import { PortfolioPosition } from '@/types/shared/analytics';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { AssetType } from '@/types/shared';
 
 type AnalyticsTab = 'asset_distribution' | 'income_distribution' | 'custom';

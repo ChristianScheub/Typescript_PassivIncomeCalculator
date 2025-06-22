@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import { setAssetFocusTimeRange, AssetFocusTimeRange } from '../../store/slices/dashboardSettingsSlice';
-import { calculatePortfolioHistory } from '../../store/slices/calculatedDataSlice';
-import { updateAssetDefinition } from '../../store/slices/assetDefinitionsSlice';
+import { setAssetFocusTimeRange, AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
+import { calculatePortfolioHistory } from '@/store/slices/calculatedDataSlice';
+import { updateAssetDefinition } from '@/store/slices/assetDefinitionsSlice';
 import { usePortfolioHistory, useAssetFocusData, useFinancialSummary } from '../../hooks/useCalculatedDataCache';
 import { useIntradayPortfolioData } from '../../hooks/useIntradayData';
-import AssetDashboardView from '../../view/finance-hub/overview/AssetDashboardView';
-import AssetDetailModal from '../../view/finance-hub/overview/AssetDetailModal';
+import AssetDashboardView from '@/view/finance-hub/overview/AssetDashboardView';
+import AssetDetailModal from '@/view/finance-hub/overview/AssetDetailModal';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
 import stockAPIService from '@/service/domain/assets/market-data/stockAPIService';
 import { useAsyncOperation } from '../../utils/containerUtils';

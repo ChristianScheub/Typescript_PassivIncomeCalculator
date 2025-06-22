@@ -3,7 +3,7 @@ import { useAppSelector } from '../../hooks/redux';
 import { Transaction as Asset } from '@/types/domains/assets/';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import Logger from '@/service/shared/logging/Logger/logger';
-import PerformanceAnalyticsView from '../../view/analytics-hub/performance/PerformanceAnalyticsView';
+import PerformanceAnalyticsView from '@/view/analytics-hub/performance/PerformanceAnalyticsView';
 import { getCurrentQuantity, getCurrentValue } from '../../utils/transactionCalculations';
 
 type PerformanceTab = 'portfolio' | 'returns' | 'historical';

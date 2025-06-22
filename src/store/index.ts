@@ -172,9 +172,15 @@ export const store = configureStore({
 
 // Mark store as hydrated and validate cache if we loaded persisted state
 if (persistedState) {
-  Logger.cache('Store created with persisted state, marking as hydrated and validating cache');
+  Logger.cache('Store created with persisted state, marking as hydrated');
+  
+  // Mark hydrated first
   store.dispatch(markStoreHydrated());
-  store.dispatch(validateCacheOnStartup());
+  
+  // Then validate cache startup after a tick to ensure store is fully initialized
+  setTimeout(() => {
+    store.dispatch(validateCacheOnStartup());
+  }, 0);
 } else {
   // If no persisted state, still mark as hydrated (empty state is also hydrated)
   Logger.infoRedux('Store created without persisted state, marking as hydrated');

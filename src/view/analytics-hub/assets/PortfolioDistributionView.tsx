@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
+import GenericPieChart from '@/ui/charts/pieCharts/GenericPieChart';
 
 interface PortfolioDistributionViewProps {
   assetAllocation: Array<{ name: string; type: string; value: number; percentage: number }>;

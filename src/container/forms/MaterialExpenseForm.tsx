@@ -6,7 +6,7 @@ import { createValidationSchema, createPaymentScheduleSchema } from '../../utils
 import { useTranslation } from 'react-i18next';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { z } from 'zod';
-import { MaterialExpenseFormView } from '../../view/shared/forms/MaterialExpenseFormView';
+import { MaterialExpenseFormView } from '@/view/shared/forms/MaterialExpenseFormView';
 
 // Create expense schema using shared schema utilities
 const expenseSchema = createValidationSchema({

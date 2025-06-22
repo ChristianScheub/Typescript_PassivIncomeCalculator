@@ -11,7 +11,7 @@ import { Landmark } from "lucide-react";
 import { Add } from "@mui/icons-material";
 import formatService from "@service/infrastructure/formatService";
 import { Liability } from '@/types/domains/financial';
-import { LoadingSpinner } from '../../../ui/feedback/LoadingSpinner';
+import { LoadingSpinner } from '@/ui/feedback/LoadingSpinner';
 
 interface LiabilitiesViewProps {
   liabilities: Liability[];

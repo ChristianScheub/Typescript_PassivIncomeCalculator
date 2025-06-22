@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
-import { StandardFormField } from '../../ui/forms/FormGrid';
+import { StandardFormField } from '@/ui/forms/FormGrid';
 import { TrendingUp } from 'lucide-react';
 
 export interface PriceEntry {

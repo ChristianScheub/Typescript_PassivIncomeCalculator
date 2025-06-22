@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ViewHeader } from '../../ui/layout/ViewHeader';
+import { ViewHeader } from '@/ui/layout/ViewHeader';
 import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
 import AnalyticsQuickInsightsSection from './hub/AnalyticsQuickInsightsSection';
-import { AnalyticsCategory, AnalyticsSubCategory } from '../../container/analytics/AnalyticsHubContainer';
+import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analytics/AnalyticsHubContainer';
 import AnalyticsOverviewSection from './hub/AnalyticsOverviewSection';
 import AnalyticsCategoriesSection from './hub/AnalyticsCategoriesSection';
 

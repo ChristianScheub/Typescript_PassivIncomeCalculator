@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '../../../hooks/redux';
 import { compositeCalculatorService as calculatorService } from '../../../service';
-import { Button, ButtonGroup } from '../../../ui/common';
-import { IconButton } from '../../../ui/common/IconButton';
+import { Button, ButtonGroup } from '@/ui/common';
+import { IconButton } from '@/ui/common/IconButton';
 import { 
   addChart, 
   updateChart, 
@@ -12,15 +12,15 @@ import {
   openConfigPanel, 
   closeConfigPanel,
   ChartType, CustomAnalyticsConfig, DataSource, GroupBy
-} from '../../../store/slices/customAnalyticsSlice';
-import { PortfolioPosition } from '@/types/shared/analytics';
+} from '@/store/slices/customAnalyticsSlice';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { 
   AllocationData, 
   PortfolioAnalyticsData as ServicePortfolioAnalyticsData,
   IncomeAnalyticsData as ServiceIncomeAnalyticsData
 } from '@/types/domains/analytics/calculations';
 import { PieChartData } from '@/types/shared/charts';
-import GenericPieChart from '../../../ui/charts/pieCharts/GenericPieChart';
+import GenericPieChart from '@/ui/charts/pieCharts/GenericPieChart';
 import { Plus, Trash2, Edit3, X } from 'lucide-react';
 
 /**

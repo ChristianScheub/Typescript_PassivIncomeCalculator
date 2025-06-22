@@ -6,9 +6,9 @@ import formatService from "@service/infrastructure/formatService";
 import { AssetType } from '../../../types';
 import { RechartsClickData } from '@/types/shared/charts';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
-import { ViewHeader } from '../../../ui/layout/ViewHeader';
-import { AssetTypeFilterCard } from '../../../ui/specialized/AssetTypeFilterCard';
-import { CollapsibleSection } from '../../../ui/common/CollapsibleSection';
+import { ViewHeader } from '@/ui/layout/ViewHeader';
+import { AssetTypeFilterCard } from '@/ui/specialized/AssetTypeFilterCard';
+import { CollapsibleSection } from '@/ui/common/CollapsibleSection';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
 
 interface MonthData {

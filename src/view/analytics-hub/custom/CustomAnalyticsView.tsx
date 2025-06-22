@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../../ui/common/Card';
-import { Button } from '../../../ui/common/Button';
+import { Card } from '@/ui/common/Card';
+import { Button } from '@/ui/common/Button';
 import { ArrowLeft, Plus, Trash2, BarChart3 } from 'lucide-react';
 
 type ChartType = 'line' | 'pie' | 'bar';

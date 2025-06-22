@@ -2,6 +2,7 @@ import { Middleware, MiddlewareAPI, AnyAction } from '@reduxjs/toolkit';
 import { updateForecastValues, updateMonthlyAssetIncomeCache } from '../slices/forecastSlice';
 import { updateDashboardValues } from '../slices/dashboardSlice';
 import { StoreState } from '../index';
+import { appInitializationService } from '../initialization/appInitialization';
 import Logger from '@service/shared/logging/Logger/logger';
 
 // Type guard to check if action has a type property
@@ -24,18 +25,26 @@ export const dataChangeMiddleware: Middleware<object, StoreState> = (store: Midd
     
     // Check if assets, income, expenses or liabilities changed
     if (isMutationAction && (
-        type.startsWith('assets/') || 
+        type.startsWith('transactions/') || 
         type.startsWith('income/') || 
         type.startsWith('expenses/') || 
-        type.startsWith('liabilities/'))) {
+        type.startsWith('liabilities/') ||
+        type.startsWith('assetDefinitions/') ||
+        type.startsWith('assetCategories/'))) {
       
       Logger.infoRedux(`Data mutation detected: ${type}, updating dashboard and forecast`);
+      
+      // Reset initialization service to allow re-initialization with new data
+      if (type.includes('/clear') || type.includes('/delete') || type.includes('/add')) {
+        Logger.cache('Data structure changed, resetting initialization service');
+        appInitializationService.reset();
+      }
       
       // Update dashboard first (since forecast depends on it)
       store.dispatch(updateDashboardValues());
       
       // If assets changed, update the monthly asset income cache specifically
-      if (type.startsWith('assets/')) {
+      if (type.startsWith('transactions/')) {
         Logger.cache('Assets changed, updating monthly asset income cache');
         store.dispatch(updateMonthlyAssetIncomeCache());
       }

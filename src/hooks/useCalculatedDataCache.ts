@@ -10,8 +10,8 @@ import {
   selectIsStoreHydrated,
   clearAllCache,
   invalidateAllCache
-} from '../store/slices/calculatedDataSlice';
-import { AssetFocusTimeRange } from '../store/slices/dashboardSettingsSlice';
+} from '@/store/slices/calculatedDataSlice';
+import { AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
 import Logger from '@/service/shared/logging/Logger/logger';
 
 /**

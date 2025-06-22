@@ -7,10 +7,10 @@ import {
   RequiredSection,
   OptionalSection,
   StandardFormField
-} from '../../../ui/forms/StandardFormWrapper';
-import { BasicAssetInformation } from '../../../ui/sections';
-import { AssetSpecificFields } from '../../../ui/specialized/AssetSpecificFields';
-import { AdditionalInformationSection } from '../../../ui/specialized/AdditionalInformationSection';
+} from '@/ui/forms/StandardFormWrapper';
+import { BasicAssetInformation } from '@/ui/sections';
+import { AssetSpecificFields } from '@/ui/specialized/AssetSpecificFields';
+import { AdditionalInformationSection } from '@/ui/specialized/AdditionalInformationSection';
 import { useTranslation } from 'react-i18next';
 
 interface MaterialAssetFormViewProps {

@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import TabSelector from '../../../ui/navigation/TabSelector';
+import TabSelector from '@/ui/navigation/TabSelector';
 import ExpenseMonthlyAnalyticsView from './ExpenseMonthlyAnalyticsView';
 import ExpenseAnnualAnalyticsView from './ExpenseAnnualAnalyticsView';
-import { ViewHeader } from '../../../ui/layout/ViewHeader';
+import { ViewHeader } from '@/ui/layout/ViewHeader';
 
 type ExpenseAnalyticsTab = 'monthly' | 'annual';
 

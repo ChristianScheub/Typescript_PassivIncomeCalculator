@@ -6,7 +6,7 @@ import { useSharedForm } from '../../hooks/useSharedForm';
 import { createIncomeSchema } from '../../utils/validationSchemas';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { z } from 'zod';
-import { MaterialIncomeFormView } from '../../view/shared/forms/MaterialIncomeFormView';
+import { MaterialIncomeFormView } from '@/view/shared/forms/MaterialIncomeFormView';
 
 const incomeSchema = createIncomeSchema();
 

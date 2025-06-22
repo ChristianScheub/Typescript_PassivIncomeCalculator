@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, CardTitle, CardContent } from '../../../ui/common/Card';
-import { CollapsibleSection } from '../../../ui/common/CollapsibleSection';
-import { Button } from '../../../ui/common/Button';
-import { ButtonGroup } from '../../../ui/common/ButtonGroup';
+import { Card, CardHeader, CardTitle, CardContent } from '@/ui/common/Card';
+import { CollapsibleSection } from '@/ui/common/CollapsibleSection';
+import { Button } from '@/ui/common/Button';
+import { ButtonGroup } from '@/ui/common/ButtonGroup';
 import { Download, Upload, Eye, EyeOff, Key, ChevronRight, Trash, Monitor } from 'lucide-react';
-import DebugSettings from '../../../ui/specialized/DebugSettings';
+import DebugSettings from '@/ui/specialized/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../../../config/featureFlags';
-import { StockAPIProvider } from '../../../store/slices/apiConfigSlice';
-import { DashboardMode } from '../../../store/slices/dashboardSettingsSlice';
-import { ConfirmationDialog } from '../../../ui/dialog/ConfirmationDialog';
-import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '../../../ui/common/ClearButton';
+import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
+import { DashboardMode } from '@/store/slices/dashboardSettingsSlice';
+import { ConfirmationDialog } from '@/ui/dialog/ConfirmationDialog';
+import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '@/ui/common/ClearButton';
 import clsx from 'clsx';
-import { Toggle } from '../../../ui/common/Toggle';
+import { Toggle } from '@/ui/common/Toggle';
 
 interface ProviderInfo {
   name: string;

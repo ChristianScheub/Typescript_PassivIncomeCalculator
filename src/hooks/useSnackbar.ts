@@ -6,8 +6,8 @@ import {
   showWarningSnackbar, 
   showInfoSnackbar,
   clearAllSnackbars 
-} from '../store/slices/snackbarSlice';
-import type { SnackbarMessage } from '../store/slices/snackbarSlice';
+} from '@/store/slices/snackbarSlice';
+import type { SnackbarMessage } from '@/store/slices/snackbarSlice';
 
 export const useSnackbar = () => {
   const dispatch = useDispatch();

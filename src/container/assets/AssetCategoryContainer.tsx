@@ -3,7 +3,7 @@ import { useForm, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { AssetCategoryManagerView } from '../../view/portfolio-hub/assets/AssetCategoryManagerView';
+import { AssetCategoryManagerView } from '@/view/portfolio-hub/assets/AssetCategoryManagerView';
 import {
   fetchAssetCategories,
   fetchAssetCategoryOptions,
@@ -14,7 +14,7 @@ import {
   addAssetCategoryOption,
   updateAssetCategoryOption,
   deleteAssetCategoryOption
-} from '../../store/slices/assetCategoriesSlice';
+} from '@/store/slices/assetCategoriesSlice';
 import { AssetCategory, AssetCategoryOption } from '@/types/domains/assets';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { useAsyncOperation } from '../../utils/containerUtils';

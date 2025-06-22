@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, } from '../../../ui/common/Card';
+import { Card, CardContent, } from '@/ui/common/Card';
 import { formatService } from '../../../service';
 import { 
   TrendingUp, 

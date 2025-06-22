@@ -1,5 +1,5 @@
 import Logger from '@/service/shared/logging/Logger/logger';
-import { PortfolioCache } from '../store/slices/transactionsSlice';
+import { PortfolioCache } from '@/store/slices/transactionsSlice';
 
 /**
  * Validates if a portfolio cache from localStorage is still valid
@@ -13,12 +13,12 @@ export const validatePortfolioCache = (
     return false;
   }
 
-  // Check cache age (max 1 hour)
+  // Check cache age (max 24 hours for persisted data, more lenient than before)
   const cacheAge = Date.now() - new Date(cache.lastCalculated).getTime();
-  const maxAge = 60 * 60 * 1000; // 1 hour in milliseconds
+  const maxAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
   
   if (cacheAge > maxAge) {
-    Logger.info(`Portfolio cache is too old: ${Math.round(cacheAge / 1000 / 60)} minutes`);
+    Logger.info(`Portfolio cache is too old: ${Math.round(cacheAge / 1000 / 60 / 60)} hours`);
     return false;
   }
 

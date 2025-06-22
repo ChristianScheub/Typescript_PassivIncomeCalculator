@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { StoreState } from '../../store';
 import { AssetType } from '@/types/shared/';
 import { RechartsClickData } from '@/types/shared/charts';
-import AssetCalendarView from '../../view/portfolio-hub/assets/AssetCalendarView';
+import AssetCalendarView from '@/view/portfolio-hub/assets/AssetCalendarView';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { calculatorService } from '../../service';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/transactionsSlice';
+import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '@/store/slices/transactionsSlice';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 
 interface MonthData {

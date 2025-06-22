@@ -12,9 +12,9 @@ import {
   selectPortfolioCacheValid,
   selectPortfolioTotals,
   selectSortedTransactions
-} from '../../store/slices/transactionsSlice';
-import { fetchAssetDefinitions } from '../../store/slices/assetDefinitionsSlice';
-import { AssetsView } from '../../view/portfolio-hub/assets/AssetsView';
+} from '@/store/slices/transactionsSlice';
+import { fetchAssetDefinitions } from '@/store/slices/assetDefinitionsSlice';
+import { AssetsView } from '@/view/portfolio-hub/assets/AssetsView';
 import { Asset } from '@/types/domains/assets';
 import { useTranslation } from 'react-i18next';
 import Logger from '@/service/shared/logging/Logger/logger';

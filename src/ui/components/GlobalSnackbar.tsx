@@ -4,7 +4,7 @@ import { Snackbar, Alert, IconButton, Button } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import type { SnackbarCloseReason } from '@mui/material';
 import { RootState } from '../../store';
-import { hideSnackbar, removeSnackbar } from '../../store/slices/snackbarSlice';
+import { hideSnackbar, removeSnackbar } from '@/store/slices/snackbarSlice';
 
 const GlobalSnackbar: React.FC = () => {
   const dispatch = useDispatch();

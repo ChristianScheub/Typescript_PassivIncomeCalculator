@@ -8,7 +8,7 @@ import ForecastContainer from '../forecast/ForecastContainer';
 import PerformanceAnalyticsContainer from './PerformanceAnalyticsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
 import OverviewAnalyticsContainer from './OverviewAnalyticsContainer';
-import AnalyticsHubView from '../../view/analytics-hub/AnalyticsHubView';
+import AnalyticsHubView from '@/view/analytics-hub/AnalyticsHubView';
 
 // Re-export types for external use
 export type { AnalyticsCategory, AnalyticsSubCategory };

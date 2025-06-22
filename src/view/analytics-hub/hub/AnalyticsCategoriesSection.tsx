@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent } from '../../../ui/common/Card';
+import { Card, CardContent } from '@/ui/common/Card';
 import { 
   BarChart3,
   TrendingUp,
@@ -10,7 +10,7 @@ import {
   Calendar,
   ArrowRight
 } from 'lucide-react';
-import { AnalyticsCategory, AnalyticsSubCategory } from '../../../container/analytics/AnalyticsHubContainer';
+import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analytics/AnalyticsHubContainer';
 
 interface AnalyticsCategoryCard {
   id: AnalyticsCategory;

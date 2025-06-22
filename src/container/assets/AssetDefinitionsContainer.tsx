@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-import { fetchAssetDefinitions, addAssetDefinition, updateAssetDefinition, deleteAssetDefinition } from '../../store/slices/assetDefinitionsSlice';
+import { fetchAssetDefinitions, addAssetDefinition, updateAssetDefinition, deleteAssetDefinition } from '@/store/slices/assetDefinitionsSlice';
 import { 
   fetchAssetCategories, 
   fetchAssetCategoryOptions, 
   fetchAssetCategoryAssignments,
   addAssetCategoryAssignment,
   deleteAssetCategoryAssignmentsByAssetId
-} from '../../store/slices/assetCategoriesSlice';
-import { AssetDefinitionsView } from '../../view/portfolio-hub/assets/AssetDefinitionsView';
+} from '@/store/slices/assetCategoriesSlice';
+import { AssetDefinitionsView } from '@/view/portfolio-hub/assets/AssetDefinitionsView';
 import { AssetDefinition, AssetCategoryAssignment } from '@/types/domains/assets';
 import { AssetType } from '@/types/shared';
 import Logger from '@/service/shared/logging/Logger/logger';
@@ -22,7 +22,7 @@ import { CreateAssetDefinitionData } from '@/types/domains/assets';
 
 // Type for the asset definition data when creating
 // type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
-import { PriceEntry } from '../../ui/dialog/AddPriceEntryDialog';
+import { PriceEntry } from '@/ui/dialog/AddPriceEntryDialog';
 import { addPriceToHistory } from '../../utils/priceHistoryUtils';
 
 interface AssetDefinitionsContainerProps {

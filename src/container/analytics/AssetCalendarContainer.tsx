@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
 import Logger from '@/service/shared/logging/Logger/logger';
-import AssetCalendarView from '../../view/portfolio-hub/assets/AssetCalendarView';
+import AssetCalendarView from '@/view/portfolio-hub/assets/AssetCalendarView';
 import { AssetType } from '@/types/shared';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { RechartsClickData } from '@/types/shared/charts';

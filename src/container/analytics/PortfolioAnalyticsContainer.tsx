@@ -1,10 +1,9 @@
-import React, { useState, useMemo, useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import PortfolioAnalyticsView from '../../view/analytics-hub/assets/PortfolioAnalyticsView';
-import { calculatorService } from '../../service';
+import React, { useState, useMemo } from 'react';
+import { useAppSelector } from '../../hooks/redux';
+import PortfolioAnalyticsView from '@/view/analytics-hub/assets/PortfolioAnalyticsView';
+import { calculatorService } from '@/service/';
 import { AssetType } from '@/types/shared/base/enums';
-import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '../../store/slices/transactionsSlice';
-import Logger from '@/service/shared/logging/Logger/logger';
+import { selectPortfolioCache } from '@/store/slices/transactionsSlice';
 
 type AnalyticsTab = 'asset_distribution' | 'income_distribution' | 'custom';
 
@@ -16,28 +15,12 @@ const PortfolioAnalyticsContainer: React.FC<PortfolioAnalyticsContainerProps> = 
   const [selectedTab, setSelectedTab] = useState<AnalyticsTab>('asset_distribution');
   const [selectedAssetType, setSelectedAssetType] = useState<AssetType | 'all'>('all');
   
-  // Get portfolio data from Redux cache
-  const dispatch = useAppDispatch();
+  // Get portfolio data from Redux cache (should be available after initialization)
   const portfolioCache = useAppSelector(selectPortfolioCache);
-  const portfolioCacheValid = useAppSelector(selectPortfolioCacheValid);
-  const assets = useAppSelector(state => state.transactions.items);
-  const assetDefinitions = useAppSelector(state => state.assetDefinitions.items);
-  const { categories, categoryOptions, categoryAssignments } = useAppSelector(state => state.assetCategories || {
-    categories: [],
-    categoryOptions: [],
-    categoryAssignments: []
-  });
 
-  // Ensure portfolio cache is available
-  useEffect(() => {
-    if (!portfolioCacheValid && assets.length > 0 && assetDefinitions.length > 0) {
-      Logger.info('Portfolio cache invalid, recalculating for analytics');
-      dispatch(calculatePortfolioData({ 
-        assetDefinitions, 
-        categoryData: { categories, categoryOptions, categoryAssignments } 
-      }));
-    }
-  }, [assets.length, assetDefinitions.length, portfolioCacheValid, dispatch, categories, categoryOptions, categoryAssignments]);
+  // Note: Portfolio cache should be available after app initialization
+  // If not available, the app initialization will handle recalculation
+  // No need for manual triggering here as it's handled centrally
   
   // Calculate analytics data from portfolio positions with asset type filtering
   const { portfolioAnalytics, incomeAnalytics, filteredPositions } = useMemo(() => {

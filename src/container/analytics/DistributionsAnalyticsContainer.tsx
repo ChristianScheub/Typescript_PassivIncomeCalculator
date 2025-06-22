@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import DistributionsAnalyticsView from '../../view/analytics-hub/distributions/DistributionsAnalyticsView';
+import DistributionsAnalyticsView from '@/view/analytics-hub/distributions/DistributionsAnalyticsView';
 import PortfolioAnalyticsContainer from './PortfolioAnalyticsContainer';
 import IncomeAnalyticsContainer from './IncomeAnalyticsContainer';
 import ExpenseAnalyticsContainer from './ExpenseAnalyticsContainer';

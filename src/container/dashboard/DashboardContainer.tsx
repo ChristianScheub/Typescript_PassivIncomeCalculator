@@ -2,13 +2,12 @@ import React, { useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import { calculate30DayHistory } from '../../store/slices/portfolioHistorySlice';
-import { loadDashboardSettingsFromStorage } from '../../store/slices/dashboardSettingsSlice';
+import { calculate30DayHistory } from '@/store/slices/portfolioHistorySlice';
+import { loadDashboardSettingsFromStorage } from '@/store/slices/dashboardSettingsSlice';
 import { 
-  calculateFinancialSummary,
   selectFinancialSummary
-} from '../../store/slices/calculatedDataSlice';
-import DashboardView from '../../view/finance-hub/overview/DashboardView';
+} from '@/store/slices/calculatedDataSlice';
+import DashboardView from '@/view/finance-hub/overview/DashboardView';
 import AssetFocusDashboardContainer from './AssetDashboardView';
 import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
 import alertsService from '@/service/application/notifications/alertsService';
@@ -24,29 +23,11 @@ const DashboardContainer: React.FC = () => {
   const { executeAsyncOperation } = useAsyncOperation();
 
   // Redux state
-  const { items: assets } = useAppSelector(state => state.transactions);
-  const { items: liabilities } = useAppSelector(state => state.liabilities);
-  const { items: expenses } = useAppSelector(state => state.expenses);
-  const { items: income } = useAppSelector(state => state.income);
   const { history30Days = [], status } = useAppSelector(state => state.portfolioHistory || {});
   const { mode: dashboardMode } = useAppSelector(state => state.dashboardSettings);
   
-  // Cached financial summary from Redux
+  // Cached financial summary from Redux (should be available after initialization)
   const financialSummaryCache = useAppSelector(selectFinancialSummary);
-
-  // Trigger financial summary calculation if cache is empty
-  const shouldCalculateFinancialSummary = useMemo(() => {
-    return !financialSummaryCache || 
-           assets.length > 0 || liabilities.length > 0 || 
-           expenses.length > 0 || income.length > 0;
-  }, [financialSummaryCache, assets.length, liabilities.length, expenses.length, income.length]);
-
-  React.useEffect(() => {
-    if (shouldCalculateFinancialSummary) {
-      Logger.cache('Dashboard: Dispatching calculateFinancialSummary');
-      dispatch(calculateFinancialSummary());
-    }
-  }, [shouldCalculateFinancialSummary, dispatch]);
 
   // Get financial summary from cache or provide fallback
   const financialSummary = useMemo(() => financialSummaryCache || {

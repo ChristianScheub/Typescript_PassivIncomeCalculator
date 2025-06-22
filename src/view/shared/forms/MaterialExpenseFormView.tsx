@@ -9,8 +9,8 @@ import {
   FormGrid,
   StandardFormField,
   CustomScheduleSection
-} from '../../../ui/forms/StandardFormWrapper';
-import { OptionalFieldsSection } from '../../../ui/forms';
+} from '@/ui/forms/StandardFormWrapper';
+import { OptionalFieldsSection } from '@/ui/forms';
 import { useTranslation } from 'react-i18next';
 import { getPaymentFrequencyOptions, getExpenseCategoryOptions } from '../../../constants';
 

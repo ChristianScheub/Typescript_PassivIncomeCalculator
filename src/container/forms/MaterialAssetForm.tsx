@@ -6,7 +6,7 @@ import { useSharedForm } from '../../hooks/useSharedForm';
 import { useTranslation } from 'react-i18next';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { createMaterialAssetSchema } from '../../utils/validationSchemas';
-import { MaterialAssetFormView } from '../../view/shared/forms/MaterialAssetFormView';
+import { MaterialAssetFormView } from '@/view/shared/forms/MaterialAssetFormView';
 import { getCurrentQuantity } from '../../utils/transactionCalculations';
 
 const assetSchema = createMaterialAssetSchema();

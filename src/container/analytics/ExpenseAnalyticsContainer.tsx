@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAppSelector } from '../../hooks/redux';
-import ExpenseAnalyticsView from '../../view/analytics-hub/expenses/ExpenseAnalyticsView';
+import ExpenseAnalyticsView from '@/view/analytics-hub/expenses/ExpenseAnalyticsView';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import { Expense } from '@/types/domains/financial/entities';
 import Logger from '@/service/shared/logging/Logger/logger';

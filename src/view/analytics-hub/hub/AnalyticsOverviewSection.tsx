@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../../hooks/redux';
 import { recentActivityService } from '../../../service';
-import { Card, CardContent, CardHeader, CardTitle } from '../../../ui/common/Card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/Card';
 import type { Expense, Liability, Asset } from '@/types/domains/financial/';
 
 // Interface definitions for analytics components
@@ -41,7 +41,7 @@ import {
   GitBranch,
   Calendar
 } from 'lucide-react';
-import { AnalyticsCategory, AnalyticsSubCategory } from '../../../container/analytics/AnalyticsHubContainer';
+import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analytics/AnalyticsHubContainer';
 
 interface AnalyticsOverviewSectionProps {
   onCategoryChange: (category: AnalyticsCategory, subCategory?: AnalyticsSubCategory) => void;
