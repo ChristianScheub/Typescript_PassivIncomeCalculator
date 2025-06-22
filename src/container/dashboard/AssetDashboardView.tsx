@@ -2,10 +2,9 @@ import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { setAssetFocusTimeRange, AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
-import { calculatePortfolioHistory } from '@/store/slices/calculatedDataSlice';
 import { updateAssetDefinition } from '@/store/slices/assetDefinitionsSlice';
 import { usePortfolioHistory, useAssetFocusData, useFinancialSummary } from '../../hooks/useCalculatedDataCache';
-import { useIntradayPortfolioData } from '../../hooks/useIntradayData';
+import { usePortfolioIntradayView, usePortfolioHistoryView } from '../../hooks/usePortfolioHistoryView';
 import AssetDashboardView from '@/view/finance-hub/overview/AssetDashboardView';
 import AssetDetailModal from '@/view/finance-hub/overview/AssetDetailModal';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
@@ -34,22 +33,52 @@ const AssetFocusDashboardContainer: React.FC = () => {
   
   // Use cached calculated data with automatic calculation
   const portfolioHistoryData = usePortfolioHistory(assetFocus.timeRange);
-  const intradayData = useIntradayPortfolioData();
+  const intradayData = usePortfolioIntradayView();
+  const portfolioHistoryViewData = usePortfolioHistoryView(assetFocus.timeRange); // NEW: For longer time ranges
   const assetFocusData = useAssetFocusData();
   const financialSummary = useFinancialSummary();
 
   // Combine regular portfolio history with intraday data for enhanced view
   const enhancedPortfolioHistory = React.useMemo(() => {
     const baseData = portfolioHistoryData?.data || [];
+    const newSystemData = portfolioHistoryViewData || [];
     
-    Logger.info(`AssetFocusDashboardContainer enhancedPortfolioHistory: timeRange=${assetFocus.timeRange}, baseData=${baseData.length}, intradayData=${intradayData.length}`);
+    Logger.info(`AssetFocusDashboardContainer enhancedPortfolioHistory: timeRange=${assetFocus.timeRange}, baseData=${baseData.length}, newSystemData=${newSystemData.length}, intradayData=${intradayData.length}`);
     
-    // If we have intraday data and we're looking at "1D" or "1W" timeframe, show intraday details
+    // For short timeframes (1D, 1W), use intraday data
     if ((assetFocus.timeRange === '1D' || assetFocus.timeRange === '1W') && intradayData.length > 0) {
       Logger.info(`Enhancing portfolio history with ${intradayData.length} intraday data points for ${assetFocus.timeRange} view`);
       
-      // Convert intraday data to portfolio history format
-      const intradayHistoryPoints = intradayData.map(point => ({
+      // Filter intraday data based on timeRange
+      let filteredIntradayData = intradayData;
+      
+      if (assetFocus.timeRange === '1D') {
+        // For 1D: Show the most recent 24 hours of available data
+        if (intradayData.length > 0) {
+          // Sort by timestamp to get the most recent data first
+          const sortedData = [...intradayData].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+          
+          // Get the most recent timestamp
+          const mostRecentTimestamp = new Date(sortedData[0].timestamp);
+          
+          // Calculate 24 hours back from the most recent data point
+          const twentyFourHoursBack = new Date(mostRecentTimestamp);
+          twentyFourHoursBack.setHours(twentyFourHoursBack.getHours() - 24);
+          
+          // Filter data to show the last 24 hours of available data
+          filteredIntradayData = intradayData.filter(point => 
+            new Date(point.timestamp) >= twentyFourHoursBack
+          );
+          
+          Logger.info(`1D: Showing last 24h of available data from ${mostRecentTimestamp.toISOString()}: ${filteredIntradayData.length} points from ${intradayData.length} total`);
+        }
+      } else if (assetFocus.timeRange === '1W') {
+        // For 1W: Show all intraday data (last 5 days)
+        Logger.info(`Using all ${intradayData.length} intraday points for 1W view`);
+      }
+      
+      // Convert filtered intraday data to portfolio history format
+      const intradayHistoryPoints = filteredIntradayData.map(point => ({
         date: point.timestamp, // Use full timestamp for intraday
         value: point.value,
         transactions: [] // No transactions for intraday points
@@ -57,7 +86,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
       
       Logger.info(`Sample intraday history points: ${JSON.stringify(intradayHistoryPoints.slice(0, 3))}`);
       
-      // Combine and sort by timestamp (chronological order - oldest first for charts)
+      // Combine base data with filtered intraday and sort by timestamp
       const combined = [...baseData, ...intradayHistoryPoints]
         .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
       
@@ -65,10 +94,24 @@ const AssetFocusDashboardContainer: React.FC = () => {
       return combined;
     }
     
-    // For other timeframes, use regular daily data
+    // For longer timeframes (1M, 3M, 1Y, All), try the new system first
+    if ((assetFocus.timeRange === '1M' || assetFocus.timeRange === '3M' || assetFocus.timeRange === '6M' || assetFocus.timeRange === '1Y' || assetFocus.timeRange === 'All') && newSystemData.length > 0) {
+      Logger.info(`Using new portfolio history system for ${assetFocus.timeRange}: ${newSystemData.length} points`);
+      
+      // Convert new system data to portfolio history format
+      const formattedData = newSystemData.map(point => ({
+        date: point.date,
+        value: point.value,
+        transactions: [] // No transactions for now
+      }));
+      
+      return formattedData;
+    }
+    
+    // Fallback to old system data
     Logger.info(`Using regular daily data for timeRange=${assetFocus.timeRange}: ${baseData.length} points`);
     return baseData;
-  }, [portfolioHistoryData?.data, intradayData, assetFocus.timeRange]);
+  }, [portfolioHistoryData?.data, portfolioHistoryViewData, intradayData, assetFocus.timeRange]);
 
   // Get data from hooks
   const { assetsWithValues, portfolioSummary } = assetFocusData;
@@ -113,8 +156,8 @@ const AssetFocusDashboardContainer: React.FC = () => {
     dispatch(setAssetFocusTimeRange(timeRange));
     Logger.info(`Asset Focus time range changed to ${timeRange}`);
     
-    // Trigger recalculation for new time range
-    dispatch(calculatePortfolioHistory({ timeRange }));
+    // Note: No manual recalculation needed - the new portfolio history system 
+    // will automatically provide the right data for the timeRange via usePortfolioIntradayView
   }, [dispatch]);
 
   // Pull to refresh handler

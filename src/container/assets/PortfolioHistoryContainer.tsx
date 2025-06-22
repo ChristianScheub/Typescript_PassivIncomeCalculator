@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Asset, AssetDefinition } from '../../types';
-import portfolioHistoryService, { PortfolioHistoryPoint }  from '@/service/domain/portfolio/history/portfolioHistoryService';
+import { Asset, AssetDefinition } from '@/types/domains/assets';
+import { usePortfolioHistoryView } from '../../hooks/usePortfolioHistoryView';
 import { PortfolioHistoryView } from '@/view/portfolio-hub/PortfolioHistoryView';
 import { ViewHeader } from '@/ui/layout/ViewHeader';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
+import Logger from '@/service/shared/logging/Logger/logger';
 
 interface PortfolioHistoryContainerProps {
   assets: Asset[];
@@ -15,42 +16,41 @@ interface PortfolioHistoryContainerProps {
 }
 
 export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps> = ({
-  assets,
-  assetDefinitions,
   totalInvestment,
   currentValue,
   onBack
 }) => {
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
-  const [historyData, setHistoryData] = useState<PortfolioHistoryPoint[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Calculate portfolio history
-  const portfolioHistory = useMemo(() => {
-    if (!assets || assets.length === 0) {
-      return [];
+  
+  // Use the new portfolio history system
+  const portfolioHistoryData = usePortfolioHistoryView('1M'); // Default to 1 month
+  
+  // Transform data for the view component (PortfolioHistoryView expects specific structure)
+  const transformedHistoryData = useMemo(() => {
+    Logger.info(`🔍 DEBUG PortfolioHistoryContainer: portfolioHistoryData length=${portfolioHistoryData.length}`);
+    if (portfolioHistoryData.length > 0) {
+      Logger.info(`🔍 DEBUG first 3 items: ${JSON.stringify(portfolioHistoryData.slice(0, 3).map(point => ({ 
+        date: point.date, 
+        value: point.value, 
+        valueType: typeof point.value,
+        hasTransactions: !!point.transactions 
+      })))}`);
     }
-    
-    try {
-      return portfolioHistoryService.calculatePortfolioHistory(assets, assetDefinitions);
-    } catch (error) {
-      console.error('Error calculating portfolio history:', error);
-      return [];
+
+    const transformed = portfolioHistoryData.map(point => ({
+      date: point.date,
+      value: point.value,
+      transactions: point.transactions || [] // This field is required by PortfolioHistoryView
+    }));
+
+    Logger.info(`🔍 DEBUG PortfolioHistoryContainer transformed: length=${transformed.length}`);
+    if (transformed.length > 0) {
+      Logger.info(`🔍 DEBUG first 3 transformed: ${JSON.stringify(transformed.slice(0, 3))}`);
     }
-  }, [assets, assetDefinitions]);
 
-  useEffect(() => {
-    setIsLoading(true);
-    
-    // Simulate loading time for better UX
-    const timer = setTimeout(() => {
-      setHistoryData(portfolioHistory);
-      setIsLoading(false);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [portfolioHistory]);
+    return transformed;
+  }, [portfolioHistoryData]);
 
   return (
     <div className="container mx-auto px-4 py-4">
@@ -61,10 +61,10 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
       />
 
       <PortfolioHistoryView
-        historyData={historyData}
+        historyData={transformedHistoryData}
         totalInvestment={totalInvestment}
         currentValue={currentValue}
-        isLoading={isLoading}
+        isLoading={portfolioHistoryData.length === 0}
       />
     </div>
   );

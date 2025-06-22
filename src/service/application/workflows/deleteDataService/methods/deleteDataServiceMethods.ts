@@ -7,6 +7,7 @@ import { clearExpenses } from './clearExpenses';
 import { clearIncome } from './clearIncome';
 import { clearPartialData } from './clearPartialData';
 import { clearAllData } from './clearAllData';
+import { clearPortfolioHistory } from './clearPortfolioHistory';
 
 class DeleteDataServiceImpl implements DeleteDataService {
     clearAssetDefinitions = clearAssetDefinitions;
@@ -17,6 +18,7 @@ class DeleteDataServiceImpl implements DeleteDataService {
     clearIncome = clearIncome;
     clearPartialData = clearPartialData;
     clearAllData = clearAllData;
+    clearPortfolioHistory = clearPortfolioHistory;
 }
 
 export const deleteDataServiceImpl = new DeleteDataServiceImpl();

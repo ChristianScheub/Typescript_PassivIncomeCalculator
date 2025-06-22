@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from './redux';
 import { 
-  calculatePortfolioHistory,
   calculateAssetFocusData,
   calculateFinancialSummary,
   selectPortfolioHistory,
@@ -33,9 +32,9 @@ export const useCalculatedDataCache = () => {
   }, [dispatch]);
 
   const refreshPortfolioHistory = useCallback((timeRange: AssetFocusTimeRange) => {
-    Logger.cache(`Refreshing portfolio history for timeRange: ${timeRange}`);
-    dispatch(calculatePortfolioHistory({ timeRange }));
-  }, [dispatch]);
+    Logger.cache(`Portfolio history refresh requested for timeRange: ${timeRange} - using new system`);
+    // The new portfolio history system handles refresh automatically
+  }, []);
 
   const refreshAssetFocusData = useCallback(() => {
     Logger.cache('Refreshing asset focus data');
@@ -52,7 +51,7 @@ export const useCalculatedDataCache = () => {
     dispatch(calculateFinancialSummary());
     dispatch(calculateAssetFocusData());
     if (timeRange) {
-      dispatch(calculatePortfolioHistory({ timeRange }));
+      Logger.cache(`Portfolio history refresh for timeRange ${timeRange} - delegated to new system`);
     }
   }, [dispatch]);
 
@@ -94,17 +93,15 @@ export const usePortfolioHistory = (timeRange: AssetFocusTimeRange) => {
       return;
     }
     
-    const shouldCalculate = !portfolioHistoryCache && 
-                           assets.length > 0 && 
-                           assetDefinitions.length > 0;
+    // DISABLED: Auto-calculation removed - using new PortfolioHistoryCalculationService
+    const shouldCalculate = false;
     
     if (shouldCalculate) {
-      Logger.cache(`Auto-calculating portfolio history for timeRange: ${timeRange} (no valid cache found, store hydrated)`);
-      dispatch(calculatePortfolioHistory({ timeRange }));
+      // Old auto-calculation logic removed
     } else if (portfolioHistoryCache) {
       Logger.cache(`Using cached portfolio history for timeRange: ${timeRange} (${portfolioHistoryCache.data.length} entries, calculated: ${portfolioHistoryCache.lastCalculated})`);
     } else {
-      Logger.cache(`No calculation needed for portfolio history timeRange: ${timeRange} (store hydrated, no data or cache exists)`);
+      Logger.cache(`No auto-calculation for portfolio history timeRange: ${timeRange} - using new PortfolioHistoryCalculationService`);
     }
   }, [isStoreHydrated, portfolioHistoryCache, assets.length, assetDefinitions.length, timeRange, dispatch]);
 
@@ -112,7 +109,11 @@ export const usePortfolioHistory = (timeRange: AssetFocusTimeRange) => {
     data: portfolioHistoryCache?.data || [],
     lastCalculated: portfolioHistoryCache?.lastCalculated,
     isLoading: isStoreHydrated && !portfolioHistoryCache && assets.length > 0,
-    refresh: () => dispatch(calculatePortfolioHistory({ timeRange }))
+    refresh: () => {
+      Logger.cache(`Manual refresh requested for portfolio history timeRange: ${timeRange}`);
+      // The new portfolio history system will handle refresh automatically
+      // when data is invalidated or dependencies change
+    }
   };
 };
 

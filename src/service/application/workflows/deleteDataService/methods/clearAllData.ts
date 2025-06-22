@@ -8,6 +8,7 @@ import { setApiKey, StockAPIProvider, setApiEnabled } from '@/store/slices/apiCo
 import Logger from "@/service/shared/logging/Logger/logger";
 import { clearSQLiteStores } from './utils';
 import { StoreNames } from '@/types/domains/database';
+import { clearPortfolioHistory } from './clearPortfolioHistory';
 
 export async function clearAllData(): Promise<void> {
     Logger.infoService("Starting to clear all data");
@@ -31,6 +32,10 @@ export async function clearAllData(): Promise<void> {
         "income",
         "exchangeRates"
     ] as StoreNames[]);
+
+    // Clear portfolio history database
+    Logger.infoService("Clearing portfolio history database");
+    await clearPortfolioHistory();
 
     // Clear ALL localStorage
     localStorage.clear();

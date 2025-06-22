@@ -8,4 +8,5 @@ export interface DeleteDataService {
     clearIncome(): Promise<void>;
     clearAllData(): Promise<void>;
     clearPartialData(): Promise<void>;
+    clearPortfolioHistory(): Promise<void>;
 }

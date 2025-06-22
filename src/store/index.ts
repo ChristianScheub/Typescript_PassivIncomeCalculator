@@ -14,7 +14,7 @@ import portfolioHistoryReducer from './slices/portfolioHistorySlice';
 import snackbarReducer from './slices/snackbarSlice';
 import dashboardSettingsReducer from './slices/dashboardSettingsSlice';
 import calculatedDataReducer, { markStoreHydrated, validateCacheOnStartup } from './slices/calculatedDataSlice';
-import intradayDataReducer from './slices/intradayDataSlice';
+import portfolioIntradayReducer from './slices/portfolioIntradaySlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
 import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
 import calculatedDataCacheMiddleware from './middleware/calculatedDataCacheMiddleware';
@@ -124,22 +124,6 @@ const loadState = () => {
         cacheValidityDuration: state.calculatedData?.cacheValidityDuration || 5 * 60 * 1000,
         enableConditionalLogging: state.calculatedData?.enableConditionalLogging ?? true,
         isHydrated: false // Will be set to true after store creation
-      },
-      intradayData: {
-        intradayEntries: state.intradayData?.intradayEntries || [],
-        intradayEntriesStatus: 'idle',
-        intradayEntriesError: null,
-        intradayEntriesCacheKey: state.intradayData?.intradayEntriesCacheKey || null,
-        intradayEntriesLastUpdated: state.intradayData?.intradayEntriesLastUpdated || null,
-        
-        portfolioIntradayData: state.intradayData?.portfolioIntradayData || [],
-        portfolioIntradayStatus: 'idle',
-        portfolioIntradayError: null,
-        portfolioIntradayCacheKey: state.intradayData?.portfolioIntradayCacheKey || null,
-        portfolioIntradayLastUpdated: state.intradayData?.portfolioIntradayLastUpdated || null,
-        
-        assetDataMap: state.intradayData?.assetDataMap || {},
-        assetDataMapCacheKey: state.intradayData?.assetDataMapCacheKey || null,
       }
     };
   } catch (err) {
@@ -168,7 +152,7 @@ export const store = configureStore({
     snackbar: snackbarReducer,
     dashboardSettings: dashboardSettingsReducer,
     calculatedData: calculatedDataReducer,
-    intradayData: intradayDataReducer,
+    portfolioIntraday: portfolioIntradayReducer,
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   preloadedState: persistedState as any,
@@ -205,81 +189,68 @@ if (persistedState) {
   store.dispatch(markStoreHydrated());
 }
 
-// Subscribe to store changes and save to localStorage
-let isClearing = false;
+// Improved localStorage handling with throttling and size management
+let saveTimeout: NodeJS.Timeout | null = null;
 
-store.subscribe(() => {
-  // Don't save to localStorage during clearing operations
-  if (isClearing) return;
-  
-  const state = store.getState();
-  try {
-    const stateToSave = {
-      transactions: { 
-        items: state.transactions.items,
-        // Save portfolio cache to localStorage
-        portfolioCache: state.transactions.portfolioCache,
-        portfolioCacheValid: state.transactions.portfolioCacheValid,
-        lastPortfolioCalculation: state.transactions.lastPortfolioCalculation
-      },
-      assetDefinitions: {
-        items: state.assetDefinitions.items
-      },
-      assetCategories: {
-        categories: state.assetCategories.categories,
-        categoryOptions: state.assetCategories.categoryOptions,
-        categoryAssignments: state.assetCategories.categoryAssignments
-      },
-      liabilities: {
-        items: state.liabilities.items
-      },
-      expenses: {
-        items: state.expenses.items
-      },
-      income: {
-        items: state.income.items
-      },
-      customAnalytics: {
-        charts: state.customAnalytics.charts
-      },
-      dashboard: state.dashboard,
-      forecast: state.forecast,
-      apiConfig: state.apiConfig,
-      calculatedData: {
-        portfolioHistory: state.calculatedData.portfolioHistory,
-        assetFocusData: state.calculatedData.assetFocusData,
-        financialSummary: state.calculatedData.financialSummary,
-        // Don't persist status, error, or settings
-        status: 'idle',
-        error: null,
-        cacheValidityDuration: state.calculatedData.cacheValidityDuration,
-        enableConditionalLogging: state.calculatedData.enableConditionalLogging
+// Enhanced store subscription with throttling
+const originalSubscribe = store.subscribe;
+store.subscribe = (listener) => {
+  return originalSubscribe(() => {
+    // Throttle localStorage saves
+    if (saveTimeout) clearTimeout(saveTimeout);
+    
+    saveTimeout = setTimeout(() => {
+      try {
+        const state = store.getState();
+        const stateToSave = {
+          transactions: { 
+            items: state.transactions.items,
+            portfolioCache: state.transactions.portfolioCache,
+            portfolioCacheValid: state.transactions.portfolioCacheValid,
+            lastPortfolioCalculation: state.transactions.lastPortfolioCalculation
+          },
+          assetDefinitions: { items: state.assetDefinitions.items },
+          assetCategories: {
+            categories: state.assetCategories.categories,
+            categoryOptions: state.assetCategories.categoryOptions,
+            categoryAssignments: state.assetCategories.categoryAssignments
+          },
+          liabilities: { items: state.liabilities.items },
+          expenses: { items: state.expenses.items },
+          income: { items: state.income.items },
+          customAnalytics: { charts: state.customAnalytics.charts },
+          dashboard: state.dashboard,
+          forecast: state.forecast,
+          apiConfig: state.apiConfig,
+          calculatedData: {
+            portfolioHistory: state.calculatedData.portfolioHistory,
+            assetFocusData: state.calculatedData.assetFocusData,
+            financialSummary: state.calculatedData.financialSummary,
+            status: 'idle',
+            error: null,
+            cacheValidityDuration: state.calculatedData.cacheValidityDuration,
+            enableConditionalLogging: state.calculatedData.enableConditionalLogging
+          }
+        };
+        
+        // Check if data is empty
+        const isEmpty = state.transactions.items.length === 0 && 
+                       state.assetDefinitions.items.length === 0;
+        
+        if (isEmpty) {
+          localStorage.removeItem('passiveIncomeCalculator');
+        } else {
+          const serialized = JSON.stringify(stateToSave);
+          localStorage.setItem('passiveIncomeCalculator', serialized);
+        }
+      } catch (err) {
+        console.error('Error saving state:', err);
       }
-    };
+    }, 1000); // 1 second throttle
     
-    // Check if we're clearing data (all arrays are empty)
-    const isEmpty = state.transactions.items.length === 0 && 
-                   state.assetDefinitions.items.length === 0 &&
-                   state.assetCategories.categories.length === 0 &&
-                   state.assetCategories.categoryOptions.length === 0 &&
-                   state.assetCategories.categoryAssignments.length === 0 &&
-                   state.liabilities.items.length === 0 && 
-                   state.expenses.items.length === 0 && 
-                   state.income.items.length === 0 &&
-                   state.customAnalytics.charts.length === 0;
-    
-    if (isEmpty) {
-      isClearing = true;
-      // Clear localStorage when all data is empty
-      localStorage.removeItem('passiveIncomeCalculator');
-      setTimeout(() => { isClearing = false; }, 100);
-    } else {
-      localStorage.setItem('passiveIncomeCalculator', JSON.stringify(stateToSave));
-    }
-  } catch (err) {
-    console.error('Error saving state:', err);
-  }
-});
+    listener();
+  });
+};
 
 // Export types derived from the store
 export type RootState = ReturnType<typeof store.getState>;
@@ -294,3 +265,8 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   unknown,
   AnyAction
 >;
+
+// Make store available globally for debugging in development
+if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
+  (window as any).__REDUX_STORE__ = store;
+}

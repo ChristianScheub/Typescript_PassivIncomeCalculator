@@ -17,15 +17,12 @@ import { updateDashboardValues } from '@/store/slices/dashboardSlice';
 import { calculate30DayHistory } from '@/store/slices/portfolioHistorySlice';
 import { updateForecastValues } from '@/store/slices/forecastSlice';
 import { 
-    clearAllCache as clearCalculatedDataCache,
-    calculatePortfolioHistory,
-    calculateAssetFocusData,
-    calculateFinancialSummary
+    clearAllCache as clearCalculatedDataCache
 } from '@/store/slices/calculatedDataSlice';
-import { AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
 import { PortfolioHistoryHelper } from '../../../../domain/portfolio/history/portfolioHistoryService/methods/portfolioHistoryHelper';
 import recentActivityService from '../../../../domain/analytics/reporting/recentActivityService';
 import Logger from "@/service/shared/logging/Logger/logger";
+import { refreshPortfolioHistory } from '../../../workflows/deleteDataService/methods/refreshPortfolioHistory';
 
 /**
  * Refreshes all caches in the application
@@ -112,16 +109,9 @@ export async function refreshAllCaches(): Promise<void> {
             store.dispatch(calculate30DayHistory())
         ]);
 
-        // Step 9: Recalculate new calculated data cache
-        Logger.infoService("Recalculating calculated data cache");
-        const dashboardSettings = state.dashboardSettings;
-        const currentTimeRange: AssetFocusTimeRange = dashboardSettings.assetFocus.timeRange || '1W';
-        
-        await Promise.all([
-            store.dispatch(calculateFinancialSummary()),
-            store.dispatch(calculateAssetFocusData()),
-            store.dispatch(calculatePortfolioHistory({ timeRange: currentTimeRange }))
-        ]);
+        // Step 9: Clear and recalculate portfolio history database with all time ranges
+        Logger.infoService("Clearing and recalculating portfolio history database");
+        await refreshPortfolioHistory();
 
         Logger.infoService("COMPLETE cache refresh completed successfully - ALL data refreshed from SQL database");
         

@@ -2,6 +2,7 @@ import { store } from '../../../../../store';
 import { invalidatePortfolioCache } from '@/store/slices/transactionsSlice';
 import Logger from "@/service/shared/logging/Logger/logger";
 import sqliteService from '../../../../infrastructure/sqlLiteService';
+import { clearPortfolioHistory } from './clearPortfolioHistory';
 
 export async function clearPriceHistory(): Promise<void> {
     Logger.infoService("Starting to clear price history");
@@ -16,8 +17,12 @@ export async function clearPriceHistory(): Promise<void> {
         }
     }
 
+    // Clear portfolio history database as it's based on price history
+    Logger.infoService("Clearing portfolio history database as it's based on price history");
+    await clearPortfolioHistory();
+
     // Invalidate cache
     store.dispatch(invalidatePortfolioCache());
 
-    Logger.infoService("Price history cleared successfully");
+    Logger.infoService("Price history and portfolio history cleared successfully");
 }
