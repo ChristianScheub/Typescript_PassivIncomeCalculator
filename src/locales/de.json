@@ -390,7 +390,7 @@
         "title": "Freizeitabdeckung",
         "description": "Sieh, wie viel deiner persönlichen und Unterhaltungsausgaben durch passives Einkommen gedeckt sind. FIRE bedeutet nicht nur Notwendigkeiten, sondern auch Lebensgenuss.",
         "noExpenses": "Noch keine Freizeitausgaben erfasst. Füge deine Unterhaltungs- und persönlichen Ausgaben hinzu.",
-        "percentCovered": "{{percent}}% der Freizeitkosten gedeckt",
+        "percentCovered": "{{percent}}% der Freizeitskosten gedeckt",
         "milestone25": "25% der Freizeitkosten durch passives Einkommen gedeckt!",
         "milestone50": "Die Hälfte deines Spaßgeldes ist jetzt passiv! 🎉",
         "milestone75": "75% der Freizeitkosten gedeckt - Freiheit ist nah!",
@@ -655,7 +655,10 @@
       "transactionType": "Transaktionstyp",
       "buyTransaction": "Kauf-Transaktion",
       "sellTransaction": "Verkaufs-Transaktion"
-    }
+    },
+    "updateStockPrices": "Aktienkurse aktualisieren",
+    "useDividendApi": "Dividenden-API verwenden",
+    "fetchDividendsFromApi": "Dividenden per API abrufen"
   },
   "paymentFrequency": {
     "monthly": "Monatlich",

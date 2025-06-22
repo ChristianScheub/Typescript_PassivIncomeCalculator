@@ -2,6 +2,9 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AssetDefinition } from '@/types/domains/assets/';
 import Logger from '@service/shared/logging/Logger/logger';
 import sqliteService from '@service/infrastructure/sqlLiteService';
+import { deepCleanObject } from '@/utils/deepCleanObject';
+import { RootState } from '../index';
+import { createDividendApiHandler } from '@/service/domain/assets/market-data/dividendAPIService';
 
 interface AssetDefinitionsState {
   items: AssetDefinition[];
@@ -62,20 +65,21 @@ export const updateAssetDefinition = createAsyncThunk(
   'assetDefinitions/updateAssetDefinition',
   async (assetDefinition: AssetDefinition) => {
     Logger.info(`Updating asset definition in database: ${assetDefinition.name}`);
-    
     try {
       // Aktualisierung des updatedAt-Feldes
       const updatedDefinition = {
         ...assetDefinition,
         updatedAt: new Date().toISOString(),
       };
-      
+      // Deep clean before DB update
+      const cleanedDefinition = deepCleanObject(updatedDefinition);
+      Logger.info('Asset definition after deep clean: ' + JSON.stringify(cleanedDefinition));
       // Speichern der Aktualisierung in der Datenbank
-      await sqliteService.update('assetDefinitions', updatedDefinition);
-      Logger.info(`Asset definition updated successfully: ${updatedDefinition.name}`);
-      return updatedDefinition;
+      await sqliteService.update('assetDefinitions', cleanedDefinition);
+      Logger.info(`Asset definition updated successfully: ${cleanedDefinition.name}`);
+      return cleanedDefinition;
     } catch (error) {
-      Logger.error(`Error updating asset definition in database: ${error}`);
+      Logger.error(`Error updating asset definition in database: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
       throw error;
     }
   }
@@ -95,6 +99,49 @@ export const deleteAssetDefinition = createAsyncThunk(
       Logger.error(`Error deleting asset definition from database: ${error}`);
       throw error;
     }
+  }
+);
+
+export const fetchAndUpdateDividends = createAsyncThunk(
+  'assetDefinitions/fetchAndUpdateDividends',
+  async (definition: AssetDefinition, { getState, dispatch }) => {
+    Logger.info('[fetchAndUpdateDividends] called for: ' + definition.fullName);
+    const state = getState() as RootState;
+    const provider = state.dividendApiConfig.selectedProvider;
+    Logger.info(`[fetchAndUpdateDividends] using provider: ${provider}`);
+    let handler;
+    try {
+      handler = createDividendApiHandler(provider);
+      Logger.info('[fetchAndUpdateDividends] handler created');
+    } catch (err) {
+      Logger.error('[fetchAndUpdateDividends] Error creating handler: ' + JSON.stringify(err));
+      throw err;
+    }
+    if (!definition.ticker) throw new Error('Kein Ticker für Asset vorhanden');
+    let result;
+    try {
+      Logger.info('[fetchAndUpdateDividends] about to call fetchDividends');
+      result = await handler.fetchDividends(definition.ticker);
+      Logger.info('[fetchAndUpdateDividends] fetchDividends finished');
+    } catch (err) {
+      Logger.error('[fetchAndUpdateDividends] Error in fetchDividends: ' + JSON.stringify(err));
+      throw err;
+    }
+    // Dividenden als Info im Asset speichern (hier: nur letzte Dividende als Beispiel)
+    const last = result.dividends[result.dividends.length - 1];
+    const updatedDefinition = {
+      ...definition,
+      dividendInfo: last
+        ? {
+            amount: last.amount,
+            frequency: last.frequency,
+            lastDividendDate: last.lastDividendDate,
+            paymentMonths: last.paymentMonths,
+          }
+        : undefined,
+    };
+    // Hier könnte direkt updateAssetDefinition(dispatch) aufgerufen werden
+    return updatedDefinition;
   }
 );
 

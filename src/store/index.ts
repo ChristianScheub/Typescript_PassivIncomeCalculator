@@ -9,6 +9,7 @@ import incomeReducer from './slices/incomeSlice';
 import dashboardReducer from './slices/dashboardSlice';
 import forecastReducer from './slices/forecastSlice';
 import apiConfigReducer, { StockAPIProvider } from './slices/apiConfigSlice';
+import dividendApiConfigReducer from './slices/dividendApiConfigSlice';
 import customAnalyticsReducer from './slices/customAnalyticsSlice';
 import snackbarReducer from './slices/snackbarSlice';
 import dashboardSettingsReducer from './slices/dashboardSettingsSlice';
@@ -145,6 +146,7 @@ export const store = configureStore({
     dashboard: dashboardReducer,
     forecast: forecastReducer,
     apiConfig: apiConfigReducer,
+    dividendApiConfig: dividendApiConfigReducer,
     customAnalytics: customAnalyticsReducer,
     snackbar: snackbarReducer,
     dashboardSettings: dashboardSettingsReducer,

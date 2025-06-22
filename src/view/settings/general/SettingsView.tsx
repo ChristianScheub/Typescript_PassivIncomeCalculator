@@ -13,6 +13,7 @@ import { ConfirmationDialog } from '@/ui/dialog/ConfirmationDialog';
 import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '@/ui/common/ClearButton';
 import clsx from 'clsx';
 import { Toggle } from '@/ui/common/Toggle';
+import { DividendApiSettingsSection } from './DividendApiSettingsSection';
 
 interface ProviderInfo {
   name: string;
@@ -409,6 +410,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </CollapsibleSection>
 
+      {/* Dividend API Configuration */}
+      <DividendApiSettingsSection />
 
       {/* Data Management */}
       <CollapsibleSection

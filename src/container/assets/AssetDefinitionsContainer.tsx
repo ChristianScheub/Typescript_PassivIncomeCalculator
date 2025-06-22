@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { RootState } from '../../store';
-import { fetchAssetDefinitions, addAssetDefinition, updateAssetDefinition, deleteAssetDefinition } from '@/store/slices/assetDefinitionsSlice';
+import { fetchAssetDefinitions, addAssetDefinition, updateAssetDefinition, deleteAssetDefinition, fetchAndUpdateDividends } from '@/store/slices/assetDefinitionsSlice';
 import { 
   fetchAssetCategories, 
   fetchAssetCategoryOptions, 
@@ -18,6 +18,7 @@ import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { StockPriceUpdater } from '@/service/shared/utilities/helper/stockPriceUpdater';
 import { TimeRangePeriod } from '@/types/shared/time';
+import { deepCleanObject } from '@/utils/deepCleanObject';
 
 // Type for the asset definition data when creating
 // type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
@@ -93,31 +94,36 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       Logger.info('Updating asset definition' + " - " + JSON.stringify({ id: editingDefinition.id, data }));
       // Merge the partial data with the existing definition to ensure all required fields are present
       const updatedDefinition = { ...editingDefinition, ...data };
-      
-      const dividendStatus = updatedDefinition.dividendInfo?.amount && updatedDefinition.dividendInfo.amount > 0 ? 'pays dividends' : 'does not pay dividends';
-      Logger.info(`Updating asset definition - ${updatedDefinition.name} (${dividendStatus})`);
-      
-      await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(updatedDefinition));
-      
+      // Deep clean before update
+      const cleanedDefinition = deepCleanObject(updatedDefinition);
+      const dividendStatus = cleanedDefinition.dividendInfo?.amount && cleanedDefinition.dividendInfo.amount > 0 ? 'pays dividends' : 'does not pay dividends';
+      Logger.info(`Updating asset definition - ${cleanedDefinition.name} (${dividendStatus})`);
+      Logger.info('Updating asset definition - FINAL DATA: ' + JSON.stringify(cleanedDefinition));
+      await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(cleanedDefinition));
       // Update category assignments
       // First delete existing assignments
       await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(deleteAssetCategoryAssignmentsByAssetId(editingDefinition.id));
-      
       // Then add new assignments
       if (categoryAssignments.length > 0) {
         const assignmentsWithAssetId = categoryAssignments.map(assignment => ({
           ...assignment,
           assetDefinitionId: editingDefinition.id
         }));
-        
         for (const assignment of assignmentsWithAssetId) {
           await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetCategoryAssignment(assignment));
         }
       }
-      
       setEditingDefinition(null);
     } catch (error) {
-      Logger.error('Failed to update asset definition' + " - " + JSON.stringify(error as Error));
+      // Enhanced error logging (stringify all details)
+      const errorDetails = [
+        '[handleUpdateDefinition] Failed to update asset definition',
+        'error: ' + (error && error.toString ? error.toString() : String(error)),
+        'errorJSON: ' + (() => { try { return JSON.stringify(error); } catch { return 'unserializable'; } })(),
+        'errorStack: ' + (error && (error as any).stack ? (error as any).stack : 'n/a'),
+        'errorKeys: ' + (error && typeof error === 'object' ? Object.keys(error).join(',') : 'n/a'),
+      ].join(' | ');
+      Logger.error(errorDetails);
     }
   };
 
@@ -264,6 +270,33 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     }
   };
 
+  // Handler für Dividenden per API abrufen
+  const handleFetchDividendsFromApi = async (definition: AssetDefinition) => {
+    try {
+      Logger.info('Fetching dividends from API for asset: ' + definition.fullName);
+      // Hier: Redux-Thunk dispatchen
+      const result = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+        // @ts-ignore
+        fetchAndUpdateDividends(definition)
+      ).unwrap();
+      if (result) {
+        Logger.info('Dividenden erfolgreich abgerufen und Asset aktualisiert: ' + JSON.stringify(result));
+        // Optional: Asset direkt updaten
+        await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(result));
+      }
+    } catch (error) {
+      // Maximales Error-Logging für Diagnose
+      const errorDetails = [
+        '[handleFetchDividendsFromApi] Fehler beim Abrufen der Dividenden per API',
+        'error: ' + (error && error.toString ? error.toString() : String(error)),
+        'errorJSON: ' + (() => { try { return JSON.stringify(error); } catch { return 'unserializable'; } })(),
+        'errorStack: ' + (error && (error as any).stack ? (error as any).stack : 'n/a'),
+        'errorKeys: ' + (error && typeof error === 'object' ? Object.keys(error).join(',') : 'n/a'),
+      ].join(' | ');
+      Logger.error(errorDetails);
+    }
+  };
+
   const getAssetTypeIcon = (type: string) => {
     switch (type as AssetType) {
       case 'stock':
@@ -306,6 +339,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       onAddDefinitionWithCategories={handleAddDefinition}
       onUpdateDefinitionWithCategories={handleUpdateDefinition}
       onAddPriceEntry={handleAddPriceEntry}
+      onFetchDividendsFromApi={handleFetchDividendsFromApi}
     />
   );
 };

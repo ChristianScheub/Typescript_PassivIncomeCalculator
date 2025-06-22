@@ -21,6 +21,7 @@ import { SectorSection } from "../../../ui/specialized/SectorSection";
 import { AdditionalInformationSection } from "../../../ui/specialized/AdditionalInformationSection";
 import { AssetIncomeSection } from "../../../ui/forms/assetDefinition/AssetIncomeSection";
 
+// Add useDividendApi to schema
 const assetDefinitionSchema = z.object({
   fullName: z.string().min(1, "Name is required"),
   ticker: z.string().optional(),
@@ -76,6 +77,9 @@ const assetDefinitionSchema = z.object({
   interestRate: z.number().min(0).max(100).optional(),
   maturityDate: z.string().optional(),
   nominalValue: z.number().min(0).optional(),
+
+  // API fields
+  useDividendApi: z.boolean().optional(),
 });
 
 // Type alias for form data from schema
@@ -181,6 +185,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
 
           dividendMonths: editingDefinition.dividendInfo?.months || [],
           rentalMonths: editingDefinition.rentalInfo?.months || [],
+          useDividendApi: editingDefinition.useDividendApi ?? false,
         }
       : {
           type: "stock",
@@ -195,6 +200,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           rentalCustomAmounts: {},
           useMultipleSectors: false,
           sectors: [],
+          useDividendApi: false,
         },
   });
 
@@ -202,6 +208,8 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
   const hasDividend = watch("hasDividend");
   const hasRental = watch("hasRental");
   const hasBond = watch("hasBond");
+  const useDividendApiRaw = watch("useDividendApi");
+  const useDividendApi = typeof useDividendApiRaw === 'boolean' ? useDividendApiRaw : false;
   const dividendPaymentMonths = watch("dividendPaymentMonths") || [];
   const rentalPaymentMonths = watch("rentalPaymentMonths") || [];
   const dividendCustomAmounts = watch("dividendCustomAmounts") || {};
@@ -332,6 +340,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
 
         dividendMonths: editingDefinition.dividendInfo?.months || [],
         rentalMonths: editingDefinition.rentalInfo?.months || [],
+        useDividendApi: editingDefinition.useDividendApi ?? false,
       };
 
       reset(resetData);
@@ -345,6 +354,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         rentalFrequency: "monthly",
         useMultipleSectors: false,
         sectors: [],
+        useDividendApi: false,
       });
     }
   }, [editingDefinition, reset]);
@@ -520,6 +530,8 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     finalDefinitionData = addDividendInfoIfNeeded(finalDefinitionData, data);
     finalDefinitionData = addRentalInfoIfNeeded(finalDefinitionData, data);
     finalDefinitionData = addBondInfoIfNeeded(finalDefinitionData, data);
+    // Add useDividendApi at the root
+    finalDefinitionData.useDividendApi = data.useDividendApi ?? false;
 
     // Submit the form and reset state
     onSubmit(finalDefinitionData, categoryAssignments);
@@ -596,22 +608,33 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
 
         {/* Dividend Section */}
         {selectedType === "stock" && (
-          <OptionalSection title={t("assets.dividendInformation")}>
-            <FormGrid columns={{ xs: "1fr", sm: "1fr" }}>
-              <AssetIncomeSection
-                type="dividend"
-                hasIncome={hasDividend}
-                onHasIncomeChange={(checked) => setValue("hasDividend", checked)}
-                amount={watch("dividendAmount") || 0}
-                onAmountChange={(value) => setValue("dividendAmount", value)}
-                frequency={watch("dividendFrequency") as PaymentFrequency}
-                onFrequencyChange={(value) => setValue("dividendFrequency", value as PaymentFrequency)}
-                paymentMonths={dividendPaymentMonths}
-                onPaymentMonthChange={handleDividendMonthChange}
-                customAmounts={dividendCustomAmounts}
-                onCustomAmountChange={handleDividendCustomAmountChange}
+          <OptionalSection title={t("assets.dividendInformation")}>  
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-gray-700 dark:text-gray-300">{t("assets.useDividendApi")}</span>
+              <Toggle
+                checked={useDividendApi}
+                onChange={(checked) => setValue("useDividendApi", checked)}
+                id="useDividendApi"
+                label={t("assets.useDividendApi")}
               />
-            </FormGrid>
+            </div>
+            {!useDividendApi && (
+              <FormGrid columns={{ xs: "1fr", sm: "1fr" }}>
+                <AssetIncomeSection
+                  type="dividend"
+                  hasIncome={hasDividend}
+                  onHasIncomeChange={(checked) => setValue("hasDividend", checked)}
+                  amount={watch("dividendAmount") || 0}
+                  onAmountChange={(value) => setValue("dividendAmount", value)}
+                  frequency={watch("dividendFrequency") as PaymentFrequency}
+                  onFrequencyChange={(value) => setValue("dividendFrequency", value as PaymentFrequency)}
+                  paymentMonths={dividendPaymentMonths}
+                  onPaymentMonthChange={handleDividendMonthChange}
+                  customAmounts={dividendCustomAmounts}
+                  onCustomAmountChange={handleDividendCustomAmountChange}
+                />
+              </FormGrid>
+            )}
           </OptionalSection>
         )}
 

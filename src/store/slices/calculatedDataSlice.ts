@@ -263,22 +263,23 @@ const calculatedDataSlice = createSlice({
     
     // Force refresh of all data (invalidate cache)
     invalidateAllCache: (state) => {
-      // Update last calculated times to force refresh
+      // Guard: ensure portfolioHistory is always an object
+      if (!state.portfolioHistory || typeof state.portfolioHistory !== 'object') {
+        Logger.warn('portfolioHistory was undefined/null in invalidateAllCache, resetting to {}');
+        state.portfolioHistory = {};
+      }
       Object.keys(state.portfolioHistory).forEach(timeRange => {
         const key = timeRange as AssetFocusTimeRange;
         if (state.portfolioHistory[key]) {
           state.portfolioHistory[key]!.lastCalculated = new Date(0).toISOString();
         }
       });
-      
       if (state.assetFocusData) {
         state.assetFocusData.lastCalculated = new Date(0).toISOString();
       }
-      
       if (state.financialSummary) {
         state.financialSummary.lastCalculated = new Date(0).toISOString();
       }
-      
       Logger.cache('Invalidated all calculated data cache');
     },
     

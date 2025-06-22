@@ -63,6 +63,9 @@ export interface AssetDefinition extends BaseEntity {
   dividendInfo?: DividendInfo;
   rentalInfo?: RentalInfo;
   bondInfo?: BondInfo;
+
+  // Dividend API integration
+  useDividendApi?: boolean;
   
   // Additional metadata
   description?: string;

@@ -49,6 +49,7 @@ interface AssetDefinitionsViewProps {
     categoryAssignments: CreateCategoryAssignmentData[]
   ) => void;
   onAddPriceEntry?: (definitionId: string, entry: PriceEntry) => void;
+  onFetchDividendsFromApi?: (definition: AssetDefinition) => void;
 }
 
 export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
@@ -71,6 +72,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   onAddDefinitionWithCategories,
   onUpdateDefinitionWithCategories,
   onAddPriceEntry,
+  onFetchDividendsFromApi,
 }) => {
   const { t } = useTranslation();
   
@@ -190,6 +192,34 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                     variant="outline"
                     size="iconSm"
                     className="ml-2"
+                  />
+                </Tooltip>
+              )}
+
+              {/* Button: Dividenden per API abrufen */}
+              {isApiEnabled && editingDefinition && editingDefinition.type === 'stock' && editingDefinition.useDividendApi && (
+                <Tooltip 
+                  title={t("assets.fetchDividendsFromApi")}
+                  arrow
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        bgcolor: 'rgba(0, 0, 0, 0.8)',
+                        '& .MuiTooltip-arrow': {
+                          color: 'rgba(0, 0, 0, 0.8)',
+                        },
+                        padding: '8px 12px',
+                        fontSize: '0.875rem',
+                      },
+                    },
+                  }}
+                >
+                  <IconButton
+                    onClick={() => onFetchDividendsFromApi && editingDefinition && onFetchDividendsFromApi(editingDefinition)}
+                    icon={<History className="h-4 w-4" />}
+                    aria-label={t("assets.fetchDividendsFromApi")}
+                    variant="outline"
+                    size="iconSm"
                   />
                 </Tooltip>
               )}
@@ -319,6 +349,16 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                         type="button"
                       >
                         {t("assets.addPriceEntry")}
+                      </button>
+                    )}
+                    {/* Dividenden per API abrufen Button */}
+                    {isApiEnabled && definition.type === 'stock' && definition.useDividendApi && (
+                      <button
+                        className="mt-4 ml-2 px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
+                        onClick={() => onFetchDividendsFromApi && onFetchDividendsFromApi(definition)}
+                        type="button"
+                      >
+                        {t("assets.fetchDividendsFromApi")}
                       </button>
                     )}
                   </div>

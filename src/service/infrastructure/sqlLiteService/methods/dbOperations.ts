@@ -19,7 +19,29 @@ export const dbOperations = {
 
   async update<K extends StoreNames>(storeName: K, item: FinanceDB[K]['value']): Promise<string> {
     const db = await initDatabase();
-    return db.put(storeName, item);
+    try {
+      // Log the item and its keys before update
+      // eslint-disable-next-line no-console
+      console.log('[DB UPDATE] Store:', storeName, 'Item:', item, 'Keys:', Object.keys(item));
+      const result = await db.put(storeName, item);
+      // eslint-disable-next-line no-console
+      console.log('[DB UPDATE] Success:', result);
+      return result;
+    } catch (error) {
+      // Log full error object and all properties
+      // eslint-disable-next-line no-console
+      console.error('[DB UPDATE ERROR]', {
+        error,
+        errorString: error && error.toString ? error.toString() : undefined,
+        errorJSON: (() => { try { return JSON.stringify(error); } catch { return undefined; } })(),
+        errorStack: error && (error as any).stack,
+        errorKeys: error && typeof error === 'object' ? Object.keys(error) : undefined,
+        item,
+        itemKeys: Object.keys(item),
+        storeName
+      });
+      throw error;
+    }
   },
 
   async remove(storeName: StoreNames, id: string): Promise<void> {
