@@ -285,11 +285,11 @@ const calculatedDataSlice = createSlice({
     // Validate cache on startup (check if cache is still valid after localStorage load)
     validateCacheOnStartup: (state) => {
       let invalidatedCount = 0;
-      
-      // Check portfolio history caches
-      Object.keys(state.portfolioHistory).forEach(timeRange => {
+      // Defensive: falls portfolioHistory nicht gesetzt ist, als leeres Objekt behandeln
+      const portfolioHistory = state.portfolioHistory || {};
+      Object.keys(portfolioHistory).forEach(timeRange => {
         const key = timeRange as AssetFocusTimeRange;
-        const cache = state.portfolioHistory[key];
+        const cache = portfolioHistory[key];
         if (cache && !isCacheValid(cache.lastCalculated, state.cacheValidityDuration)) {
           delete state.portfolioHistory[key];
           invalidatedCount++;
@@ -371,23 +371,23 @@ export const {
 
 // Selectors for accessing cached data
 export const selectPortfolioHistory = (timeRange: AssetFocusTimeRange) => (state: StoreState) => 
-  state.calculatedData.portfolioHistory[timeRange];
+  state.calculatedData?.portfolioHistory?.[timeRange];
 
 export const selectAssetFocusData = (state: StoreState) => 
-  state.calculatedData.assetFocusData;
+  state.calculatedData?.assetFocusData;
 
 export const selectFinancialSummary = (state: StoreState) => 
-  state.calculatedData.financialSummary;
+  state.calculatedData?.financialSummary;
 
 export const selectCalculatedDataStatus = (state: StoreState) => 
-  state.calculatedData.status;
+  state.calculatedData?.status || 'idle';
 
 export const selectCacheSettings = (state: StoreState) => ({
-  cacheValidityDuration: state.calculatedData.cacheValidityDuration,
-  enableConditionalLogging: state.calculatedData.enableConditionalLogging
+  cacheValidityDuration: state.calculatedData?.cacheValidityDuration || 5 * 60 * 1000,
+  enableConditionalLogging: state.calculatedData?.enableConditionalLogging ?? true
 });
 
 export const selectIsStoreHydrated = (state: StoreState) => 
-  state.calculatedData.isHydrated;
+  state.calculatedData?.isHydrated || false;
 
 export default calculatedDataSlice.reducer;

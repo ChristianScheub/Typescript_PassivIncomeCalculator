@@ -63,11 +63,83 @@ const PortfolioHistoryTooltip: React.FC<PortfolioHistoryTooltipProps> = ({ activ
 
 const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ isIntradayView = false }) => {
   const { t } = useTranslation();
-  
   // Load 30-day portfolio history from IndexedDB
   const history30Days = usePortfolioHistoryView('1M');
-  
-  // Show empty state if no data
+
+  // Always define hooks before any return
+  const transformedHistory = useMemo(() => {
+    if (!history30Days || history30Days.length === 0) return [];
+    return history30Days.map((item, index) => {
+      let change = 0;
+      let changePercentage = 0;
+      if (index > 0) {
+        const previousValue = history30Days[index - 1].value;
+        change = item.value - previousValue;
+        changePercentage = previousValue ? (change / previousValue) * 100 : 0;
+      }
+      return {
+        date: item.date,
+        value: item.value,
+        change,
+        changePercentage
+      };
+    });
+  }, [history30Days]);
+
+  const firstDay = transformedHistory[0];
+  const lastDay = transformedHistory[transformedHistory.length - 1];
+  const totalChange = lastDay?.value - firstDay?.value || 0;
+  const totalChangePercentage = firstDay?.value ? (totalChange / firstDay.value) * 100 : 0;
+  const gradientColor = totalChange >= 0 ? '#22C55E' : '#EF4444';
+  const changeColor = totalChange >= 0 ? 'text-green-600' : 'text-red-600';
+
+  const calculateYAxisDomain = () => {
+    if (transformedHistory.length === 0) return ['auto', 'auto'];
+    const values = transformedHistory.map(item => item.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+    const range = maxValue - minValue;
+    if (range === 0) return ['auto', 'auto'];
+    const avgValue = (minValue + maxValue) / 2;
+    const rangePercentage = (range / avgValue) * 100;
+    let paddingFactor = 0.1;
+    if (rangePercentage < 0.5) {
+      paddingFactor = 0.01;
+    } else if (rangePercentage < 2) {
+      paddingFactor = 0.02;
+    } else if (rangePercentage < 5) {
+      paddingFactor = 0.05;
+    }
+    const padding = range * paddingFactor;
+    const domainMin = Math.max(0, minValue - padding);
+    const domainMax = maxValue + padding;
+    const roundedMin = Math.floor(domainMin / 100) * 100;
+    const roundedMax = Math.ceil(domainMax / 100) * 100;
+    return [roundedMin, roundedMax];
+  };
+  const [yAxisMin, yAxisMax] = calculateYAxisDomain();
+  const formatXAxisLabel = (dateStr: string) => {
+    const date = new Date(dateStr);
+    if (isIntradayView) {
+      return format(date, 'MMM d, HH:mm');
+    } else {
+      return format(date, 'MMM d');
+    }
+  };
+  const getTitle = () => {
+    if (isIntradayView) {
+      return t('dashboard.portfolioHistoryIntraday') || 'Portfolio Verlauf (Intraday)';
+    }
+    return t('dashboard.portfolioHistory') || 'Portfolio Verlauf';
+  };
+  const getSubtitle = () => {
+    if (isIntradayView) {
+      return t('dashboard.last5DaysIntraday') || 'Letzte 5 Tage (Intraday)';
+    }
+    return t('dashboard.last30Days') || 'Letzte 30 Tage';
+  };
+
+  // Now do the conditional return
   if (!history30Days || history30Days.length === 0) {
     return (
       <Card className="w-full">
@@ -85,107 +157,6 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ isIntradayV
       </Card>
     );
   }
-  
-  // Transform the data to include change and changePercentage
-  const transformedHistory = useMemo(() => {
-    if (!history30Days || history30Days.length === 0) return [];
-    
-    return history30Days.map((item, index) => {
-      let change = 0;
-      let changePercentage = 0;
-      
-      if (index > 0) {
-        const previousValue = history30Days[index - 1].value;
-        change = item.value - previousValue;
-        changePercentage = previousValue ? (change / previousValue) * 100 : 0;
-      }
-      
-      return {
-        date: item.date,
-        value: item.value,
-        change,
-        changePercentage
-      };
-    });
-  }, [history30Days]);
-  
-  // Find the overall change using transformed data
-  const firstDay = transformedHistory[0];
-  const lastDay = transformedHistory[transformedHistory.length - 1];
-  const totalChange = lastDay?.value - firstDay?.value || 0;
-  const totalChangePercentage = firstDay?.value ? (totalChange / firstDay.value) * 100 : 0;
-
-  const gradientColor = totalChange >= 0 ? '#22C55E' : '#EF4444';
-  const changeColor = totalChange >= 0 ? 'text-green-600' : 'text-red-600';
-
-  // Calculate dynamic Y-axis domain for better visibility of fluctuations
-  const calculateYAxisDomain = () => {
-    if (transformedHistory.length === 0) return ['auto', 'auto'];
-    
-    const values = transformedHistory.map(item => item.value);
-    const minValue = Math.min(...values);
-    const maxValue = Math.max(...values);
-    const range = maxValue - minValue;
-    
-    // If there's no variation in data, use auto scaling
-    if (range === 0) return ['auto', 'auto'];
-    
-    // Calculate the range as percentage of the average value
-    const avgValue = (minValue + maxValue) / 2;
-    const rangePercentage = (range / avgValue) * 100;
-    
-    let paddingFactor = 0.1; // Default 10% padding
-    
-    if (rangePercentage < 0.5) {
-      // Very small fluctuations (less than 0.5%) - zoom in significantly
-      paddingFactor = 0.01; // 1% padding for maximum zoom
-    } else if (rangePercentage < 2) {
-      // Small fluctuations (less than 2%) - zoom in moderately
-      paddingFactor = 0.02; // 2% padding
-    } else if (rangePercentage < 5) {
-      // Medium fluctuations (less than 5%) - use moderate padding
-      paddingFactor = 0.05; // 5% padding
-    }
-    
-    const padding = range * paddingFactor;
-    const domainMin = Math.max(0, minValue - padding); // Don't go below 0 for portfolio values
-    const domainMax = maxValue + padding;
-    
-    // Round to reasonable values for cleaner display
-    const roundedMin = Math.floor(domainMin / 100) * 100;
-    const roundedMax = Math.ceil(domainMax / 100) * 100;
-    
-    return [roundedMin, roundedMax];
-  };
-
-  const [yAxisMin, yAxisMax] = calculateYAxisDomain();
-
-  // Format X-axis labels based on whether it's intraday view
-  const formatXAxisLabel = (dateStr: string) => {
-    const date = new Date(dateStr);
-    if (isIntradayView) {
-      // For intraday, show date and time (MMM d, HH:mm)
-      return format(date, 'MMM d, HH:mm');
-    } else {
-      // For daily view, show date (MMM d)
-      return format(date, 'MMM d');
-    }
-  };
-
-  // Update title and subtitle based on view type
-  const getTitle = () => {
-    if (isIntradayView) {
-      return t('dashboard.portfolioHistoryIntraday') || 'Portfolio Verlauf (Intraday)';
-    }
-    return t('dashboard.portfolioHistory') || 'Portfolio Verlauf';
-  };
-
-  const getSubtitle = () => {
-    if (isIntradayView) {
-      return t('dashboard.last5DaysIntraday') || 'Letzte 5 Tage (Intraday)';
-    }
-    return t('dashboard.last30Days') || 'Letzte 30 Tage';
-  };
 
   return (
     <Card className="bg-white dark:bg-gray-800">
