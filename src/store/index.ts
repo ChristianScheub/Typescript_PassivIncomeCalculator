@@ -10,7 +10,6 @@ import dashboardReducer from './slices/dashboardSlice';
 import forecastReducer from './slices/forecastSlice';
 import apiConfigReducer, { StockAPIProvider } from './slices/apiConfigSlice';
 import customAnalyticsReducer from './slices/customAnalyticsSlice';
-import portfolioHistoryReducer from './slices/portfolioHistorySlice';
 import snackbarReducer from './slices/snackbarSlice';
 import dashboardSettingsReducer from './slices/dashboardSettingsSlice';
 import calculatedDataReducer, { markStoreHydrated, validateCacheOnStartup } from './slices/calculatedDataSlice';
@@ -116,7 +115,6 @@ const loadState = () => {
         }
       },
       calculatedData: {
-        portfolioHistory: state.calculatedData?.portfolioHistory || {},
         assetFocusData: state.calculatedData?.assetFocusData || null,
         financialSummary: state.calculatedData?.financialSummary || null,
         status: 'idle',
@@ -148,7 +146,6 @@ export const store = configureStore({
     forecast: forecastReducer,
     apiConfig: apiConfigReducer,
     customAnalytics: customAnalyticsReducer,
-    portfolioHistory: portfolioHistoryReducer,
     snackbar: snackbarReducer,
     dashboardSettings: dashboardSettingsReducer,
     calculatedData: calculatedDataReducer,
@@ -223,7 +220,6 @@ store.subscribe = (listener) => {
           forecast: state.forecast,
           apiConfig: state.apiConfig,
           calculatedData: {
-            portfolioHistory: state.calculatedData.portfolioHistory,
             assetFocusData: state.calculatedData.assetFocusData,
             financialSummary: state.calculatedData.financialSummary,
             status: 'idle',

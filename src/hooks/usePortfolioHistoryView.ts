@@ -1,5 +1,5 @@
 import { useAppSelector, useAppDispatch } from './redux';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useState } from 'react';
 import portfolioHistoryService from '@/service/infrastructure/sqlLitePortfolioHistory';
 import PortfolioHistoryCalculationService from '@/service/application/portfolioHistoryCalculation/PortfolioHistoryCalculationService';
 import { 
@@ -7,7 +7,6 @@ import {
   setPortfolioIntradayStatus,
   setPortfolioIntradayError 
 } from '@/store/slices/portfolioIntradaySlice';
-import { calculate30DayHistory } from '@/store/slices/portfolioHistorySlice';
 import Logger from '@/service/shared/logging/Logger/logger';
 
 /**
@@ -171,16 +170,16 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
  * Hook for accessing portfolio history data (daily snapshots) with time range support
  * Supports different time ranges: 1D, 1W, 1M, 3M, 6M, 1Y, All
  * Returns data in the format expected by PortfolioHistoryView
+ * Data is loaded directly from IndexedDB (no Redux cache)
  */
 export function usePortfolioHistoryView(timeRange?: string): Array<{ date: string; value: number; transactions: Array<any> }> {
-  const dispatch = useAppDispatch();
   const { portfolioCache } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const { isHydrated } = useAppSelector(state => state.calculatedData);
   
-  // Use portfolioHistory Redux slice for longer time ranges
-  const portfolioHistoryData = useAppSelector(state => state.portfolioHistory?.history30Days || []);
-  const portfolioHistoryStatus = useAppSelector(state => state.portfolioHistory?.status || 'idle');
+  // State for storing data directly (no Redux)
+  const [portfolioHistoryData, setPortfolioHistoryData] = useState<Array<{ date: string; value: number; change: number; changePercentage: number }>>([]);
+  const [isLoading, setIsLoading] = useState(false);
   
   // Use ref to prevent infinite loops
   const isLoadingRef = useRef(false);
@@ -195,16 +194,16 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
       return;
     }
 
-    // ALWAYS load from DB for data integrity - don't trust Redux for history data
-    // The Redux slice uses old calculation logic that produces null values
+    // ALWAYS load from DB for data integrity - no Redux cache needed
 
     // Prevent multiple simultaneous loads
-    if (isLoadingRef.current || portfolioHistoryStatus === 'loading') {
+    if (isLoadingRef.current) {
       return;
     }
 
     // Load data from DB
     isLoadingRef.current = true;
+    setIsLoading(true);
 
     const loadPortfolioHistoryData = async () => {
       Logger.infoService(`📂 Loading portfolio history data from IndexedDB for timeRange: ${timeRange}...`);
@@ -246,13 +245,13 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         if (dbData.length > 0) {
           Logger.infoService(`📂 Loaded ${dbData.length} portfolio history points from IndexedDB for ${timeRange}`);
           
-          // Update Redux with transformed data FROM DB (not old calculation)
-          dispatch(calculate30DayHistory.fulfilled(dbData.map(point => ({
+          // Set data directly to state (no Redux)
+          setPortfolioHistoryData(dbData.map(point => ({
             date: point.date,
             value: point.value,
             change: point.totalReturn,
             changePercentage: point.totalReturnPercentage
-          })), ''));
+          })));
           
         } else {
           // No data in DB, trigger calculation
@@ -269,24 +268,25 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
           if (newDbData.length > 0) {
             Logger.infoService(`📂 Loaded ${newDbData.length} portfolio history points after calculation for ${timeRange}`);
             
-            // Update Redux with transformed data FROM DB
-            dispatch(calculate30DayHistory.fulfilled(newDbData.map(point => ({
+            // Set data directly to state (no Redux)
+            setPortfolioHistoryData(newDbData.map(point => ({
               date: point.date,
               value: point.value,
               change: point.totalReturn,
               changePercentage: point.totalReturnPercentage
-            })), ''));
+            })));
           }
         }
       } catch (error) {
         Logger.error(`❌ Failed to load portfolio history data for ${timeRange}: ` + (error instanceof Error ? error.message : String(error)));
       } finally {
         isLoadingRef.current = false;
+        setIsLoading(false);
       }
     };
 
     loadPortfolioHistoryData();
-  }, [timeRange, isHydrated, portfolioCache?.positions?.length, assetDefinitions.length, dispatch]); // REMOVED portfolioHistoryData.length dependency
+  }, [timeRange, isHydrated, portfolioCache?.positions?.length, assetDefinitions.length]);
 
   // Return data based on time range with proper structure for PortfolioHistoryView
   const transformedData = useMemo(() => {
@@ -325,11 +325,11 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
 
 /**
  * Hook to trigger recalculation when assets change
+ * (Simplified version without Redux dependencies)
  */
 export function usePortfolioHistoryRecalculation() {
   const { portfolioCache } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
-  const dispatch = useAppDispatch();
 
   const triggerRecalculation = async () => {
     if (!portfolioCache?.positions || !assetDefinitions) {
@@ -340,9 +340,6 @@ export function usePortfolioHistoryRecalculation() {
     Logger.infoService('🔄 Manually triggering portfolio history recalculation...');
     
     try {
-      // Set loading state
-      dispatch(setPortfolioIntradayStatus('loading'));
-      
       await PortfolioHistoryCalculationService.calculateAndSavePortfolioHistory({
         assetDefinitions,
         portfolioPositions: portfolioCache.positions
@@ -350,14 +347,8 @@ export function usePortfolioHistoryRecalculation() {
       
       Logger.infoService('✅ Portfolio history recalculation completed');
       
-      // Clear Redux cache to force reload from DB
-      dispatch(setPortfolioIntradayData([]));
-      dispatch(setPortfolioIntradayStatus('idle'));
-      
     } catch (error) {
       Logger.error('❌ Portfolio history recalculation failed: ' + JSON.stringify(error));
-      dispatch(setPortfolioIntradayError(error instanceof Error ? error.message : 'Calculation failed'));
-      dispatch(setPortfolioIntradayStatus('failed'));
       throw error;
     }
   };

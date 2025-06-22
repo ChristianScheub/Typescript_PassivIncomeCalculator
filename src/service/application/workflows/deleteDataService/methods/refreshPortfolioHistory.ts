@@ -4,7 +4,6 @@ import {
     calculateAssetFocusData,
     calculateFinancialSummary
 } from '@/store/slices/calculatedDataSlice';
-import { calculate30DayHistory } from '@/store/slices/portfolioHistorySlice';
 import { AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
 import Logger from "@/service/shared/logging/Logger/logger";
 
@@ -42,8 +41,8 @@ export async function refreshPortfolioHistory(): Promise<void> {
         Logger.infoService("Recalculating calculated data");
         await Promise.all([
             store.dispatch(calculateFinancialSummary()),
-            store.dispatch(calculateAssetFocusData()),
-            store.dispatch(calculate30DayHistory())
+            store.dispatch(calculateAssetFocusData())
+            // Note: 30-day history is now calculated directly from IndexedDB, no Redux action needed
         ]);
 
         Logger.infoService("Portfolio history refresh completed successfully - all data recalculated");

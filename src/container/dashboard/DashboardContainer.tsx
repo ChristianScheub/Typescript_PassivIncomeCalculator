@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import { calculate30DayHistory } from '@/store/slices/portfolioHistorySlice';
 import { loadDashboardSettingsFromStorage } from '@/store/slices/dashboardSettingsSlice';
 import { 
   selectFinancialSummary

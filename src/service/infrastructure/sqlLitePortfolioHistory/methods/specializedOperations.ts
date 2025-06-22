@@ -3,6 +3,7 @@ import {
   PortfolioIntradayPoint, 
   PortfolioHistoryPoint 
 } from '../interfaces/IPortfolioHistoryService';
+import Logger from '@/service/shared/logging/Logger/logger';
 
 const specializedOperations = {
   // Portfolio data specialized methods
@@ -11,7 +12,7 @@ const specializedOperations = {
       const allData = await dbOperations.getAll('portfolioIntradayData') as PortfolioIntradayPoint[];
       return allData.filter(point => point.date >= startDate && point.date <= endDate);
     } catch (error) {
-      console.error('Error getting portfolio intraday by date range:', error);
+      Logger.error('Error getting portfolio intraday by date range: ' + JSON.stringify(error));
       return [];
     }
   },
@@ -21,7 +22,7 @@ const specializedOperations = {
       const allData = await dbOperations.getAll('portfolioHistory') as PortfolioHistoryPoint[];
       return allData.filter(point => point.date >= startDate && point.date <= endDate);
     } catch (error) {
-      console.error('Error getting portfolio history by date range:', error);
+      Logger.error('Error getting portfolio history by date range: ' + JSON.stringify(error));
       return [];
     }
   },
@@ -31,7 +32,7 @@ const specializedOperations = {
     try {
       await dbOperations.bulkUpsert('portfolioIntradayData', data);
     } catch (error) {
-      console.error('Error bulk adding portfolio intraday data:', error);
+      Logger.error('Error bulk adding portfolio intraday data: ' + JSON.stringify(error));
       throw error;
     }
   },
@@ -40,7 +41,7 @@ const specializedOperations = {
     try {
       await dbOperations.bulkUpsert('portfolioIntradayData', data);
     } catch (error) {
-      console.error('Error bulk upserting portfolio intraday data:', error);
+      Logger.error('Error bulk upserting portfolio intraday data: ' + JSON.stringify(error));
       throw error;
     }
   },
@@ -49,7 +50,7 @@ const specializedOperations = {
     try {
       await dbOperations.bulkUpsert('portfolioHistory', data);
     } catch (error) {
-      console.error('Error bulk adding portfolio history:', error);
+      Logger.error('Error bulk adding portfolio history: ' + JSON.stringify(error));
       throw error;
     }
   },
@@ -58,7 +59,7 @@ const specializedOperations = {
     try {
       await dbOperations.bulkUpsert('portfolioHistory', data);
     } catch (error) {
-      console.error('Error bulk upserting portfolio history:', error);
+      Logger.error('Error bulk upserting portfolio history: ' + JSON.stringify(error));
       throw error;
     }
   },
@@ -80,9 +81,9 @@ const specializedOperations = {
         await dbOperations.remove('portfolioHistory', point.date);
       }
       
-      console.log(`Cleared ${oldPortfolioIntraday.length} old portfolio intraday points and ${oldPortfolioHistory.length} old portfolio history points`);
+      Logger.infoService(`Cleared ${oldPortfolioIntraday.length} old portfolio intraday points and ${oldPortfolioHistory.length} old portfolio history points`);
     } catch (error) {
-      console.error('Error clearing old data:', error);
+      Logger.error('Error clearing old data: ' + JSON.stringify(error));
       throw error;
     }
   },
@@ -106,7 +107,7 @@ const specializedOperations = {
         newestDate: allDates[allDates.length - 1] || ''
       };
     } catch (error) {
-      console.error('Error getting data size info:', error);
+      Logger.error('Error getting data size info: ' + JSON.stringify(error));
       return { totalEntries: 0, oldestDate: '', newestDate: '' };
     }
   }
