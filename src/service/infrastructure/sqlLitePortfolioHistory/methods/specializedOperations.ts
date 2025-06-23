@@ -99,7 +99,7 @@ const specializedOperations = {
       const allDates = [
         ...allPortfolioIntraday.map(p => p.date),
         ...allPortfolioHistory.map(p => p.date)
-      ].filter(Boolean).sort();
+      ].filter(Boolean).sort((a, b) => a.localeCompare(b));
       
       return {
         totalEntries: portfolioIntradayCount + portfolioHistoryCount,

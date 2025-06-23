@@ -94,8 +94,8 @@ const AssetFocusDashboardContainer: React.FC = () => {
       return combined;
     }
     
-    // For longer timeframes (1M, 3M, 1Y, All), try the new system first
-    if ((assetFocus.timeRange === '1M' || assetFocus.timeRange === '3M' || assetFocus.timeRange === '6M' || assetFocus.timeRange === '1Y' || assetFocus.timeRange === 'All') && newSystemData.length > 0) {
+    // For longer timeframes (1M, 3M, 1Y, ALL), try the new system first
+    if ((assetFocus.timeRange === '1M' || assetFocus.timeRange === '3M' || assetFocus.timeRange === '6M' || assetFocus.timeRange === '1Y' || assetFocus.timeRange === 'ALL') && newSystemData.length > 0) {
       Logger.info(`Using new portfolio history system for ${assetFocus.timeRange}: ${newSystemData.length} points`);
       
       // Convert new system data to portfolio history format

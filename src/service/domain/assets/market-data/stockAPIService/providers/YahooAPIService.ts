@@ -217,7 +217,7 @@ export class YahooAPIService implements IStockAPIService {
         hasQuote: !!chart?.indicators?.quote?.[0]
       });
       
-      if (!chart || !chart.timestamp || !chart.indicators || !chart.indicators.quote || chart.timestamp.length === 0) {
+      if (!chart?.timestamp?.length || !chart?.indicators?.quote?.[0]) {
         Logger.warn(`No intraday data available for ${symbol}`);
         return {
           symbol,

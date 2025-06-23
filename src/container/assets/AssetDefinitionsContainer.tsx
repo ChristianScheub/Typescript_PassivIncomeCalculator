@@ -29,6 +29,23 @@ interface AssetDefinitionsContainerProps {
   onBack?: () => void;
 }
 
+// Type alias for asset types
+export type AssetTypeAlias = 'stock' | 'real_estate' | 'bond' | 'cash' | 'crypto' | 'other';
+
+// Robust error stringification utility
+function stringifyError(error: unknown): string {
+  if (!error) return 'Unknown error';
+  if (typeof error === 'string') return error;
+  if (error instanceof Error) {
+    return `${error.name}: ${error.message}\n${error.stack}`;
+  }
+  try {
+    return JSON.stringify(error);
+  } catch {
+    return String(error);
+  }
+}
+
 const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ onBack }) => {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -57,73 +74,52 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     fetchData();
   }, [dispatch]);
 
+  // Helper to add category assignments
+  const addCategoryAssignments = async (assignments: Omit<AssetCategoryAssignment, 'id' | 'createdAt' | 'updatedAt'>[], assetId: string) => {
+    if (assignments.length > 0 && assetId) {
+      const assignmentsWithAssetId = assignments.map(assignment => ({
+        ...assignment,
+        assetDefinitionId: assetId
+      }));
+      for (const assignment of assignmentsWithAssetId) {
+        await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetCategoryAssignment(assignment));
+      }
+    }
+  };
+
   const handleAddDefinition = async (data: CreateAssetDefinitionData, categoryAssignments: Omit<AssetCategoryAssignment, 'id' | 'createdAt' | 'updatedAt'>[]) => {
     try {
-      Logger.info('Adding new asset definition' + " - " + JSON.stringify(data));
-      
-      // Convert CreateAssetDefinitionData to the format expected by addAssetDefinition
+      Logger.info('Adding new asset definition' + ' - ' + JSON.stringify(data));
       const definitionData: Omit<AssetDefinition, 'id' | 'createdAt' | 'updatedAt'> = {
         ...data,
-        name: data.name || data.fullName || 'Unnamed Asset' // Ensure name is always a string
+        name: data.name || data.fullName || 'Unnamed Asset'
       };
-      
       const action = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetDefinition(definitionData));
       const newDefinition = addAssetDefinition.fulfilled.match(action) ? action.payload : null;
-      
-      // Add category assignments if any
-      if (categoryAssignments.length > 0 && newDefinition?.id) {
-        const assignmentsWithAssetId = categoryAssignments.map(assignment => ({
-          ...assignment,
-          assetDefinitionId: newDefinition.id
-        }));
-        
-        for (const assignment of assignmentsWithAssetId) {
-          await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetCategoryAssignment(assignment));
-        }
+      if (newDefinition?.id) {
+        await addCategoryAssignments(categoryAssignments, newDefinition.id);
       }
-      
       setIsAddingDefinition(false);
     } catch (error) {
-      Logger.error('Failed to add asset definition' + " - " + JSON.stringify(error as Error));
+      Logger.error('Failed to add asset definition - ' + stringifyError(error));
     }
   };
 
   const handleUpdateDefinition = async (data: Partial<AssetDefinition>, categoryAssignments: Omit<AssetCategoryAssignment, 'id' | 'createdAt' | 'updatedAt'>[]) => {
     if (!editingDefinition) return;
     try {
-      Logger.info('Updating asset definition' + " - " + JSON.stringify({ id: editingDefinition.id, data }));
-      // Merge the partial data with the existing definition to ensure all required fields are present
+      Logger.info('Updating asset definition' + ' - ' + JSON.stringify({ id: editingDefinition.id, data }));
       const updatedDefinition = { ...editingDefinition, ...data };
-      // Deep clean before update
       const cleanedDefinition = deepCleanObject(updatedDefinition);
-      const dividendStatus = cleanedDefinition.dividendInfo?.amount && cleanedDefinition.dividendInfo.amount > 0 ? 'pays dividends' : 'does not pay dividends';
-      Logger.info(`Updating asset definition - ${cleanedDefinition.name} (${dividendStatus})`);
+      const dividendStatus = cleanedDefinition.dividendInfo?.amount && cleanedDefinition.dividendInfo?.amount > 0 ? 'pays dividends' : 'does not pay dividends';
+      Logger.info(`Updating asset definition - ${cleanedDefinition?.name} (${dividendStatus})`);
       Logger.info('Updating asset definition - FINAL DATA: ' + JSON.stringify(cleanedDefinition));
       await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(cleanedDefinition));
-      // Update category assignments
-      // First delete existing assignments
       await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(deleteAssetCategoryAssignmentsByAssetId(editingDefinition.id));
-      // Then add new assignments
-      if (categoryAssignments.length > 0) {
-        const assignmentsWithAssetId = categoryAssignments.map(assignment => ({
-          ...assignment,
-          assetDefinitionId: editingDefinition.id
-        }));
-        for (const assignment of assignmentsWithAssetId) {
-          await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(addAssetCategoryAssignment(assignment));
-        }
-      }
+      await addCategoryAssignments(categoryAssignments, editingDefinition.id);
       setEditingDefinition(null);
     } catch (error) {
-      // Enhanced error logging (stringify all details)
-      const errorDetails = [
-        '[handleUpdateDefinition] Failed to update asset definition',
-        'error: ' + (error && error.toString ? error.toString() : String(error)),
-        'errorJSON: ' + (() => { try { return JSON.stringify(error); } catch { return 'unserializable'; } })(),
-        'errorStack: ' + (error && (error as any).stack ? (error as any).stack : 'n/a'),
-        'errorKeys: ' + (error && typeof error === 'object' ? Object.keys(error).join(',') : 'n/a'),
-      ].join(' | ');
-      Logger.error(errorDetails);
+      Logger.error('[handleUpdateDefinition] Failed to update asset definition: ' + stringifyError(error));
     }
   };
 
@@ -281,24 +277,16 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       ).unwrap();
       if (result) {
         Logger.info('Dividenden erfolgreich abgerufen und Asset aktualisiert: ' + JSON.stringify(result));
-        // Optional: Asset direkt updaten
         await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(result));
       }
     } catch (error) {
-      // Maximales Error-Logging für Diagnose
-      const errorDetails = [
-        '[handleFetchDividendsFromApi] Fehler beim Abrufen der Dividenden per API',
-        'error: ' + (error && error.toString ? error.toString() : String(error)),
-        'errorJSON: ' + (() => { try { return JSON.stringify(error); } catch { return 'unserializable'; } })(),
-        'errorStack: ' + (error && (error as any).stack ? (error as any).stack : 'n/a'),
-        'errorKeys: ' + (error && typeof error === 'object' ? Object.keys(error).join(',') : 'n/a'),
-      ].join(' | ');
-      Logger.error(errorDetails);
+      Logger.error('[handleFetchDividendsFromApi] Fehler beim Abrufen der Dividenden per API: ' + stringifyError(error));
     }
   };
 
-  const getAssetTypeIcon = (type: string) => {
-    switch (type as AssetType) {
+  // Asset type icon helper (must be in scope for JSX)
+  const getAssetTypeIcon = (type: AssetTypeAlias) => {
+    switch (type) {
       case 'stock':
         return <TrendingUp className="h-5 w-5 text-blue-600" />;
       case 'real_estate':
@@ -313,33 +301,26 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
     }
   };
 
-  // Sort asset definitions alphabetically by fullName
-  const sortedAssetDefinitions = [...assetDefinitions].sort((a, b) => 
-    a.fullName.localeCompare(b.fullName, 'de', { sensitivity: 'base' })
-  );
-
   return (
     <AssetDefinitionsView
-      assetDefinitions={sortedAssetDefinitions}
+      assetDefinitions={assetDefinitions}
       status={status}
       isAddingDefinition={isAddingDefinition}
+      onSetIsAddingDefinition={setIsAddingDefinition}
       editingDefinition={editingDefinition}
+      onSetEditingDefinition={setEditingDefinition}
       isUpdatingPrices={isUpdatingPrices}
       isUpdatingHistoricalData={isUpdatingHistoricalData}
-      isApiEnabled={isApiEnabled}
-      getAssetTypeIcon={getAssetTypeIcon}
+      onBack={onBack}
       onAddDefinition={(data) => handleAddDefinition(data, [])}
       onUpdateDefinition={(data) => handleUpdateDefinition(data, [])}
       onDeleteDefinition={handleDeleteDefinition}
-      onSetIsAddingDefinition={setIsAddingDefinition}
-      onSetEditingDefinition={setEditingDefinition}
       onUpdateStockPrices={handleUpdateStockPrices}
       onUpdateHistoricalData={handleUpdateHistoricalData}
-      onBack={onBack}
-      onAddDefinitionWithCategories={handleAddDefinition}
-      onUpdateDefinitionWithCategories={handleUpdateDefinition}
       onAddPriceEntry={handleAddPriceEntry}
       onFetchDividendsFromApi={handleFetchDividendsFromApi}
+      isApiEnabled={isApiEnabled}
+      getAssetTypeIcon={(type) => getAssetTypeIcon(type as AssetTypeAlias)}
     />
   );
 };

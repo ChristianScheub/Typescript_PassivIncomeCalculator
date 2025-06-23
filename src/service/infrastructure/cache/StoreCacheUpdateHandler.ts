@@ -8,7 +8,7 @@ import type { AppDispatch } from '@/store';
  * Store-based cache update handler that integrates with Redux store
  */
 export class StoreCacheUpdateHandler implements CacheUpdateHandler {
-  constructor(private dispatch: AppDispatch) {}
+  constructor(private readonly dispatch: AppDispatch) {}
 
   updateAssetCache(assetId: string, cachedDividends: CachedDividends): void {
     this.dispatch(updateAssetCache({

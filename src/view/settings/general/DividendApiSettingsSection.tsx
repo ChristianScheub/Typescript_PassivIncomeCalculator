@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store';
 import { setDividendApiEnabled, setDividendApiProvider, setDividendApiKey, DividendApiProvider } from '@/store/slices/dividendApiConfigSlice';
-import { Card, CardHeader, CardTitle, CardContent } from '@/ui/common/Card';
 import { CollapsibleSection } from '@/ui/common/CollapsibleSection';
 import { Toggle } from '@/ui/common/Toggle';
 import { Button } from '@/ui/common/Button';
-import { ButtonGroup } from '@/ui/common/ButtonGroup';
 import { Key } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 

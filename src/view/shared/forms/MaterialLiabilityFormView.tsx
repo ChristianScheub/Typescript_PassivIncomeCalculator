@@ -67,10 +67,6 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
 
-  // Helper function to safely cast watch values
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const watchValue = (field: string) => watch(field) as string | number | boolean | undefined;
-
   const liabilityTypeOptions = getLiabilityTypeOptions(t);
   const paymentFrequencyOptions = getPaymentFrequencyOptions(t);
 
@@ -89,7 +85,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             required
             error={errors.name?.message}
             value={watch('name')}
-            onChange={(value) => setValue('name', value)}
+            onChange={(value) => setValue('name', value as string)}
             placeholder={t('liabilities.form.enterLiabilityName')}
           />
 
@@ -101,7 +97,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             options={liabilityTypeOptions}
             error={errors.type?.message}
             value={watch('type')}
-            onChange={(value) => setValue('type', value)}
+            onChange={(value) => setValue('type', value as LiabilityType)}
             placeholder={t('liabilities.form.selectType')}
           />
 
@@ -112,7 +108,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             required
             error={errors.initialBalance?.message}
             value={watch('initialBalance')}
-            onChange={(value) => setValue('initialBalance', value)}
+            onChange={(value) => setValue('initialBalance', Number(value))}
             placeholder="0"
             step={0.01}
             min={0}
@@ -125,7 +121,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             required
             error={errors.currentBalance?.message}
             value={watch('currentBalance')}
-            onChange={(value) => setValue('currentBalance', value)}
+            onChange={(value) => setValue('currentBalance', Number(value))}
             placeholder="0"
             step={0.01}
             min={0}
@@ -138,7 +134,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             required
             error={errors.interestRate?.message}
             value={watch('interestRate')}
-            onChange={(value) => setValue('interestRate', value)}
+            onChange={(value) => setValue('interestRate', Number(value))}
             placeholder="0"
             step={0.01}
             min={0}
@@ -152,7 +148,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             options={paymentFrequencyOptions}
             error={errors.paymentSchedule?.frequency?.message}
             value={watch('paymentSchedule.frequency')}
-            onChange={(value) => setValue('paymentSchedule.frequency', value)}
+            onChange={(value) => setValue('paymentSchedule.frequency', value as PaymentFrequency)}
             placeholder={t('liabilities.form.selectFrequency')}
           />
 
@@ -163,7 +159,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             required
             error={errors.paymentSchedule?.amount?.message}
             value={watch('paymentSchedule.amount')}
-            onChange={(value) => setValue('paymentSchedule.amount', value)}
+            onChange={(value) => setValue('paymentSchedule.amount', Number(value))}
             placeholder="0"
             step={0.01}
             min={0}
@@ -176,7 +172,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             required
             error={errors.startDate?.message}
             value={watch('startDate')}
-            onChange={(value) => setValue('startDate', value)}
+            onChange={(value) => setValue('startDate', value as string)}
           />
         </FormGrid>
       </RequiredSection>

@@ -47,7 +47,7 @@ const assetCalculatorService: IAssetCalculatorService = {
     Logger.cache(`Cache miss: falling back to individual calculations for ${assets.length} assets`);
     // Priority 2: Individual calculations with cache-aware approach
     // Use the cache-aware function that checks and can potentially extend cache
-    let assetsNeedingCacheUpdate: Array<{asset: Asset, cacheData: CacheUpdateData}> = [];
+    const assetsNeedingCacheUpdate: Array<{asset: Asset, cacheData: CacheUpdateData}> = [];
     
     const total = assets.reduce((sum, asset) => {
       const result = calculateAssetMonthlyIncomeWithCache(asset);

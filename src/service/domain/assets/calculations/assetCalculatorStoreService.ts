@@ -10,7 +10,7 @@ import type { AppDispatch } from "@/store";
  * This service should be used when you want automatic cache extension after calculations
  */
 export class AssetCalculationStoreService {
-  constructor(private dispatch: AppDispatch) {}
+  constructor(private readonly dispatch: AppDispatch) {}
 
   /**
    * Calculate asset monthly income with automatic cache updates

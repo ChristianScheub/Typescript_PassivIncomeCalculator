@@ -32,10 +32,10 @@ export const dbOperations = {
       // eslint-disable-next-line no-console
       console.error('[DB UPDATE ERROR]', {
         error,
-        errorString: error && error.toString ? error.toString() : undefined,
+        errorString: error?.toString ? error.toString() : undefined,
         errorJSON: (() => { try { return JSON.stringify(error); } catch { return undefined; } })(),
-        errorStack: error && (error as any).stack,
-        errorKeys: error && typeof error === 'object' ? Object.keys(error) : undefined,
+        errorStack: (error as any)?.stack,
+        errorKeys: (typeof error === 'object' && error !== null) ? Object.keys(error) : undefined,
         item,
         itemKeys: Object.keys(item),
         storeName

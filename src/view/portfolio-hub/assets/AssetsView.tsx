@@ -14,14 +14,14 @@ import { AssetDetailView } from "./AssetDetailView";
 import TabSelector from "../../../ui/navigation/TabSelector";
 import { HeaderButtonGroup } from "../../../ui/common/HeaderButtonGroup";
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
-import { Plus } from "lucide-react";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
 import formatService from "@service/infrastructure/formatService";
 import { 
   TrendingUp, 
   Settings,
   Tag,
-  BarChart3
+  BarChart3,
+  Plus
 } from "lucide-react";
 import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { EmptyStateView } from "./EmptyStateAssetView";
@@ -100,7 +100,7 @@ const HeaderButtons: React.FC<{
     id: 'categories',
     icon: Tag,
     label: t("categories.management"),
-    onClick: onNavigateToCategories,
+    onClick: onNavigateToCategories ?? (() => {}),
     tooltip: t("categories.management")
   };
 

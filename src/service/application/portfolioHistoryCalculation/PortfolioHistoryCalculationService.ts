@@ -226,7 +226,7 @@ export class PortfolioHistoryCalculationService {
     // Calculate portfolio value for each date
     const portfolioHistoryData: PortfolioHistoryPoint[] = [];
     
-    Array.from(allDates).sort().forEach(date => {
+    Array.from(allDates).sort((a, b) => a.localeCompare(b)).forEach(date => {
       let portfolioValue = 0;
       let totalInvested = 0;
       let assetsWithPrices = 0;

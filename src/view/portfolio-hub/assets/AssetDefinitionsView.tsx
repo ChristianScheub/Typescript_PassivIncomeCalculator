@@ -5,8 +5,7 @@ import { AssetDefinition } from "../../../types/domains/assets";
 import { AssetDefinitionForm } from "../../shared/forms/AssetDefinitionForm";
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
-import { Plus } from "lucide-react";
-import { Wallet, RefreshCw, History } from "lucide-react";
+import { Plus,Wallet, RefreshCw, History } from "lucide-react";
 import { IconButton } from "../../../ui/common";
 import { Tooltip } from "@mui/material";
 import { formatService } from "../../../service";
@@ -16,11 +15,6 @@ import { AddPriceEntryDialog, PriceEntry } from "../../../ui/dialog/AddPriceEntr
 import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { CreateAssetDefinitionData } from '@/types/domains/assets';
 
-/**
- * Type for creating new asset definitions, omits metadata fields like id, createdAt, updatedAt.
- * The name field is optional as it's derived from fullName in the adapter function.
- */
-// type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
 type CreateCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
 
 interface AssetDefinitionsViewProps {
