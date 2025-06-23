@@ -9,11 +9,12 @@ export interface AssetWithValue {
   totalInvestment: number;
   dayChange: number;
   dayChangePercent: number;
-  assetDefinition: AssetDefinition;
+  assetDefinitionId: string;
 }
 
 interface AssetPositionsListProps {
   assetsWithValues: AssetWithValue[];
+  assetDefinitions: AssetDefinition[];
   onAssetClick?: (asset: Asset, assetDefinition: AssetDefinition) => void;
   title?: string;
   emptyMessage?: string;
@@ -25,6 +26,7 @@ interface AssetPositionsListProps {
 
 export const AssetPositionsList: React.FC<AssetPositionsListProps> = ({
   assetsWithValues,
+  assetDefinitions = [],
   onAssetClick,
   title,
   emptyMessage,
@@ -42,8 +44,9 @@ export const AssetPositionsList: React.FC<AssetPositionsListProps> = ({
   const gridClass = "grid-cols-4";
 
   const handleAssetClick = (assetWithValue: AssetWithValue) => {
-    if (onAssetClick) {
-      onAssetClick(assetWithValue.asset, assetWithValue.assetDefinition);
+    const assetDefinition = assetDefinitions.find(def => def.id === assetWithValue.assetDefinitionId);
+    if (onAssetClick && assetDefinition) {
+      onAssetClick(assetWithValue.asset, assetDefinition);
     }
   };
 
@@ -71,7 +74,9 @@ export const AssetPositionsList: React.FC<AssetPositionsListProps> = ({
 
           {/* Assets Rows */}
           {assetsWithValues.map((assetWithValue, index) => {
-            const { asset, assetDefinition, currentValue, dayChange, dayChangePercent } = assetWithValue;
+            const { asset, assetDefinitionId, currentValue, dayChange, dayChangePercent } = assetWithValue;
+            const assetDefinition = assetDefinitions.find(def => def.id === assetDefinitionId);
+            if (!assetDefinition) return null;
             const quantity = asset.purchaseQuantity || 0;
             
             return (

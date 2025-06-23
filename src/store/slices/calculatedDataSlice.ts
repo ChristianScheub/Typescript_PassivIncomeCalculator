@@ -193,23 +193,31 @@ export const calculateFinancialSummary = createAsyncThunk(
     const { items: liabilities } = state.liabilities || { items: [] };
     const { items: expenses } = state.expenses || { items: [] };
     const { items: income } = state.income || { items: [] };
-    
-    const inputData = { assets, assetDefinitions, liabilities, expenses, income };
+
+    // Only use minimal references for inputHash
+    const inputData = {
+      assetDefinitionIds: assetDefinitions.map((a: any) => a.id),
+      assetIds: assets.map((a: any) => a.id),
+      liabilityIds: liabilities.map((l: any) => l.id),
+      expenseIds: expenses.map((e: any) => e.id),
+      incomeIds: income.map((i: any) => i.id),
+      // Optionally, add other primitive fields that affect calculation (e.g. lastUpdated timestamps)
+    };
     const inputHash = createInputHash(inputData);
-    
+
     // Check if we have valid cached data
     const existingCache = state.calculatedData.financialSummary;
     const isValid = existingCache && 
       existingCache.inputHash === inputHash &&
       isCacheValid(existingCache.lastCalculated, state.calculatedData.cacheValidityDuration);
-    
+
     if (isValid) {
       Logger.cache(`Financial summary cache hit`);
       return existingCache;
     }
-    
+
     Logger.cache(`Calculating financial summary`);
-    
+
     const result = analyticsService.calculateFinancialSummary(
       assets, 
       liabilities, 
@@ -217,7 +225,7 @@ export const calculateFinancialSummary = createAsyncThunk(
       income, 
       assetDefinitions
     );
-    
+
     return {
       ...result,
       lastCalculated: new Date().toISOString(),

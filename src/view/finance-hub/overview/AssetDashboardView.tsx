@@ -11,6 +11,7 @@ import { AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
 import PortfolioHistoryCard from './PortfolioHistoryCard';
+import { useSelector } from 'react-redux';
 
 interface PortfolioSummary {
   totalValue: number;
@@ -54,6 +55,7 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
   isIntradayView
 }) => {
   const { t } = useTranslation();
+  const assetDefinitions = useSelector((state: any) => state.assetDefinitions.items);
 
   const timeRangeOptions: { value: AssetFocusTimeRange; label: string }[] = [
     { value: '1D', label: '1T' },
@@ -144,6 +146,7 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
         {/* Assets List */}
         <AssetPositionsList
           assetsWithValues={assetsWithValues}
+          assetDefinitions={assetDefinitions}
           onAssetClick={onNavigateToAssetDetail}
         />
       </div>

@@ -7,7 +7,7 @@ export interface AssetWithValue {
   totalInvestment: number;
   dayChange: number;
   dayChangePercent: number;
-  assetDefinition: AssetDefinition;
+  assetDefinitionId: string;
 }
 
 export interface AssetFocusData {
@@ -41,12 +41,10 @@ class AssetFocusService {
           Logger.info(`Asset definition not found for asset ${asset.id}`);
           return;
         }
-
         const assetKey = assetDef.id;
         const existing = assetMap.get(assetKey);
         const quantity = asset.transactionType === 'sell' ? -(asset.purchaseQuantity || 0) : (asset.purchaseQuantity || 0);
         const investment = asset.transactionType === 'sell' ? -asset.value : asset.value;
-
         if (existing) {
           existing.asset.purchaseQuantity = (existing.asset.purchaseQuantity || 0) + quantity;
           existing.totalInvestment += investment;
@@ -60,7 +58,7 @@ class AssetFocusService {
             totalInvestment: investment,
             dayChange: 0,
             dayChangePercent: 0,
-            assetDefinition: assetDef
+            assetDefinitionId: assetDef.id
           });
         }
       });
@@ -68,8 +66,10 @@ class AssetFocusService {
       // Calculate current values and day changes
       const result: AssetWithValue[] = [];
       assetMap.forEach((assetWithValue) => {
-        const { asset, assetDefinition } = assetWithValue;
-        
+        const { asset, assetDefinitionId } = assetWithValue;
+        const assetDefinition = assetDefinitions.find(def => def.id === assetDefinitionId);
+        if (!assetDefinition) return;
+
         const quantity = asset.purchaseQuantity || 0;
         if (quantity <= 0) return; // Skip sold assets
 
