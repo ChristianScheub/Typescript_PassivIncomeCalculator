@@ -46,6 +46,7 @@ interface SettingsViewProps {
   clearIncomeStatus: ClearStatus;
   clearAllDataStatus: ClearStatus;
   clearReduxCacheStatus: ClearStatus;
+  clearDividendHistoryStatus: ClearStatus;
   isApiEnabled: boolean;
   isDividendApiEnabled: boolean;
   dashboardMode: DashboardMode;
@@ -86,6 +87,8 @@ interface SettingsViewProps {
   onDiviProviderChange: (provider: string) => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
   getLogLevelColor: (level: string) => string;
+  // Fix: Add missing prop for dividend history clear
+  onClearDividendHistory: () => void;
 }
 
 const SettingsView: React.FC<SettingsViewProps> = ({
@@ -108,6 +111,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   clearExpensesStatus,
   clearIncomeStatus,
   clearReduxCacheStatus,
+  clearDividendHistoryStatus,
   isApiEnabled,
   dashboardMode,
   onApiToggle,
@@ -141,7 +145,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   confirmDialog,
   onCloseConfirmDialog,
   isDividendApiEnabled,
-  onDividendApiToggle
+  onDividendApiToggle,
+  // Fix: Add missing prop for dividend history clear
+  onClearDividendHistory
 }) => {
   const { t } = useTranslation();
   const [showApiKey, setShowApiKey] = useState(false);
@@ -447,7 +453,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 descKey="settings.clearAssetDefinitionsDesc"
                 t={t}
               />
-              
               <ClearButton
                 status={clearPriceHistoryStatus}
                 onClick={onClearPriceHistory}
@@ -455,12 +460,20 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 descKey="settings.clearPriceHistoryDesc"
                 t={t}
               />
-
+              {/* Transaktionen löschen */}
               <ClearButton
                 status={clearAssetTransactionsStatus}
                 onClick={onClearAssetTransactions}
                 titleKey="settings.clearAssetTransactions"
                 descKey="settings.clearAssetTransactionsDesc"
+                t={t}
+              />
+              {/* Dividendenverlauf löschen */}
+              <ClearButton
+                status={clearDividendHistoryStatus}
+                onClick={onClearDividendHistory}
+                titleKey="settings.clearDividendHistory"
+                descKey="settings.clearDividendHistoryDesc"
                 t={t}
               />
             </div>

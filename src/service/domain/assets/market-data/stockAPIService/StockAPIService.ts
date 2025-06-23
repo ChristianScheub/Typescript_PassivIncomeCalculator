@@ -10,8 +10,8 @@ export interface IStockAPIServiceManager {
    * Create or update the Stock API Gateway with current configuration
    */
   createStockAPIService: (
-    selectedProvider?: StockAPIProvider, 
-    apiKeys?: { [K in StockAPIProvider]?: string }
+    selectedProvider: StockAPIProvider, 
+    apiKeys: { [K in StockAPIProvider]?: string }
   ) => IStockAPIService;
 
   /**
@@ -22,7 +22,7 @@ export interface IStockAPIServiceManager {
   /**
    * Get available API providers with their configuration status
    */
-  getAvailableProviders: () => Array<{
+  getAvailableProviders: (apiKeys: { [K in StockAPIProvider]?: string }) => Array<{
     id: StockAPIProvider;
     name: string;
     description: string;

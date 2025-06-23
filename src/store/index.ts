@@ -254,6 +254,9 @@ store.subscribe = (listener) => {
   });
 };
 
+// Helper to get the store instance for use outside React
+export const getStore = () => store;
+
 // Export types derived from the store
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

@@ -1,10 +1,13 @@
 import { AssetDefinition } from '@/types/domains/assets';
 import Logger from '@/service/shared/logging/Logger/logger';
-import stockAPIService from '../../../domain/assets/market-data/stockAPIService';
+import stockAPIService, {
+  createStockAPIServiceMethod
+} from '../../../domain/assets/market-data/stockAPIService';
 import { updateAssetDefinitionPrice, cleanupOldPriceHistory } from '@/utils/priceHistoryUtils';
 import { IStockAPIService } from '../../../domain/assets/market-data/stockAPIService/interfaces/IStockAPIService';
 import { StockHistoryEntry } from '@/types/domains/assets/market-data';
 import { TimeRangePeriod } from '@/types/shared/time';
+import { getStore } from '@/store';
 
 /**
  * Helper class to update stock prices in batch
@@ -32,7 +35,10 @@ export class StockPriceUpdater {
     Logger.infoService(`Updating prices for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`);
     
     try {
-      const stockAPI = stockAPIService.createStockAPIService();
+      // Get Redux state for provider/apiKeys
+      const store = getStore();
+      const apiConfig = store.getState().apiConfig;
+      const stockAPI = createStockAPIServiceMethod(apiConfig.selectedProvider, apiConfig.apiKeys);
       const updatedDefinitions: AssetDefinition[] = [];
 
       for (const definition of stockDefinitionsToUpdate) {
@@ -97,7 +103,10 @@ export class StockPriceUpdater {
     Logger.infoService(`Fetching 30-day historical data for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`);
     
     try {
-      const stockAPI = stockAPIService.createStockAPIService();
+      // Get Redux state for provider/apiKeys
+      const store = getStore();
+      const apiConfig = store.getState().apiConfig;
+      const stockAPI = createStockAPIServiceMethod(apiConfig.selectedProvider, apiConfig.apiKeys);
       const updatedDefinitions: AssetDefinition[] = [];
 
       for (const definition of stockDefinitionsToUpdate) {
@@ -153,10 +162,7 @@ export class StockPriceUpdater {
    * @param period Time period for historical data (e.g., "1d", "1mo", "1y", etc.)
    * @returns Array of updated asset definitions with historical data
    */
-  static async updateStockHistoricalDataWithPeriod(
-    definitions: AssetDefinition[], 
-    period: TimeRangePeriod
-  ): Promise<AssetDefinition[]> {
+  static async updateStockHistoricalDataWithPeriod(definitions: AssetDefinition[], period: TimeRangePeriod): Promise<AssetDefinition[]> {
     const stockDefinitionsToUpdate = definitions.filter(definition => 
       definition.type === 'stock' && definition.ticker
     );
@@ -169,11 +175,10 @@ export class StockPriceUpdater {
     Logger.infoService(`Updating historical data (${period}) for ${stockDefinitionsToUpdate.length} stock definitions`);
     
     try {
-      const stockAPI = stockAPIService.createStockAPIService();
-      if (!stockAPI) {
-        throw new Error('Stock API service not available. Please check your API configuration in Settings.');
-      }
-
+      // Get Redux state for provider/apiKeys
+      const store = getStore();
+      const apiConfig = store.getState().apiConfig;
+      const stockAPI = createStockAPIServiceMethod(apiConfig.selectedProvider, apiConfig.apiKeys);
       const updatedDefinitions: AssetDefinition[] = [];
 
       for (const definition of stockDefinitionsToUpdate) {

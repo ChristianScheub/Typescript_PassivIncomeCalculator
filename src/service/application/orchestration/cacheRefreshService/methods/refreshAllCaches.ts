@@ -110,6 +110,24 @@ export async function refreshAllCaches(): Promise<void> {
         await refreshPortfolioHistory();
 
         Logger.infoService("COMPLETE cache refresh completed successfully - ALL data refreshed from SQL database");
+
+        // Step 10: Trigger portfolio intraday aggregation with latest data
+        const refreshedState = store.getState();
+        const portfolioPositions = refreshedState.transactions?.portfolioCache?.positions || [];
+        const portfolioCacheId = refreshedState.transactions?.portfolioCache?.id || 'default';
+        const assetDefinitionsForIntraday = refreshedState.assetDefinitions?.items || [];
+        if (portfolioPositions.length > 0 && assetDefinitionsForIntraday.length > 0) {
+            await store.dispatch(
+                require('@/store/slices/portfolioIntradaySlice').calculatePortfolioIntradayDataDirect({
+                    portfolioPositions,
+                    portfolioCacheId,
+                    assetDefinitions: assetDefinitionsForIntraday
+                })
+            );
+            Logger.infoService('Triggered portfolio intraday aggregation after full cache refresh');
+        } else {
+            Logger.warn('No portfolio positions or asset definitions found for intraday aggregation after cache refresh');
+        }
         
     } catch (error) {
         Logger.error("Failed to refresh ALL caches: " + JSON.stringify(error));

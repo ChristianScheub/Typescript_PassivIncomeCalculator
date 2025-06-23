@@ -162,6 +162,22 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         }
 
         Logger.info('Successfully updated stock prices for asset definitions');
+        // Trigger portfolio intraday aggregation after price update
+        const state = (dispatch as ThunkDispatch<RootState, unknown, AnyAction> & { getState?: () => RootState }).getState?.() ?? {};
+        const portfolioPositions = state.transactions?.portfolioCache?.positions || [];
+        const portfolioCacheId = state.transactions?.portfolioCache?.id || 'default';
+        if (portfolioPositions.length > 0) {
+          await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+            require('@/store/slices/portfolioIntradaySlice').calculatePortfolioIntradayDataDirect({
+              portfolioPositions,
+              portfolioCacheId,
+              assetDefinitions: assetDefinitions
+            })
+          );
+          Logger.info('Triggered portfolio intraday aggregation after price update');
+        } else {
+          Logger.warn('No portfolio positions found for intraday aggregation after price update');
+        }
       } else {
         Logger.info('No stock definitions were updated');
       }
@@ -265,8 +281,13 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         let resultToDispatch = { ...result };
         if (resultToDispatch.dividendInfo) {
           const { amount, lastDividendDate, paymentMonths } = resultToDispatch.dividendInfo;
+          // Typ-Umwandlung für Frequency, damit auch 'none' oder andere Werte abgefangen werden
+          const allowedFrequencies = ['monthly', 'quarterly', 'annually', 'custom'] as const;
+          const rawFrequency = resultToDispatch.dividendInfo.frequency;
           const frequency: 'monthly' | 'quarterly' | 'annually' | 'custom' =
-            resultToDispatch.dividendInfo.frequency ?? 'custom';
+            allowedFrequencies.includes(rawFrequency as any)
+              ? (rawFrequency as any)
+              : 'custom';
           resultToDispatch.dividendInfo = {
             amount,
             frequency,

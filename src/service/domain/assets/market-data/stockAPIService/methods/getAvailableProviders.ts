@@ -1,21 +1,17 @@
 import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
 
 /**
- * Get available API providers with their configuration status
+ * Get available API providers with their configuration status (Redux-driven)
  */
-export const getAvailableProvidersMethod = (): Array<{
+export const getAvailableProvidersMethod = (apiKeys: {
+  [K in StockAPIProvider]?: string;
+}): Array<{
   id: StockAPIProvider;
   name: string;
   description: string;
   isConfigured: boolean;
   isImplemented: boolean;
 }> => {
-  const apiKeys = {
-    [StockAPIProvider.FINNHUB]: localStorage.getItem('finnhub_api_key'),
-    [StockAPIProvider.YAHOO]: localStorage.getItem('yahoo_api_key'),
-    [StockAPIProvider.ALPHA_VANTAGE]: localStorage.getItem('alpha_vantage_api_key'),
-  };
-
   return [
     {
       id: StockAPIProvider.FINNHUB,
@@ -29,14 +25,14 @@ export const getAvailableProvidersMethod = (): Array<{
       name: 'Yahoo Finance',
       description: 'Financial data from Yahoo Finance API',
       isConfigured: true, // Yahoo Finance doesn't require an API key
-      isImplemented: true, // Now implemented with simplified interface
+      isImplemented: true,
     },
     {
       id: StockAPIProvider.ALPHA_VANTAGE,
       name: 'Alpha Vantage',
       description: 'Financial data from Alpha Vantage API',
       isConfigured: !!apiKeys[StockAPIProvider.ALPHA_VANTAGE],
-      isImplemented: false, // TODO: Set to true when implemented
+      isImplemented: true,
     },
   ];
 };

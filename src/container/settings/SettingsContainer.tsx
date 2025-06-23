@@ -52,6 +52,7 @@ const SettingsContainer: React.FC = () => {
   const [clearIncomeStatus, setClearIncomeStatus] = useState<ClearOperationStatus>("idle");
   const [clearAllDataStatus, setClearAllDataStatus] = useState<ClearOperationStatus>("idle");
   const [clearReduxCacheStatus, setClearReduxCacheStatus] = useState<ClearOperationStatus>("idle");
+  const [clearDividendHistoryStatus, setClearDividendHistoryStatus] = useState<ClearOperationStatus>("idle");
 
   // Confirmation Dialog State
   const [confirmDialog, setConfirmDialog] = useState<ConfirmationDialogState>({
@@ -588,6 +589,51 @@ const SettingsContainer: React.FC = () => {
     }
   };
 
+  // Handle clearing only dividend history
+  const handleClearDividendHistory = async () => {
+    try {
+      setClearDividendHistoryStatus("clearing");
+      Logger.info("Starte das Löschen des Dividendenverlaufs aller AssetDefinitions");
+      const assetDefs = await sqliteService.getAll("assetDefinitions");
+      let updatedCount = 0;
+      for (const def of assetDefs) {
+        let changed = false;
+        if (def.dividendHistory && def.dividendHistory.length > 0) {
+          def.dividendHistory = [];
+          changed = true;
+        }
+        if (def.dividendGrowthPast3Y !== undefined) {
+          def.dividendGrowthPast3Y = undefined;
+          changed = true;
+        }
+        if (def.dividendForecast3Y && def.dividendForecast3Y.length > 0) {
+          def.dividendForecast3Y = undefined;
+          changed = true;
+        }
+        if (changed && def.id) {
+          await sqliteService.update("assetDefinitions", def);
+          updatedCount++;
+        }
+      }
+      setClearDividendHistoryStatus("success");
+      Logger.info(`Dividendenverlauf bei ${updatedCount} Assets gelöscht.`);
+      dispatch(showSuccessSnackbar(t("settings.snackbar.dividendHistoryCleared") || "Dividendenverlauf gelöscht."));
+      setTimeout(() => setClearDividendHistoryStatus("idle"), 2000);
+    } catch (error) {
+      Logger.error("Fehler beim Löschen des Dividendenverlaufs: " + JSON.stringify(error));
+      setClearDividendHistoryStatus("idle");
+      dispatch(showErrorSnackbar(t("settings.snackbar.dividendHistoryClearError") || "Fehler beim Löschen des Dividendenverlaufs."));
+    }
+  };
+
+  const handleClearDividendHistoryWithConfirm = () => {
+    showConfirmDialog(
+      t("settings.clearDividendHistoryTitle"),
+      t("settings.clearDividendHistoryConfirm"),
+      handleClearDividendHistory
+    );
+  };
+
   return (
     <SettingsView
       exportStatus={exportStatus}
@@ -609,6 +655,7 @@ const SettingsContainer: React.FC = () => {
       clearIncomeStatus={clearIncomeStatus}
       clearAllDataStatus={clearAllDataStatus}
       clearReduxCacheStatus={clearReduxCacheStatus}
+      clearDividendHistoryStatus={clearDividendHistoryStatus}
       isApiEnabled={apiConfig.isEnabled}
       isDividendApiEnabled={apiConfig.isDividendApiEnabled}
       dashboardMode={dashboardSettings.mode}
@@ -639,6 +686,7 @@ const SettingsContainer: React.FC = () => {
       onDiviApiKeyChange={handleDiviApiKeyChange}
       onDiviApiKeyRemove={handleDiviApiKeyRemove}
       onDiviProviderChange={handleDiviProviderChange}
+      onClearDividendHistory={handleClearDividendHistoryWithConfirm}
       confirmDialog={confirmDialog}
       onCloseConfirmDialog={closeConfirmDialog}
       formatLogEntry={formatLogEntry}
