@@ -74,11 +74,6 @@ export class StockAPIGateway implements IStockAPIService {
     };
   }
 
-  // Delegate all IStockAPIService methods to the current provider
-  async getStockExchanges(symbol: string) {
-    return this.currentProvider.getStockExchanges(symbol);
-  }
-
   async getCurrentStockPrice(symbol: string) {
     return this.currentProvider.getCurrentStockPrice(symbol);
   }

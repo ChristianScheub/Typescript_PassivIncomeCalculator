@@ -1,5 +1,4 @@
 import { 
-  StockExchange,
   StockPrice,
   StockHistory
 } from '@/types/domains/assets/';
@@ -9,12 +8,6 @@ import {
  * Provides only essential stock data functionality
  */
 export interface IStockAPIService {
-  /**
-   * Get possible stock exchanges (suffixes) for a symbol
-   * @param symbol - Stock symbol (e.g., "AAPL")
-   * @returns Array of exchange information with suffixes
-   */
-  getStockExchanges: (symbol: string) => Promise<StockExchange[]>;
 
   /**
    * Get current stock price

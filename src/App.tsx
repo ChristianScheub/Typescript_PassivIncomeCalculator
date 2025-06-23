@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
+import { Snackbar } from "@mui/material";
 
 // Layouts
 import MobileLayout from './layouts/MobileLayout';
@@ -21,6 +22,7 @@ import { useAppInitialization } from './hooks/useAppInitialization';
 import { useAutoPortfolioHistoryUpdate } from './hooks/useAutoPortfolioHistoryUpdate';
 import { ErrorScreenAppStart } from '@/ui/appStart/appStartError';
 import { LoadingScreenAppStart } from '@/ui/appStart/appStartLoading';
+import GlobalSnackbar from './ui/components/GlobalSnackbar';
 
 // Main App Content with initialization check
 const AppContent = () => {
@@ -64,6 +66,7 @@ function App() {
       <AppProvider>
         <ThemeProvider>
           <AppContent />
+          <GlobalSnackbar /> 
         </ThemeProvider>
       </AppProvider>
     </Provider>

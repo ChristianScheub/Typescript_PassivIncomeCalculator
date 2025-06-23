@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Snackbar, Alert, IconButton, Button } from '@mui/material';
 import { X } from 'lucide-react';
@@ -13,17 +13,7 @@ const GlobalSnackbar: React.FC = () => {
   // Get the current message (first in queue)
   const currentMessage = messages[0];
 
-  useEffect(() => {
-    if (currentMessage?.autoHideDuration) {
-      const timer = setTimeout(() => {
-        handleClose();
-      }, currentMessage.autoHideDuration);
-
-      return () => clearTimeout(timer);
-    }
-  }, [currentMessage, handleClose]);
-
-  const handleClose = useCallback((_event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
+  const handleClose = React.useCallback((_event?: React.SyntheticEvent | Event, reason?: SnackbarCloseReason) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -37,6 +27,20 @@ const GlobalSnackbar: React.FC = () => {
       }
     }, 300); // Material-UI transition duration
   }, [dispatch, currentMessage]);
+
+  // Use a ref to always have the latest handleClose in useEffect
+  const handleCloseRef = React.useRef(handleClose);
+  handleCloseRef.current = handleClose;
+
+  React.useEffect(() => {
+    if (currentMessage?.autoHideDuration) {
+      const timer = setTimeout(() => {
+        handleCloseRef.current();
+      }, currentMessage.autoHideDuration);
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentMessage]);
 
   const handleActionClick = () => {
     if (currentMessage?.action?.onClick) {

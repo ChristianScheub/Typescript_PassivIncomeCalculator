@@ -221,14 +221,12 @@ export const importExportOperations = {
 
       Logger.infoService('Data import completed successfully');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      Logger.error(`Import failed: ${errorMessage}`);
-      
+      Logger.errorStack('Import error details', error as Error);
       if (error instanceof SyntaxError) {
         throw new Error('Invalid JSON file format. Please check your backup file.');
       }
       
-      throw error instanceof Error ? error : new Error(errorMessage);
+      throw error instanceof Error ? error : new Error();
     }
   }
 };

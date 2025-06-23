@@ -1,20 +1,11 @@
 import { IStockAPIService } from '../interfaces/IStockAPIService';
 import {
-  StockExchange,
   StockPrice,
   StockHistory,
   StockHistoryEntry
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { CapacitorHttp } from '@capacitor/core';
-
-// Yahoo API response interfaces
-interface YahooExchangeItem {
-  symbol: string;
-  exchange?: string;
-  market?: string;
-  currency?: string;
-}
 
 /**
  * Yahoo Finance API Service Provider (Capacitor + Typescript)
@@ -62,49 +53,6 @@ export class YahooAPIService implements IStockAPIService {
       return res.data.chart.result[0];
     } catch (error) {
       Logger.error(`Fehler beim Abrufen der Chart-Daten für ${symbol}: ${JSON.stringify(error)}`);
-      throw error;
-    }
-  }
-
-  async getStockExchanges(symbol: string): Promise<StockExchange[]> {
-    const url = `https://finance.yahoo.com/_finance_doubledown/api/resource/searchassist?searchTerm=${encodeURIComponent(symbol)}`;
-    Logger.infoAPI(`Getting stock exchanges from Yahoo Finance`, { url, symbol });
-
-    try {
-      const res = await CapacitorHttp.get({
-        url,
-        headers: {
-          'User-Agent': 'Mozilla/5.0',
-          'Accept': 'application/json',
-        },
-      });
-
-      Logger.infoAPI(`Received exchange data response for ${symbol}`, null, res.data);
-
-      if (!res.data.items) {
-        Logger.warn(`No exchange data found for ${symbol}`);
-        return [];
-      }
-
-      const exchanges: StockExchange[] = res.data.items
-        .filter((item: YahooExchangeItem) => item.symbol.toLowerCase().startsWith(symbol.toLowerCase()))
-        .map((item: YahooExchangeItem) => ({
-          code: item.symbol,
-          name: item.exchange ?? '',
-          country: item.market ?? '',
-          timezone: '',
-          // Additional API compatibility fields
-          symbol: item.symbol,
-          suffix: item.symbol.replace(symbol, ''),
-          exchangeName: item.exchange ?? '',
-          market: item.market ?? '',
-          currency: item.currency ?? '',
-        }));
-
-      Logger.infoService(`Found ${exchanges.length} exchanges for ${symbol}`);
-      return exchanges;
-    } catch (error) {
-      Logger.error(`Error fetching stock exchanges for ${symbol}: ${JSON.stringify(error)}`);
       throw error;
     }
   }

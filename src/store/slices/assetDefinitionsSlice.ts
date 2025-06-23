@@ -3,11 +3,10 @@ import { AssetDefinition } from '@/types/domains/assets/';
 import Logger from '@service/shared/logging/Logger/logger';
 import sqliteService from '@service/infrastructure/sqlLiteService';
 import { deepCleanObject } from '@/utils/deepCleanObject';
-import { RootState } from '../index';
-import { createDividendApiHandler } from '@/service/domain/assets/market-data/dividendAPIService';
 import { DividendHistoryEntry } from '@/types/domains/assets/dividends';
 import { parseDividendHistoryFromApiResult } from '@/utils/parseDividendHistoryFromApiResult';
 import type { DividendFrequency } from '@/types/shared/base/enums';
+import dividendApiService from '@/service/domain/assets/market-data/dividendAPIService';
 
 interface AssetDefinitionsState {
   items: AssetDefinition[];
@@ -151,24 +150,13 @@ export const deleteAssetDefinition = createAsyncThunk(
 
 export const fetchAndUpdateDividends = createAsyncThunk(
   'assetDefinitions/fetchAndUpdateDividends',
-  async (definition: AssetDefinition, { getState }) => {
+  async (definition: AssetDefinition) => {
     Logger.info('[fetchAndUpdateDividends] called for: ' + definition.fullName);
-    const state = getState() as RootState;
-    const provider = state.dividendApiConfig.selectedProvider;
-    Logger.info(`[fetchAndUpdateDividends] using provider: ${provider}`);
-    let handler;
-    try {
-      handler = createDividendApiHandler(provider);
-      Logger.info('[fetchAndUpdateDividends] handler created');
-    } catch (err) {
-      Logger.error('[fetchAndUpdateDividends] Error creating handler: ' + JSON.stringify(err));
-      throw err;
-    }
     if (!definition.ticker) throw new Error('Kein Ticker für Asset vorhanden');
     let result: any;
     try {
       Logger.info('[fetchAndUpdateDividends] about to call fetchDividends');
-      result = await handler.fetchDividends(definition.ticker, { interval: '1d', range: '2y' });
+      result = await dividendApiService.fetchDividends(definition.ticker, { interval: '1d', range: '2y' });
       Logger.info('[fetchAndUpdateDividends] fetchDividends finished');
     } catch (err) {
       Logger.error('[fetchAndUpdateDividends] Error in fetchDividends: ' + JSON.stringify(err));
@@ -187,14 +175,10 @@ export const fetchAndUpdateDividends = createAsyncThunk(
     if (dividendHistory.length > 1) {
       const months = dividendHistory.map(d => new Date(d.date).getMonth() + 1); // 1-based
       paymentMonths = Array.from(new Set(months)).sort((a, b) => a - b);
-      const intervals = dividendHistory.slice(1).map((d, i) =>
-        (new Date(d.date).getTime() - new Date(dividendHistory[i].date).getTime()) / (1000 * 60 * 60 * 24)
-      );
-      const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-      if (avgInterval < 40) frequency = 'monthly';
-      else if (avgInterval < 100) frequency = 'quarterly';
-      else if (avgInterval < 200) frequency = 'annually';
-      else frequency = 'custom';
+    }
+    // Frequency direkt aus dem API-Result übernehmen, falls vorhanden
+    if (dividendHistory.length > 0 && result.dividends?.[0]?.frequency) {
+      frequency = result.dividends[0].frequency;
     }
 
     // --- NEU: Dividend Growth & Forecast berechnen ---

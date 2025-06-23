@@ -22,9 +22,6 @@ import { createStockAPIService } from '@/service/stockAPIService';
 // Create service instance
 const stockAPI = createStockAPIService();
 
-// Get possible exchange suffixes for a symbol
-const exchanges = await stockAPI.getStockExchanges('AAPL');
-
 // Get current stock price
 const price = await stockAPI.getCurrentStockPrice('AAPL.US');
 
@@ -44,7 +41,6 @@ const history30 = await stockAPI.getHistory30Days('AAPL.US');
 - **Utility Functions**: API key management, symbol formatting, currency conversion
 
 ## Key Methods
-- `getStockExchanges(symbol)` - Get possible exchange assignments (suffixes) for a symbol
 - `getCurrentStockPrice(symbol)` - Get current stock price with change information
 - `getHistory(symbol, days)` - Get historical data for specified number of days
 - `getHistory30Days(symbol)` - Get 30 days of historical data (convenience method)
@@ -53,7 +49,6 @@ const history30 = await stockAPI.getHistory30Days('AAPL.US');
 ```mermaid
 classDiagram
     class StockAPIService {
-      +getStockExchanges(symbol)
       +getCurrentStockPrice(symbol)
       +getHistory(symbol, days)
       +getHistory30Days(symbol)
@@ -65,7 +60,6 @@ classDiagram
 flowchart TD
     A[getCurrentStockPrice] --> B[Finnhub API]
     C[getHistory] --> B
-    D[getStockExchanges] --> B
     E[getHistory30Days] --> C
 ```
 

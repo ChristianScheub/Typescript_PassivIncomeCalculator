@@ -1,6 +1,5 @@
 import { IStockAPIService } from '../interfaces/IStockAPIService';
 import { 
-  StockExchange,
   StockPrice,
   StockHistory
 } from '@/types/domains/assets/';
@@ -16,11 +15,6 @@ export class AlphaVantageAPIService implements IStockAPIService {
   constructor(apiKey: string) {
     this.apiKey = apiKey;
     Logger.info('Initialized AlphaVantageAPIService with simplified interface (placeholder)');
-  }
-
-  async getStockExchanges(symbol: string): Promise<StockExchange[]> {
-    Logger.info(`Alpha Vantage: Getting stock exchanges for ${symbol} (not implemented)`);
-    throw new Error('Alpha Vantage provider not yet implemented');
   }
 
   async getCurrentStockPrice(symbol: string): Promise<StockPrice> {

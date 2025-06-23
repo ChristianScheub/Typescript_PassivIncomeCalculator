@@ -127,14 +127,6 @@ export const calculateAssetMonthlyIncome = (asset: Asset): number => {
   Logger.infoService(
     `Final individual income for asset ${asset.name}: ${income}`
   );
-
-  // TODO: Cache extension should be handled by a higher-level service
-  // that has access to store dispatch. For now, just log that cache should be updated.
-  if (income === 0) {
-    Logger.cache(`Asset ${asset.name} has 0 income - this should be cached to avoid repeated calculations`);
-  } else {
-    Logger.cache(`Asset ${asset.name} calculated income ${income} - this should be cached for future use`);
-  }
   
   return income;
 };

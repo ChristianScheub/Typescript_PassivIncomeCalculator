@@ -14,6 +14,7 @@ import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '@/u
 import clsx from 'clsx';
 import { Toggle } from '@/ui/common/Toggle';
 import { DividendApiSettingsSection } from './DividendApiSettingsSection';
+import { StockApiSettingsSection } from './StockApiSettingsSection';
 
 interface ProviderInfo {
   name: string;
@@ -23,9 +24,7 @@ interface ProviderInfo {
   requiresApiKey: boolean;
 }
 
-interface ProviderInfoMap {
-  [key: string]: ProviderInfo;
-}
+type ProviderInfoMap = Record<StockAPIProvider, ProviderInfo>;
 
 interface SettingsViewProps {
   exportStatus: 'idle' | 'loading' | 'success' | 'error';
@@ -48,6 +47,7 @@ interface SettingsViewProps {
   clearAllDataStatus: ClearStatus;
   clearReduxCacheStatus: ClearStatus;
   isApiEnabled: boolean;
+  isDividendApiEnabled: boolean;
   dashboardMode: DashboardMode;
   confirmDialog: {
     isOpen: boolean;
@@ -57,6 +57,7 @@ interface SettingsViewProps {
   };
   onCloseConfirmDialog: () => void;
   onApiToggle: (enabled: boolean) => void;
+  onDividendApiToggle: (enabled: boolean) => void;
   onExportData: () => void;
   onImportData: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onToggleLogs: () => void;
@@ -77,6 +78,12 @@ interface SettingsViewProps {
   onClearExpenses: () => void;
   onClearIncome: () => void;
   onClearReduxCache: () => void;
+  // Dividend API
+  selectedDiviProvider: string;
+  dividendApiKey: { [provider: string]: string };
+  onDiviApiKeyChange: (provider: string, apiKey: string) => void;
+  onDiviApiKeyRemove: (provider: string) => void;
+  onDiviProviderChange: (provider: string) => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
   getLogLevelColor: (level: string) => string;
 }
@@ -124,25 +131,32 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onClearExpenses,
   onClearIncome,
   onClearReduxCache,
+  selectedDiviProvider,
+  dividendApiKey,
+  onDiviApiKeyChange,
+  onDiviApiKeyRemove,
+  onDiviProviderChange,
   formatLogEntry,
   getLogLevelColor,
   confirmDialog,
-  onCloseConfirmDialog
+  onCloseConfirmDialog,
+  isDividendApiEnabled,
+  onDividendApiToggle
 }) => {
   const { t } = useTranslation();
   const [showApiKey, setShowApiKey] = useState(false);
-  const [tempApiKeys, setTempApiKeys] = useState<{ [K in StockAPIProvider]?: string }>({
-    [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] || '',
-    [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] || '',
-    [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] || '',
+  const [tempApiKeys, setTempApiKeys] = useState<Record<StockAPIProvider, string>>({
+    [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? '',
+    [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] ?? '',
+    [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] ?? '',
   });
 
   // Update tempApiKeys when apiKeys prop changes
   useEffect(() => {
     setTempApiKeys({
-      [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] || '',
-      [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] || '',
-      [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] || '',
+      [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? '',
+      [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] ?? '',
+      [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] ?? '',
     });
   }, [apiKeys]);
 
@@ -301,76 +315,24 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           {/* API Key Configuration for Selected Provider */}
           {isApiEnabled && providerInfo[selectedProvider].requiresApiKey && (
             <div>
-              <h3 className="font-medium">
-                {t('settings.apiKeyFor', { provider: providerInfo[selectedProvider].name })}
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                {t('settings.getApiKeyFrom')}{' '}
-                <a 
-                  href={providerInfo[selectedProvider].website} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-blue-500 hover:text-blue-600 underline"
-                >
-                  {providerInfo[selectedProvider].name}
-                </a>
-                {' '}{t('settings.toEnableStockData')}
-              </p>
-              
-              <div className="space-y-3">
-                <div className="relative">
-                  <input
-                    type={showApiKey ? 'text' : 'password'}
-                    value={tempApiKeys[selectedProvider] || ''}
-                    onChange={(e) => setTempApiKeys(prev => ({
-                      ...prev,
-                      [selectedProvider]: e.target.value
-                    }))}
-                    placeholder={providerInfo[selectedProvider].keyPlaceholder}
-                    className="w-full px-3 py-2 pr-10 border rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                  >
-                    {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
-                </div>
-                
-                {apiKeyError && (
-                  <p className="text-sm text-red-500">{apiKeyError}</p>
-                )}
-                
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => onApiKeyChange(selectedProvider, tempApiKeys[selectedProvider] || '')}
-                    disabled={apiKeyStatus === 'saving' || !tempApiKeys[selectedProvider]?.trim()}
-                    className="flex items-center space-x-2"
-                  >
-                    <span>{apiKeyButtonText}</span>
-                  </Button>
-                  
-                  {apiKeys?.[selectedProvider] && (
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        onApiKeyRemove(selectedProvider);
-                        setTempApiKeys(prev => ({ ...prev, [selectedProvider]: '' }));
-                      }}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      {t('common.remove')}
-                    </Button>
-                  )}
-                </div>
-                
-                {apiKeys?.[selectedProvider] && (
-                  <p className="text-sm text-green-600 dark:text-green-400">
-                    {t('settings.apiKeyConfigured')}
-                  </p>
-                )}
-              </div>
+              <StockApiSettingsSection
+                selectedProvider={selectedProvider}
+                apiKeys={{
+                  [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? '',
+                  [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] ?? '',
+                  [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] ?? '',
+                }}
+                apiKeyStatus={apiKeyStatus}
+                apiKeyError={apiKeyError}
+                tempApiKeys={tempApiKeys}
+                setTempApiKeys={setTempApiKeys}
+                showApiKey={showApiKey}
+                setShowApiKey={setShowApiKey}
+                onApiKeyChange={onApiKeyChange}
+                onApiKeyRemove={onApiKeyRemove}
+                providerInfo={providerInfo}
+                apiKeyButtonText={apiKeyButtonText}
+              />
             </div>
           )}
           
@@ -379,39 +341,36 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
               {t('settings.stockMarketCurrencyDescription')}
             </p>
-            
-            {(() => {
-              return (
-                <ButtonGroup className="flex space-x-3">
-                  <Button
-                    onClick={() => onCurrencyChange('EUR')}
-                    variant={currency === 'EUR' ? 'default' : 'secondary'}
-                    size="sm"
-                  >
-                    {t('settings.eurAutoConverted')}
-                  </Button>
-                  <Button
-                    onClick={() => onCurrencyChange('USD')}
-                    variant={currency === 'USD' ? 'default' : 'secondary'}
-                    size="sm"
-                  >
-                    {t('settings.usdOriginal')}
-                  </Button>
-                </ButtonGroup>
-              );
-            })()}
-            
+            <div className="flex items-center space-x-4">
+              <Toggle
+                checked={currency === 'EUR'}
+                onChange={(checked) => onCurrencyChange(checked ? 'EUR' : 'USD')}
+                id="currency-toggle"
+                label={t('settings.currencyToggleLabel')}
+              />
+              <span className="text-sm">
+                {currency === 'EUR'
+                  ? t('settings.eurAutoConverted')
+                  : t('settings.usdOriginal')}
+              </span>
+            </div>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-              {t('settings.currentCurrency', {
-                currency,
-              })}
+              {t('settings.currentCurrency', { currency })}
             </p>
           </div>
         </div>
       </CollapsibleSection>
 
       {/* Dividend API Configuration */}
-      <DividendApiSettingsSection />
+      <DividendApiSettingsSection
+        enabled={isDividendApiEnabled}
+        selectedProvider={selectedDiviProvider || 'yahoo'}
+        apiKeys={dividendApiKey || {}}
+        onEnabledChange={onDividendApiToggle}
+        onProviderChange={onDiviProviderChange}
+        onApiKeyChange={onDiviApiKeyChange}
+        onApiKeyRemove={onDiviApiKeyRemove}
+      />
 
       {/* Data Management */}
       <CollapsibleSection

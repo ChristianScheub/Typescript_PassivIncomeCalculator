@@ -1,6 +1,5 @@
 import { IStockAPIService } from '../interfaces/IStockAPIService';
 import { 
-  StockExchange,
   StockPrice,
   StockHistory,
   StockHistoryEntry
@@ -21,16 +20,6 @@ interface FinnhubQuote {
   o: number; // Open price of the day
   pc: number; // Previous close price
   t: number; // Timestamp
-}
-
-interface FinnhubSymbolSearch {
-  count: number;
-  result: Array<{
-    description: string;
-    displaySymbol: string;
-    symbol: string;
-    type: string;
-  }>;
 }
 
 interface FinnhubCandle {
@@ -121,85 +110,6 @@ export class FinnhubAPIService implements IStockAPIService {
   private calculateMiddayPrice(high: number, low: number): number {
     // Use average of high and low as midday approximation
     return (high + low) / 2;
-  }
-
-  /**
-   * Get possible stock exchanges (suffixes) for a symbol
-   */
-  async getStockExchanges(symbol: string): Promise<StockExchange[]> {
-    try {
-      Logger.info(`Getting stock exchanges for symbol: ${symbol}`);
-      
-      // Search for the symbol to find available exchanges
-      const searchResult = await this.fetchFromAPI<FinnhubSymbolSearch>('/search', {
-        q: symbol
-      });
-
-      const exchanges: StockExchange[] = [];
-      
-      if (searchResult.result && searchResult.result.length > 0) {
-        // Filter results that match our symbol
-        const matchingResults = searchResult.result.filter(result => 
-          result.symbol.toUpperCase().includes(symbol.toUpperCase()) ||
-          result.displaySymbol.toUpperCase().includes(symbol.toUpperCase())
-        );
-
-        for (const result of matchingResults) {
-          // Extract exchange suffix from display symbol
-          const parts = result.displaySymbol.split('.');
-          const suffix = parts.length > 1 ? parts[parts.length - 1] : '';
-          
-          exchanges.push({
-            code: result.symbol,
-            name: this.getExchangeName(suffix),
-            country: this.getExchangeCountry(suffix),
-            timezone: '',
-            // API compatibility fields
-            symbol: result.symbol,
-            suffix: suffix,
-            exchangeName: this.getExchangeName(suffix),
-            market: result.type || 'Stock',
-            currency: this.getExchangeCurrency(suffix)
-          });
-        }
-      }
-
-      // Add common exchanges if none found
-      if (exchanges.length === 0) {
-        exchanges.push(
-          {
-            code: `${symbol}.US`,
-            name: 'NASDAQ/NYSE',
-            country: 'USA',
-            timezone: 'America/New_York',
-            // API compatibility fields
-            symbol: `${symbol}.US`,
-            suffix: 'US',
-            exchangeName: 'NASDAQ/NYSE',
-            market: 'Stock',
-            currency: 'USD'
-          },
-          {
-            code: `${symbol}.DE`,
-            name: 'XETRA',
-            country: 'Germany',
-            timezone: 'Europe/Berlin',
-            // API compatibility fields
-            symbol: `${symbol}.DE`,
-            suffix: 'DE',
-            exchangeName: 'XETRA',
-            market: 'Stock',
-            currency: 'EUR'
-          }
-        );
-      }
-
-      Logger.info(`Found ${exchanges.length} exchanges for ${symbol}`);
-      return exchanges;
-    } catch (error) {
-      Logger.error(`Failed to get stock exchanges for ${symbol}: ${error}`);
-      throw error;
-    }
   }
 
   /**

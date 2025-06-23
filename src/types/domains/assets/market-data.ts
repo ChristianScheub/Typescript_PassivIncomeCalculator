@@ -35,20 +35,6 @@ export interface StockInfo {
   needsApiKey?: boolean;
 }
 
-// Exchange and trading information
-export interface StockExchange {
-  code: string;
-  name: string;
-  country: string;
-  timezone: string;
-  // Additional fields for API compatibility
-  symbol?: string;
-  suffix?: string;
-  exchangeName?: string;
-  market?: string;
-  currency?: string;
-}
-
 export interface StockPrice {
   symbol: string;
   price: number;

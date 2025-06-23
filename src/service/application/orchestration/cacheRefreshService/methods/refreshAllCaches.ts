@@ -40,7 +40,6 @@ export async function refreshAllCaches(): Promise<void> {
     try {
         // Step 1: Clear all dividend caches
         Logger.infoService("Clearing dividend caches");
-        // TODO: Handle individual asset dividend cache invalidation if needed
         // Individual dividend caches are now managed per asset basis
 
         // Step 2: Clear portfolio cache

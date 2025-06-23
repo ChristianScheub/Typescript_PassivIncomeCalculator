@@ -29,7 +29,7 @@
       "december": "Dez"
     }
   },
-  
+
   "dashboard": {
     "monthlyBreakdown": "Monatliche Übersicht",
     "monthlyOverview": "Monatliche Übersicht",
@@ -58,7 +58,7 @@
     "last30Days": "Die letzten 30 Tage",
     "quickActions": "Schnellaktionen",
     "addIncome": "Einkommen hinzufügen",
-    "addExpense": "Ausgabe hinzufügen", 
+    "addExpense": "Ausgabe hinzufügen",
     "recordTransaction": "Transaktion erfassen",
     "payDebt": "Schuld bezahlen",
     "activeMilestones": "Aktive Meilensteine",
@@ -66,7 +66,7 @@
     "alertsRecommendations": "Hinweise & Empfehlungen",
     "passiveRatio": "Passive Quote",
     "expenseCoverage": "Ausgabendeckung",
-    "debtRatio": "Schuldenquote", 
+    "debtRatio": "Schuldenquote",
     "savingsRate": "Sparquote",
     "refreshing": "Cache wird aktualisiert...",
     "pullToRefresh": "Zum Aktualisieren ziehen",
@@ -93,7 +93,7 @@
       "addAssets": "Assets hinzufügen"
     }
   },
-  
+
   "alerts": {
     "cashflow": {
       "negative": {
@@ -188,7 +188,7 @@
       }
     }
   },
-  
+
   "navigation": {
     "home": "Start",
     "dashboard": "Dashboard",
@@ -202,7 +202,7 @@
     "analytics": "Analysen",
     "settings": "Einstellungen"
   },
-  
+
   "settings": {
     "dashboardSettings": "Dashboard Einstellungen",
     "dashboardMode": "Dashboard Modus",
@@ -256,7 +256,7 @@
     "enableDividendApi": "Dividenden-API aktivieren",
     "enableDividendApiDescription": "Aktivieren oder deaktivieren Sie die Integration der Dividenden-API",
     "selectDividendApiProvider": "Dividenden-API-Anbieter auswählen",
-    "recalculateDividendForecasts": "Dividendenprognosen neu berechnen",    
+    "recalculateDividendForecasts": "Dividendenprognosen neu berechnen",
     "clearData": "Daten löschen",
     "clearAllDataDesc": "Dies löscht alle Finanzdaten, einschließlich Vermögenswerte, Ausgaben, Verbindlichkeiten und Einstellungen wie API-Schlüssel und Wechselkurse.",
     "clearPartialData": "Finanzdaten löschen",
@@ -265,16 +265,20 @@
     "clearAllDataTitle": "Alle Daten löschen",
     "clearingData": "Daten werden gelöscht...",
     "dataCleared": "Daten gelöscht!",
-    "confirmClearPartialData": "Sind Sie sicher, dass Sie alle Finanzdaten löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "confirmClearDebts": "Sind Sie sicher, dass Sie alle Verbindlichkeiten löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "confirmClearAssets": "Sind Sie sicher, dass Sie alle Vermögenswerte löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "confirmClearExpenses": "Sind Sie sicher, dass Sie alle Ausgaben löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "confirmClearIncome": "Sind Sie sicher, dass Sie alle Einkommensquellen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "confirmClearAllData": "Sind Sie sicher, dass Sie ALLE Daten einschließlich API-Schlüssel löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "confirmClearPriceHistory": "Sind Sie sicher, dass Sie den gesamten Preisverlauf löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "confirmClearAssetDefinitions": "Sind Sie sicher, dass Sie alle Asset-Definitionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "confirmClearAssetTransactions": "Sind Sie sicher, dass Sie alle Asset-Transaktionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
-    "confirmClearAssetCategories": "Sind Sie sicher, dass Sie alle Asset-Kategorien löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearPriceHistoryTitle": "Preisverlauf löschen",
+    "clearPriceHistoryConfirm": "Sind Sie sicher, dass Sie den gesamten Preisverlauf löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearAssetTransactionsTitle": "Asset-Transaktionen löschen",
+    "clearAssetTransactionsConfirm": "Sind Sie sicher, dass Sie alle Asset-Transaktionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearDebtsTitle": "Schulden löschen",
+    "clearDebtsConfirm": "Sind Sie sicher, dass Sie alle Verbindlichkeiten löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearExpensesTitle": "Ausgaben löschen",
+    "clearExpensesConfirm": "Sind Sie sicher, dass Sie alle Ausgaben löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearIncomeTitle": "Einkommen löschen",
+    "clearIncomeConfirm": "Sind Sie sicher, dass Sie alle Einkommensquellen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearReduxCacheTitle": "Redux Cache löschen",
+    "clearReduxCacheConfirm": "Sind Sie sicher, dass Sie den gesamten Redux Cache löschen möchten? Dies kann nicht rückgängig gemacht werden.",
+    "clearAssetDefinitionsTitle": "Asset-Definitionen löschen",
+    "clearAssetDefinitionsConfirm": "Sind Sie sicher, dass Sie alle Asset-Definitionen löschen möchten? Dies kann nicht rückgängig gemacht werden.",
     "stockApiConfig": "Stock-API-Konfiguration",
     "enableStockApi": "Stock-API aktivieren",
     "enableStockApiDescription": "Aktivieren oder deaktivieren Sie die Integration der Stock-API",
@@ -300,7 +304,8 @@
     "saveApiKey": "API-Schlüssel speichern",
     "apiKeyConfigured": "✓ API-Schlüssel konfiguriert",
     "stockMarketCurrency": "Aktienmarktwährung",
-    "stockMarketCurrencyDescription": "Wählen Sie die Währung für die Anzeige von Aktienkursen. USD zeigt Originalpreise, EUR konvertiert USD-Preise mit aktuellen Wechselkursen in Euro.",
+    "stockMarketCurrencyDescription": "Wählen Sie die Währung für die Anzeige von Aktienkursen. Ist der Schalter aktiviert, werden USD-Preise automatisch mit aktuellen EZB-Wechselkursen in EUR umgerechnet. Deaktiviert zeigt Original-USD-Preise.",
+    "currencyToggleLabel": "EUR (umgerechnet) / USD (Original)",
     "eurAutoConverted": "EUR (automatisch umgerechnet)",
     "usdOriginal": "USD (Original)",
     "currentCurrency": "Aktuell: {{currency}}",
@@ -326,7 +331,7 @@
     "clearReduxCacheDesc": "Alle zwischengespeicherten Berechnungen und temporären Daten im Arbeitsspeicher zurücksetzen",
     "clearAllDataConfirm": "Sind Sie sicher, dass Sie ALLE Daten löschen möchten? Dies wird sämtliche Einstellungen und Daten unwiderruflich entfernen."
   },
-  
+
   "pages": {
     "addNewIncome": "Neues Einkommen hinzufügen",
     "addNewAsset": "Neuen Vermögenswert hinzufügen",
@@ -345,7 +350,7 @@
     "totalAssets": "Gesamtvermögen",
     "totalLiabilities": "Gesamtverbindlichkeiten"
   },
-  
+
   "forecast": {
     "title": "Finanzprognose",
     "projections": "Projektionen",
@@ -447,7 +452,7 @@
       }
     }
   },
-  
+
   "assetDefinitions": {
     "title": "Asset-Definitionen",
     "subtitle": "Verwalten Sie Ihre Asset-Stammdaten und Definitionen",
@@ -457,17 +462,17 @@
     "noDefinitionsDesc": "Erstellen Sie Asset-Definitionen, um Transaktionen zu vereinfachen",
     "createDefinitionsFirst": "Erstellen Sie zuerst Asset-Definitionen, bevor Sie Transaktionen hinzufügen können"
   },
-  
+
   "assetCategories": {
     "management": "Asset-Kategorien",
     "manageCategories": "Asset-Kategorien verwalten",
     "manageCategoriesDescription": "Erstellen und verwalten Sie benutzerdefinierte Kategorien zur Organisation Ihrer Assets",
     "openManager": "Manager öffnen"
   },
-  
+
   "categories": {
     "income": "Einkommen",
-    "expenses": "Ausgaben", 
+    "expenses": "Ausgaben",
     "planning": "Planung",
     "title": "Asset-Kategorien",
     "addCategory": "Kategorie hinzufügen",
@@ -489,7 +494,7 @@
     "deleteConfirmWithOptions": "Diese Kategorie hat {{count}} Optionen. Wirklich löschen?",
     "assetCategories": "Asset-Kategorien",
     "management": "Asset-Kategorien",
-    "manageCategories": "Asset-Kategorien verwalten", 
+    "manageCategories": "Asset-Kategorien verwalten",
     "manageCategoriesDescription": "Erstellen und verwalten Sie benutzerdefinierte Kategorien zur Organisation Ihrer Assets",
     "openManager": "Manager öffnen",
     "addAssignment": "Zuordnung hinzufügen",
@@ -501,7 +506,7 @@
     "optionsForCategory": "Optionen für diese Kategorie",
     "previewOptions": "Optionen-Vorschau"
   },
-  
+
   "assets": {
     "title": "Assets",
     "type": "Typ",
@@ -679,7 +684,7 @@
   },
   "frequency": {
     "monthly": "Monatlich",
-    "quarterly": "Quartalsweise", 
+    "quarterly": "Quartalsweise",
     "annually": "Jährlich",
     "custom": "Individuell"
   },
@@ -715,7 +720,7 @@
     "income": "Einkommen",
     "expenses": "Ausgaben",
     "asset": "Asset",
-    "position": "Position", 
+    "position": "Position",
     "value": "Wert",
     "change": "Änderung"
   },
@@ -755,81 +760,81 @@
       "other": "Sonstiges"
     }
   },
-   "liabilities": {
-      "title": "Verbindlichkeiten",
+  "liabilities": {
+    "title": "Verbindlichkeiten",
+    "addLiability": "Verbindlichkeit hinzufügen",
+    "editLiability": "Verbindlichkeit bearbeiten",
+    "summary": "Verbindlichkeitenübersicht",
+    "totalDebt": "Gesamtschulden",
+    "monthlyPayments": "Monatliche Zahlungen",
+    "noLiabilities": "Noch keine Verbindlichkeiten",
+    "noLiabilitiesDesc": "Verfolgen Sie Ihre Kredite, Hypotheken und andere Schulden, um einen vollständigen Überblick über Ihre Finanzen zu erhalten.",
+    "form": {
+      "currentBalance": "Aktueller Saldo",
+      "interestRate": "Zinssatz",
+      "paymentSchedule": "Zahlungsplan",
+      "loanTerm": "Kreditlaufzeit",
+      "loanTermUnit": "Kreditlaufzeit Einheit",
+      "months": "Monate",
+      "years": "Jahre",
+      "paymentAmount": "Zahlungsbetrag",
+      "paymentFrequency": "Zahlungshäufigkeit",
+      "paymentMonths": "Zahlungsmonate",
+      "currentBalanceRequired": "Aktueller Saldo ist erforderlich",
+      "interestRatePositive": "Zinssatz muss positiv sein",
+      "paymentAmountPositive": "Zahlungsbetrag muss positiv sein",
+      "initialBalance": "Anfangssaldo",
+      "initialBalancePositive": "Anfangssaldo muss positiv sein",
+      "noRegularPayments": "Keine regelmäßigen Zahlungen",
+      "endDateOptional": "Enddatum (Optional)",
       "addLiability": "Verbindlichkeit hinzufügen",
-      "editLiability": "Verbindlichkeit bearbeiten",
-      "summary": "Verbindlichkeitenübersicht",
-      "totalDebt": "Gesamtschulden",
-      "monthlyPayments": "Monatliche Zahlungen",
-      "noLiabilities": "Noch keine Verbindlichkeiten",
-      "noLiabilitiesDesc": "Verfolgen Sie Ihre Kredite, Hypotheken und andere Schulden, um einen vollständigen Überblick über Ihre Finanzen zu erhalten.",
-      "form": {
-        "currentBalance": "Aktueller Saldo",
-        "interestRate": "Zinssatz",
-        "paymentSchedule": "Zahlungsplan",
-        "loanTerm": "Kreditlaufzeit",
-        "loanTermUnit": "Kreditlaufzeit Einheit",
-        "months": "Monate",
-        "years": "Jahre",
-        "paymentAmount": "Zahlungsbetrag",
-        "paymentFrequency": "Zahlungshäufigkeit",
-        "paymentMonths": "Zahlungsmonate",
-        "currentBalanceRequired": "Aktueller Saldo ist erforderlich",
-        "interestRatePositive": "Zinssatz muss positiv sein",
-        "paymentAmountPositive": "Zahlungsbetrag muss positiv sein",
-        "initialBalance": "Anfangssaldo",
-        "initialBalancePositive": "Anfangssaldo muss positiv sein",
-        "noRegularPayments": "Keine regelmäßigen Zahlungen",
-        "endDateOptional": "Enddatum (Optional)",
-        "addLiability": "Verbindlichkeit hinzufügen",
-        "updateLiability": "Verbindlichkeit aktualisieren",
-        "type": "Art der Verbindlichkeit"
-      },
-      "types": {
-        "mortgage": "Hypothek",
-        "personal_loan": "Privatkredit",
-        "credit_card": "Kreditkarte",
-        "student_loan": "Studentenkredit",
-        "auto_loan": "Autokredit",
-        "other": "Sonstiges"
-      }
+      "updateLiability": "Verbindlichkeit aktualisieren",
+      "type": "Art der Verbindlichkeit"
     },
-   "income": {
-      "title": "Einkommen",
-      "addIncome": "Einkommen hinzufügen",
-      "editIncome": "Einkommen bearbeiten",
-      "summary": "Einkommensübersicht",
-      "totalMonthly": "Monatliches Gesamteinkommen",
+    "types": {
+      "mortgage": "Hypothek",
+      "personal_loan": "Privatkredit",
+      "credit_card": "Kreditkarte",
+      "student_loan": "Studentenkredit",
+      "auto_loan": "Autokredit",
+      "other": "Sonstiges"
+    }
+  },
+  "income": {
+    "title": "Einkommen",
+    "addIncome": "Einkommen hinzufügen",
+    "editIncome": "Einkommen bearbeiten",
+    "summary": "Einkommensübersicht",
+    "totalMonthly": "Monatliches Gesamteinkommen",
+    "passiveIncome": "Passives Einkommen",
+    "noIncome": "Noch keine Einkommensquellen",
+    "noIncomeDesc": "Fügen Sie Ihre Einkommensquellen hinzu, um Ihre Einnahmen zu verfolgen und Ihren Cashflow zu berechnen.",
+    "form": {
+      "type": "Typ",
+      "amount": "Betrag",
+      "paymentFrequency": "Zahlungshäufigkeit",
+      "paymentAmount": "Zahlungsbetrag",
+      "paymentDay": "Zahltag",
+      "dayOfMonth": "Tag des Monats",
+      "dayOfMonthPlaceholder": "z.B. 15 (für den 15. des Monats)",
       "passiveIncome": "Passives Einkommen",
-      "noIncome": "Noch keine Einkommensquellen",
-      "noIncomeDesc": "Fügen Sie Ihre Einkommensquellen hinzu, um Ihre Einnahmen zu verfolgen und Ihren Cashflow zu berechnen.",
-      "form": {
-        "type": "Typ",
-        "amount": "Betrag",
-        "paymentFrequency": "Zahlungshäufigkeit",
-        "paymentAmount": "Zahlungsbetrag",
-        "paymentDay": "Zahltag",
-        "dayOfMonth": "Tag des Monats",
-        "dayOfMonthPlaceholder": "z.B. 15 (für den 15. des Monats)",
-        "passiveIncome": "Passives Einkommen",
-        "sourceAsset": "Quelle Vermögenswert",
-        "selectAsset": "Vermögenswert auswählen",
-        "paymentMonths": "Zahlungsmonate",
-        "income": "Einkommen",
-        "enterIncomeName": "Einkommensname eingeben",
-        "selectIncomeType": "Einkommenstyp auswählen",
-        "selectFrequency": "Häufigkeit auswählen"
-      },
-      "types": {
-        "salary": "Gehalt",
-        "rental": "Mieteinnahmen",
-        "dividend": "Dividende",
-        "interest": "Zinsen",
-        "side_hustle": "Nebeneinkünfte",
-        "other": "Sonstiges"
-      }
+      "sourceAsset": "Quelle Vermögenswert",
+      "selectAsset": "Vermögenswert auswählen",
+      "paymentMonths": "Zahlungsmonate",
+      "income": "Einkommen",
+      "enterIncomeName": "Einkommensname eingeben",
+      "selectIncomeType": "Einkommenstyp auswählen",
+      "selectFrequency": "Häufigkeit auswählen"
     },
+    "types": {
+      "salary": "Gehalt",
+      "rental": "Mieteinnahmen",
+      "dividend": "Dividende",
+      "interest": "Zinsen",
+      "side_hustle": "Nebeneinkünfte",
+      "other": "Sonstiges"
+    }
+  },
   "analytics": {
     "hub": {
       "title": "Analytics Hub",
@@ -1147,7 +1152,7 @@
       "addLiability": "Schuld hinzufügen"
     },
     "track": "Verfolgen",
-    "manage": "Verwalten", 
+    "manage": "Verwalten",
     "totalDebt": "Gesamtschulden",
     "debts": "Schulden",
     "transactionsDesc": "Einheitliche Transaktionsverwaltung für alle Kategorien",
@@ -1194,14 +1199,14 @@
     "timelineFeature": "Asset-Timeline Funktion",
     "timelineComingSoon": "Interaktive Timeline-Visualisierung folgt bald. Dies bietet eine chronologische Ansicht aller Ihrer Asset-Aktivitäten.",
     "hub": {
-      "title": "Portfolio Hub", 
+      "title": "Portfolio Hub",
       "subtitle": "Verwalten Sie Ihr komplettes finanzielles Portfolio",
       "recentActivities": "Letzte Portfolio-Aktivitäten",
       "recommendations": "Empfehlungen",
       "recent": {
         "assetManagement": "Asset-Management",
         "incomeManagement": "Einkommensverwaltung",
-        "expenseTracking": "Ausgabenverfolgung", 
+        "expenseTracking": "Ausgabenverfolgung",
         "viewedRecently": "Kürzlich angesehen"
       },
       "insights": {
@@ -1237,7 +1242,7 @@
       "hubRecommendations": {
         "debtReduction": "Schuldenlast reduzieren",
         "debtReductionDesc": "Ihr Schulden-zu-Asset-Verhältnis ist hoch. Erwägen Sie Schuldenabbau zur Verbesserung Ihrer finanziellen Gesundheit.",
-        "improveIncome": "Cashflow verbessern", 
+        "improveIncome": "Cashflow verbessern",
         "improveIncomeDesc": "Ihre Ausgaben übersteigen das Einkommen. Erwägen Sie Einkommenssteigerung oder Ausgabenreduzierung.",
         "diversifyIncome": "Einkommensströme diversifizieren",
         "diversifyIncomeDesc": "Fügen Sie mehr Einkommensquellen hinzu, um finanzielle Risiken zu reduzieren und Stabilität zu verbessern.",
@@ -1263,7 +1268,7 @@
     "monthsBuffer": "Monate Puffer",
     "fixedCosts": "Fixkostendeckung"
   },
-  
+
   "emptyStates": {
     "assets": {
       "title": "Beginnen Sie Ihre Investitionsreise!",
