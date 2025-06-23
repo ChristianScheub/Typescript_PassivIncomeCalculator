@@ -421,7 +421,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                 if (onAddDefinitionWithCategories) {
                   onAddDefinitionWithCategories(transformedData, transformedCategoryAssignments);
                 } else {
-                  onAddDefinition(transformedData);
+                  onAddDefinition?.(transformedData);
                 }
               }
             }}

@@ -252,7 +252,13 @@
     "debugModeActive": "Debug-Modus aktiv",
     "debugModeDescription": "Zusätzliche Debug-Funktionen sind aktiviert. In der Produktion deaktivieren.",
     "seconds": "s",
+    "dividendApiConfig": "Dividenden-API-Konfiguration",
+    "enableDividendApi": "Dividenden-API aktivieren",
+    "enableDividendApiDescription": "Aktivieren oder deaktivieren Sie die Integration der Dividenden-API",
+    "selectDividendApiProvider": "Dividenden-API-Anbieter auswählen",
+    "recalculateDividendForecasts": "Dividendenprognosen neu berechnen",    
     "clearData": "Daten löschen",
+    "clearAllDataDesc": "Dies löscht alle Finanzdaten, einschließlich Vermögenswerte, Ausgaben, Verbindlichkeiten und Einstellungen wie API-Schlüssel und Wechselkurse.",
     "clearPartialData": "Finanzdaten löschen",
     "clearPartialDataDescription": "Löscht alle Finanzdaten (Vermögenswerte, Ausgaben, Verbindlichkeiten, etc.), behält aber Einstellungen wie API-Schlüssel und Wechselkurse",
     "clearAllData": "Alle Daten löschen",
@@ -668,7 +674,8 @@
     "annually": "Jährlich",
     "annual": "Jährlich",
     "custom": "Individuell",
-    "undefined": "Nicht definiert"
+    "undefined": "Nicht definiert",
+    "12": "Monatlich (12 Monate)"
   },
   "frequency": {
     "monthly": "Monatlich",
@@ -1125,7 +1132,8 @@
   "portfolio": {
     "netWorth": "Nettovermögen",
     "trending": {
-      "down": "Trend nach unten"
+      "down": "Trend nach unten",
+      "up": "Trend nach oben"
     },
     "assets": "Vermögenswerte",
     "liabilities": "Verbindlichkeiten",

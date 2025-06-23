@@ -310,8 +310,6 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   if (isShowingPortfolioHistory) {
     return (
       <PortfolioHistoryContainer 
-        assets={assets}
-        assetDefinitions={assetDefinitions}
         totalInvestment={portfolioTotals?.totalInvestment || 0}
         currentValue={portfolioTotals?.totalValue || 0}
         onBack={handleBackToAssets}

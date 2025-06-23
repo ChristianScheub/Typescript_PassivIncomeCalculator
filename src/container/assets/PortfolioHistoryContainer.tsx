@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Asset, AssetDefinition } from '@/types/domains/assets';
 import { usePortfolioHistoryView } from '../../hooks/usePortfolioHistoryView';
 import { PortfolioHistoryView } from '@/view/portfolio-hub/PortfolioHistoryView';
 import { ViewHeader } from '@/ui/layout/ViewHeader';
@@ -8,8 +7,6 @@ import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck
 import Logger from '@/service/shared/logging/Logger/logger';
 
 interface PortfolioHistoryContainerProps {
-  assets: Asset[];
-  assetDefinitions: AssetDefinition[];
   totalInvestment: number;
   currentValue: number;
   onBack: () => void;

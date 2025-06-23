@@ -56,9 +56,9 @@ export const DividendHistoryView: React.FC<DividendHistoryViewProps> = ({
         </span>
       </h4>
       <div className="space-y-2 max-h-48 overflow-y-auto">
-        {sortedHistory.map((entry, idx) => (
+        {sortedHistory.map((entry) => (
           <div
-            key={idx}
+            key={entry.date + '-' + entry.amount}
             className="flex items-center justify-between py-2 px-3 bg-white dark:bg-gray-700 rounded border"
           >
             <div className="flex items-center gap-2">

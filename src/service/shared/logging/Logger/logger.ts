@@ -52,7 +52,7 @@ class Logger {
   private static saveLogsToLocalStorage(logs: string[]): void {
     localStorage.setItem(this.logKey, JSON.stringify(logs));
   }
-
+  
   static log(message: string): void {
     const functionName = this.getCallerFunctionName();
     const logMessage = `[${functionName}] ${message}`;
@@ -109,6 +109,14 @@ class Logger {
   static error(message: string): void {
     if (featureFlag_Debug_Log_Error || featureFlag_Debug_AllLogs) {
       this.log(this.formatMessage(`ERROR: ${message}`, "‼️🆘"));
+    }
+  }
+
+  //New method to log errors with stack trace
+  static errorStack(message: string, error: Error): void {
+    if (featureFlag_Debug_Log_Error || featureFlag_Debug_AllLogs) {
+      const errorMessage = `${this.formatMessage(`ERROR: ${message}`, "‼️🆘")}\nError Details: ${error.message}\nStack Trace: ${error.stack}`;
+      this.log(errorMessage);
     }
   }
 

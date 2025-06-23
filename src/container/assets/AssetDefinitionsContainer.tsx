@@ -12,7 +12,6 @@ import {
 } from '@/store/slices/assetCategoriesSlice';
 import { AssetDefinitionsView } from '@/view/portfolio-hub/assets/AssetDefinitionsView';
 import { AssetDefinition, AssetCategoryAssignment,CreateAssetDefinitionData } from '@/types/domains/assets';
-import { AssetType } from '@/types/shared';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { TrendingUp, Building, Banknote, Coins, Wallet } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -31,20 +30,6 @@ interface AssetDefinitionsContainerProps {
 
 // Type alias for asset types
 export type AssetTypeAlias = 'stock' | 'real_estate' | 'bond' | 'cash' | 'crypto' | 'other';
-
-// Robust error stringification utility
-function stringifyError(error: unknown): string {
-  if (!error) return 'Unknown error';
-  if (typeof error === 'string') return error;
-  if (error instanceof Error) {
-    return `${error.name}: ${error.message}\n${error.stack}`;
-  }
-  try {
-    return JSON.stringify(error);
-  } catch {
-    return String(error);
-  }
-}
 
 const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ onBack }) => {
   const { t } = useTranslation();
@@ -101,7 +86,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       }
       setIsAddingDefinition(false);
     } catch (error) {
-      Logger.error('Failed to add asset definition - ' + stringifyError(error));
+      Logger.errorStack('Failed to add asset definition', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -119,7 +104,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       await addCategoryAssignments(categoryAssignments, editingDefinition.id);
       setEditingDefinition(null);
     } catch (error) {
-      Logger.error('[handleUpdateDefinition] Failed to update asset definition: ' + stringifyError(error));
+      Logger.errorStack('[handleUpdateDefinition] Failed to update asset definition', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -140,7 +125,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
           throw new Error('Failed to delete asset definition');
         }
       } catch (error) {
-        Logger.error('Failed to delete asset definition' + " - " + JSON.stringify(error as Error));
+        Logger.errorStack('Failed to delete asset definition', error instanceof Error ? error : new Error(String(error)));
       }
     }
   };
@@ -181,7 +166,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         Logger.info('No stock definitions were updated');
       }
     } catch (error) {
-      Logger.error('Failed to update stock prices for asset definitions' + ' - ' + JSON.stringify(error as Error));
+      Logger.errorStack('Failed to update stock prices for asset definitions', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsUpdatingPrices(false);
     }
@@ -225,7 +210,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
         Logger.info('No stock definitions were updated with historical data');
       }
     } catch (error) {
-      Logger.error('Failed to update historical data for asset definitions' + ' - ' + JSON.stringify(error as Error));
+      Logger.errorStack('Failed to update historical data for asset definitions', error instanceof Error ? error : new Error(String(error)));
     } finally {
       setIsUpdatingHistoricalData(false);
     }
@@ -262,7 +247,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(updatedDefinition));
       Logger.info(`Successfully added price entry to ${definition.fullName}`);
     } catch (error) {
-      Logger.error('Failed to add price entry' + " - " + JSON.stringify(error as Error));
+      Logger.errorStack('Failed to add price entry', error instanceof Error ? error : new Error(String(error)));
     }
   };
 
@@ -277,10 +262,22 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({ o
       ).unwrap();
       if (result) {
         Logger.info('Dividenden erfolgreich abgerufen und Asset aktualisiert: ' + JSON.stringify(result));
-        await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(result));
+        let resultToDispatch = { ...result };
+        if (resultToDispatch.dividendInfo) {
+          const { amount, lastDividendDate, paymentMonths } = resultToDispatch.dividendInfo;
+          const frequency: 'monthly' | 'quarterly' | 'annually' | 'custom' =
+            resultToDispatch.dividendInfo.frequency ?? 'custom';
+          resultToDispatch.dividendInfo = {
+            amount,
+            frequency,
+            lastDividendDate,
+            paymentMonths,
+          };
+        }
+        await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(resultToDispatch as AssetDefinition));
       }
     } catch (error) {
-      Logger.error('[handleFetchDividendsFromApi] Fehler beim Abrufen der Dividenden per API: ' + stringifyError(error));
+      Logger.errorStack('[handleFetchDividendsFromApi] Fehler beim Abrufen der Dividenden per API', error instanceof Error ? error : new Error(String(error)));
     }
   };
 

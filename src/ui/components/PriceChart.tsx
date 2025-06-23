@@ -306,12 +306,12 @@ export const PriceChart: React.FC<PriceChartProps> = ({
                 />
 
                 {/* Data points */}
-                {sortedHistory.map((entry, index) => {
-                  const x = 50 + (index / (sortedHistory.length - 1)) * 500;
+                {sortedHistory.map((entry) => {
+                  const x = 50 + (sortedHistory.indexOf(entry) / (sortedHistory.length - 1)) * 500;
                   const y = 200 - ((entry.price - paddedMin) / (paddedRange || 1)) * 150;
                   
                   return (
-                    <g key={`point-${index}`}>
+                    <g key={`point-${entry.date}-${entry.price}`}>
                       <circle
                         cx={x}
                         cy={y}
