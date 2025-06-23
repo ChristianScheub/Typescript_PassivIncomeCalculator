@@ -197,6 +197,14 @@ export const fetchAndUpdateDividends = createAsyncThunk(
       else frequency = 'custom';
     }
 
+    // --- NEU: Dividend Growth & Forecast berechnen ---
+    // 1. Wachstum der letzten 3 Jahre
+    const { calculateDividendCAGRForYears, generateDividendForecast } = await import('@/utils/dividendHistoryUtils');
+    const dividendGrowthPast3Y = calculateDividendCAGRForYears(dividendHistory, 3) ?? 0;
+    // 2. Prognose für die nächsten 3 Jahre
+    const dividendForecast3Y = generateDividendForecast(dividendHistory, 3);
+    // ---
+
     const last = dividendHistory.length > 0 ? dividendHistory[dividendHistory.length - 1] : undefined;
     const updatedDefinition = {
       ...definition,
@@ -209,6 +217,8 @@ export const fetchAndUpdateDividends = createAsyncThunk(
           }
         : undefined,
       dividendHistory,
+      dividendGrowthPast3Y,
+      dividendForecast3Y,
     };
     Logger.info('[DEBUG] updatedDefinition before return: ' + JSON.stringify(updatedDefinition));
     return updatedDefinition;

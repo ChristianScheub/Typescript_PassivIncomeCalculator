@@ -528,6 +528,7 @@
     "transactionNamePlaceholder": "z.B. Apple Aktien Kauf 2024",
     "noDefinitionsAvailable": "Keine Asset-Definitionen verfügbar",
     "types": {
+      "all": "Alle",
       "stock": "Aktie",
       "bond": "Anleihe",
       "realestate": "Immobilie",

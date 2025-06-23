@@ -7,6 +7,9 @@ import { Toggle } from '@/ui/common/Toggle';
 import { Button } from '@/ui/common/Button';
 import { Key } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { fetchAssetDefinitions } from '@/store/slices/assetDefinitionsSlice';
+import sqliteService from '@service/infrastructure/sqlLiteService';
+import { calculateDividendCAGRForYears, generateDividendForecast } from '@/utils/dividendHistoryUtils';
 
 const providerInfo = {
   yahoo: {
@@ -33,6 +36,21 @@ export const DividendApiSettingsSection: React.FC = () => {
   const handleProviderChange = (provider: DividendApiProvider) => {
     dispatch(setDividendApiProvider(provider));
     setTempApiKey(apiKeys[provider] || '');
+  };
+
+  // Button-Handler: Prognose für alle Assets neu berechnen
+  const handleRecalculateForecasts = async () => {
+    // Alle AssetDefinitions holen
+    const allAssets = await sqliteService.getAll('assetDefinitions');
+    for (const asset of allAssets) {
+      if (asset.dividendHistory && asset.dividendHistory.length > 0) {
+        asset.dividendGrowthPast3Y = calculateDividendCAGRForYears(asset.dividendHistory, 3) ?? 0;
+        asset.dividendForecast3Y = generateDividendForecast(asset.dividendHistory, 3);
+        await sqliteService.update('assetDefinitions', asset);
+      }
+    }
+    // AssetDefinitions nach Update neu laden (ohne Dispatch)
+    await fetchAssetDefinitions();
   };
 
   return (
@@ -110,6 +128,12 @@ export const DividendApiSettingsSection: React.FC = () => {
                 </Button>
               </div>
             )}
+            {/* Button: Prognose für alle Assets neu berechnen */}
+            <div className="flex justify-end mt-4">
+              <Button onClick={handleRecalculateForecasts} variant="outline">
+                {t('settings.recalculateDividendForecasts') || 'Dividendenprognose aktualisieren'}
+              </Button>
+            </div>
           </div>
         )}
       </div>

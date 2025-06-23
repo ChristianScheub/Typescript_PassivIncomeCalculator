@@ -18,7 +18,10 @@ interface MonthData {
   positions: Array<{
     position: PortfolioPosition;
     income: number;
+    isForecast?: boolean;
+    forecastShare?: number;
   }>;
+  forecastShare?: number;
 }
 
 interface ChartData {
@@ -26,6 +29,7 @@ interface ChartData {
   income: number;
   isSelected: boolean;
   monthNumber?: number;
+  forecastShare?: number;
 }
 
 interface AssetTypeOption {
@@ -65,10 +69,14 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const getBarColorByMonth = (month: string) => {
-    // Find the corresponding chart data entry
-    const chartEntry = chartData.find(entry => entry.month === month);
-    return chartEntry?.isSelected ? '#3B82F6' : '#E5E7EB';
+  const getBarColorByMonth = (month: string, forecastShare?: number, isSelected?: boolean) => {
+    if (forecastShare && forecastShare > 0.01) {
+      // Zeige Forecast-Anteil als Verlauf (blau für real, orange für forecast)
+      return isSelected
+        ? 'url(#forecastBarGradientSelected)'
+        : 'url(#forecastBarGradient)';
+    }
+    return isSelected ? '#3B82F6' : '#E5E7EB';
   };
 
   return (
@@ -115,11 +123,21 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart 
-                    data={chartData} 
+                    data={chartData}
                     margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                     onClick={onBarClick}
                     style={{ cursor: 'pointer' }}
                   >
+                    <defs>
+                      <linearGradient id="forecastBarGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#F59E42" stopOpacity="0.7" />
+                        <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.7" />
+                      </linearGradient>
+                      <linearGradient id="forecastBarGradientSelected" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#F59E42" stopOpacity="1" />
+                        <stop offset="100%" stopColor="#3B82F6" stopOpacity="1" />
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                     <XAxis 
                       dataKey="month" 
@@ -132,10 +150,10 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
                       tickFormatter={(value) => formatService.formatCurrency(value)}
                     />
                     <Bar dataKey="income" radius={[4, 4, 0, 0]}>
-                      {chartData.map((entry) => (
+                      {chartData.map((entry, idx) => (
                         <Cell 
                           key={`cell-${entry.month}`}
-                          fill={getBarColorByMonth(entry.month)}
+                          fill={getBarColorByMonth(entry.month, entry.forecastShare, entry.isSelected)}
                           style={{ cursor: 'pointer' }}
                         />
                       ))}
@@ -221,7 +239,7 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
                           {selectedMonthData.positions.map((item, index) => (
                             <div
                               key={item.position.id}
-                              className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                              className={`flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors ${item.isForecast ? 'border-l-4 border-orange-400' : ''}`}
                             >
                               <div className="flex items-center space-x-4">
                                 <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
@@ -233,6 +251,9 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
                                   <h4 className="font-medium">{item.position.name}</h4>
                                   <p className="text-sm text-gray-600 dark:text-gray-400">
                                     {item.position.type} • {formatService.formatCurrency(item.position.currentValue)}
+                                    {item.isForecast && (
+                                      <span className="ml-2 text-orange-500 font-semibold">(Forecast)</span>
+                                    )}
                                   </p>
                                 </div>
                               </div>

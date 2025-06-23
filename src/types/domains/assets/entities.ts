@@ -74,6 +74,15 @@ export interface AssetDefinition extends BaseEntity {
   description?: string;
   riskLevel?: RiskLevel;
   isActive?: boolean;
+
+  /**
+   * Durchschnittliche jährliche Wachstumsrate der Dividende der letzten 3 Jahre (z.B. 0.05 = 5%)
+   */
+  dividendGrowthPast3Y?: number;
+  /**
+   * Prognose der Dividendenzahlungen für die nächsten 3 Jahre (basierend auf History & Wachstum)
+   */
+  dividendForecast3Y?: import('./dividends').DividendHistoryEntry[];
 }
 
 // Enhanced AssetDefinition with categories

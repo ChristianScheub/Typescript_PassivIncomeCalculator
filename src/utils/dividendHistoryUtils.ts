@@ -54,3 +54,13 @@ export function generateDividendForecast(history: DividendHistoryEntry[], years:
   }
   return forecast;
 }
+
+/**
+ * Berechnet die durchschnittliche jährliche Wachstumsrate (CAGR) der letzten N Jahre.
+ */
+export function calculateDividendCAGRForYears(history: DividendHistoryEntry[], years: number): number | null {
+  const now = new Date();
+  const cutoff = new Date(now.getFullYear() - years, now.getMonth(), now.getDate());
+  const filtered = history.filter(entry => new Date(entry.date) >= cutoff);
+  return calculateDividendCAGR(filtered);
+}

@@ -11,6 +11,8 @@ import { calculatorService } from '../../service';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '@/store/slices/transactionsSlice';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { AssetDefinition } from '@/types/domains/assets/entities';
+import { DividendHistoryEntry } from '@/types/domains/assets/dividends';
 
 interface MonthData {
   month: number;
@@ -19,7 +21,10 @@ interface MonthData {
   positions: Array<{
     position: PortfolioPosition;
     income: number;
+    isForecast?: boolean;
+    forecastShare?: number;
   }>;
+  forecastShare?: number;
 }
 
 interface ChartData {
@@ -27,6 +32,7 @@ interface ChartData {
   income: number;
   isSelected: boolean;
   monthNumber: number;
+  forecastShare?: number;
 }
 
 interface AssetCalendarContainerProps {
@@ -55,7 +61,14 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   const [selectedAssetType, setSelectedAssetType] = useState<AssetType | 'all'>('all');
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState(currentYear);
-  const yearOptions = useMemo(() => [currentYear, currentYear - 1, currentYear - 2], [currentYear]);
+  // Show previous 2, current, and next 3 years
+  const yearOptions = useMemo(() => {
+    const years = [];
+    for (let y = currentYear - 2; y <= currentYear + 3; y++) {
+      years.push(y);
+    }
+    return years;
+  }, [currentYear]);
 
   // Ensure portfolio cache is available
   useEffect(() => {
@@ -244,8 +257,9 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
     Logger.info(`Calculating months data for ${filteredPositions.length} portfolio positions in year ${selectedYear}`);
     const data: MonthData[] = [];
     for (let month = 1; month <= 12; month++) {
-      const monthPositions: Array<{ position: PortfolioPosition; income: number }> = [];
+      const monthPositions: Array<{ position: PortfolioPosition; income: number; isForecast?: boolean; forecastShare?: number }> = [];
       let totalIncome = 0;
+      let totalForecast = 0;
       filteredPositions.forEach((position: PortfolioPosition) => {
         // Transaktionen bis Monatsende aufsummieren
         const monthEnd = new Date(selectedYear, month, 0, 23, 59, 59, 999);
@@ -269,20 +283,43 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
         // Ertrag mit der gehaltenen Menge berechnen
         // Wir übergeben die dynamische Menge an die Einkommensberechnung
         const positionWithQuantity = { ...position, totalQuantity: quantity };
-        const income = calculatePositionIncomeForMonth(positionWithQuantity, month);
-        Logger.cache(`Position ${position.name} income for month ${month} (gehaltene Menge: ${quantity}): ${income}`);
+        let income = calculatePositionIncomeForMonth(positionWithQuantity, month);
+        let isForecast = false;
+        let forecastShare = 0;
+        // --- Forecast-Integration: Nur für Aktien mit dividendHistory & Forecast ---
+        if (
+          positionWithQuantity.assetDefinition?.type === 'stock' &&
+          Array.isArray(positionWithQuantity.assetDefinition.dividendHistory) &&
+          positionWithQuantity.assetDefinition.dividendHistory.length > 0 &&
+          Array.isArray(positionWithQuantity.assetDefinition.dividendForecast3Y)
+        ) {
+          const forecastEntries = getForecastForMonth(positionWithQuantity.assetDefinition, month, selectedYear);
+          if (forecastEntries.length > 0 && quantity > 0) {
+            const hasRealDividend = positionWithQuantity.assetDefinition.dividendHistory.some(entry => {
+              const d = new Date(entry.date);
+              return d.getMonth() + 1 === month && d.getFullYear() === selectedYear && (entry.amount ?? 0) > 0;
+            });
+            if (!hasRealDividend) {
+              const forecastSum = forecastEntries.reduce((sum, entry) => sum + (entry.amount || 0), 0) * quantity;
+              income += forecastSum;
+              isForecast = true;
+              forecastShare = forecastSum / income;
+              totalForecast += forecastSum;
+            }
+          }
+        }
+        // ---
         if (income > 0) {
-          monthPositions.push({ position: positionWithQuantity, income });
+          monthPositions.push({ position: positionWithQuantity, income, isForecast, forecastShare });
           totalIncome += income;
         }
       });
-      Logger.info(`Month ${month} (${monthNames[month - 1]}): ${monthPositions.length} positions with income, total: ${totalIncome}`);
-      const sortedMonthPositions = monthPositions.toSorted((a, b) => b.income - a.income);
       data.push({
         month,
         name: monthNames[month - 1],
         totalIncome,
-        positions: sortedMonthPositions
+        positions: monthPositions,
+        forecastShare: totalIncome > 0 ? totalForecast / totalIncome : 0
       });
     }
     Logger.info(`Months data calculated for ${data.length} months`);
@@ -310,7 +347,8 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
         month: shortMonthsObj[monthKey], // Translated short month name
         income: monthData.totalIncome,
         isSelected: monthData.month === selectedMonth, // This should work correctly now
-        monthNumber: monthData.month // Add month number for debugging
+        monthNumber: monthData.month, // Add month number for debugging
+        forecastShare: monthData.forecastShare ?? 0
       };
     });
   }, [monthsData, selectedMonth, t]);
@@ -345,6 +383,24 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   useEffect(() => {
     Logger.info(`AssetCalendarContainer: ${assets.length} total assets, ${filteredPositions.length} filtered positions, tab: ${selectedTab}`);
   }, [assets.length, filteredPositions.length, selectedTab]);
+
+  // Hilfsfunktion: Gibt true zurück, wenn für diesen Monat/Jahr KEIN Eintrag in der History existiert
+  function isMonthMissingInHistory(dividendHistory: DividendHistoryEntry[] | undefined, month: number, year: number): boolean {
+    // Nur Einträge mit amount > 0 zählen als "existierend"
+    return !dividendHistory?.some((entry: DividendHistoryEntry) => {
+      const d = new Date(entry.date);
+      return d.getMonth() + 1 === month && d.getFullYear() === year && (entry.amount ?? 0) > 0;
+    });
+  }
+
+  // Hilfsfunktion: Gibt alle forecast-Einträge für einen Monat/Jahr zurück, die noch nicht in der echten History sind
+  function getForecastForMonth(assetDefinition: AssetDefinition, month: number, year: number): DividendHistoryEntry[] {
+    if (!assetDefinition?.dividendForecast3Y || !Array.isArray(assetDefinition.dividendForecast3Y)) return [];
+    return assetDefinition.dividendForecast3Y.filter((entry: DividendHistoryEntry) => {
+      const d = new Date(entry.date);
+      return d.getMonth() + 1 === month && d.getFullYear() === year && isMonthMissingInHistory(assetDefinition.dividendHistory, month, year);
+    });
+  }
 
   return (
     <AssetCalendarView
