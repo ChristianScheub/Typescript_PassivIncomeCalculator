@@ -2,7 +2,6 @@ import React, { CSSProperties } from "react";
 import { IconType } from "react-icons";
 import { Fab } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { SvgIconComponent } from "@mui/icons-material";
 
 
 export enum ButtonAlignment {
@@ -13,7 +12,7 @@ export enum ButtonAlignment {
 
 interface FloatingBtnProps {
   alignment: ButtonAlignment;
-  icon: IconType | SvgIconComponent;
+  icon: IconType | React.ComponentType<any>;
   onClick: () => void;
   backgroundColor?: string;
   hoverBackgroundColor?: string;
@@ -80,7 +79,7 @@ const FloatingBtn: React.FC<FloatingBtnProps> = ({
         disabled={disabled}
         data-testid="floating-btn" 
       >
-        <IconComponent sx={{ fontSize: 35 }} />
+        <IconComponent size={35} />
       </StyledFabWithCustomColors>
     </div>
   );

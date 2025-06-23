@@ -14,7 +14,7 @@ import { AssetDetailView } from "./AssetDetailView";
 import TabSelector from "../../../ui/navigation/TabSelector";
 import { HeaderButtonGroup } from "../../../ui/common/HeaderButtonGroup";
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
-import { Add } from "@mui/icons-material";
+import { Plus } from "lucide-react";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
 import formatService from "@service/infrastructure/formatService";
 import { 
@@ -545,7 +545,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
       {(!isAddingAsset && !editingAsset) && (
 
         <FloatingBtn
-          icon={Add}
+          icon={Plus}
           onClick={() => onSetIsAddingAsset(true)}
           alignment={ButtonAlignment.RIGHT}
         />

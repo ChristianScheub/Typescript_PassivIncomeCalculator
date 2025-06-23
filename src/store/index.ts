@@ -1,12 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import type { AnyAction, ThunkAction } from '@reduxjs/toolkit';
 import transactionsReducer from './slices/transactionsSlice';
-import assetDefinitionsReducer from './slices/assetDefinitionsSlice';
+import assetDefinitionsReducer, { fetchAssetDefinitions } from './slices/assetDefinitionsSlice';
 import assetCategoriesReducer from './slices/assetCategoriesSlice';
 import liabilitiesReducer from './slices/liabilitiesSlice';
 import expensesReducer from './slices/expensesSlice';
 import incomeReducer from './slices/incomeSlice';
-import dashboardReducer from './slices/dashboardSlice';
 import forecastReducer from './slices/forecastSlice';
 import apiConfigReducer, { StockAPIProvider } from './slices/apiConfigSlice';
 import dividendApiConfigReducer from './slices/dividendApiConfigSlice';
@@ -66,8 +65,9 @@ const loadState = () => {
           categoryAssignments: []
         }
       },
+      // assetDefinitions NICHT mehr aus dem Storage laden, sondern leer initialisieren
       assetDefinitions: {
-        items: state.assetDefinitions?.items || [],
+        items: [],
         status: 'idle' as Status,
         error: null
       },
@@ -98,7 +98,6 @@ const loadState = () => {
         isConfigPanelOpen: false,
         editingChartId: null
       },
-      dashboard: state.dashboard || {},
       forecast: state.forecast || {},
       apiConfig: {
         isEnabled: state.apiConfig?.isEnabled ?? (localStorage.getItem('stock_api_enabled') === 'true'),
@@ -143,7 +142,6 @@ export const store = configureStore({
     liabilities: liabilitiesReducer,
     expenses: expensesReducer,
     income: incomeReducer,
-    dashboard: dashboardReducer,
     forecast: forecastReducer,
     apiConfig: apiConfigReducer,
     dividendApiConfig: dividendApiConfigReducer,
@@ -174,19 +172,26 @@ export const store = configureStore({
 // Mark store as hydrated and validate cache if we loaded persisted state
 if (persistedState) {
   Logger.cache('Store created with persisted state, marking as hydrated');
-  
   // Mark hydrated first
   store.dispatch(markStoreHydrated());
-  
-  // Then validate cache startup after a tick to ensure store is fully initialized
+  // Dann validate cache startup nach einem Tick
   setTimeout(() => {
     store.dispatch(validateCacheOnStartup());
+    // AssetDefinitions nach Store-Hydration aus der DB laden
+    store.dispatch(fetchAssetDefinitions());
   }, 0);
 } else {
   // If no persisted state, still mark as hydrated (empty state is also hydrated)
   Logger.infoRedux('Store created without persisted state, marking as hydrated');
   store.dispatch(markStoreHydrated());
+  // AssetDefinitions nach Store-Hydration aus der DB laden
+  store.dispatch(fetchAssetDefinitions());
 }
+
+// Nach dem Laden des States müssen die AssetDefinitions asynchron aus der DB geladen werden!
+// Dispatch dazu nach Store-Initialisierung: store.dispatch(fetchAssetDefinitions());
+// Beispiel: Im App-Root (z.B. App.tsx) nach Store-Hydration:
+//   useEffect(() => { if (store.getState().calculatedData.isHydrated) dispatch(fetchAssetDefinitions()); }, [dispatch]);
 
 // Improved localStorage handling with throttling and size management
 let saveTimeout: NodeJS.Timeout | null = null;
@@ -208,7 +213,7 @@ store.subscribe = (listener) => {
             portfolioCacheValid: state.transactions.portfolioCacheValid,
             lastPortfolioCalculation: state.transactions.lastPortfolioCalculation
           },
-          assetDefinitions: { items: state.assetDefinitions.items },
+          // assetDefinitions wird NICHT mehr gespeichert!
           assetCategories: {
             categories: state.assetCategories.categories,
             categoryOptions: state.assetCategories.categoryOptions,
@@ -218,7 +223,6 @@ store.subscribe = (listener) => {
           expenses: { items: state.expenses.items },
           income: { items: state.income.items },
           customAnalytics: { charts: state.customAnalytics.charts },
-          dashboard: state.dashboard,
           forecast: state.forecast,
           apiConfig: state.apiConfig,
           calculatedData: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { IconButton, useTheme } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { X } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -55,7 +55,7 @@ export const Modal: React.FC<ModalProps> = ({
               boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
             }}
           >
-            <Close fontSize="small" />
+            <X size={20} />
           </IconButton>
           {children}
         </div>

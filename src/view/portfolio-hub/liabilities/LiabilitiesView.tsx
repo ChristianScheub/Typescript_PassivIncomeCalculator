@@ -8,7 +8,7 @@ import { MaterialLiabilityForm } from "../../../container/forms/MaterialLiabilit
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { Landmark } from "lucide-react";
-import { Add } from "@mui/icons-material";
+import { Plus } from "lucide-react";
 import formatService from "@service/infrastructure/formatService";
 import { Liability } from '@/types/domains/financial';
 import { LoadingSpinner } from '@/ui/feedback/LoadingSpinner';
@@ -145,7 +145,7 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
       {!isAddingLiability && !editingLiability && (
         <FloatingBtn
           alignment={ButtonAlignment.RIGHT}
-          icon={Add}
+          icon={Plus}
           onClick={() => onSetIsAddingLiability(true)}
           backgroundColor="#EF4444"
           hoverBackgroundColor="#DC2626"

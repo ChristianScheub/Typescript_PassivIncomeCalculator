@@ -5,9 +5,14 @@ import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { format } from 'date-fns';
 import formatService from "@service/infrastructure/formatService";
 import { LineChart } from 'lucide-react';
-import { usePortfolioHistoryView } from '@/hooks/usePortfolioHistoryView';
 
 interface PortfolioHistoryCardProps {
+  history: Array<{
+    date: string;
+    value: number;
+    change: number;
+    changePercentage: number;
+  }>;
   isIntradayView?: boolean; // Optional prop to determine if showing minute-level data
 }
 
@@ -61,30 +66,13 @@ const PortfolioHistoryTooltip: React.FC<PortfolioHistoryTooltipProps> = ({ activ
   );
 };
 
-const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ isIntradayView = false }) => {
+const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history, isIntradayView = false }) => {
   const { t } = useTranslation();
-  // Load 30-day portfolio history from IndexedDB
-  const history30Days = usePortfolioHistoryView('1M');
 
-  // Always define hooks before any return
   const transformedHistory = useMemo(() => {
-    if (!history30Days || history30Days.length === 0) return [];
-    return history30Days.map((item, index) => {
-      let change = 0;
-      let changePercentage = 0;
-      if (index > 0) {
-        const previousValue = history30Days[index - 1].value;
-        change = item.value - previousValue;
-        changePercentage = previousValue ? (change / previousValue) * 100 : 0;
-      }
-      return {
-        date: item.date,
-        value: item.value,
-        change,
-        changePercentage
-      };
-    });
-  }, [history30Days]);
+    if (!history || history.length === 0) return [];
+    return history;
+  }, [history]);
 
   const firstDay = transformedHistory[0];
   const lastDay = transformedHistory[transformedHistory.length - 1];
@@ -140,7 +128,7 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ isIntradayV
   };
 
   // Now do the conditional return
-  if (!history30Days || history30Days.length === 0) {
+  if (!transformedHistory || transformedHistory.length === 0) {
     return (
       <Card className="w-full">
         <CardHeader>
@@ -182,7 +170,7 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ isIntradayV
       </CardHeader>
       <CardContent>
         <div className="h-64">
-          {history30Days.length > 0 ? (
+          {transformedHistory.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={transformedHistory} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                 <defs>

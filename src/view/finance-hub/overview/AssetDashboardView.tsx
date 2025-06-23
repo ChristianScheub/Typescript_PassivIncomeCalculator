@@ -107,7 +107,7 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
               )}
             </div>
             <PortfolioHistoryCard 
-              history30Days={portfolioHistory.map((point, index) => ({
+              history={portfolioHistory.map((point, index) => ({
                 date: point.date,
                 value: point.value,
                 change: index > 0 ? point.value - portfolioHistory[index - 1].value : 0,

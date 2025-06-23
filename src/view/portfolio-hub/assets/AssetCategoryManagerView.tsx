@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { AssetCategory, AssetCategoryOption } from "../../../types/domains/assets/categories";
 import { CategoryFormData, OptionFormData } from "../../../types/shared/ui/view-props";
 import { Plus, Trash2 } from "lucide-react";
-import { Add } from "@mui/icons-material";
 import { Modal } from "../../../ui/common/Modal";
 import { ActionButtonGroup } from "../../../ui/common/ActionButtonGroup";
 import { Button } from "../../../ui/common/Button";
@@ -372,7 +371,7 @@ export const AssetCategoryManagerView: React.FC<
               !editingOption && (
                 <FloatingBtn
                   alignment={ButtonAlignment.RIGHT}
-                  icon={Add}
+                  icon={Plus}
                   onClick={() => onSetIsAddingCategory(true)}
                   backgroundColor="#2563eb"
                   hoverBackgroundColor="#1d4ed8"

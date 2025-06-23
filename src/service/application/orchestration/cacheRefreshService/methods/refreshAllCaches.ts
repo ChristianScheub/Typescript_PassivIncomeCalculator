@@ -13,7 +13,6 @@ import {
 import { fetchLiabilities } from '@/store/slices/liabilitiesSlice';
 import { fetchExpenses } from '@/store/slices/expensesSlice';
 import { fetchIncome } from '@/store/slices/incomeSlice';
-import { updateDashboardValues } from '@/store/slices/dashboardSlice';
 import { updateForecastValues } from '@/store/slices/forecastSlice';
 import { 
     clearAllCache as clearCalculatedDataCache
@@ -103,7 +102,6 @@ export async function refreshAllCaches(): Promise<void> {
         // Step 8: Update ALL calculated values and derived data
         Logger.infoService("Updating ALL dashboard, forecast, and analytics values");
         await Promise.all([
-            store.dispatch(updateDashboardValues()),
             store.dispatch(updateForecastValues())
             // Note: 30-day history is now calculated directly from IndexedDB, no Redux action needed
         ]);

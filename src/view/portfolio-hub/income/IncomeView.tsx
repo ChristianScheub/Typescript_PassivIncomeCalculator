@@ -8,7 +8,7 @@ import { MaterialIncomeForm } from "../../../container/forms/MaterialIncomeForm"
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { CreditCard } from "lucide-react";
-import { Add } from "@mui/icons-material";
+import { Plus } from "lucide-react";
 import formatService from "@service/infrastructure/formatService";
 import { Income } from '@/types/domains/financial';
 import { LoadingSpinner } from "../../../ui/feedback/LoadingSpinner";
@@ -168,7 +168,7 @@ const IncomeView: React.FC<IncomeViewProps> = ({
       {!isAddingIncome && !editingIncome && (
         <FloatingBtn
           alignment={ButtonAlignment.RIGHT}
-          icon={Add}
+          icon={Plus}
           onClick={() => onSetIsAddingIncome(true)}
           backgroundColor="#10B981"
           hoverBackgroundColor="#059669"

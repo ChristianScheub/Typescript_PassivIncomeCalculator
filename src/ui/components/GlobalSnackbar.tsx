@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Snackbar, Alert, IconButton, Button } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+import { X } from 'lucide-react';
 import type { SnackbarCloseReason } from '@mui/material';
 import { RootState } from '../../store';
 import { hideSnackbar, removeSnackbar } from '@/store/slices/snackbarSlice';
@@ -69,7 +69,7 @@ const GlobalSnackbar: React.FC = () => {
               color="inherit"
               onClick={() => handleClose()}
             >
-              <CloseIcon fontSize="small" />
+              <X size={16} />
             </IconButton>
           </>
         }

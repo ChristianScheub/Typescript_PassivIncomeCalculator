@@ -11,8 +11,7 @@ import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { ReceiptText } from "lucide-react";
 import formatService from "@service/infrastructure/formatService";
 import { Expense } from "../../../types/domains/financial/entities";
-import { Add } from "@mui/icons-material";
-
+import { Plus } from "lucide-react";
 
 interface ExpensesViewProps {
   expenses: Expense[];
@@ -138,7 +137,7 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
       {!isAddingExpense && !editingExpense && (
         <FloatingBtn
           alignment={ButtonAlignment.RIGHT}
-          icon={Add}
+          icon={Plus}
           onClick={() => onSetIsAddingExpense(true)}
           backgroundColor="#B91C1C"
           hoverBackgroundColor="#991B1B"

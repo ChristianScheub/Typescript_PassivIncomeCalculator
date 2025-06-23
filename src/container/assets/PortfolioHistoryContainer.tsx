@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Asset, AssetDefinition } from '@/types/domains/assets';
 import { usePortfolioHistoryView } from '../../hooks/usePortfolioHistoryView';
@@ -23,9 +23,12 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
   
-  // Use the new portfolio history system
-  const portfolioHistoryData = usePortfolioHistoryView('1M'); // Default to 1 month
-  
+  // Zeitbereich-Filter im Container halten
+  const [selectedTimeRange, setSelectedTimeRange] = useState<'1T' | '1W' | '1M' | '3M' | '6M' | '1J' | 'Max'>('1M');
+
+  // usePortfolioHistoryView mit aktuellem Zeitbereich aufrufen
+  const portfolioHistoryData = usePortfolioHistoryView(selectedTimeRange);
+
   // Transform data for the view component (PortfolioHistoryView expects specific structure)
   const transformedHistoryData = useMemo(() => {
     Logger.info(`🔍 DEBUG PortfolioHistoryContainer: portfolioHistoryData length=${portfolioHistoryData.length}`);
@@ -35,7 +38,7 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
         value: point.value, 
         valueType: typeof point.value,
         hasTransactions: !!point.transactions 
-      })))}`);
+      })))}"`);
     }
 
     const transformed = portfolioHistoryData.map(point => ({
@@ -52,6 +55,7 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
     return transformed;
   }, [portfolioHistoryData]);
 
+  console.log('Container: Rendering PortfolioHistoryView', selectedTimeRange, transformedHistoryData.length);
   return (
     <div className="container mx-auto px-4 py-4">
       <ViewHeader
@@ -61,10 +65,13 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
       />
 
       <PortfolioHistoryView
+        key={selectedTimeRange}
         historyData={transformedHistoryData}
         totalInvestment={totalInvestment}
         currentValue={currentValue}
         isLoading={portfolioHistoryData.length === 0}
+        timeRange={selectedTimeRange}
+        onTimeRangeChange={setSelectedTimeRange}
       />
     </div>
   );

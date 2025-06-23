@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from '@mui/material';
-import { Save, Close } from '@mui/icons-material';
+import { Save, X } from 'lucide-react';
 import FloatingBtn, { ButtonAlignment } from '../layout/floatingBtn';
 
 interface FormSubmitButtonProps {
@@ -45,7 +45,7 @@ export const FormSubmitButton: React.FC<FormSubmitButtonProps> = ({
       }}>
         <FloatingBtn
           alignment={ButtonAlignment.RIGHT}
-          icon={Close}
+          icon={X}
           onClick={onCancel}
           backgroundColor="#f44336"
           hoverBackgroundColor="#d32f2f"

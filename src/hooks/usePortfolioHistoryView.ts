@@ -186,7 +186,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
 
   // Load data from DB for time ranges other than 1D/1W
   useEffect(() => {
-    if (!timeRange || timeRange === '1D' || timeRange === '1W' || !isHydrated) {
+    if (!timeRange || timeRange === '1D' || !isHydrated) {
       return;
     }
 
@@ -194,87 +194,114 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
       return;
     }
 
-    // ALWAYS load from DB for data integrity - no Redux cache needed
-
     // Prevent multiple simultaneous loads
     if (isLoadingRef.current) {
       return;
     }
 
-    // Load data from DB
     isLoadingRef.current = true;
     setIsLoading(true);
 
     const loadPortfolioHistoryData = async () => {
-      Logger.infoService(`📂 Loading portfolio history data from IndexedDB for timeRange: ${timeRange}...`);
-      
       try {
-        // Calculate date range based on timeRange
-        const today = new Date();
-        let daysBack = 30; // Default for 1M
-        
-        switch (timeRange) {
-          case '1M':
-            daysBack = 30;
-            break;
-          case '3M':
-            daysBack = 90;
-            break;
-          case '6M':
-            daysBack = 180;
-            break;
-          case '1Y':
-            daysBack = 365;
-            break;
-          case 'All':
-            daysBack = 365 * 5; // 5 years max
-            break;
-          default:
-            daysBack = 30;
-        }
-        
-        const startDate = new Date(today);
-        startDate.setDate(today.getDate() - daysBack);
-        
-        const startDateStr = startDate.toISOString().split('T')[0];
-        const endDateStr = today.toISOString().split('T')[0];
-        
-        // BATCH OPERATION: Get data from DB
-        const dbData = await portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr);
-        
-        if (dbData.length > 0) {
-          Logger.infoService(`📂 Loaded ${dbData.length} portfolio history points from IndexedDB for ${timeRange}`);
-          
-          // Set data directly to state (no Redux)
-          setPortfolioHistoryData(dbData.map(point => ({
-            date: point.date,
-            value: point.value,
-            change: point.totalReturn,
-            changePercentage: point.totalReturnPercentage
-          })));
-          
-        } else {
-          // No data in DB, trigger calculation
-          Logger.infoService(`🔄 No portfolio history data in IndexedDB for ${timeRange}, triggering calculation...`);
-          
-          await PortfolioHistoryCalculationService.calculateAndSavePortfolioHistory({
-            assetDefinitions,
-            portfolioPositions: portfolioCache.positions
+        if (timeRange === '1W') {
+          // Kombinierte 1W-Logik: Hole Intraday- und Tagesdaten für die letzten 7 Tage
+          const today = new Date();
+          const days = 7;
+          const startDate = new Date(today);
+          startDate.setDate(today.getDate() - (days - 1));
+          const startDateStr = startDate.toISOString().split('T')[0];
+          const endDateStr = today.toISOString().split('T')[0];
+
+          // Hole beide Datenquellen parallel
+          const [intraday, daily] = await Promise.all([
+            portfolioHistoryService.getPortfolioIntradayByDateRange(startDateStr, endDateStr),
+            portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr)
+          ]);
+
+          // Mappe Intraday nach Datum für schnellen Zugriff
+          const intradayByDate: Record<string, { date: string; value: number; timestamp: string }> = {};
+          intraday.forEach(point => {
+            // Nur den letzten Wert pro Tag nehmen (höchster timestamp)
+            if (!intradayByDate[point.date] || (intradayByDate[point.date].timestamp < point.timestamp)) {
+              intradayByDate[point.date] = point;
+            }
           });
-          
-          // Load again after calculation
-          const newDbData = await portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr);
-          
-          if (newDbData.length > 0) {
-            Logger.infoService(`📂 Loaded ${newDbData.length} portfolio history points after calculation for ${timeRange}`);
-            
-            // Set data directly to state (no Redux)
-            setPortfolioHistoryData(newDbData.map(point => ({
+
+          // Mappe Tagesdaten nach Datum
+          const dailyByDate: Record<string, { date: string; value: number }> = {};
+          daily.forEach(point => {
+            dailyByDate[point.date] = point;
+          });
+
+          // Baue lückenlose Historie für die letzten 7 Tage
+          const result: Array<{ date: string; value: number; transactions: Array<any> }> = [];
+          for (let i = 0; i < days; i++) {
+            const d = new Date(startDate);
+            d.setDate(startDate.getDate() + i);
+            const dateStr = d.toISOString().split('T')[0];
+            if (intradayByDate[dateStr]) {
+              result.push({
+                date: dateStr,
+                value: typeof intradayByDate[dateStr].value === 'number' && !isNaN(intradayByDate[dateStr].value) ? intradayByDate[dateStr].value : 0,
+                transactions: []
+              });
+            } else if (dailyByDate[dateStr]) {
+              result.push({
+                date: dateStr,
+                value: typeof dailyByDate[dateStr].value === 'number' && !isNaN(dailyByDate[dateStr].value) ? dailyByDate[dateStr].value : 0,
+                transactions: []
+              });
+            } else {
+              // Kein Wert vorhanden, setze 0
+              result.push({ date: dateStr, value: 0, transactions: [] });
+            }
+          }
+          setPortfolioHistoryData(result as any);
+        } else {
+          // ...bestehende Logik für andere Zeitbereiche...
+          Logger.infoService(`📂 Loading portfolio history data from IndexedDB for timeRange: ${timeRange}...`);
+          // Calculate date range based on timeRange
+          const today = new Date();
+          let daysBack = 30; // Default for 1M
+          switch (timeRange) {
+            case '1M': daysBack = 30; break;
+            case '3M': daysBack = 90; break;
+            case '6M': daysBack = 180; break;
+            case '1Y': case '1J': daysBack = 365; break;
+            case 'ALL': case 'All': case 'Max': daysBack = 365 * 5; break;
+            default: daysBack = 30;
+          }
+          const startDate = new Date(today);
+          startDate.setDate(today.getDate() - daysBack);
+          const startDateStr = startDate.toISOString().split('T')[0];
+          const endDateStr = today.toISOString().split('T')[0];
+          // BATCH OPERATION: Get data from DB
+          const dbData = await portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr);
+          if (dbData.length > 0) {
+            Logger.infoService(`📂 Loaded ${dbData.length} portfolio history points from IndexedDB for ${timeRange}`);
+            setPortfolioHistoryData(dbData.map(point => ({
               date: point.date,
               value: point.value,
               change: point.totalReturn,
               changePercentage: point.totalReturnPercentage
             })));
+          } else {
+            Logger.infoService(`🔄 No portfolio history data in IndexedDB for ${timeRange}, triggering calculation...`);
+            await PortfolioHistoryCalculationService.calculateAndSavePortfolioHistory({
+              assetDefinitions,
+              portfolioPositions: portfolioCache.positions
+            });
+            const newDbData = await portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr);
+            if (newDbData.length > 0) {
+              Logger.infoService(`📂 Loaded ${newDbData.length} portfolio history points after calculation for ${timeRange}`);
+              setPortfolioHistoryData(newDbData.map(point => ({
+                date: point.date,
+                value: point.value,
+                change: point.totalReturn,
+                changePercentage: point.totalReturnPercentage
+              })));
+            }
           }
         }
       } catch (error) {
@@ -293,10 +320,13 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
     if (!timeRange) {
       return [];
     }
-
-    // For short ranges, return empty (use intraday data instead)
-    if (timeRange === '1D' || timeRange === '1W') {
-      return [];
+    // Für 1W direkt die kombinierten Daten zurückgeben
+    if (timeRange === '1W') {
+      return portfolioHistoryData.map((item: any) => ({
+        date: item.date,
+        value: typeof item.value === 'number' && !isNaN(item.value) ? item.value : 0,
+        transactions: []
+      }));
     }
 
     // Debug logging

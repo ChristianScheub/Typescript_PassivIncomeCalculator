@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
-import { PortfolioHistoryPoint } from '@service/domain/portfolio/history/portfolioHistoryService/interfaces/IPortfolioHistoryService';
+import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
 import { formatService } from '../../service';
 import { ChartTooltip } from '@/ui/charts/ChartTooltips';
 import { TabButton, TabGroup } from '@/ui/common';
@@ -13,6 +13,8 @@ interface PortfolioHistoryViewProps {
   totalInvestment: number;
   currentValue: number;
   isLoading?: boolean;
+  timeRange: '1T' | '1W' | '1M' | '3M' | '6M' | '1J' | 'Max';
+  onTimeRangeChange: (range: '1T' | '1W' | '1M' | '3M' | '6M' | '1J' | 'Max') => void;
 }
 
 interface ChartDotProps {
@@ -41,59 +43,28 @@ const ChartDot = (props: ChartDotProps) => {
   );
 };
 
-type TimeFilter = '1T' | '1W' | '1M' | 'YTD' | '1J' | 'Max';
-
 export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
   historyData,
   totalInvestment,
   currentValue,
-  isLoading = false
+  isLoading = false,
+  timeRange,
+  onTimeRangeChange
 }) => {
+  console.log('PortfolioHistoryView received', historyData.length, 'points for', timeRange);
   const { t } = useTranslation();
-  const [selectedTimeFilter, setSelectedTimeFilter] = useState<TimeFilter>('Max');
-
-  // Filter data based on selected time period
-  const filteredHistoryData = useMemo(() => {
-    if (!historyData || historyData.length === 0) return [];
-    
-    const now = new Date();
-    let startDate: Date;
-    
-    switch (selectedTimeFilter) {
-      case '1T':
-        startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 1 day
-        break;
-      case '1W':
-        startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000); // 1 week
-        break;
-      case '1M':
-        startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // 1 month
-        break;
-      case 'YTD':
-        startDate = new Date(now.getFullYear(), 0, 1); // Year to date
-        break;
-      case '1J':
-        startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000); // 1 year
-        break;
-      case 'Max':
-      default:
-        return historyData;
-    }
-    
-    return historyData.filter(point => new Date(point.date) >= startDate);
-  }, [historyData, selectedTimeFilter]);
 
   const chartData = useMemo(() => {
-    return filteredHistoryData.map(point => ({
+    return historyData.map(point => ({
       date: point.date,
       value: point.value,
       formattedDate: new Date(point.date).toLocaleDateString('de-DE'),
       hasTransactions: point.transactions.length > 0
     }));
-  }, [filteredHistoryData]);
+  }, [historyData]);
 
   const performanceMetrics = useMemo(() => {
-    if (filteredHistoryData.length === 0) {
+    if (historyData.length === 0) {
       return {
         totalReturn: 0,
         totalReturnPercentage: 0,
@@ -102,7 +73,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
       };
     }
 
-    const values = filteredHistoryData.map(p => p.value).filter(v => isFinite(v) && v >= 0);
+    const values = historyData.map(p => p.value).filter(v => isFinite(v) && v >= 0);
     
     if (values.length === 0) {
       return {
@@ -122,13 +93,14 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
       peakValue: Math.max(...values),
       lowestValue: Math.min(...values)
     };
-  }, [filteredHistoryData, currentValue, totalInvestment]);
+  }, [historyData, currentValue, totalInvestment]);
 
-  const timeFilters: Array<{ key: TimeFilter; label: string }> = [
+  const timeFilters: Array<{ key: typeof timeRange; label: string }> = [
     { key: '1T', label: '1T' },
     { key: '1W', label: '1W' },
     { key: '1M', label: '1M' },
-    { key: 'YTD', label: 'YTD' },
+    { key: '3M', label: '3M' },
+    { key: '6M', label: '6M' },
     { key: '1J', label: '1J' },
     { key: 'Max', label: 'Max' }
   ];
@@ -159,8 +131,8 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
         {timeFilters.map((filter) => (
           <TabButton
             key={filter.key}
-            isActive={selectedTimeFilter === filter.key}
-            onClick={() => setSelectedTimeFilter(filter.key)}
+            isActive={timeRange === filter.key}
+            onClick={() => onTimeRangeChange(filter.key)}
           >
             {filter.label}
           </TabButton>

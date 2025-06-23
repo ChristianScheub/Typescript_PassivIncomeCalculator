@@ -5,7 +5,7 @@ import { AssetDefinition } from "../../../types/domains/assets";
 import { AssetDefinitionForm } from "../../shared/forms/AssetDefinitionForm";
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
-import { Add } from "@mui/icons-material";
+import { Plus } from "lucide-react";
 import { Wallet, RefreshCw, History } from "lucide-react";
 import { IconButton } from "../../../ui/common";
 import { Tooltip } from "@mui/material";
@@ -438,7 +438,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
           {!isAddingDefinition && !editingDefinition && (
             <FloatingBtn
               alignment={ButtonAlignment.RIGHT}
-              icon={Add}
+              icon={Plus}
               onClick={() => onSetIsAddingDefinition(true)}
               backgroundColor="#2563eb"
               hoverBackgroundColor="#1d4ed8"
