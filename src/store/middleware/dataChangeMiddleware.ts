@@ -40,7 +40,7 @@ export const dataChangeMiddleware: Middleware<object, StoreState> = (store: Midd
       }
       
       // Update dashboard first (since forecast depends on it)
-      store.dispatch(updateDashboardValues());
+      // store.dispatch(updateDashboardValues()); // Entfernt, da nicht vorhanden
       
       // If assets changed, update the monthly asset income cache specifically
       if (type.startsWith('transactions/')) {

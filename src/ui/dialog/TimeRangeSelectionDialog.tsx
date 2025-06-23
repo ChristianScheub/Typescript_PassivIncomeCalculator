@@ -159,7 +159,7 @@ export const TimeRangeSelectionDialog: React.FC<TimeRangeSelectionDialogProps> =
             onClick={handleConfirm}
             className="px-4 py-2"
           >
-            {t("common.confirm") || "Bestätigen"}
+            {t("common.save") || "Bestätigen"}
           </Button>
         </div>
       </div>

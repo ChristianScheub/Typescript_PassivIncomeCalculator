@@ -9,7 +9,7 @@ export interface DividendData {
 }
 
 export interface DividendApiHandler {
-  fetchDividends: (ticker: string) => Promise<{ dividends: DividendData[] }>;
+  fetchDividends: (ticker: string, opts?: { interval?: string; range?: string }) => Promise<{ dividends: DividendData[] }>;
 }
 
 function getFinnhubApiKey(): string {
@@ -60,9 +60,11 @@ export function createDividendApiHandler(provider: 'yahoo' | 'finnhub'): Dividen
   }
   // Default: Yahoo
   return {
-    async fetchDividends(ticker: string) {
+    async fetchDividends(ticker: string, opts?: { interval?: string; range?: string }) {
       try {
-        const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1m&range=max&events=div`;
+        const interval = opts?.interval || '1m';
+        const range = opts?.range || 'max';
+        const url = `https://query2.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=${interval}&range=${range}&events=div`;
         Logger.infoService(`[Yahoo] About to fetch dividends for ${ticker} with URL: ${url}`);
         Logger.infoService(`[Yahoo] CapacitorHttp typeof: ${typeof CapacitorHttp}`);
         Logger.infoService(`[Yahoo] CapacitorHttp.get typeof: ${typeof CapacitorHttp.get}`);
@@ -85,15 +87,8 @@ export function createDividendApiHandler(provider: 'yahoo' | 'finnhub'): Dividen
         }
         // Parse Yahoo JSON response
         const data = response.data;
-        const result = data?.chart?.result?.[0];
-        const dividendsObj = result?.events?.dividends || {};
-        const dividends: DividendData[] = Object.values(dividendsObj).map((div: any) => ({
-          amount: div.amount,
-          frequency: 'annually', // Yahoo does not provide frequency, default to annually
-          lastDividendDate: div.date ? new Date(div.date * 1000).toISOString().substring(0, 10) : undefined,
-        }));
-        Logger.infoService(`[Yahoo] Parsed dividends: ${JSON.stringify(dividends)}`);
-        return { dividends };
+        // Return the full Yahoo API response for unified parsing in the slice
+        return data;
       } catch (error) {
         const err = error as any;
         Logger.error(`Error fetching dividends from Yahoo: ${JSON.stringify({

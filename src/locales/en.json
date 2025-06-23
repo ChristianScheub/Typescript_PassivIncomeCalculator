@@ -533,6 +533,7 @@
     "dividend": "Dividend",
     "frequency": "Frequency",
     "purchase": "Purchase",
+    "dividendHistory": "Dividend History",
     "updatePrices": "Update Prices",
     "updateHistoricalData": "Update Historical Data",
     "selectTimeRange": "Select Time Range",

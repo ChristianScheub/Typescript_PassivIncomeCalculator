@@ -84,7 +84,7 @@ export const DividendApiSettingsSection: React.FC = () => {
                 );
               })}
             </div>
-            {providerInfo[selectedProvider].requiresApiKey && (
+            {providerInfo[selectedProvider as 'yahoo' | 'finnhub'].requiresApiKey && (
               <div className="space-y-3">
                 <div className="relative">
                   <input

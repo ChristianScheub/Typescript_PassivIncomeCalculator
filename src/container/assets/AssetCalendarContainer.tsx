@@ -53,6 +53,9 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1); // Current month (1-12)
   const [selectedAssetType, setSelectedAssetType] = useState<AssetType | 'all'>('all');
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const yearOptions = useMemo(() => [currentYear, currentYear - 1, currentYear - 2], [currentYear]);
 
   // Ensure portfolio cache is available
   useEffect(() => {
@@ -133,24 +136,36 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   const calculateStockIncome = useCallback((position: PortfolioPosition, month: number): number => {
     const assetDefinition = position.assetDefinition;
     if (!assetDefinition) return 0;
-    
     const totalQuantity = position.totalQuantity;
-    
+    if (totalQuantity <= 0) return 0;
+
+    // NEU: dividendHistory bevorzugen, falls vorhanden und nicht leer
+    const dividendHistory = assetDefinition.dividendHistory;
+    if (Array.isArray(dividendHistory) && dividendHistory.length > 0) {
+      // Berechne die Summe aller Dividenden für den gegebenen Monat UND Jahr
+      const monthDividends = dividendHistory.filter(entry => {
+        const date = new Date(entry.date);
+        return date.getMonth() + 1 === month && date.getFullYear() === selectedYear;
+      });
+      const totalDividend = monthDividends.reduce((sum, entry) => sum + (entry.amount || 0), 0) * totalQuantity;
+      Logger.cache(`DividendHistory für ${position.name} (${selectedYear}-${month}): ${totalDividend} aus ${monthDividends.length} Events`);
+      return isFinite(totalDividend) ? totalDividend : 0;
+    }
+
+    // Fallback: dividendInfo wie bisher
     if (!assetDefinition.dividendInfo?.frequency || 
-        assetDefinition.dividendInfo.frequency === 'none' ||
-        totalQuantity <= 0) {
+        assetDefinition.dividendInfo.frequency === 'none') {
       return 0;
     }
-    
     try {
       const dividendForMonth = calculatorService.calculateDividendForMonth(assetDefinition.dividendInfo, totalQuantity, month);
-      Logger.cache(`Dividend for ${position.name} month ${month}: ${dividendForMonth}`);
+      Logger.cache(`DividendInfo für ${position.name} (Monat ${month}): ${dividendForMonth}`);
       return isFinite(dividendForMonth) ? dividendForMonth : 0;
     } catch (error) {
       Logger.cache(`Error calculating dividend for ${position.name}: ${error}`);
       return 0;
     }
-  }, []);
+  }, [selectedYear]);
   
   const calculateInterestIncome = useCallback((position: PortfolioPosition): number => {
     const assetDefinition = position.assetDefinition;
@@ -226,29 +241,43 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   
   // Memoize months data calculation with portfolio positions
   const monthsData = useMemo(() => {
-    Logger.info(`Calculating months data for ${filteredPositions.length} portfolio positions`);
-    
+    Logger.info(`Calculating months data for ${filteredPositions.length} portfolio positions in year ${selectedYear}`);
     const data: MonthData[] = [];
-    
     for (let month = 1; month <= 12; month++) {
       const monthPositions: Array<{ position: PortfolioPosition; income: number }> = [];
       let totalIncome = 0;
-
       filteredPositions.forEach((position: PortfolioPosition) => {
-        const income = calculatePositionIncomeForMonth(position, month);
-        Logger.cache(`Position ${position.name} income for month ${month}: ${income}`);
-        
+        // Transaktionen bis Monatsende aufsummieren
+        const monthEnd = new Date(selectedYear, month, 0, 23, 59, 59, 999);
+        let quantity = 0;
+        if (Array.isArray(position.transactions)) {
+          position.transactions.forEach(tx => {
+            const txDate = new Date(tx.purchaseDate);
+            if (txDate <= monthEnd) {
+              if (tx.transactionType === 'buy') {
+                quantity += tx.purchaseQuantity || 0;
+              } else if (tx.transactionType === 'sell') {
+                quantity -= tx.purchaseQuantity || 0;
+              }
+            }
+          });
+        }
+        if (quantity <= 0) {
+          // Noch keine Anteile gehalten, kein Ertrag
+          return;
+        }
+        // Ertrag mit der gehaltenen Menge berechnen
+        // Wir übergeben die dynamische Menge an die Einkommensberechnung
+        const positionWithQuantity = { ...position, totalQuantity: quantity };
+        const income = calculatePositionIncomeForMonth(positionWithQuantity, month);
+        Logger.cache(`Position ${position.name} income for month ${month} (gehaltene Menge: ${quantity}): ${income}`);
         if (income > 0) {
-          monthPositions.push({ position, income });
+          monthPositions.push({ position: positionWithQuantity, income });
           totalIncome += income;
         }
       });
-
       Logger.info(`Month ${month} (${monthNames[month - 1]}): ${monthPositions.length} positions with income, total: ${totalIncome}`);
-
-      // Sort by income descending - using toSorted to avoid mutating the original array
       const sortedMonthPositions = monthPositions.toSorted((a, b) => b.income - a.income);
-
       data.push({
         month,
         name: monthNames[month - 1],
@@ -256,18 +285,14 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
         positions: sortedMonthPositions
       });
     }
-
     Logger.info(`Months data calculated for ${data.length} months`);
-    
-    // Log summary of months with income
     const monthsWithIncome = data.filter(m => m.totalIncome > 0);
     Logger.info(`Months with income: ${monthsWithIncome.length} out of ${data.length}`);
     monthsWithIncome.forEach(m => {
       Logger.info(`  ${m.name}: ${m.totalIncome} from ${m.positions.length} positions`);
     });
-    
     return data;
-  }, [filteredPositions, monthNames, calculatePositionIncomeForMonth]);
+  }, [filteredPositions, monthNames, calculatePositionIncomeForMonth, selectedYear]);
 
   // Memoize selected month data
   const selectedMonthData = useMemo(() => {
@@ -332,6 +357,9 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
       onBarClick={handleBarClick}
       onAssetTypeChange={handleAssetTypeChange}
       onBack={onBack}
+      selectedYear={selectedYear}
+      yearOptions={yearOptions}
+      onYearChange={setSelectedYear}
     />
   );
 };

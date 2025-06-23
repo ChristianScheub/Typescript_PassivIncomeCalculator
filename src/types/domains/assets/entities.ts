@@ -66,6 +66,9 @@ export interface AssetDefinition extends BaseEntity {
 
   // Dividend API integration
   useDividendApi?: boolean;
+
+  // Dividend history (API and manual entries)
+  dividendHistory?: import('./dividends').DividendHistoryEntry[];
   
   // Additional metadata
   description?: string;

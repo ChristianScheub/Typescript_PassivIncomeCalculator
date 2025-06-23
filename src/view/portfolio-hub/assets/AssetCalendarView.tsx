@@ -3,13 +3,13 @@ import { Calendar, TrendingUp, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import formatService from "@service/infrastructure/formatService";
-import { AssetType } from '../../../types';
 import { RechartsClickData } from '@/types/shared/charts';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { ViewHeader } from '@/ui/layout/ViewHeader';
 import { AssetTypeFilterCard } from '@/ui/specialized/AssetTypeFilterCard';
 import { CollapsibleSection } from '@/ui/common/CollapsibleSection';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
+import { AssetType } from '@/types/shared';
 
 interface MonthData {
   month: number;
@@ -43,6 +43,9 @@ interface AssetCalendarViewProps {
   onBarClick: (data: RechartsClickData) => void;
   onAssetTypeChange: (type: AssetType | 'all') => void;
   onBack?: () => void;
+  selectedYear: number;
+  yearOptions: number[];
+  onYearChange: (year: number) => void;
 }
 
 const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
@@ -54,7 +57,10 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
   positions,
   onBarClick,
   onAssetTypeChange,
-  onBack
+  onBack,
+  selectedYear,
+  yearOptions,
+  onYearChange
 }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -72,6 +78,17 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
         <ViewHeader
           title={t('assets.calendar')}
           onBack={onBack || (() => navigate(-1))}
+          rightContent={
+            <select
+              className="ml-4 px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+              value={selectedYear}
+              onChange={e => onYearChange(Number(e.target.value))}
+            >
+              {yearOptions.map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          }
         />
         
         {/* Asset Type Filter Card */}
@@ -142,7 +159,7 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
                 >
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-2xl font-semibold">{selectedMonthData.name} {new Date().getFullYear()}</h2>
+                      <h2 className="text-2xl font-semibold">{selectedMonthData.name} {selectedYear}</h2>
                       <div className="flex items-center space-x-2">
                         <TrendingUp className="w-5 h-5 text-green-600" />
                         <span className="text-xl font-bold text-green-600">

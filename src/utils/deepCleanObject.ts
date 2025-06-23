@@ -2,8 +2,8 @@
 // Optionally, restrict to allowed keys (schemaKeys)
 function cleanArray(arr: any[], schemaKeys?: string[]): any[] {
   return arr
-    .map((item) => deepCleanObject(item, schemaKeys))
-    .filter((v) => v != null && (typeof v !== 'object' || Object.keys(v).length > 0));
+    .map((item) => (typeof item === 'object' && item !== null ? deepCleanObject(item, schemaKeys) : item))
+    .filter((v) => v != null && (typeof v !== 'object' || Array.isArray(v) || Object.keys(v).length > 0));
 }
 
 function cleanObject(obj: any, schemaKeys?: string[]): any {
@@ -15,7 +15,8 @@ function cleanObject(obj: any, schemaKeys?: string[]): any {
     if (value === undefined || value === null) continue;
     if (Array.isArray(value)) {
       const arr = cleanArray(value);
-      if (arr.length > 0) cleaned[key] = arr;
+      // Arrays should always be preserved, even if empty
+      cleaned[key] = arr;
     } else if (typeof value === 'object') {
       const nested = deepCleanObject(value);
       if (nested && Object.keys(nested).length > 0) cleaned[key] = nested;

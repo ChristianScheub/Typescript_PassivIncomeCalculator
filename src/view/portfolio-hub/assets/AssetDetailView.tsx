@@ -5,6 +5,7 @@ import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { formatService } from '@service';
 import { PriceHistoryView } from '@/ui/components/PriceHistoryView';
 import { PriceChart } from '@/ui/components/PriceChart';
+import { DividendHistoryView } from '@/ui/components/DividendHistoryView';
 import { featureFlag_Debug_View } from '../../../config/featureFlags';
 import { IconButton } from '@/ui/common';
 
@@ -212,6 +213,15 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
               priceHistory={asset.assetDefinition.priceHistory}
               ticker={asset.assetDefinition.ticker}
               transactions={asset.transactions}
+            />
+          )}
+
+          {/* Dividend History */}
+          {asset.assetDefinition?.dividendHistory && asset.assetDefinition.dividendHistory.length > 0 && (
+            <DividendHistoryView
+              dividendHistory={asset.assetDefinition.dividendHistory}
+              maxEntries={9000}
+              showSourceIcons={true}
             />
           )}
 

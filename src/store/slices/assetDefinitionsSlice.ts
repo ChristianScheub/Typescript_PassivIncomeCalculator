@@ -5,6 +5,9 @@ import sqliteService from '@service/infrastructure/sqlLiteService';
 import { deepCleanObject } from '@/utils/deepCleanObject';
 import { RootState } from '../index';
 import { createDividendApiHandler } from '@/service/domain/assets/market-data/dividendAPIService';
+import { DividendHistoryEntry } from '@/types/domains/assets/dividends';
+import { parseDividendHistoryFromApiResult } from '@/utils/parseDividendHistoryFromApiResult';
+import type { DividendFrequency } from '@/types/shared/base/enums';
 
 interface AssetDefinitionsState {
   items: AssetDefinition[];
@@ -18,6 +21,24 @@ const initialState: AssetDefinitionsState = {
   error: null,
 };
 
+// Typ für Yahoo Dividend API Response
+// interface YahooDividendApiResponse {
+//   chart: {
+//     result: [
+//       {
+//         events?: {
+//           dividends?: {
+//             [timestamp: string]: {
+//               amount: number;
+//               date: number;
+//             };
+//           };
+//         };
+//       }
+//     ];
+//   };
+// }
+
 // Async thunks
 export const fetchAssetDefinitions = createAsyncThunk(
   'assetDefinitions/fetchAssetDefinitions',
@@ -27,6 +48,23 @@ export const fetchAssetDefinitions = createAsyncThunk(
       // Abrufen der Asset-Definitionen aus der Datenbank
       const definitions = await sqliteService.getAll('assetDefinitions');
       Logger.info(`Fetched ${definitions.length} asset definitions`);
+      definitions.forEach(def => {
+        if (def.dividendHistory) {
+          Logger.info(`[DEBUG] Asset ${def.name} hat dividendHistory mit ${def.dividendHistory.length} Einträgen`);
+        } else {
+          Logger.info(`[DEBUG] Asset ${def.name} hat KEINE dividendHistory`);
+        }
+      });
+      
+      // Migration: dividendHistory immer setzen
+      for (const def of definitions) {
+        if (def.dividendHistory === undefined) {
+          def.dividendHistory = [];
+          Logger.info(`[MIGRATION] Setze dividendHistory für Asset ${def.name}`);
+          await sqliteService.update('assetDefinitions', def);
+        }
+      }
+      
       return definitions;
     } catch (error) {
       Logger.error(`Error fetching asset definitions: ${error}`);
@@ -44,6 +82,7 @@ export const addAssetDefinition = createAsyncThunk(
       // Erstellen einer neuen Asset-Definition mit ID und Zeitstempeln
       const newAssetDefinition: AssetDefinition = {
         ...assetDefinitionData,
+        dividendHistory: assetDefinitionData.dividendHistory ?? [],
         id: Date.now().toString(), // Temporäre ID, wird von der Datenbank überschrieben
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
@@ -66,14 +105,22 @@ export const updateAssetDefinition = createAsyncThunk(
   async (assetDefinition: AssetDefinition) => {
     Logger.info(`Updating asset definition in database: ${assetDefinition.name}`);
     try {
+      Logger.info('[DEBUG] Vor DeepClean: ' + JSON.stringify(assetDefinition));
       // Aktualisierung des updatedAt-Feldes
       const updatedDefinition = {
         ...assetDefinition,
+        dividendHistory: assetDefinition.dividendHistory ?? [],
         updatedAt: new Date().toISOString(),
       };
+      Logger.info('[DEBUG] Nach updatedAt: ' + JSON.stringify(updatedDefinition));
       // Deep clean before DB update
       const cleanedDefinition = deepCleanObject(updatedDefinition);
-      Logger.info('Asset definition after deep clean: ' + JSON.stringify(cleanedDefinition));
+      Logger.info('[DEBUG] Nach DeepClean: ' + JSON.stringify(cleanedDefinition));
+      if (cleanedDefinition.dividendHistory) {
+        Logger.info(`[DEBUG] Update: Asset ${cleanedDefinition.name} hat dividendHistory mit ${cleanedDefinition.dividendHistory.length} Einträgen`);
+      } else {
+        Logger.info(`[DEBUG] Update: Asset ${cleanedDefinition.name} hat KEINE dividendHistory`);
+      }
       // Speichern der Aktualisierung in der Datenbank
       await sqliteService.update('assetDefinitions', cleanedDefinition);
       Logger.info(`Asset definition updated successfully: ${cleanedDefinition.name}`);
@@ -104,7 +151,7 @@ export const deleteAssetDefinition = createAsyncThunk(
 
 export const fetchAndUpdateDividends = createAsyncThunk(
   'assetDefinitions/fetchAndUpdateDividends',
-  async (definition: AssetDefinition, { getState, dispatch }) => {
+  async (definition: AssetDefinition, { getState }) => {
     Logger.info('[fetchAndUpdateDividends] called for: ' + definition.fullName);
     const state = getState() as RootState;
     const provider = state.dividendApiConfig.selectedProvider;
@@ -118,29 +165,52 @@ export const fetchAndUpdateDividends = createAsyncThunk(
       throw err;
     }
     if (!definition.ticker) throw new Error('Kein Ticker für Asset vorhanden');
-    let result;
+    let result: any;
     try {
       Logger.info('[fetchAndUpdateDividends] about to call fetchDividends');
-      result = await handler.fetchDividends(definition.ticker);
+      result = await handler.fetchDividends(definition.ticker, { interval: '1d', range: '2y' });
       Logger.info('[fetchAndUpdateDividends] fetchDividends finished');
     } catch (err) {
       Logger.error('[fetchAndUpdateDividends] Error in fetchDividends: ' + JSON.stringify(err));
       throw err;
     }
-    // Dividenden als Info im Asset speichern (hier: nur letzte Dividende als Beispiel)
-    const last = result.dividends[result.dividends.length - 1];
+
+    // Mapping ausgelagert
+    const currency = definition.currency || undefined;
+    let dividendHistory: DividendHistoryEntry[] = parseDividendHistoryFromApiResult(result, currency);
+    Logger.info('[DEBUG] Parsed dividendHistory (unified): ' + JSON.stringify(dividendHistory));
+    dividendHistory.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+    // Frequency und paymentMonths ableiten
+    let frequency: DividendFrequency | undefined = undefined;
+    let paymentMonths: number[] | undefined = undefined;
+    if (dividendHistory.length > 1) {
+      const months = dividendHistory.map(d => new Date(d.date).getMonth() + 1); // 1-based
+      paymentMonths = Array.from(new Set(months)).sort((a, b) => a - b);
+      const intervals = dividendHistory.slice(1).map((d, i) =>
+        (new Date(d.date).getTime() - new Date(dividendHistory[i].date).getTime()) / (1000 * 60 * 60 * 24)
+      );
+      const avgInterval = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      if (avgInterval < 40) frequency = 'monthly';
+      else if (avgInterval < 100) frequency = 'quarterly';
+      else if (avgInterval < 200) frequency = 'annually';
+      else frequency = 'custom';
+    }
+
+    const last = dividendHistory.length > 0 ? dividendHistory[dividendHistory.length - 1] : undefined;
     const updatedDefinition = {
       ...definition,
       dividendInfo: last
         ? {
             amount: last.amount,
-            frequency: last.frequency,
-            lastDividendDate: last.lastDividendDate,
-            paymentMonths: last.paymentMonths,
+            frequency,
+            lastDividendDate: last.date,
+            paymentMonths,
           }
         : undefined,
+      dividendHistory,
     };
-    // Hier könnte direkt updateAssetDefinition(dispatch) aufgerufen werden
+    Logger.info('[DEBUG] updatedDefinition before return: ' + JSON.stringify(updatedDefinition));
     return updatedDefinition;
   }
 );

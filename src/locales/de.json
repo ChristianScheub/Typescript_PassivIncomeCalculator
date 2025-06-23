@@ -504,6 +504,7 @@
     "currency": "Währung",
     "dividend": "Dividende",
     "frequency": "Häufigkeit",
+    "dividendHistory": "Dividenden-Historie",
     "priceInformation": "Preis Daten",
     "addPriceEntry": "Preis-Eintrag hinzufügen",
     "addPriceEntry.description": "Fügen Sie einen neuen Preiseintrag für einen bestimmten Tag zur Preishistorie hinzu.",

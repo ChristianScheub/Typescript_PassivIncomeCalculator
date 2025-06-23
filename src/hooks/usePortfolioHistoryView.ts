@@ -206,15 +206,16 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         portfolioHistoryService.getPortfolioIntradayByDateRange(startDateStr, endDateStr),
         portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr)
       ]);
-      const intradayByDate: Record<string, { date: string; value: number; timestamp: string }> = {};
-      intraday.forEach(point => {
-        if (!intradayByDate[point.date] || (intradayByDate[point.date].timestamp < point.timestamp)) {
-          intradayByDate[point.date] = point;
-        }
-      });
+      // Map daily data by date
       const dailyByDate: Record<string, { date: string; value: number }> = {};
       daily.forEach(point => {
         dailyByDate[point.date] = point;
+      });
+      // Map intraday data by date (collect all points per day)
+      const intradayByDate: Record<string, Array<{ date: string; value: number; timestamp: string }>> = {};
+      intraday.forEach(point => {
+        if (!intradayByDate[point.date]) intradayByDate[point.date] = [];
+        intradayByDate[point.date].push(point);
       });
       const days = 7;
       const result: Array<{ date: string; value: number; transactions: Array<any> }> = [];
@@ -223,12 +224,17 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         const d = new Date(startDate);
         d.setDate(startDate.getDate() + i);
         const dateStr = d.toISOString().split('T')[0];
-        if (intradayByDate[dateStr]) {
-          result.push({
-            date: dateStr,
-            value: typeof intradayByDate[dateStr].value === 'number' && !isNaN(intradayByDate[dateStr].value) ? intradayByDate[dateStr].value : 0,
-            transactions: []
-          });
+        if (intradayByDate[dateStr] && intradayByDate[dateStr].length > 0) {
+          // Alle Intraday-Minutenpunkte für diesen Tag übernehmen
+          intradayByDate[dateStr]
+            .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+            .forEach(point => {
+              result.push({
+                date: point.timestamp, // timestamp für feineres Chart
+                value: typeof point.value === 'number' && !isNaN(point.value) ? point.value : 0,
+                transactions: []
+              });
+            });
         } else if (dailyByDate[dateStr]) {
           result.push({
             date: dateStr,
