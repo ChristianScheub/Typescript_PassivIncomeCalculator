@@ -105,6 +105,17 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
     { key: 'Max', label: 'Max' }
   ];
 
+  // Y-Achse: min = niedrigster Wert - 10%, max = höchster Wert + 10%
+  const values = chartData.map(p => p.value).filter(v => isFinite(v));
+  let yDomain: [number | 'auto', number | 'auto'] = ['auto', 'auto'];
+  if (values.length > 0) {
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const domainMin = Math.max(0, Math.floor((min - min * 0.1)));
+    const domainMax = Math.ceil(max + max * 0.1);
+    yDomain = [domainMin, domainMax];
+  }
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -226,6 +237,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
                 tick={{ fontSize: 12 }}
                 className="text-gray-600 dark:text-gray-400"
                 tickFormatter={(value) => formatService.formatCurrency(value)}
+                domain={yDomain}
               />
               <Tooltip content={<ChartTooltip chartType="bar" t={t} useCustomFormatting={true} showTransactions={true} />} />
               <Line 

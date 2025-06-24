@@ -22,7 +22,8 @@ import deleteDataService from "../../service/application/workflows/deleteDataSer
 import { t } from "i18next";
 import { ConfirmationDialogState } from "../../ui/dialog/types";
 import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '../../store/slices/snackbarSlice';
-
+import { useCalculatedDataCache } from '../../hooks/useCalculatedDataCache';
+import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";
 type AsyncOperationStatus = "idle" | "loading" | "success" | "error";
@@ -687,6 +688,7 @@ const SettingsContainer: React.FC = () => {
       onDiviApiKeyRemove={handleDiviApiKeyRemove}
       onDiviProviderChange={handleDiviProviderChange}
       onClearDividendHistory={handleClearDividendHistoryWithConfirm}
+      onPortfolioHistoryRefresh={() => cacheRefreshService.refreshAllCaches()}
       confirmDialog={confirmDialog}
       onCloseConfirmDialog={closeConfirmDialog}
       formatLogEntry={formatLogEntry}

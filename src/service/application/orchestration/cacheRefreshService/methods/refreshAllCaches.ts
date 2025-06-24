@@ -21,6 +21,7 @@ import { PortfolioHistoryHelper } from '../../../../domain/portfolio/history/por
 import recentActivityService from '../../../../domain/analytics/reporting/recentActivityService';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { refreshPortfolioHistory } from '../../../workflows/deleteDataService/methods/refreshPortfolioHistory';
+import { calculatePortfolioIntradayDataDirect } from '@/store/slices/portfolioIntradaySlice';
 
 /**
  * Refreshes all caches in the application
@@ -118,7 +119,7 @@ export async function refreshAllCaches(): Promise<void> {
         const assetDefinitionsForIntraday = refreshedState.assetDefinitions?.items || [];
         if (portfolioPositions.length > 0 && assetDefinitionsForIntraday.length > 0) {
             await store.dispatch(
-                require('@/store/slices/portfolioIntradaySlice').calculatePortfolioIntradayDataDirect({
+                calculatePortfolioIntradayDataDirect({
                     portfolioPositions,
                     portfolioCacheId,
                     assetDefinitions: assetDefinitionsForIntraday

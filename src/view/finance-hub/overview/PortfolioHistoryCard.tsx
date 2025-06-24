@@ -81,29 +81,16 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history, is
   const gradientColor = totalChange >= 0 ? '#22C55E' : '#EF4444';
   const changeColor = totalChange >= 0 ? 'text-green-600' : 'text-red-600';
 
+  // Y-Achse: min = niedrigster Wert - 10%, max = höchster Wert + 10%, niemals unter 0
   const calculateYAxisDomain = () => {
     if (transformedHistory.length === 0) return ['auto', 'auto'];
     const values = transformedHistory.map(item => item.value);
     const minValue = Math.min(...values);
     const maxValue = Math.max(...values);
-    const range = maxValue - minValue;
-    if (range === 0) return ['auto', 'auto'];
-    const avgValue = (minValue + maxValue) / 2;
-    const rangePercentage = (range / avgValue) * 100;
-    let paddingFactor = 0.1;
-    if (rangePercentage < 0.5) {
-      paddingFactor = 0.01;
-    } else if (rangePercentage < 2) {
-      paddingFactor = 0.02;
-    } else if (rangePercentage < 5) {
-      paddingFactor = 0.05;
-    }
-    const padding = range * paddingFactor;
-    const domainMin = Math.max(0, minValue - padding);
-    const domainMax = maxValue + padding;
-    const roundedMin = Math.floor(domainMin / 100) * 100;
-    const roundedMax = Math.ceil(domainMax / 100) * 100;
-    return [roundedMin, roundedMax];
+    if (minValue === maxValue) return ['auto', 'auto'];
+    const domainMin = Math.max(0, Math.floor(minValue - minValue * 0.1));
+    const domainMax = Math.ceil(maxValue + maxValue * 0.1);
+    return [domainMin, domainMax];
   };
   const [yAxisMin, yAxisMax] = calculateYAxisDomain();
   const formatXAxisLabel = (dateStr: string) => {

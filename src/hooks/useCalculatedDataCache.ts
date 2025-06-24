@@ -86,18 +86,16 @@ export const usePortfolioHistory = (timeRange: AssetFocusTimeRange) => {
   const { items: assets } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
 
-  // Auto-calculate only if store is hydrated, cache is empty, and we have data
+  // Auto-calculate only if store is hydrated, cache is empty, und wir haben Daten
   React.useEffect(() => {
     if (!isStoreHydrated) {
       Logger.cache(`Portfolio history hook waiting for store hydration (timeRange: ${timeRange})`);
       return;
     }
-    
-    // DISABLED: Auto-calculation removed - using new PortfolioHistoryCalculationService
-    const shouldCalculate = false;
-    
+    const shouldCalculate = !portfolioHistoryCache && assets.length > 0 && assetDefinitions.length > 0;
     if (shouldCalculate) {
-      // Old auto-calculation logic removed
+      Logger.cache(`Auto-calculating portfolio history (no valid cache found, store hydrated, timeRange: ${timeRange})`);
+      dispatch({ type: 'portfolioHistory/triggerCalculation', payload: { timeRange } });
     } else if (portfolioHistoryCache) {
       Logger.cache(`Using cached portfolio history for timeRange: ${timeRange} (${portfolioHistoryCache.data.length} entries, calculated: ${portfolioHistoryCache.lastCalculated})`);
     } else {

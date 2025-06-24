@@ -89,6 +89,8 @@ interface SettingsViewProps {
   getLogLevelColor: (level: string) => string;
   // Fix: Add missing prop for dividend history clear
   onClearDividendHistory: () => void;
+  // NEW: Debug button for portfolio history refresh
+  onPortfolioHistoryRefresh?: () => void;
 }
 
 const SettingsView: React.FC<SettingsViewProps> = ({
@@ -147,7 +149,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   isDividendApiEnabled,
   onDividendApiToggle,
   // Fix: Add missing prop for dividend history clear
-  onClearDividendHistory
+  onClearDividendHistory,
+  onPortfolioHistoryRefresh,
 }) => {
   const { t } = useTranslation();
   const [showApiKey, setShowApiKey] = useState(false);
@@ -570,6 +573,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           onAutoRefreshChange={onAutoRefreshChange}
           formatLogEntry={formatLogEntry}
           getLogLevelColor={getLogLevelColor}
+          pullToRefreshFake={onPortfolioHistoryRefresh}
         />
       )}
 
