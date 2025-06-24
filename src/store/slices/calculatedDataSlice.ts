@@ -6,6 +6,7 @@ import assetFocusService from '@/service/domain/dashboard/assetFocusService';
 import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
 import { AssetFocusTimeRange } from './dashboardSettingsSlice';
+import { generatePortfolioInputHash, simpleHash } from '@/utils/hashUtils';
 
 // Types for cached data
 export interface CachedPortfolioHistory {
@@ -64,8 +65,19 @@ const initialState: CalculatedDataState = {
 };
 
 // Helper function to create input hash for cache invalidation
-const createInputHash = (data: unknown): string => {
-  return JSON.stringify(data);
+const createInputHash = (data: { assets: any[]; assetDefinitions: any[] }): string => {
+  return generatePortfolioInputHash(data.assets, data.assetDefinitions);
+};
+
+// Helper function to create input hash for financial summary (nur IDs)
+const createFinancialSummaryInputHash = (assets: any[], assetDefinitions: any[], liabilities: any[], expenses: any[], income: any[]): string => {
+  // Hash nur IDs und updatedAt für Stabilität
+  const assetHash = simpleHash(assets.map((a: any) => ({ id: a.id, updatedAt: a.updatedAt })).sort((a, b) => a.id.localeCompare(b.id)));
+  const definitionHash = simpleHash(assetDefinitions.map((a: any) => ({ id: a.id, updatedAt: a.updatedAt })).sort((a, b) => a.id.localeCompare(b.id)));
+  const liabilityHash = simpleHash(liabilities.map((l: any) => ({ id: l.id, updatedAt: l.updatedAt })).sort((a, b) => a.id.localeCompare(b.id)));
+  const expenseHash = simpleHash(expenses.map((e: any) => ({ id: e.id, updatedAt: e.updatedAt })).sort((a, b) => a.id.localeCompare(b.id)));
+  const incomeHash = simpleHash(income.map((i: any) => ({ id: i.id, updatedAt: i.updatedAt })).sort((a, b) => a.id.localeCompare(b.id)));
+  return `${assetHash}_${definitionHash}_${liabilityHash}_${expenseHash}_${incomeHash}`;
 };
 
 // Helper function to check if cache is valid
@@ -195,15 +207,7 @@ export const calculateFinancialSummary = createAsyncThunk(
     const { items: income } = state.income || { items: [] };
 
     // Only use minimal references for inputHash
-    const inputData = {
-      assetDefinitionIds: assetDefinitions.map((a: any) => a.id),
-      assetIds: assets.map((a: any) => a.id),
-      liabilityIds: liabilities.map((l: any) => l.id),
-      expenseIds: expenses.map((e: any) => e.id),
-      incomeIds: income.map((i: any) => i.id),
-      // Optionally, add other primitive fields that affect calculation (e.g. lastUpdated timestamps)
-    };
-    const inputHash = createInputHash(inputData);
+    const inputHash = createFinancialSummaryInputHash(assets, assetDefinitions, liabilities, expenses, income);
 
     // Check if we have valid cached data
     const existingCache = state.calculatedData.financialSummary;
@@ -243,6 +247,7 @@ const calculatedDataSlice = createSlice({
       state.portfolioHistory = {};
       state.assetFocusData = null;
       state.financialSummary = null;
+      localStorage.removeItem('passiveIncomeCalculator');
       Logger.cache('Cleared all calculated data cache');
     },
     

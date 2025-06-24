@@ -55,3 +55,12 @@ export const generateDefinitionHash = (definitions: AssetDefinition[]): string =
   
   return simpleHash(relevantData);
 };
+
+// Entferne die doppelten Exporte und Imports, alles bleibt lokal in dieser Datei
+
+export function generatePortfolioInputHash(assets: Transaction[], assetDefinitions: AssetDefinition[]): string {
+  // Sortierung für Stabilität
+  const assetHash = generateAssetHash([...assets].sort((a, b) => a.id.localeCompare(b.id)));
+  const definitionHash = generateDefinitionHash([...assetDefinitions].sort((a, b) => a.id.localeCompare(b.id)));
+  return `${assetHash}_${definitionHash}`;
+}

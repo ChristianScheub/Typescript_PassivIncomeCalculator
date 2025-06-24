@@ -113,7 +113,7 @@ export const calculatePortfolioPositions = (
     
     const position: PortfolioPosition = {
       id: key,
-      assetDefinition,
+      assetDefinitionId: assetDefinition?.id,
       name: assetDefinition?.fullName || firstTransaction.name,
       ticker: assetDefinition?.ticker,
       type: assetDefinition?.type || firstTransaction.type,

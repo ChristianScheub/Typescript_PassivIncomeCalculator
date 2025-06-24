@@ -2,12 +2,13 @@
  * Enhanced Portfolio Cache Types
  */
 
-import { AssetDefinition, Transaction } from '../assets/entities';
+import { Transaction } from '../assets/entities';
 import { PriceHistoryEntry } from '../assets/market-data';
+import { AssetDefinition } from '../assets/entities';
 
 // Portfolio Position with full transaction details
 export interface PortfolioPosition {
-  assetDefinition: AssetDefinition;
+  assetDefinitionId: string;
   transactions: Transaction[];
   transactionCount: number;
   totalQuantity: number;

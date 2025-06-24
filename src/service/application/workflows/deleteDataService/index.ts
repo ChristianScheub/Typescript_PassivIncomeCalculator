@@ -9,6 +9,7 @@ import { clearPartialData } from './methods/clearPartialData';
 import { clearPriceHistory } from './methods/clearPriceHistory';
 import { clearPortfolioHistory } from './methods/clearPortfolioHistory';
 import { refreshPortfolioHistory } from './methods/refreshPortfolioHistory';
+import { clearReduxCacheOnly } from './methods/clearReduxCacheOnly';
 
 // Create deleteDataService as a functional object
 const deleteDataService: DeleteDataService = {
@@ -20,7 +21,8 @@ const deleteDataService: DeleteDataService = {
     clearIncome,
     clearPartialData,
     clearPriceHistory,
-    clearPortfolioHistory
+    clearPortfolioHistory,
+    clearReduxCacheOnly
 };
 
 // Export the service interface and implementation
@@ -41,5 +43,6 @@ export {
     clearPartialData,
     clearPriceHistory,
     clearPortfolioHistory,
-    refreshPortfolioHistory
+    refreshPortfolioHistory,
+    clearReduxCacheOnly
 };

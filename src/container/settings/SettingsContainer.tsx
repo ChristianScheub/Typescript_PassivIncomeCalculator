@@ -18,7 +18,7 @@ import {
   setCurrency as setGlobalCurrency,
   getCurrency,
 } from "../../service/domain/assets/market-data/stockAPIService/utils/fetch";
-import deleteDataService from "../../service/application/workflows/deleteDataService";
+import deleteDataService from '../../service/application/workflows/deleteDataService';
 import { t } from "i18next";
 import { ConfirmationDialogState } from "../../ui/dialog/types";
 import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '../../store/slices/snackbarSlice';
@@ -464,9 +464,8 @@ const SettingsContainer: React.FC = () => {
       setClearReduxCacheStatus("clearing");
       Logger.info("Starting to clear Redux cache");
 
-      // Clear all cached data from Redux store
-      dispatch(clearAllCache());
-      dispatch(clearAllCharts());
+      // Nutze deleteDataService für Redux-Cache + LocalStorage
+      await deleteDataService.clearReduxCacheOnly(dispatch);
       
       Logger.info("Redux cache cleared successfully");
       setClearReduxCacheStatus("success");

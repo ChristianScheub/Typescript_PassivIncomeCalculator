@@ -2,12 +2,12 @@
  * Portfolio Position Types
  */
 
-import { AssetDefinition, Transaction } from '../assets';
+import { Transaction } from '../assets';
 import { AssetCategory, AssetCategoryOption } from '../assets/categories';
 
 export interface PortfolioPosition {
   id: string; // AssetDefinitionId or fallback identifier
-  assetDefinition?: AssetDefinition;
+  assetDefinitionId?: string;
   name: string;
   ticker?: string;
   type: string;

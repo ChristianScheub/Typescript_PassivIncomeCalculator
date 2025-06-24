@@ -69,9 +69,10 @@ const PortfolioHistoryTooltip: React.FC<PortfolioHistoryTooltipProps> = ({ activ
 const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history, isIntradayView = false }) => {
   const { t } = useTranslation();
 
+  // Filter out entries with NaN values
   const transformedHistory = useMemo(() => {
     if (!history || history.length === 0) return [];
-    return history;
+    return history.filter(item => typeof item.value === 'number' && !isNaN(item.value));
   }, [history]);
 
   const firstDay = transformedHistory[0];

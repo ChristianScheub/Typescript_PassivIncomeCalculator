@@ -8,6 +8,7 @@ import { clearIncome } from './clearIncome';
 import { clearPartialData } from './clearPartialData';
 import { clearAllData } from './clearAllData';
 import { clearPortfolioHistory } from './clearPortfolioHistory';
+import { clearReduxCacheOnly } from './clearReduxCacheOnly';
 
 class DeleteDataServiceImpl implements DeleteDataService {
     clearAssetDefinitions = clearAssetDefinitions;
@@ -19,6 +20,7 @@ class DeleteDataServiceImpl implements DeleteDataService {
     clearPartialData = clearPartialData;
     clearAllData = clearAllData;
     clearPortfolioHistory = clearPortfolioHistory;
+    clearReduxCacheOnly = clearReduxCacheOnly;
 }
 
 export const deleteDataServiceImpl = new DeleteDataServiceImpl();
