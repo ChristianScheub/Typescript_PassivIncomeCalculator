@@ -43,43 +43,37 @@ const AssetFocusDashboardContainer: React.FC = () => {
   const assetFocusData = useAssetFocusData();
   const financialSummary = useFinancialSummary();
 
+  // State for pull-to-refresh
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+
   // Combine regular portfolio history with intraday data for enhanced view
   const enhancedPortfolioHistory = React.useMemo(() => {
     const baseData = portfolioHistoryData?.data || [];
     const newSystemData = portfolioHistoryViewData || [];
-    
     Logger.info(`AssetFocusDashboardContainer enhancedPortfolioHistory: timeRange=${assetFocus.timeRange}, baseData=${baseData.length}, newSystemData=${newSystemData.length}, intradayData=${intradayData.length}`);
-    
-    // For short timeframes (1D, 1W), use intraday data
-    if ((assetFocus.timeRange === '1D' || assetFocus.timeRange === '1W') && intradayData.length > 0) {
-      Logger.info(`Enhancing portfolio history with ${intradayData.length} intraday data points for ${assetFocus.timeRange} view`);
-      
+
+    // Für 1D: wie gehabt
+    if (assetFocus.timeRange === '1D' && intradayData.length > 0) {
       // Filter intraday data based on timeRange
       let filteredIntradayData = intradayData;
-      
-      if (assetFocus.timeRange === '1D') {
-        // For 1D: Show the most recent 24 hours of available data
-        if (intradayData.length > 0) {
-          // Sort by timestamp to get the most recent data first
-          const sortedData = [...intradayData].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-          
-          // Get the most recent timestamp
-          const mostRecentTimestamp = new Date(sortedData[0].timestamp);
-          
-          // Calculate 24 hours back from the most recent data point
-          const twentyFourHoursBack = new Date(mostRecentTimestamp);
-          twentyFourHoursBack.setHours(twentyFourHoursBack.getHours() - 24);
-          
-          // Filter data to show the last 24 hours of available data
-          filteredIntradayData = intradayData.filter(point => 
-            new Date(point.timestamp) >= twentyFourHoursBack
-          );
-          
-          Logger.info(`1D: Showing last 24h of available data from ${mostRecentTimestamp.toISOString()}: ${filteredIntradayData.length} points from ${intradayData.length} total`);
-        }
-      } else if (assetFocus.timeRange === '1W') {
-        // For 1W: Show all intraday data (last 5 days)
-        Logger.info(`Using all ${intradayData.length} intraday points for 1W view`);
+      if (intradayData.length > 0) {
+        // Sort by timestamp to get the most recent data first
+        const sortedData = [...intradayData].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+        
+        // Get the most recent timestamp
+        const mostRecentTimestamp = new Date(sortedData[0].timestamp);
+        
+        // Calculate 24 hours back from the most recent data point
+        const twentyFourHoursBack = new Date(mostRecentTimestamp);
+        twentyFourHoursBack.setHours(twentyFourHoursBack.getHours() - 24);
+        
+        // Filter data to show the last 24 hours of available data
+        filteredIntradayData = intradayData.filter(point => 
+          new Date(point.timestamp) >= twentyFourHoursBack
+        );
+        
+        Logger.info(`1D: Showing last 24h of available data from ${mostRecentTimestamp.toISOString()}: ${filteredIntradayData.length} points from ${intradayData.length} total`);
       }
       
       // Convert filtered intraday data to portfolio history format
@@ -98,22 +92,43 @@ const AssetFocusDashboardContainer: React.FC = () => {
       Logger.info(`Combined portfolio history: ${combined.length} total points (${baseData.length} daily + ${intradayHistoryPoints.length} intraday)`);
       return combined;
     }
-    
-    // For longer timeframes (1M, 3M, 1Y, ALL), try the new system first
+
+    // Für 1W: Zeige die letzten 5 Tage mit Daten, pro Tag nur den letzten Wert (gleichmäßige X-Achse)
+    if (assetFocus.timeRange === '1W' && newSystemData.length > 0) {
+      Logger.info(`Using combined 1W history from usePortfolioHistoryView: ${newSystemData.length} points`);
+      // Gruppiere nach Tag und nimm pro Tag den letzten Wert
+      const byDay: Record<string, typeof newSystemData[0]> = {};
+      [...newSystemData]
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .forEach(point => {
+          const day = point.date.slice(0, 10); // YYYY-MM-DD
+          byDay[day] = point; // Überschreibt, sodass der letzte Wert pro Tag bleibt
+        });
+      // Nimm die letzten 5 Tage mit Daten
+      const days = Object.keys(byDay).sort((a, b) => new Date(b).getTime() - new Date(a).getTime()).slice(0, 5);
+      const result = days
+        .map(day => byDay[day])
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+        .map(point => ({
+          date: point.date,
+          value: point.value,
+          transactions: point.transactions || []
+        }));
+      Logger.info(`1W: Showing last ${days.length} days (one value per day), ${result.length} points`);
+      return result;
+    }
+
+    // Für längere Zeiträume wie gehabt
     if ((assetFocus.timeRange === '1M' || assetFocus.timeRange === '3M' || assetFocus.timeRange === '6M' || assetFocus.timeRange === '1Y' || assetFocus.timeRange === 'ALL') && newSystemData.length > 0) {
       Logger.info(`Using new portfolio history system for ${assetFocus.timeRange}: ${newSystemData.length} points`);
-      
-      // Convert new system data to portfolio history format
       const formattedData = newSystemData.map(point => ({
         date: point.date,
         value: point.value,
-        transactions: [] // No transactions for now
+        transactions: []
       }));
-      
       return formattedData;
     }
-    
-    // Fallback to old system data
+
     Logger.info(`Using regular daily data for timeRange=${assetFocus.timeRange}: ${baseData.length} points`);
     return baseData;
   }, [portfolioHistoryData?.data, portfolioHistoryViewData, intradayData, assetFocus.timeRange]);
@@ -165,14 +180,17 @@ const AssetFocusDashboardContainer: React.FC = () => {
     // will automatically provide the right data for the timeRange via usePortfolioIntradayView
   }, [dispatch]);
 
-  // Pull to refresh handler
   const handleRefresh = useCallback(async () => {
-    Logger.infoService("Asset Focus pull-to-refresh triggered");
-    
-    executeAsyncOperation(
-      'refresh asset focus data',
-      () => cacheRefreshService.refreshAllCaches()
-    );
+    setIsRefreshing(true);
+    try {
+      Logger.infoService("Asset Focus pull-to-refresh triggered");
+      await executeAsyncOperation(
+        'refresh asset focus data',
+        () => cacheRefreshService.refreshAllCaches()
+      );
+    } finally {
+      setIsRefreshing(false);
+    }
   }, [executeAsyncOperation]);
 
   // Intraday history update handler
@@ -274,6 +292,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
         selectedTimeRange={assetFocus.timeRange}
         onTimeRangeChange={handleTimeRangeChange}
         onRefresh={handleRefresh}
+        isRefreshing={isRefreshing}
         onNavigateToForecast={handleNavigateToForecast}
         onNavigateToSettings={handleNavigateToSettings}
         onNavigateToAssetDetail={handleAssetClick}
@@ -284,7 +303,6 @@ const AssetFocusDashboardContainer: React.FC = () => {
         onUpdateIntradayHistory={handleUpdateIntradayHistory}
         isIntradayView={((assetFocus.timeRange === '1D' || assetFocus.timeRange === '1W') && intradayData.length > 0)}
       />
-      
       {/* Asset Detail Modal */}
       <AssetDetailModal
         asset={selectedAsset}

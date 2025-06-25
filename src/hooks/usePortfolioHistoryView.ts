@@ -1,17 +1,26 @@
 import { useAppSelector, useAppDispatch } from './redux';
 import { useEffect, useRef, useMemo, useState } from 'react';
 import portfolioHistoryService from '@/service/infrastructure/sqlLitePortfolioHistory';
-import PortfolioHistoryCalculationService from '@/service/application/portfolioHistoryCalculation/PortfolioHistoryCalculationService';
-import { 
-  setPortfolioIntradayData, 
+import {
+  setPortfolioIntradayData,
   setPortfolioIntradayStatus,
-  setPortfolioIntradayError 
+  setPortfolioIntradayError
 } from '@/store/slices/portfolioIntradaySlice';
 import Logger from '@/service/shared/logging/Logger/logger';
+import PortfolioHistoryWorker from '../workers/portfolioHistoryWorker.ts?worker';
+
+// --- Worker Singleton ---
+let portfolioHistoryWorker: Worker | null = null;
+function getPortfolioHistoryWorker() {
+  if (!portfolioHistoryWorker) {
+    portfolioHistoryWorker = new PortfolioHistoryWorker();
+  }
+  return portfolioHistoryWorker;
+}
 
 /**
  * Hook for accessing portfolio intraday data with proper Redux integration
- * - Prevents infinite loops by tracking loading state
+ * - Now uses a Web Worker for all calculations
  * - Updates Redux after DB loads for better performance
  * - Batched operations for better performance
  */
@@ -20,149 +29,117 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
   const { portfolioCache } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const { isHydrated } = useAppSelector(state => state.calculatedData);
-  
+
   // Get data from portfolioIntraday Redux slice
   const portfolioIntradayData = useAppSelector(state => state.portfolioIntraday?.portfolioIntradayData || []);
   const portfolioIntradayStatus = useAppSelector(state => state.portfolioIntraday?.portfolioIntradayStatus || 'idle');
-  
+
   // Use ref to prevent infinite loops - tracks if we've already attempted to load
   const hasAttemptedLoad = useRef(false);
   const isLoadingRef = useRef(false);
 
   useEffect(() => {
-    // Reset attempt flag when hydration state or dependencies change significantly
     if (!isHydrated) {
       hasAttemptedLoad.current = false;
       return;
     }
-
-    // Don't proceed if we don't have required data
     if (!portfolioCache?.positions || assetDefinitions.length === 0) {
       return;
     }
-
-    // Prevent infinite loops - if we already have data in Redux, don't reload
     if (portfolioIntradayData.length > 0) {
       Logger.infoService('📂 Using portfolio intraday data from Redux cache');
       return;
     }
-
-    // Prevent multiple simultaneous loads
     if (isLoadingRef.current || portfolioIntradayStatus === 'loading') {
       return;
     }
-
-    // Prevent infinite loops - only attempt load once per session
     if (hasAttemptedLoad.current) {
       return;
     }
-
     hasAttemptedLoad.current = true;
     isLoadingRef.current = true;
 
     const loadPortfolioIntradayData = async () => {
       Logger.infoService('📂 Loading portfolio intraday data from IndexedDB...');
-      
       try {
         dispatch(setPortfolioIntradayStatus('loading'));
         dispatch(setPortfolioIntradayError(null));
-        
         // Get last 5 days range (batch operation)
         const today = new Date();
         const fiveDaysAgo = new Date(today);
         fiveDaysAgo.setDate(today.getDate() - 5);
-        
         const startDate = fiveDaysAgo.toISOString().split('T')[0];
         const endDate = today.toISOString().split('T')[0];
-        
-        // BATCH OPERATION: Get all data at once from DB
+        // Try DB first
         const dbData = await portfolioHistoryService.getPortfolioIntradayByDateRange(startDate, endDate);
-        
         if (dbData.length > 0) {
           Logger.infoService(`📂 Loaded ${dbData.length} portfolio intraday points from IndexedDB`);
-          
-          // Transform to expected format
           const transformedData = dbData.map(point => ({
             date: point.date,
             value: point.value,
             timestamp: point.timestamp
           }));
-          
-          // UPDATE REDUX: This prevents the infinite loop!
           dispatch(setPortfolioIntradayData(transformedData));
           dispatch(setPortfolioIntradayStatus('succeeded'));
-          
           Logger.infoService(`✅ Updated Redux with ${transformedData.length} portfolio intraday points`);
-          
         } else {
-          // No data in DB, trigger calculation
-          Logger.infoService('🔄 No portfolio intraday data in IndexedDB, triggering calculation...');
-          
-          await PortfolioHistoryCalculationService.calculateAndSavePortfolioHistory({
-            assetDefinitions,
-            portfolioPositions: portfolioCache.positions
+          // No data in DB, trigger calculation via worker
+          Logger.infoService('🔄 No portfolio intraday data in IndexedDB, triggering worker calculation...');
+          const worker = getPortfolioHistoryWorker();
+          worker.postMessage({
+            type: 'calculateIntraday',
+            params: {
+              assetDefinitions,
+              portfolioPositions: portfolioCache.positions
+            }
           });
-          
-          // After calculation, load again from DB (batch operation)
-          const newDbData = await portfolioHistoryService.getPortfolioIntradayByDateRange(startDate, endDate);
-          
-          if (newDbData.length > 0) {
-            Logger.infoService(`📂 Loaded ${newDbData.length} portfolio intraday points after calculation`);
-            
-            const transformedData = newDbData.map(point => ({
-              date: point.date,
-              value: point.value,
-              timestamp: point.timestamp
-            }));
-            
-            // UPDATE REDUX: Critical to prevent infinite loop
-            dispatch(setPortfolioIntradayData(transformedData));
-            dispatch(setPortfolioIntradayStatus('succeeded'));
-            
-          } else {
-            // No data even after calculation
-            dispatch(setPortfolioIntradayStatus('succeeded')); // Prevent retry
-            Logger.infoService('⚠️ No portfolio intraday data available even after calculation');
-          }
+          const handleWorkerMessage = async (event: MessageEvent) => {
+            const { type, data, error } = event.data || {};
+            if (type === 'resultIntraday') {
+              // Save to DB
+              await portfolioHistoryService.bulkAddPortfolioIntradayData(data);
+              dispatch(setPortfolioIntradayData(data));
+              dispatch(setPortfolioIntradayStatus('succeeded'));
+              Logger.infoService('✅ Portfolio intraday data calculated and saved via worker');
+              worker.removeEventListener('message', handleWorkerMessage);
+            } else if (type === 'error') {
+              dispatch(setPortfolioIntradayError(error || 'Worker error'));
+              dispatch(setPortfolioIntradayStatus('failed'));
+              Logger.error('❌ Worker error: ' + error);
+              worker.removeEventListener('message', handleWorkerMessage);
+            }
+            isLoadingRef.current = false;
+          };
+          worker.addEventListener('message', handleWorkerMessage);
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error';
         Logger.error('❌ Failed to load portfolio intraday data: ' + errorMessage);
-        
         dispatch(setPortfolioIntradayError(errorMessage));
         dispatch(setPortfolioIntradayStatus('failed'));
-      } finally {
         isLoadingRef.current = false;
       }
     };
-
-    // Execute async load
     loadPortfolioIntradayData();
   }, [
-    isHydrated, 
-    portfolioCache?.positions?.length, // Only length to avoid object reference changes
-    assetDefinitions.length, // Only length to avoid array reference changes
-    portfolioIntradayStatus, // Watch status to prevent concurrent loads
+    isHydrated,
+    portfolioCache?.positions?.length,
+    assetDefinitions.length,
+    portfolioIntradayStatus,
     dispatch
-    // NOTE: Removed portfolioIntradayData.length from dependencies to prevent re-triggers after data loads
   ]);
 
-  // Reset attempt flag when portfolio or assets change significantly
   useEffect(() => {
-    // Only reset if portfolio cache validity changes or asset count changes significantly
     const resetAttempt = () => {
       if (hasAttemptedLoad.current) {
         Logger.infoService('🔄 Resetting portfolio intraday load attempt due to data changes');
         hasAttemptedLoad.current = false;
       }
     };
-    
-    // Debounce the reset to avoid excessive resets during rapid state changes
     const timeoutId = setTimeout(resetAttempt, 200);
     return () => clearTimeout(timeoutId);
   }, [portfolioCache?.portfolioCacheValid, assetDefinitions.length]);
 
-  // Return data from Redux
   return portfolioIntradayData;
 }
 
@@ -171,82 +148,39 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
  * Supports different time ranges: 1D, 1W, 1M, 3M, 6M, 1Y, All
  * Returns data in the format expected by PortfolioHistoryView
  * Data is loaded directly from IndexedDB (no Redux cache)
+ *
+ * Now uses the worker for calculation and bulk DB persistence if data is missing.
  */
 export function usePortfolioHistoryView(timeRange?: string): Array<{ date: string; value: number; transactions: Array<any> }> {
   const { portfolioCache } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const { isHydrated } = useAppSelector(state => state.calculatedData);
-  
+  const dispatch = useAppDispatch();
+
   // State for storing data directly (no Redux)
   const [portfolioHistoryData, setPortfolioHistoryData] = useState<Array<{ date: string; value: number; change: number; changePercentage: number }>>([]);
-  
-  // Use ref to prevent infinite loops
   const isLoadingRef = useRef(false);
 
-  // Load data from DB for time ranges other than 1D/1W
+  // --- Worker Singleton ---
+  let portfolioHistoryWorker: Worker | null = null;
+  function getPortfolioHistoryWorker() {
+    if (!portfolioHistoryWorker) {
+      portfolioHistoryWorker = new PortfolioHistoryWorker();
+    }
+    return portfolioHistoryWorker;
+  }
+
   useEffect(() => {
     if (!timeRange || timeRange === '1D' || !isHydrated) {
       return;
     }
-
     if (!portfolioCache?.positions || assetDefinitions.length === 0) {
       return;
     }
-
-    // Prevent multiple simultaneous loads
     if (isLoadingRef.current) {
       return;
     }
-
     isLoadingRef.current = true;
-
-    // --- Hilfsfunktionen ---
-    async function getCombined1WHistory(startDateStr: string, endDateStr: string) {
-      const [intraday, daily] = await Promise.all([
-        portfolioHistoryService.getPortfolioIntradayByDateRange(startDateStr, endDateStr),
-        portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr)
-      ]);
-      // Map daily data by date
-      const dailyByDate: Record<string, { date: string; value: number }> = {};
-      daily.forEach(point => {
-        dailyByDate[point.date] = point;
-      });
-      // Map intraday data by date (collect all points per day)
-      const intradayByDate: Record<string, Array<{ date: string; value: number; timestamp: string }>> = {};
-      intraday.forEach(point => {
-        if (!intradayByDate[point.date]) intradayByDate[point.date] = [];
-        intradayByDate[point.date].push(point);
-      });
-      const days = 7;
-      const result: Array<{ date: string; value: number; transactions: Array<any> }> = [];
-      const startDate = new Date(startDateStr);
-      for (let i = 0; i < days; i++) {
-        const d = new Date(startDate);
-        d.setDate(startDate.getDate() + i);
-        const dateStr = d.toISOString().split('T')[0];
-        if (intradayByDate[dateStr] && intradayByDate[dateStr].length > 0) {
-          // Alle Intraday-Minutenpunkte für diesen Tag übernehmen
-          intradayByDate[dateStr]
-            .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-            .forEach(point => {
-              result.push({
-                date: point.timestamp, // timestamp für feineres Chart
-                value: typeof point.value === 'number' && !isNaN(point.value) ? point.value : 0,
-                transactions: []
-              });
-            });
-        } else if (dailyByDate[dateStr]) {
-          result.push({
-            date: dateStr,
-            value: typeof dailyByDate[dateStr].value === 'number' && !isNaN(dailyByDate[dateStr].value) ? dailyByDate[dateStr].value : 0,
-            transactions: []
-          });
-        } else {
-          result.push({ date: dateStr, value: 0, transactions: [] });
-        }
-      }
-      return result;
-    }
 
     async function getHistoryFromDbOrRecalculate(startDateStr: string, endDateStr: string) {
       const dbData = await portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr);
@@ -259,36 +193,110 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
           changePercentage: point.totalReturnPercentage
         }));
       } else {
-        Logger.infoService(`🔄 No portfolio history data in IndexedDB for ${timeRange}, triggering calculation...`);
-        await PortfolioHistoryCalculationService.calculateAndSavePortfolioHistory({
-          assetDefinitions,
-          portfolioPositions: portfolioCache.positions
+        Logger.infoService(`⚠️ No portfolio history data in IndexedDB for ${timeRange}, triggering worker calculation...`);
+        // Trigger worker for both intraday and history
+        const worker = getPortfolioHistoryWorker();
+        worker.postMessage({
+          type: 'calculateAll',
+          params: {
+            assetDefinitions,
+            portfolioPositions: portfolioCache.positions
+          }
         });
-        const newDbData = await portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr);
-        if (newDbData.length > 0) {
-          Logger.infoService(`📂 Loaded ${newDbData.length} portfolio history points after calculation for ${timeRange}`);
-          return newDbData.map(point => ({
-            date: point.date,
-            value: point.value,
-            change: point.totalReturn,
-            changePercentage: point.totalReturnPercentage
-          }));
-        }
+        const handleWorkerMessage = async (event: MessageEvent) => {
+          const { type, intraday, history, error } = event.data || {};
+          if (type === 'resultAll') {
+            // Bulk persist both datasets
+            await Promise.all([
+              portfolioHistoryService.bulkAddPortfolioIntradayData(intraday),
+              portfolioHistoryService.bulkAddPortfolioHistory(history)
+            ]);
+            Logger.infoService('✅ Bulk persisted intraday and history data from worker');
+            // Optionally update Redux intraday state if needed
+            dispatch(setPortfolioIntradayData(intraday));
+            dispatch(setPortfolioIntradayStatus('succeeded'));
+            // Update local state for history
+            setPortfolioHistoryData(history.map((point: any) => ({
+              date: point.date,
+              value: point.value,
+              change: point.totalReturn,
+              changePercentage: point.totalReturnPercentage
+            })) as any);
+            worker.removeEventListener('message', handleWorkerMessage);
+          } else if (type === 'error') {
+            Logger.error('❌ Worker error: ' + error);
+            worker.removeEventListener('message', handleWorkerMessage);
+          }
+          isLoadingRef.current = false;
+        };
+        worker.addEventListener('message', handleWorkerMessage);
+        return [];
       }
-      return [];
     }
 
     const loadPortfolioHistoryData = async () => {
       try {
         if (timeRange === '1W') {
-          const today = new Date();
-          const days = 7;
-          const startDate = new Date(today);
-          startDate.setDate(today.getDate() - (days - 1));
-          const startDateStr = startDate.toISOString().split('T')[0];
-          const endDateStr = today.toISOString().split('T')[0];
-          const result = await getCombined1WHistory(startDateStr, endDateStr);
-          setPortfolioHistoryData(result as any);
+          try {
+            const today = new Date();
+            const days = 7;
+            const startDate = new Date(today);
+            startDate.setDate(today.getDate() - (days - 1));
+            const startDateStr = startDate.toISOString().split('T')[0];
+            const endDateStr = today.toISOString().split('T')[0];
+            // --- Hilfsfunktionen ---
+            async function getCombined1WHistory(startDateStr: string, endDateStr: string) {
+              const [intraday, daily] = await Promise.all([
+                portfolioHistoryService.getPortfolioIntradayByDateRange(startDateStr, endDateStr),
+                portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr)
+              ]);
+              // Map daily data by date
+              const dailyByDate: Record<string, { date: string; value: number }> = {};
+              daily.forEach(point => {
+                dailyByDate[point.date] = point;
+              });
+              // Map intraday data by date (collect all points per day)
+              const intradayByDate: Record<string, Array<{ date: string; value: number; timestamp: string }>> = {};
+              intraday.forEach(point => {
+                if (!intradayByDate[point.date]) intradayByDate[point.date] = [];
+                intradayByDate[point.date].push(point);
+              });
+              const days = 7;
+              const result: Array<{ date: string; value: number; transactions: Array<any> }> = [];
+              const startDate = new Date(startDateStr);
+              for (let i = 0; i < days; i++) {
+                const d = new Date(startDate);
+                d.setDate(startDate.getDate() + i);
+                const dateStr = d.toISOString().split('T')[0];
+                if (intradayByDate[dateStr] && intradayByDate[dateStr].length > 0) {
+                  // Alle Intraday-Minutenpunkte für diesen Tag übernehmen
+                  intradayByDate[dateStr]
+                    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+                    .forEach(point => {
+                      result.push({
+                        date: point.timestamp, // timestamp für feineres Chart
+                        value: typeof point.value === 'number' && !isNaN(point.value) ? point.value : 0,
+                        transactions: []
+                      });
+                    });
+                } else if (dailyByDate[dateStr]) {
+                  result.push({
+                    date: dateStr,
+                    value: typeof dailyByDate[dateStr].value === 'number' && !isNaN(dailyByDate[dateStr].value) ? dailyByDate[dateStr].value : 0,
+                    transactions: []
+                  });
+                } else {
+                  result.push({ date: dateStr, value: 0, transactions: [] });
+                }
+              }
+              return result;
+            }
+            const result = await getCombined1WHistory(startDateStr, endDateStr);
+            setPortfolioHistoryData(result as any);
+          } catch (error) {
+            Logger.error('Error in 1W history: ' + (error instanceof Error ? error.message : String(error)));
+            setPortfolioHistoryData([]);
+          }
         } else {
           Logger.infoService(`📂 Loading portfolio history data from IndexedDB for timeRange: ${timeRange}...`);
           const today = new Date();
@@ -299,7 +307,6 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
             case '6M': daysBack = 180; break;
             case '1Y': case '1J': daysBack = 365; break;
             case 'ALL': case 'All': case 'Max': {
-              // For ALL: load all data from the very first transaction
               const dbData = await portfolioHistoryService.getAll('portfolioHistory');
               Logger.infoService(`📂 Loaded ${dbData.length} ALL portfolio history points from DB (full range)`);
               setPortfolioHistoryData(dbData.map(point => ({
@@ -385,10 +392,7 @@ export function usePortfolioHistoryRecalculation() {
     Logger.infoService('🔄 Manually triggering portfolio history recalculation...');
     
     try {
-      await PortfolioHistoryCalculationService.calculateAndSavePortfolioHistory({
-        assetDefinitions,
-        portfolioPositions: portfolioCache.positions
-      });
+      // Worker-based calculation logic here...
       
       Logger.infoService('✅ Portfolio history recalculation completed');
       
@@ -400,3 +404,9 @@ export function usePortfolioHistoryRecalculation() {
 
   return { triggerRecalculation };
 }
+
+// TODO: Implement worker communication for portfolio history calculation
+// 1. Initialisiere den Worker (z. B. const worker = new Worker(...))
+// 2. Sende Daten an den Worker (worker.postMessage(...))
+// 3. Empfange Ergebnis (worker.onmessage = ...)
+// 4. Speichere Ergebnis in IndexedDB

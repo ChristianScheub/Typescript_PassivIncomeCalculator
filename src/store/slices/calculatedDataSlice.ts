@@ -7,6 +7,7 @@ import analyticsService from '@/service/domain/analytics/calculations/financialA
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
 import { AssetFocusTimeRange } from './dashboardSettingsSlice';
 import { generatePortfolioInputHash, simpleHash } from '@/utils/hashUtils';
+import { isFinancialSummaryAllZero } from '@/utils/isFinancialSummaryValid';
 
 // Types for cached data
 export interface CachedPortfolioHistory {
@@ -59,7 +60,7 @@ const initialState: CalculatedDataState = {
   financialSummary: null,
   status: 'idle',
   error: null,
-  cacheValidityDuration: 5 * 60 * 1000, // 5 minutes
+  cacheValidityDuration: 7 * 24 * 60 * 60 * 1000, // 7 Tage
   enableConditionalLogging: true,
   isHydrated: false
 };
@@ -85,6 +86,11 @@ const isCacheValid = (lastCalculated: string, validityDuration: number): boolean
   const now = new Date().getTime();
   const cacheTime = new Date(lastCalculated).getTime();
   return (now - cacheTime) < validityDuration;
+};
+
+// Helper function to check if cache is valid (inputHash only)
+const isCacheValidByInputHash = (existingCache: { inputHash: string }, currentInputHash: string): boolean => {
+  return existingCache && existingCache.inputHash === currentInputHash;
 };
 
 // Async thunk for calculating portfolio history with caching
@@ -209,19 +215,20 @@ export const calculateFinancialSummary = createAsyncThunk(
     // Only use minimal references for inputHash
     const inputHash = createFinancialSummaryInputHash(assets, assetDefinitions, liabilities, expenses, income);
 
-    // Check if we have valid cached data
+    // Check if we have valid cached data (inputHash only)
     const existingCache = state.calculatedData.financialSummary;
-    const isValid = existingCache && 
-      existingCache.inputHash === inputHash &&
-      isCacheValid(existingCache.lastCalculated, state.calculatedData.cacheValidityDuration);
-
-    if (isValid) {
-      Logger.cache(`Financial summary cache hit`);
+    const isValid = existingCache && isCacheValidByInputHash(existingCache, inputHash);
+    // NEU: Wenn alle Werte auf 0 UND es gibt Daten, dann ist der Cache ungültig
+    const hasData = assets.length > 0 || liabilities.length > 0 || expenses.length > 0 || income.length > 0;
+    const allZero = isFinancialSummaryAllZero(existingCache);
+    if (isValid && !(hasData && allZero)) {
+      Logger.cache(`Financial summary cache hit (inputHash)`);
       return existingCache;
     }
-
-    Logger.cache(`Calculating financial summary`);
-
+    if (isValid && hasData && allZero) {
+      Logger.warn('Financial summary cache ist zwar inputHash-valid, aber alle Werte sind 0 und es gibt Daten → wird neu berechnet!');
+    }
+    Logger.cache(`Calculating financial summary (inputHash changed oder allZero)`);
     const result = analyticsService.calculateFinancialSummary(
       assets, 
       liabilities, 
@@ -229,7 +236,6 @@ export const calculateFinancialSummary = createAsyncThunk(
       income, 
       assetDefinitions
     );
-
     return {
       ...result,
       lastCalculated: new Date().toISOString(),
@@ -305,23 +311,20 @@ const calculatedDataSlice = createSlice({
         const key = timeRange as AssetFocusTimeRange;
         const cache = portfolioHistory[key];
         if (cache && !isCacheValid(cache.lastCalculated, state.cacheValidityDuration)) {
+          Logger.warn(`validateCacheOnStartup: portfolioHistory[${key}] ist abgelaufen (lastCalculated=${cache.lastCalculated}) → wird gelöscht.`);
           delete state.portfolioHistory[key];
           invalidatedCount++;
         }
       });
-      
-      // Check asset focus data cache
-      if (state.assetFocusData && !isCacheValid(state.assetFocusData.lastCalculated, state.cacheValidityDuration)) {
-        state.assetFocusData = null;
-        invalidatedCount++;
+      // Check asset focus data cache (inputHash only)
+      if (state.assetFocusData) {
+        // Recompute inputHash for current state
+        // (Hier ggf. analog wie im Thunk createInputHash auf aktuelle Datenbasis berechnen)
+        // Fallback: Immer gültig lassen, außer explizit invalidiert
       }
-      
-      // Check financial summary cache
-      if (state.financialSummary && !isCacheValid(state.financialSummary.lastCalculated, state.cacheValidityDuration)) {
-        state.financialSummary = null;
-        invalidatedCount++;
-      }
-      
+      // Check financial summary cache (inputHash only)
+      // Niemals per Zeit invalidieren!
+      // (Wird automatisch im Thunk geprüft)
       if (invalidatedCount > 0) {
         Logger.cache(`Validated cache on startup: invalidated ${invalidatedCount} expired caches`);
       } else if (state.enableConditionalLogging) {

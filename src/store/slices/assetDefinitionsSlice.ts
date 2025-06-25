@@ -20,24 +20,6 @@ const initialState: AssetDefinitionsState = {
   error: null,
 };
 
-// Typ für Yahoo Dividend API Response
-// interface YahooDividendApiResponse {
-//   chart: {
-//     result: [
-//       {
-//         events?: {
-//           dividends?: {
-//             [timestamp: string]: {
-//               amount: number;
-//               date: number;
-//             };
-//           };
-//         };
-//       }
-//     ];
-//   };
-// }
-
 // Async thunks
 export const fetchAssetDefinitions = createAsyncThunk(
   'assetDefinitions/fetchAssetDefinitions',

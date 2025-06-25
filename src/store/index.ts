@@ -206,6 +206,18 @@ store.subscribe = (listener) => {
     saveTimeout = setTimeout(() => {
       try {
         const state = store.getState();
+        // Fallback: lastCalculated setzen, falls nicht vorhanden
+        let assetFocusDataToSave = state.calculatedData.assetFocusData;
+        if (assetFocusDataToSave && !assetFocusDataToSave.lastCalculated) {
+          Logger.warn('Persist: assetFocusData.lastCalculated fehlt, setze auf jetzt!');
+          assetFocusDataToSave = { ...assetFocusDataToSave, lastCalculated: new Date().toISOString() };
+        }
+        let financialSummaryToSave = state.calculatedData.financialSummary;
+        if (financialSummaryToSave && !financialSummaryToSave.lastCalculated) {
+          Logger.warn('Persist: financialSummary.lastCalculated fehlt, setze auf jetzt!');
+          financialSummaryToSave = { ...financialSummaryToSave, lastCalculated: new Date().toISOString() };
+        }
+        Logger.infoRedux(`Persist: Speichere calculatedData | assetFocusDataLastCalculated=${assetFocusDataToSave?.lastCalculated} | financialSummaryLastCalculated=${financialSummaryToSave?.lastCalculated}`);
         const stateToSave = {
           transactions: { 
             items: state.transactions.items,
@@ -226,8 +238,8 @@ store.subscribe = (listener) => {
           forecast: state.forecast,
           apiConfig: state.apiConfig,
           calculatedData: {
-            assetFocusData: state.calculatedData.assetFocusData,
-            financialSummary: state.calculatedData.financialSummary,
+            assetFocusData: assetFocusDataToSave,
+            financialSummary: financialSummaryToSave,
             status: 'idle',
             error: null,
             cacheValidityDuration: state.calculatedData.cacheValidityDuration,

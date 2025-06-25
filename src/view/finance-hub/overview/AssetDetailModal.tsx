@@ -111,15 +111,12 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
     totalReturn: totalReturn,
     totalReturnPercentage: totalReturnPercentage,
     transactions: relatedTransactions, // Include ALL related transactions
-    assetDefinition, // Include the full asset definition
     sector: assetDefinition.sector || '',
     country: assetDefinition.country || '',
     categoryAssignments: [], // Can be empty or populated if available
-    // Add required properties for PortfolioPosition
     transactionCount: relatedTransactions.length,
     firstPurchaseDate: firstPurchaseDate,
     lastPurchaseDate: lastPurchaseDate,
-    // Add formatted values
     formatted: {
       currentValue: formatService.formatCurrency(currentValue),
       totalInvestment: formatService.formatCurrency(totalInvestment),

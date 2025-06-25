@@ -21,7 +21,6 @@ export { default as recentActivityService } from './domain/analytics/reporting/r
 export { default as sqliteService } from './infrastructure/sqlLiteService';
 export { default as portfolioHistoryService } from './infrastructure/sqlLitePortfolioHistory';
 export { default as formatService } from './infrastructure/formatService';
-export { default as cacheService } from './infrastructure/cacheService';
 export { default as configService } from './infrastructure/configService';
 
 // Shared Services (Utilities) - direct exports  

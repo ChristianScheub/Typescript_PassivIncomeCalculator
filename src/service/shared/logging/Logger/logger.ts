@@ -13,8 +13,9 @@ import {
 import { handleFileDownload } from "../../utilities/helper/downloadFile";
 
 class Logger {
-  private static readonly isMobile: boolean = Capacitor.getPlatform() === "ios" || Capacitor.getPlatform() === "android";
+  private static readonly isMobile: boolean = typeof window !== 'undefined' && (Capacitor.getPlatform() === "ios" || Capacitor.getPlatform() === "android");
   private static readonly logKey: string = "app_logs";
+  private static readonly isWorker: boolean = typeof window === 'undefined';
 
   private static getCallerFunctionName(): string {
     const stack = new Error().stack;
@@ -36,7 +37,9 @@ class Logger {
   }
 
   static deleteLogs(){
-    Logger.saveLogsToLocalStorage([])
+    if (!this.isWorker) {
+      Logger.saveLogsToLocalStorage([])
+    }
     Logger.infoService("Logs deleted!");
   }
 
@@ -45,12 +48,16 @@ class Logger {
   }
 
   private static getLogsFromLocalStorage(): string[] {
-    const storedLogs = localStorage.getItem(this.logKey);
+    if (this.isWorker) return [];
+    const storedLogs = typeof window !== 'undefined' ? localStorage.getItem(this.logKey) : null;
     return storedLogs ? JSON.parse(storedLogs) : [];
   }
 
   private static saveLogsToLocalStorage(logs: string[]): void {
-    localStorage.setItem(this.logKey, JSON.stringify(logs));
+    if (this.isWorker) return;
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(this.logKey, JSON.stringify(logs));
+    }
   }
   
   static log(message: string): void {

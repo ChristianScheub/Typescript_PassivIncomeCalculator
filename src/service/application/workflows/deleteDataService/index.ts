@@ -22,7 +22,7 @@ const deleteDataService: DeleteDataService = {
     clearPartialData,
     clearPriceHistory,
     clearPortfolioHistory,
-    clearReduxCacheOnly
+    clearReduxCacheOnly,
 };
 
 // Export the service interface and implementation
@@ -34,15 +34,5 @@ export default deleteDataService;
 
 // Export individual methods for direct use if needed
 export {
-    clearAllData,
-    clearAssetDefinitions,
-    clearAssetTransactions,
-    clearDebts,
-    clearExpenses,
-    clearIncome,
-    clearPartialData,
-    clearPriceHistory,
-    clearPortfolioHistory,
-    refreshPortfolioHistory,
-    clearReduxCacheOnly
+    refreshPortfolioHistory
 };

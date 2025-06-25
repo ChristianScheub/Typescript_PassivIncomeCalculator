@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
 import { 
-  fetchTransactions, 
   addTransaction, 
   updateTransaction, 
   deleteTransaction, 
@@ -13,7 +12,6 @@ import {
   selectPortfolioTotals,
   selectSortedTransactions
 } from '@/store/slices/transactionsSlice';
-import { fetchAssetDefinitions } from '@/store/slices/assetDefinitionsSlice';
 import { AssetsView } from '@/view/portfolio-hub/assets/AssetsView';
 import { Asset } from '@/types/domains/assets';
 import { useTranslation } from 'react-i18next';
@@ -62,18 +60,6 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
       setIsAddingAsset(true);
     }
   }, [initialAction]);
-
-  useEffect(() => {
-    if (status === 'idle') {
-      Logger.info('Fetching transactions');
-      dispatch(fetchTransactions());
-    }
-    
-    // Also fetch asset definitions
-    dispatch(fetchAssetDefinitions());
-    
-    // Dividend cache service initialization removed (now integrated in calculatorService)
-  }, [dispatch, status]);
 
   // Calculate portfolio data when needed (with caching)
   useEffect(() => {

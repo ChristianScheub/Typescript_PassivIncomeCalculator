@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { fetchExpenses, addExpense, updateExpense, deleteExpense } from '@/store/slices/expensesSlice';
+import { addExpense, updateExpense, deleteExpense } from '@/store/slices/expensesSlice';
 import { Expense } from '@/types/domains/financial';
 import { ExpenseFormData } from '@/types/domains/forms/form-data';
 import { useTranslation } from 'react-i18next';
-import Logger from '@/service/shared/logging/Logger/logger';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import ExpensesView from '@/view/portfolio-hub/expenses/ExpensesView';
 import { sortExpenses, SortOrder } from '../../utils/sortingUtils';
@@ -24,13 +23,6 @@ const ExpensesContainer: React.FC<{ onBack?: () => void; initialAction?: string 
       setIsAddingExpense(true);
     }
   }, [initialAction]);
-
-  useEffect(() => {
-    if (status === 'idle') {
-      Logger.info('Fetching expenses');
-      dispatch(fetchExpenses());
-    }
-  }, [dispatch, status]);
 
   const totalMonthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
 

@@ -63,6 +63,7 @@ interface DashboardViewProps {
   alerts: UIAlert[];
   navigationHandlers: NavigationHandlers;
   onRefresh: () => Promise<void>;
+  isRefreshing: boolean;
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({
@@ -73,6 +74,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   alerts,
   navigationHandlers,
   onRefresh,
+  isRefreshing,
 }) => {
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
@@ -93,13 +95,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <PullToRefresh
       onRefresh={onRefresh}
-      refreshingText={t("dashboard.refreshing") || "Aktualisiere..."}
-      pullToRefreshText={
-        t("dashboard.pullToRefresh") || "Zum Aktualisieren ziehen"
-      }
-      releaseToRefreshText={
-        t("dashboard.releaseToRefresh") || "Loslassen zum Aktualisieren"
-      }
+      isRefreshing={isRefreshing}
       className="min-h-screen"
     >
       <div className="space-y-6 pb-8 overflow-x-hidden">
@@ -179,7 +175,8 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           icon={<BarChart3 className="h-5 w-5 text-indigo-500" />}
           defaultExpanded={false}
         >
-          <PortfolioHistoryCard />
+          <PortfolioHistoryCard history={[]} />
+          {/* TODO: Replace with actual portfolio history data */}
         </CollapsibleSection>
 
         {/* Alerts & Recommendations */}

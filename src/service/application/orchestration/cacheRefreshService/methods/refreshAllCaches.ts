@@ -20,11 +20,11 @@ import {
 import { PortfolioHistoryHelper } from '../../../../domain/portfolio/history/portfolioHistoryService/methods/portfolioHistoryHelper';
 import recentActivityService from '../../../../domain/analytics/reporting/recentActivityService';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { refreshPortfolioHistory } from '../../../workflows/deleteDataService/methods/refreshPortfolioHistory';
 import { calculatePortfolioIntradayDataDirect } from '@/store/slices/portfolioIntradaySlice';
+import PortfolioHistoryWorker from '@/workers/portfolioHistoryWorker.ts?worker';
 
 /**
- * Refreshes all caches in the application
+ * Refreshes all caches in the application (e.g. for pull to refresh)
  * This includes:
  * - Clearing all dividend caches
  * - Clearing portfolio cache  
@@ -107,8 +107,38 @@ export async function refreshAllCaches(): Promise<void> {
         ]);
 
         // Step 9: Clear and recalculate portfolio history database with all time ranges
-        Logger.infoService("Clearing and recalculating portfolio history database");
-        await refreshPortfolioHistory();
+        Logger.infoService("Clearing and recalculating portfolio history database via Web Worker");
+        // Hole aktuelle Daten für Worker
+        const refreshedStateForWorker = store.getState();
+        const portfolioPositionsForWorker = refreshedStateForWorker.transactions?.portfolioCache?.positions || [];
+        const assetDefinitionsForHistory = refreshedStateForWorker.assetDefinitions?.items || [];
+        if (portfolioPositionsForWorker.length > 0 && assetDefinitionsForHistory.length > 0) {
+            const worker = new PortfolioHistoryWorker();
+            const workerPromise = new Promise((resolve, reject) => {
+                worker.onmessage = async (event) => {
+                    const { type, history, error } = event.data || {};
+                    if (type === 'resultAll' && history) {
+                        const portfolioHistoryService = (await import('@/service/infrastructure/sqlLitePortfolioHistory')).default;
+                        await portfolioHistoryService.bulkAddPortfolioHistory(history);
+                        Logger.infoService('✅ Portfolio history updated via Web Worker');
+                        resolve(null);
+                    } else if (type === 'error') {
+                        Logger.error('❌ Worker error: ' + error);
+                        reject(error);
+                    }
+                };
+                worker.postMessage({
+                    type: 'calculateAll',
+                    params: {
+                        assetDefinitions: assetDefinitionsForHistory,
+                        portfolioPositions: portfolioPositionsForWorker
+                    }
+                });
+            });
+            await workerPromise;
+        } else {
+            Logger.warn('No portfolio positions or asset definitions found for portfolio history aggregation after cache refresh');
+        }
 
         Logger.infoService("COMPLETE cache refresh completed successfully - ALL data refreshed from SQL database");
 

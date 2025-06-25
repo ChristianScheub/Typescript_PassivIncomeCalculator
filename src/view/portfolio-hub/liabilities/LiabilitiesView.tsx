@@ -19,8 +19,8 @@ interface LiabilitiesViewProps {
   totalMonthlyPayment: number;
   isAddingLiability: boolean;
   editingLiability: Liability | null;
-  onAddLiability: (data: unknown) => void; // Form sends Liability object, not LiabilityFormData
-  onUpdateLiability: (data: unknown) => void; // Form sends Liability object, not LiabilityFormData
+  onAddLiability: (data: Liability) => void; // Form sends Liability object
+  onUpdateLiability: (data: Liability) => void; // Form sends Liability object
   onDeleteLiability: (id: string) => void;
   onSetIsAddingLiability: (isAdding: boolean) => void;
   onSetEditingLiability: (liability: Liability | null) => void;

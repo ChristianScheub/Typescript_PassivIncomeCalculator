@@ -51,9 +51,9 @@ const SNACKBAR_CONFIG: Record<string, boolean> = {
   'clear data': true,
   
   // API Operations
-  'fetch stock price': false,
+  'fetch stock price': true,
   'update stock prices': true,
-  'validate api key': true,
+  'update historical data': true
 };
 
 /**
@@ -61,22 +61,30 @@ const SNACKBAR_CONFIG: Record<string, boolean> = {
  * @param operationName - Name of the operation for logging and snackbar messages
  * @param operation - The async operation to execute
  * @param onSuccess - Optional callback to execute on successful completion
+ * @param extraLogInfo - Optional extra context information to log
  * @returns Promise<T | undefined> - Result of the operation or undefined if failed
  */
 export const executeAsyncOperation = async <T>(
   operationName: string,
   operation: () => Promise<T>,
-  onSuccess?: () => void
+  onSuccess?: () => void,
+  extraLogInfo?: string
 ): Promise<T | undefined> => {
   try {
     Logger.info(`Starting ${operationName}`);
+    if (extraLogInfo) {
+      Logger.info(`[${operationName}] context: ${extraLogInfo}`);
+    }
     const result = await operation();
     Logger.info(`Successfully completed ${operationName}`);
     onSuccess?.();
     return result;
   } catch (error) {
-    Logger.error(`Failed ${operationName}: ${JSON.stringify(error)}`);
-    
+    Logger.errorStack(
+      `Failed ${operationName}: ${JSON.stringify(error)}`,
+      error instanceof Error ? error : new Error(String(error))
+    );
+
     // Check if snackbar should be shown for this operation
     const shouldShowSnackbar = SNACKBAR_CONFIG[operationName] ?? false;
     

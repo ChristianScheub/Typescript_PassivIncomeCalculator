@@ -1,8 +1,7 @@
 import { Transaction as Asset } from "@/types/domains/assets/entities";
 import Logger from "@/service/shared/logging/Logger/logger";
 import { 
-  getCachedDividendData,
-  createCachedDividends
+  getCachedDividendData
 } from "@/utils/dividendCacheUtils";
 
 // Optimized function: Check if all assets have cached data
@@ -71,32 +70,4 @@ export const calculateTotalAssetIncomeForMonthFromCache = (
     Logger.cache(`Not all assets cached for month ${monthNumber}, fallback needed`);
     return null;
   }
-};
-
-// Helper function to update asset cache data (should be called from Redux actions)
-export const updateAssetCacheData = (
-  asset: Asset,
-  calculationResult: {
-    monthlyAmount: number;
-    annualAmount: number;
-    monthlyBreakdown: Record<number, number>;
-  }
-) => {
-  // Cache data for assets with income potential (using assetDefinition data only)
-  const hasDividendInfo = asset.assetDefinition?.dividendInfo;
-  const hasInterestInfo = asset.assetDefinition?.bondInfo?.interestRate !== undefined;
-  const hasRentalInfo = asset.assetDefinition?.rentalInfo;
-  
-  if ((asset.type === "stock" && hasDividendInfo) || 
-      ((asset.type === "bond" || asset.type === "cash") && hasInterestInfo) || 
-      (asset.type === "real_estate" && hasRentalInfo)) {
-    
-    return createCachedDividends(
-      calculationResult.monthlyAmount,
-      calculationResult.annualAmount,
-      calculationResult.monthlyBreakdown,
-      asset
-    );
-  }
-  return null;
 };

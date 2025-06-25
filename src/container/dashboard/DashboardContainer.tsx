@@ -7,7 +7,7 @@ import {
   selectFinancialSummary
 } from '@/store/slices/calculatedDataSlice';
 import DashboardView from '@/view/finance-hub/overview/DashboardView';
-import AssetFocusDashboardContainer from './AssetDashboardView';
+import AssetFocusDashboardContainer from './AssetDashboardContainer';
 import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
 import alertsService from '@/service/application/notifications/alertsService';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
@@ -86,22 +86,26 @@ const DashboardContainer: React.FC = () => {
     Logger.infoService(`DashboardContainer: Dashboard mode is '${dashboardMode}'`);
   }, [dashboardMode]);
 
+  // Pull-to-refresh state for PullToRefresh
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
+
   // Pull to refresh handler - only works when user is at the top of the page
   const handleRefresh = useCallback(async () => {
-    // Check if user is at the top of the page (with small tolerance for mobile)
     const isAtTop = window.scrollY <= 10; // Allow 10px tolerance
-    
     if (!isAtTop) {
       Logger.infoService("Dashboard pull-to-refresh ignored - user not at top of page (scrollY: " + window.scrollY + ")");
-      return; // Don't trigger refresh if not at top
+      return;
     }
-
     Logger.infoService("Dashboard pull-to-refresh triggered - user at top of page");
-    
-    executeAsyncOperation(
-      'refresh dashboard cache',
-      () => cacheRefreshService.refreshAllCaches()
-    );
+    setIsRefreshing(true);
+    try {
+      await executeAsyncOperation(
+        'refresh dashboard cache',
+        () => cacheRefreshService.refreshAllCaches()
+      );
+    } finally {
+      setIsRefreshing(false);
+    }
   }, [executeAsyncOperation]);
 
   // Dashboard mode routing
@@ -121,6 +125,7 @@ const DashboardContainer: React.FC = () => {
       alerts={alerts}
       navigationHandlers={navigationHandlers}
       onRefresh={handleRefresh}
+      isRefreshing={isRefreshing}
     />
   );
 };

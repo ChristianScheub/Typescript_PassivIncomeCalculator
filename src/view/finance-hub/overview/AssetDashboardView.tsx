@@ -26,6 +26,7 @@ interface AssetDashboardViewProps {
   selectedTimeRange: AssetFocusTimeRange;
   onTimeRangeChange: (timeRange: AssetFocusTimeRange) => void;
   onRefresh: () => Promise<void>;
+  isRefreshing: boolean;
   onNavigateToForecast: () => void;
   onNavigateToSettings: () => void;
   onNavigateToAssetDetail: (asset: Asset, assetDefinition: AssetDefinition) => void;
@@ -44,6 +45,7 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
   selectedTimeRange,
   onTimeRangeChange,
   onRefresh,
+  isRefreshing,
   onNavigateToForecast,
   onNavigateToSettings,
   onNavigateToAssetDetail,
@@ -69,13 +71,7 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
   return (
     <PullToRefresh
       onRefresh={onRefresh}
-      refreshingText={t("dashboard.refreshing") || "Aktualisiere..."}
-      pullToRefreshText={
-        t("dashboard.pullToRefresh") || "Zum Aktualisieren ziehen"
-      }
-      releaseToRefreshText={
-        t("dashboard.releaseToRefresh") || "Loslassen zum Aktualisieren"
-      }
+      isRefreshing={isRefreshing}
       className="min-h-screen"
     >
       <div className="space-y-6 pb-8 overflow-x-hidden">

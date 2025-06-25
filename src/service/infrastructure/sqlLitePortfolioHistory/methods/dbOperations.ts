@@ -1,5 +1,6 @@
 import { PortfolioHistoryStoreNames, PortfolioHistoryDB } from '../interfaces/IPortfolioHistoryService';
 import { initPortfolioHistoryDatabase } from './initDatabase';
+import Logger from '@/service/shared/logging/Logger/logger';
 
 export const dbOperations = {
   async getAll<K extends PortfolioHistoryStoreNames>(storeName: K): Promise<PortfolioHistoryDB[K]['value'][]> {
@@ -13,11 +14,13 @@ export const dbOperations = {
   },
 
   async add<K extends PortfolioHistoryStoreNames>(storeName: K, item: PortfolioHistoryDB[K]['value']): Promise<void> {
+    Logger.infoService(`DB ACTION: add to ${storeName} - ${JSON.stringify(item)}`);
     const db = await initPortfolioHistoryDatabase();
     await db.add(storeName as any, item);
   },
 
   async update<K extends PortfolioHistoryStoreNames>(storeName: K, item: PortfolioHistoryDB[K]['value']): Promise<void> {
+    Logger.infoService(`DB ACTION: update in ${storeName} - ${JSON.stringify(item)}`);
     const db = await initPortfolioHistoryDatabase();
     await db.put(storeName as any, item);
   },
@@ -29,6 +32,7 @@ export const dbOperations = {
 
   // Bulk operations for performance
   async bulkAdd<K extends PortfolioHistoryStoreNames>(storeName: K, items: PortfolioHistoryDB[K]['value'][]): Promise<void> {
+    Logger.infoService(`DB ACTION: bulkAdd to ${storeName} - ${JSON.stringify(items)}`);
     const db = await initPortfolioHistoryDatabase();
     const tx = db.transaction(storeName as any, 'readwrite');
     const store = tx.objectStore(storeName as any);
@@ -40,6 +44,7 @@ export const dbOperations = {
   },
 
   async bulkUpdate<K extends PortfolioHistoryStoreNames>(storeName: K, items: PortfolioHistoryDB[K]['value'][]): Promise<void> {
+    Logger.infoService(`DB ACTION: bulkUpdate in ${storeName} - ${JSON.stringify(items)}`);
     const db = await initPortfolioHistoryDatabase();
     const tx = db.transaction(storeName as any, 'readwrite');
     const store = tx.objectStore(storeName as any);
@@ -52,6 +57,7 @@ export const dbOperations = {
 
   // Upsert operation (insert or update)
   async bulkUpsert<K extends PortfolioHistoryStoreNames>(storeName: K, items: PortfolioHistoryDB[K]['value'][]): Promise<void> {
+    Logger.infoService(`DB ACTION: bulkUpsert in ${storeName} - ${JSON.stringify(items)}`);
     const db = await initPortfolioHistoryDatabase();
     const tx = db.transaction(storeName as any, 'readwrite');
     const store = tx.objectStore(storeName as any);

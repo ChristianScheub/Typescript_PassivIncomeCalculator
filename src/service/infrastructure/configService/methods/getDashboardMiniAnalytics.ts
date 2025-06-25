@@ -1,6 +1,6 @@
 import { TrendingUp, TrendingDown, Target, ArrowUpRight } from 'lucide-react';
-import { FinancialRatios } from '../../analyticsService/interfaces/IAnalyticsService';
 import { MiniAnalytic, NavigationHandlers } from '../interfaces/IConfigService';
+import { FinancialRatios } from '@/types/domains/analytics';
 
 export const getDashboardMiniAnalytics = (
   ratios: FinancialRatios,

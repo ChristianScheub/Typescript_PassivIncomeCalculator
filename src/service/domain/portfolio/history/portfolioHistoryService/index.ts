@@ -52,3 +52,4 @@ export {
 
 // Export interfaces and types
 export * from './interfaces/IPortfolioHistoryService';
+export * from './methods/calculatePortfolioIntraday';

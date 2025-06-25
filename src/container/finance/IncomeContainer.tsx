@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { fetchIncome, addIncome, updateIncome, deleteIncome } from '@/store/slices/incomeSlice';
+import { addIncome, updateIncome, deleteIncome } from '@/store/slices/incomeSlice';
 import { Income } from '@/types/domains/financial';
 import { useTranslation } from 'react-i18next';
-import Logger from '@/service/shared/logging/Logger/logger';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import IncomeView from '@/view/portfolio-hub/income/IncomeView';
 import { sortIncome, SortOrder } from '../../utils/sortingUtils';
@@ -23,13 +22,6 @@ const IncomeContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
       setIsAddingIncome(true);
     }
   }, [initialAction]);
-
-  useEffect(() => {
-    if (status === 'idle') {
-      Logger.info('Fetching income items');
-      dispatch(fetchIncome());
-    }
-  }, [dispatch, status]);
 
   const calculateMonthlyAmountFromIncome = (income: Income): number => {
     return calculatorService.calculateMonthlyIncome(income);

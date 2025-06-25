@@ -2,48 +2,38 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { cn } from '../../utils/cn';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface PullToRefreshProps {
   children: React.ReactNode;
   onRefresh: () => Promise<void>;
+  isRefreshing: boolean;
   className?: string;
   pullThreshold?: number;
-  refreshingText?: string;
-  pullToRefreshText?: string;
-  releaseToRefreshText?: string;
 }
 
 export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   children,
   onRefresh,
+  isRefreshing,
   className,
   pullThreshold = 80,
-  refreshingText = "Aktualisiere...",
-  pullToRefreshText = "Zum Aktualisieren ziehen",
-  releaseToRefreshText = "Loslassen zum Aktualisieren",
 }) => {
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { t } = useTranslation();
   const [pullDistance, setPullDistance] = useState(0);
   const [isPulling, setIsPulling] = useState(false);
   const [startY, setStartY] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleRefresh = useCallback(async () => {
-    setIsRefreshing(true);
-    try {
-      await onRefresh();
-    } finally {
-      setIsRefreshing(false);
-      setPullDistance(0);
-      setIsPulling(false);
-    }
+    await onRefresh();
+    setPullDistance(0);
+    setIsPulling(false);
   }, [onRefresh]);
 
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    // Check if both the container and window are at the top (with small tolerance)
     const isContainerAtTop = containerRef.current && containerRef.current.scrollTop === 0;
-    const isWindowAtTop = window.scrollY <= 10; // Allow 10px tolerance for mobile
-    
+    const isWindowAtTop = window.scrollY <= 10;
     if (isContainerAtTop && isWindowAtTop) {
       setStartY(e.touches[0].clientY);
       setIsPulling(true);
@@ -52,7 +42,6 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
 
   const handleTouchEnd = useCallback(() => {
     if (!isPulling || isRefreshing) return;
-
     if (pullDistance >= pullThreshold) {
       handleRefresh();
     } else {
@@ -62,9 +51,9 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
   }, [isPulling, isRefreshing, pullDistance, pullThreshold, handleRefresh]);
 
   const getRefreshStatus = () => {
-    if (isRefreshing) return refreshingText;
-    if (pullDistance >= pullThreshold) return releaseToRefreshText;
-    if (isPulling && pullDistance > 0) return pullToRefreshText;
+    if (isRefreshing) return t('dashboard.refreshing');
+    if (pullDistance >= pullThreshold) return t('dashboard.releaseToRefresh');
+    if (isPulling && pullDistance > 0) return t('dashboard.pullToRefresh');
     return '';
   };
 
@@ -80,40 +69,28 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
 
   const handleTouchMove = useCallback((e: TouchEvent) => {
     if (!isPulling || isRefreshing || !containerRef.current) return;
-
-    // Double-check that we're still at the top before allowing pull
     const isContainerAtTop = containerRef.current.scrollTop === 0;
     const isWindowAtTop = window.scrollY <= 10;
-    
     if (!isContainerAtTop || !isWindowAtTop) {
-      // If user scrolled down, stop the pulling gesture
       setIsPulling(false);
       setPullDistance(0);
       return;
     }
-
     const currentY = e.touches[0].clientY;
     const distance = Math.max(0, currentY - startY);
-    
-    // Prevent default scroll behavior when pulling down
     if (distance > 0) {
       e.preventDefault();
       setPullDistance(Math.min(distance, pullThreshold * 1.5));
     }
   }, [isPulling, isRefreshing, startY, pullThreshold]);
 
-  // Use useEffect to properly handle event listeners with passive option
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
     const handleTouchMoveNative = (e: TouchEvent) => {
       handleTouchMove(e);
     };
-
-    // Add event listener with passive: false to allow preventDefault
     container.addEventListener('touchmove', handleTouchMoveNative, { passive: false });
-
     return () => {
       container.removeEventListener('touchmove', handleTouchMoveNative);
     };
@@ -164,7 +141,6 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
           </span>
         </div>
       </div>
-
       {/* Content */}
       <div
         className={cn(
@@ -174,14 +150,13 @@ export const PullToRefresh: React.FC<PullToRefreshProps> = ({
       >
         {children}
       </div>
-
       {/* Loading Overlay */}
       {isRefreshing && (
         <div className="absolute inset-0 bg-white dark:bg-gray-900 bg-opacity-50 dark:bg-opacity-50 backdrop-blur-sm z-20 flex items-center justify-center">
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-lg flex flex-col items-center space-y-3">
             <LoadingSpinner size={32} />
             <p className="text-gray-700 dark:text-gray-300 font-medium">
-              {refreshingText}
+              {t('dashboard.refreshing')}
             </p>
           </div>
         </div>
