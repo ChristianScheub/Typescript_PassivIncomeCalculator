@@ -186,7 +186,7 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
     allTimestamps.forEach(timestamp => {
       let portfolioValue = 0;
       let assetsWithPrices = 0;
-      let debugInfo: string[] = [];
+      const debugInfo: string[] = [];
 
       portfolioCache.positions.forEach((position: any) => {
         const definition = position.assetDefinition;

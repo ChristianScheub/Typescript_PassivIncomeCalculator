@@ -29,8 +29,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
   // Redux state
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const { assetFocus } = useAppSelector(state => state.dashboardSettings);
-  const { isEnabled: isApiEnabled } = useAppSelector(state => state.apiConfig);
-  const apiConfig = useAppSelector(state => state.apiConfig);
+  const isApiEnabled = useAppSelector(state => state.apiConfig.isEnabled);
   
   // Use cached calculated data with automatic calculation
   const portfolioHistoryData = usePortfolioHistory(assetFocus.timeRange);

@@ -42,7 +42,12 @@ export async function recalculatePortfolioHistoryAndIntraday({ assetDefinitions,
       } else if (type === 'error') {
         Logger.error('❌ Worker error: ' + error);
         worker.removeEventListener('message', handleWorkerMessage);
-        reject(error);
+        // Ensure rejection reason is always an Error object
+        if (error instanceof Error) {
+          reject(error);
+        } else {
+          reject(new Error(typeof error === 'string' ? error : JSON.stringify(error)));
+        }
       }
     };
     worker.addEventListener('message', handleWorkerMessage);
@@ -267,15 +272,14 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
                 const dateStr = d.toISOString().split('T')[0];
                 if (intradayByDate[dateStr] && intradayByDate[dateStr].length > 0) {
                   // Alle Intraday-Minutenpunkte für diesen Tag übernehmen
-                  intradayByDate[dateStr]
-                    .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
-                    .forEach(point => {
-                      result.push({
-                        date: point.timestamp, // timestamp für feineres Chart
-                        value: typeof point.value === 'number' && !isNaN(point.value) ? point.value : 0,
-                        transactions: []
-                      });
+                  const sortedPoints = intradayByDate[dateStr].toSorted((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+                  sortedPoints.forEach(point => {
+                    result.push({
+                      date: point.timestamp, // timestamp für feineres Chart
+                      value: typeof point.value === 'number' && !isNaN(point.value) ? point.value : 0,
+                      transactions: []
                     });
+                  });
                 } else if (dailyByDate[dateStr]) {
                   result.push({
                     date: dateStr,

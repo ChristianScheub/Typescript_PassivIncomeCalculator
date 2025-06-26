@@ -1,4 +1,4 @@
-import { store } from '../../../../../store';
+import { store } from '@/store';
 import { 
     invalidatePortfolioCache, 
     calculatePortfolioData,
@@ -17,8 +17,8 @@ import { updateForecastValues } from '@/store/slices/forecastSlice';
 import { 
     clearAllCache as clearCalculatedDataCache
 } from '@/store/slices/calculatedDataSlice';
-import { PortfolioHistoryHelper } from '../../../../domain/portfolio/history/portfolioHistoryService/methods/portfolioHistoryHelper';
-import recentActivityService from '../../../../domain/analytics/reporting/recentActivityService';
+import { PortfolioHistoryHelper } from '@/service/domain/portfolio/history/portfolioHistoryService/methods/portfolioHistoryHelper';
+import recentActivityService from '@/service/domain/analytics/reporting/recentActivityService';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { calculatePortfolioIntradayDataDirect } from '@/store/slices/portfolioIntradaySlice';
 import PortfolioHistoryWorker from '@/workers/portfolioHistoryWorker.ts?worker';

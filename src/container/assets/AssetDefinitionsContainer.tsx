@@ -49,6 +49,9 @@ export type AssetTypeAlias =
   | "crypto"
   | "other";
 
+// Type alias for dividend frequency
+export type DividendFrequency = "monthly" | "quarterly" | "annually" | "custom";
+
 const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   onBack,
 }) => {
@@ -273,7 +276,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
             "Dividenden erfolgreich abgerufen und Asset aktualisiert: " +
               JSON.stringify(result)
           );
-          let resultToDispatch = { ...result };
+          const resultToDispatch = { ...result };
           if (resultToDispatch.dividendInfo) {
             const { amount, lastDividendDate, paymentMonths } =
               resultToDispatch.dividendInfo;
@@ -284,9 +287,9 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
               "custom",
             ] as const;
             const rawFrequency = resultToDispatch.dividendInfo.frequency;
-            const frequency: "monthly" | "quarterly" | "annually" | "custom" =
+            const frequency: DividendFrequency =
               allowedFrequencies.includes(rawFrequency as any)
-                ? (rawFrequency as any)
+                ? (rawFrequency as DividendFrequency)
                 : "custom";
             resultToDispatch.dividendInfo = {
               amount,

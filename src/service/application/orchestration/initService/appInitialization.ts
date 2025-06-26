@@ -1,13 +1,12 @@
-import { AppDispatch, RootState } from "../../../../store/index";
-import { calculatePortfolioData } from "../../../../store/slices/transactionsSlice";
-import { calculateFinancialSummary } from "../../../../store/slices/calculatedDataSlice";
+import { AppDispatch, RootState } from "@/store/index";
+import { calculateFinancialSummary } from "@/store/slices/calculatedDataSlice";
 import Logger from "@/service/shared/logging/Logger/logger";
 import { isFinancialSummaryAllZero } from "@/utils/isFinancialSummaryValid";
-import { fetchAssetDefinitions } from '../../../../store/slices/assetDefinitionsSlice';
-import { fetchTransactions } from '../../../../store/slices/transactionsSlice';
-import { fetchLiabilities } from '../../../../store/slices/liabilitiesSlice';
-import { fetchExpenses } from '../../../../store/slices/expensesSlice';
-import { fetchIncome } from '../../../../store/slices/incomeSlice';
+import { fetchAssetDefinitions } from '@/store/slices/assetDefinitionsSlice';
+import { fetchTransactions,calculatePortfolioData } from '@/store/slices/transactionsSlice';
+import { fetchLiabilities } from '@/store/slices/liabilitiesSlice';
+import { fetchExpenses } from '@/store/slices/expensesSlice';
+import { fetchIncome } from '@/store/slices/incomeSlice';
 
 /**
  * Central initialization logic for the application

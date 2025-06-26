@@ -147,7 +147,7 @@ export const fetchAndUpdateDividends = createAsyncThunk(
 
     // Mapping ausgelagert
     const currency = definition.currency || undefined;
-    let dividendHistory: DividendHistoryEntry[] = parseDividendHistoryFromApiResult(result, currency);
+    const dividendHistory: DividendHistoryEntry[] = parseDividendHistoryFromApiResult(result, currency);
     Logger.info('[DEBUG] Parsed dividendHistory (unified): ' + JSON.stringify(dividendHistory));
     dividendHistory.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 

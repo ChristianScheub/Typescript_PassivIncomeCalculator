@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/ui/common/Card';
 import { CollapsibleSection } from '@/ui/common/CollapsibleSection';
 import { Button } from '@/ui/common/Button';
 import { ButtonGroup } from '@/ui/common/ButtonGroup';
-import { Download, Upload, Eye, EyeOff, Key, ChevronRight, Trash, Monitor } from 'lucide-react';
+import { Download, Upload, Key, ChevronRight, Trash, Monitor } from 'lucide-react';
 import DebugSettings from '@/ui/specialized/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../../../config/featureFlags';
 import { StockAPIProvider } from '@/store/slices/apiConfigSlice';

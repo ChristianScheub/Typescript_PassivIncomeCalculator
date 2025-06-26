@@ -175,7 +175,10 @@ export const calculatePortfolioIntradayDataDirect = createAsyncThunk(
         let assetsWithPrices = 0;
 
         params.portfolioPositions.forEach((position: PortfolioPosition) => {
-          const definition = position.assetDefinition;
+          // Find the matching asset definition by assetDefinitionId
+          const definition = params.assetDefinitions.find(
+            (def) => def.id === position.assetDefinitionId
+          );
           if (!definition) return;
 
           const price = findLastAvailablePrice(definition, timestamp);
@@ -204,7 +207,7 @@ export const calculatePortfolioIntradayDataDirect = createAsyncThunk(
       });
 
       // Sort by timestamp (newest first)
-      const sortedData = portfolioIntradayData.sort((a, b) => 
+      const sortedData = portfolioIntradayData.toSorted((a, b) => 
         new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
       );
 

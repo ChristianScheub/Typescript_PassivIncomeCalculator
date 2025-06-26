@@ -1,5 +1,4 @@
-import { store } from '@/store';
-import { RootState } from '@/store';
+import { store ,RootState} from '@/store';
 import { DividendApiProvider, DividendData } from '../types';
 import { dividendProviders } from './dividendProviders';
 

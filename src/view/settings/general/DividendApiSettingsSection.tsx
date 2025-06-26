@@ -137,7 +137,7 @@ export const DividendApiSettingsSection: React.FC<DividendApiSettingsSectionProp
                   >
                     {t('settings.saveApiKey')}
                   </Button>
-                  {apiKeys && apiKeys[safeProvider] && (
+                  {apiKeys?.[safeProvider] && (
                     <Button
                       variant="outline"
                       onClick={() => {
@@ -150,7 +150,7 @@ export const DividendApiSettingsSection: React.FC<DividendApiSettingsSectionProp
                     </Button>
                   )}
                 </div>
-                {apiKeys && apiKeys[safeProvider] && (
+                {apiKeys?.[safeProvider] && (
                   <p className="text-sm text-green-600 dark:text-green-400">
                     {t('settings.apiKeyConfigured')}
                   </p>
