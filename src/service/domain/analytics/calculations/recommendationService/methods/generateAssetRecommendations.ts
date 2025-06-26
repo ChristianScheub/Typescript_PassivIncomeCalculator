@@ -1,105 +1,180 @@
 import { PortfolioRecommendation } from '@/types/domains/analytics';
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
 
+// Hilfsfunktionen für Portfolio-Analysen
+function getTotalValue(assetDefinitions: AssetDefinition[]): number {
+  return assetDefinitions.reduce((sum, asset) => sum + (asset.currentPrice || 0), 0);
+}
+
+function getSectorAllocation(assetDefinitions: AssetDefinition[]): Record<string, number> {
+  const total = getTotalValue(assetDefinitions);
+  const bySector: Record<string, number> = {};
+  assetDefinitions.forEach(asset => {
+    const sector = asset.sector || 'Unbekannt';
+    bySector[sector] = (bySector[sector] || 0) + (asset.currentPrice || 0);
+  });
+  Object.keys(bySector).forEach(sector => {
+    bySector[sector] = total > 0 ? (bySector[sector] / total) * 100 : 0;
+  });
+  return bySector;
+}
+
+function getCountryAllocation(assetDefinitions: AssetDefinition[]): Record<string, number> {
+  const total = getTotalValue(assetDefinitions);
+  const byCountry: Record<string, number> = {};
+  assetDefinitions.forEach(asset => {
+    const country = asset.country || 'Unbekannt';
+    byCountry[country] = (byCountry[country] || 0) + (asset.currentPrice || 0);
+  });
+  Object.keys(byCountry).forEach(country => {
+    byCountry[country] = total > 0 ? (byCountry[country] / total) * 100 : 0;
+  });
+  return byCountry;
+}
+
+function getCashQuote(assetDefinitions: AssetDefinition[]): number {
+  const total = getTotalValue(assetDefinitions);
+  const cash = assetDefinitions.filter(a => a.type === 'cash').reduce((sum, a) => sum + (a.currentPrice || 0), 0);
+  return total > 0 ? (cash / total) * 100 : 0;
+}
+
+function getDividendYield(assetDefinitions: AssetDefinition[]): number {
+  // Annahme: dividendInfo.amount ist Jahresdividende, currentPrice ist aktuell
+  const dividendSum = assetDefinitions
+    .filter(a => a.dividendInfo && typeof a.dividendInfo.amount === 'number')
+    .reduce((sum, a) => sum + (a.dividendInfo!.amount || 0), 0);
+  const total = getTotalValue(assetDefinitions);
+  return total > 0 ? (dividendSum / total) * 100 : 0;
+}
+
+function getSpeculativeQuote(assetDefinitions: AssetDefinition[]): number {
+  // Annahme: type === 'crypto' oder riskLevel === 'high' ist spekulativ
+  const total = getTotalValue(assetDefinitions);
+  const speculative = assetDefinitions.filter(a => a.type === 'crypto' || a.riskLevel === 'high').reduce((sum, a) => sum + (a.currentPrice || 0), 0);
+  return total > 0 ? (speculative / total) * 100 : 0;
+}
+
+function getLossPositions(assets: Asset[]): Asset[] {
+  return assets.filter(a => typeof a.totalReturnPercentage === 'number' && a.totalReturnPercentage < -40);
+}
+
 export const generateAssetRecommendations = (
   assets: Asset[],
   assetDefinitions: AssetDefinition[] = []
 ): PortfolioRecommendation[] => {
   const recommendations: PortfolioRecommendation[] = [];
+  const total = getTotalValue(assetDefinitions);
 
-  // Calculate sector allocation
-  const sectorAllocation = calculateSectorAllocation(assets, assetDefinitions);
-  const sectorPercentages = Object.values(sectorAllocation) as number[];
-  const maxSectorPercentage = sectorPercentages.length > 0 ? Math.max(...sectorPercentages) : 0;
-  
-  // Calculate geographical allocation
-  const countryAllocation = calculateCountryAllocation(assets, assetDefinitions);
-  const countryPercentages = Object.values(countryAllocation) as number[];
-  const maxCountryPercentage = countryPercentages.length > 0 ? Math.max(...countryPercentages) : 0;
-  
-  // Calculate asset type allocation
-  const typeAllocation = calculateTypeAllocation(assets);
-  const typePercentages = Object.values(typeAllocation) as number[];
-  const maxTypePercentage = typePercentages.length > 0 ? Math.max(...typePercentages) : 0;
-
-  // 1. Sector Diversification
-  if (maxSectorPercentage > 60) {
+  // 1. Klumpenrisiko (Einzelwert >30%)
+  const riskyAssets = assetDefinitions.filter(a => total > 0 && (a.currentPrice || 0) / total > 0.3);
+  if (riskyAssets.length > 0) {
     recommendations.push({
-      id: 'sector-diversification',
+      id: 'single-asset-risk',
       category: 'assets',
       priority: 'high',
-      titleKey: 'recommendations.assets.sectorDiversification.title',
-      descriptionKey: 'recommendations.assets.sectorDiversification.description',
+      titleKey: 'recommendations.assets.singleAssetRisk.title',
+      descriptionKey: 'recommendations.assets.singleAssetRisk.description',
       actionCategory: 'assets',
       actionSubCategory: 'portfolio',
-      metadata: { maxSectorPercentage }
+      metadata: { count: riskyAssets.length }
     });
   }
 
-  // 2. Geographical Diversification
-  if (maxCountryPercentage > 70) {
+  // 2. Sektorrisiko (Sektor >40%)
+  const sectorAlloc = getSectorAllocation(assetDefinitions);
+  const maxSector = Object.entries(sectorAlloc).reduce((max, curr) => curr[1] > max[1] ? curr : max, ["", 0]);
+  if (maxSector[1] > 40) {
     recommendations.push({
-      id: 'geographical-diversification',
+      id: 'sector-risk',
       category: 'assets',
       priority: 'medium',
-      titleKey: 'recommendations.assets.geographicalDiversification.title',
-      descriptionKey: 'recommendations.assets.geographicalDiversification.description',
+      titleKey: 'recommendations.assets.sectorRisk.title',
+      descriptionKey: 'recommendations.assets.sectorRisk.description',
       actionCategory: 'assets',
       actionSubCategory: 'portfolio',
-      metadata: { maxCountryPercentage }
+      metadata: { sector: maxSector[0], percentage: Math.round(maxSector[1]) }
     });
   }
 
-  // 3. Asset Type Diversification
-  if (maxTypePercentage > 80) {
+  // 3. Regionale Diversifikation (Land >60%)
+  const countryAlloc = getCountryAllocation(assetDefinitions);
+  const maxCountry = Object.entries(countryAlloc).reduce((max, curr) => curr[1] > max[1] ? curr : max, ["", 0]);
+  if (maxCountry[1] > 60) {
     recommendations.push({
-      id: 'asset-type-diversification',
+      id: 'country-risk',
       category: 'assets',
       priority: 'medium',
-      titleKey: 'recommendations.assets.assetTypeDiversification.title',
-      descriptionKey: 'recommendations.assets.assetTypeDiversification.description',
+      titleKey: 'recommendations.assets.countryRisk.title',
+      descriptionKey: 'recommendations.assets.countryRisk.description',
       actionCategory: 'assets',
-      actionSubCategory: 'management',
-      metadata: { maxTypePercentage }
+      actionSubCategory: 'portfolio',
+      metadata: { country: maxCountry[0], percentage: Math.round(maxCountry[1]) }
     });
   }
 
-  // 4. Undervalued Assets
-  const undervaluedAssets = findUndervaluedAssets(assets, assetDefinitions);
-  if (undervaluedAssets.length > 0) {
+  // 4. Cashquote zu hoch/niedrig
+  const cashQuote = getCashQuote(assetDefinitions);
+  if (cashQuote > 30) {
     recommendations.push({
-      id: 'undervalued-assets',
+      id: 'cash-too-high',
       category: 'assets',
       priority: 'low',
-      titleKey: 'recommendations.assets.undervaluedAssets.title',
-      descriptionKey: 'recommendations.assets.undervaluedAssets.description',
+      titleKey: 'recommendations.assets.cashTooHigh.title',
+      descriptionKey: 'recommendations.assets.cashTooHigh.description',
       actionCategory: 'assets',
       actionSubCategory: 'management',
-      metadata: { count: undervaluedAssets.length }
+      metadata: { cashQuote: Math.round(cashQuote) }
+    });
+  } else if (cashQuote < 2) {
+    recommendations.push({
+      id: 'cash-too-low',
+      category: 'assets',
+      priority: 'low',
+      titleKey: 'recommendations.assets.cashTooLow.title',
+      descriptionKey: 'recommendations.assets.cashTooLow.description',
+      actionCategory: 'assets',
+      actionSubCategory: 'management',
+      metadata: { cashQuote: Math.round(cashQuote) }
     });
   }
 
-  // 5. Portfolio Rebalancing
-  const needsRebalancing = checkRebalancingNeeded(assets, assetDefinitions);
-  if (needsRebalancing) {
+  // 5. Dividendenrendite unter 1% (nur wenn Dividenden vorhanden)
+  const divYield = getDividendYield(assetDefinitions);
+  if (divYield > 0 && divYield < 1) {
     recommendations.push({
-      id: 'portfolio-rebalancing',
+      id: 'dividend-yield-low',
+      category: 'assets',
+      priority: 'low',
+      titleKey: 'recommendations.assets.dividendYieldLow.title',
+      descriptionKey: 'recommendations.assets.dividendYieldLow.description',
+      actionCategory: 'assets',
+      actionSubCategory: 'management',
+      metadata: { dividendYield: Math.round(divYield * 100) / 100 }
+    });
+  }
+
+  // 6. Spekulative Assets >20%
+  const specQuote = getSpeculativeQuote(assetDefinitions);
+  if (specQuote > 20) {
+    recommendations.push({
+      id: 'speculative-assets',
       category: 'assets',
       priority: 'medium',
-      titleKey: 'recommendations.assets.portfolioRebalancing.title',
-      descriptionKey: 'recommendations.assets.portfolioRebalancing.description',
+      titleKey: 'recommendations.assets.speculativeAssets.title',
+      descriptionKey: 'recommendations.assets.speculativeAssets.description',
       actionCategory: 'assets',
-      actionSubCategory: 'portfolio'
+      actionSubCategory: 'portfolio',
+      metadata: { speculativeQuote: Math.round(specQuote) }
     });
   }
 
-  // 6. Loss-making Positions
-  const lossPositions = findLossPositions(assets, assetDefinitions);
+  // 7. Verlustpositionen >40% im Minus
+  const lossPositions = getLossPositions(assets);
   if (lossPositions.length > 0) {
     recommendations.push({
       id: 'loss-positions',
       category: 'assets',
-      priority: 'high',
+      priority: 'medium',
       titleKey: 'recommendations.assets.lossPositions.title',
       descriptionKey: 'recommendations.assets.lossPositions.description',
       actionCategory: 'assets',
@@ -108,76 +183,21 @@ export const generateAssetRecommendations = (
     });
   }
 
-  // 7. Update Asset Prices
-  const outdatedAssets = findOutdatedAssets(assetDefinitions);
-  if (outdatedAssets.length > 0) {
+  // 8. Rebalancing-Hinweis (wenn Aktienquote >90% oder <30%)
+  const stockValue = assetDefinitions.filter(a => a.type === 'stock').reduce((sum, a) => sum + (a.currentPrice || 0), 0);
+  const stockQuote = total > 0 ? (stockValue / total) * 100 : 0;
+  if (stockQuote > 90 || stockQuote < 30) {
     recommendations.push({
-      id: 'update-asset-prices',
+      id: 'rebalancing',
       category: 'assets',
-      priority: 'low',
-      titleKey: 'recommendations.assets.updateAssetPrices.title',
-      descriptionKey: 'recommendations.assets.updateAssetPrices.description',
+      priority: 'medium',
+      titleKey: 'recommendations.assets.rebalancing.title',
+      descriptionKey: 'recommendations.assets.rebalancing.description',
       actionCategory: 'assets',
-      actionSubCategory: 'definitions',
-      metadata: { count: outdatedAssets.length }
-    });
-  }
-
-  // 8. Asset Categories
-  const uncategorizedAssets = findUncategorizedAssets(assets, assetDefinitions);
-  if (uncategorizedAssets.length > 0) {
-    recommendations.push({
-      id: 'asset-categories',
-      category: 'assets',
-      priority: 'low',
-      titleKey: 'recommendations.assets.assetCategories.title',
-      descriptionKey: 'recommendations.assets.assetCategories.description',
-      actionCategory: 'assets',
-      actionSubCategory: 'categories',
-      metadata: { count: uncategorizedAssets.length }
+      actionSubCategory: 'portfolio',
+      metadata: { stockQuote: Math.round(stockQuote) }
     });
   }
 
   return recommendations;
-};
-
-// Basic helper functions - detailed implementation will be in separate helper files
-const calculateSectorAllocation = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Record<string, number> => {
-  // TODO: Implement detailed sector allocation calculation
-  return {};
-};
-
-const calculateCountryAllocation = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Record<string, number> => {
-  // TODO: Implement detailed country allocation calculation
-  return {};
-};
-
-const calculateTypeAllocation = (_assets: Asset[]): Record<string, number> => {
-  // TODO: Implement detailed type allocation calculation
-  return {};
-};
-
-const findUndervaluedAssets = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Asset[] => {
-  // TODO: Implement undervalued assets detection
-  return [];
-};
-
-const checkRebalancingNeeded = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): boolean => {
-  // TODO: Implement rebalancing check
-  return false;
-};
-
-const findLossPositions = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Asset[] => {
-  // TODO: Implement loss positions detection
-  return [];
-};
-
-const findOutdatedAssets = (_assetDefinitions: AssetDefinition[]): AssetDefinition[] => {
-  // TODO: Implement outdated assets detection
-  return [];
-};
-
-const findUncategorizedAssets = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Asset[] => {
-  // TODO: Implement uncategorized assets detection
-  return [];
 };

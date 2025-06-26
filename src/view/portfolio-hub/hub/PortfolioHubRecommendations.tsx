@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { recommendationService } from "@service/domain/analytics/calculations/recommendationService";
+import { generateAssetRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateAssetRecommendations";
 import { PortfolioRecommendation, RecommendationPriority } from "@/types/domains/analytics";
 import { CollapsibleSection } from "@/ui/common";
 import { Target } from "lucide-react";
@@ -23,16 +24,23 @@ const PortfolioHubRecommendations: React.FC<
   const liabilities = useSelector(
     (state: RootState) => state.liabilities.items
   );
+  const assetDefinitions = useSelector((state: RootState) => state.assetDefinitions.items);
 
-  // Generate recommendations using analyticsService
+  // Generate recommendations using both planning and asset logic
   const recommendations: PortfolioRecommendation[] = useMemo(() => {
-    return recommendationService.generatePlanningRecommendations(
-      assets,
-      income,
-      expenses,
-      liabilities
-    );
-  }, [assets, income, expenses, liabilities]);
+    return [
+      ...recommendationService.generatePlanningRecommendations(
+        assets,
+        income,
+        expenses,
+        liabilities
+      ),
+      ...generateAssetRecommendations(
+        assets,
+        assetDefinitions
+      )
+    ];
+  }, [assets, income, expenses, liabilities, assetDefinitions]);
 
   // Helper function to get priority styling
   const getPriorityColor = (priority: RecommendationPriority) => {
