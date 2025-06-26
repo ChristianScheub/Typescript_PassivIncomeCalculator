@@ -246,53 +246,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
             startDate.setDate(today.getDate() - (days - 1));
             const startDateStr = startDate.toISOString().split('T')[0];
             const endDateStr = today.toISOString().split('T')[0];
-            // --- Hilfsfunktionen ---
-            async function getCombined1WHistory(startDateStr: string, endDateStr: string) {
-              const [intraday, daily] = await Promise.all([
-                portfolioHistoryService.getPortfolioIntradayByDateRange(startDateStr, endDateStr),
-                portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr)
-              ]);
-              // Map daily data by date
-              const dailyByDate: Record<string, { date: string; value: number }> = {};
-              daily.forEach(point => {
-                dailyByDate[point.date] = point;
-              });
-              // Map intraday data by date (collect all points per day)
-              const intradayByDate: Record<string, Array<{ date: string; value: number; timestamp: string }>> = {};
-              intraday.forEach(point => {
-                if (!intradayByDate[point.date]) intradayByDate[point.date] = [];
-                intradayByDate[point.date].push(point);
-              });
-              const days = 7;
-              const result: Array<{ date: string; value: number; transactions: Array<any> }> = [];
-              const startDate = new Date(startDateStr);
-              for (let i = 0; i < days; i++) {
-                const d = new Date(startDate);
-                d.setDate(startDate.getDate() + i);
-                const dateStr = d.toISOString().split('T')[0];
-                if (intradayByDate[dateStr] && intradayByDate[dateStr].length > 0) {
-                  // Alle Intraday-Minutenpunkte für diesen Tag übernehmen
-                  const sortedPoints = intradayByDate[dateStr].toSorted((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-                  sortedPoints.forEach(point => {
-                    result.push({
-                      date: point.timestamp, // timestamp für feineres Chart
-                      value: typeof point.value === 'number' && !isNaN(point.value) ? point.value : 0,
-                      transactions: []
-                    });
-                  });
-                } else if (dailyByDate[dateStr]) {
-                  result.push({
-                    date: dateStr,
-                    value: typeof dailyByDate[dateStr].value === 'number' && !isNaN(dailyByDate[dateStr].value) ? dailyByDate[dateStr].value : 0,
-                    transactions: []
-                  });
-                } else {
-                  result.push({ date: dateStr, value: 0, transactions: [] });
-                }
-              }
-              return result;
-            }
-            const result = await getCombined1WHistory(startDateStr, endDateStr);
+            const result = await getCombined1WHistory(startDateStr, endDateStr, portfolioHistoryService);
             setPortfolioHistoryData(result as any);
           } catch (error) {
             Logger.error('Error in 1W history: ' + (error instanceof Error ? error.message : String(error)));
@@ -343,12 +297,13 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
     if (!timeRange) {
       return [];
     }
-    // Für 1W direkt die kombinierten Daten zurückgeben
+    // Für 1W: Kombinierte Daten mit Typ-Flag (intraday/daily)
     if (timeRange === '1W') {
-      return portfolioHistoryData.map((item: any) => ({
+      return (portfolioHistoryData as any[]).map((item: any) => ({
         date: item.date,
         value: typeof item.value === 'number' && !isNaN(item.value) ? item.value : 0,
-        transactions: []
+        transactions: [],
+        type: item.type || 'intraday'
       }));
     }
 
@@ -403,4 +358,64 @@ export function usePortfolioHistoryRecalculation() {
   };
 
   return { triggerRecalculation };
+}
+
+// --- Helper: Combine 1W History ---
+interface CombinedHistoryPoint {
+  date: string;
+  value: number;
+  transactions: Array<any>;
+  type: 'intraday' | 'daily';
+}
+
+async function getCombined1WHistory(
+  startDateStr: string,
+  endDateStr: string,
+  portfolioHistoryService: any
+): Promise<CombinedHistoryPoint[]> {
+  const [intraday, daily] = await Promise.all([
+    portfolioHistoryService.getPortfolioIntradayByDateRange(startDateStr, endDateStr),
+    portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr)
+  ]);
+  // Map daily data by date
+  const dailyByDate: Record<string, { date: string; value: number }> = {};
+  daily.forEach((point: { date: string; value: number }) => {
+    dailyByDate[point.date] = point;
+  });
+  // Map intraday data by date (collect all points per day)
+  const intradayByDate: Record<string, Array<{ date: string; value: number; timestamp: string }>> = {};
+  intraday.forEach((point: { date: string; value: number; timestamp: string }) => {
+    if (!intradayByDate[point.date]) intradayByDate[point.date] = [];
+    intradayByDate[point.date].push(point);
+  });
+  const days = 7;
+  const result: CombinedHistoryPoint[] = [];
+  const startDate = new Date(startDateStr);
+  for (let i = 0; i < days; i++) {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
+    const dateStr = d.toISOString().split('T')[0];
+    // Alle Intraday-Minutenpunkte für diesen Tag übernehmen
+    if (intradayByDate[dateStr]) {
+      const sortedPoints = intradayByDate[dateStr].toSorted((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+      sortedPoints.forEach(point => {
+        result.push({
+          date: point.timestamp,
+          value: typeof point.value === 'number' && !isNaN(point.value) ? point.value : 0,
+          transactions: [],
+          type: 'intraday'
+        });
+      });
+    }
+    // Zusätzlich den Daily-Wert (sofern vorhanden)
+    if (dailyByDate[dateStr]) {
+      result.push({
+        date: dateStr + 'T23:59:59',
+        value: typeof dailyByDate[dateStr].value === 'number' && !isNaN(dailyByDate[dateStr].value) ? dailyByDate[dateStr].value : 0,
+        transactions: [],
+        type: 'daily'
+      });
+    }
+  }
+  return result;
 }

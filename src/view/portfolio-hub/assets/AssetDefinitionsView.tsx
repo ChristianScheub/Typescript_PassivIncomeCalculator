@@ -209,7 +209,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                   }}
                 >
                   <IconButton
-                    onClick={() => onFetchDividendsFromApi && editingDefinition && onFetchDividendsFromApi(editingDefinition)}
+                    onClick={() => onFetchDividendsFromApi?.(editingDefinition)}
                     icon={<History className="h-4 w-4" />}
                     aria-label={t("assets.fetchDividendsFromApi")}
                     variant="outline"
@@ -349,7 +349,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                     {isApiEnabled && definition.type === 'stock' && definition.useDividendApi && (
                       <button
                         className="mt-4 ml-2 px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
-                        onClick={() => onFetchDividendsFromApi && onFetchDividendsFromApi(definition)}
+                        onClick={() => onFetchDividendsFromApi?.(definition)}
                         type="button"
                       >
                         {t("assets.fetchDividendsFromApi")}
@@ -420,8 +420,9 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                 // For new definitions, just pass the form data
                 if (onAddDefinitionWithCategories) {
                   onAddDefinitionWithCategories(transformedData, transformedCategoryAssignments);
-                } else {
-                  onAddDefinition?.(transformedData);
+                }
+                if (onAddDefinition && !onAddDefinitionWithCategories) {
+                  onAddDefinition(transformedData);
                 }
               }
             }}

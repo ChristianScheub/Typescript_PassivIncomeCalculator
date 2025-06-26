@@ -116,7 +116,7 @@ export function addIntradayPriceHistory(
   
   // Take only the most recent intraday entries if we exceed the limit
   const intradayCopy = [...intradayEntries];
-  const sortedIntraday = intradayCopy.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  const sortedIntraday = intradayCopy.toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   const limitedIntradayEntries = sortedIntraday.slice(0, maxIntradayEntries);
   
   // Combine with existing history and sort by date (newest first)

@@ -13,10 +13,6 @@ import { Target } from "lucide-react";
 
 interface PortfolioHubRecommendationsProps {
   className?: string;
-  onCategoryChange: (
-    category: PortfolioCategory,
-    subCategory?: PortfolioSubCategory
-  ) => void;
 }
 
 const PortfolioHubRecommendations: React.FC<
@@ -105,14 +101,14 @@ const PortfolioHubRecommendations: React.FC<
                       {getPriorityIcon(recommendation.priority)}
                     </span>
                     <h4 className="font-medium">
-                      {t(recommendation.titleKey)}
+                      {t(recommendation.titleKey ?? "")}
                     </h4>
                     <span className="text-xs px-2 py-1 bg-white bg-opacity-50 rounded-full">
                       {t(`categories.${recommendation.category}`)}
                     </span>
                   </div>
                   <p className="text-sm opacity-80">
-                    {t(recommendation.descriptionKey)}
+                    {t(recommendation.descriptionKey ?? "")}
                   </p>
                 </div>
               </div>

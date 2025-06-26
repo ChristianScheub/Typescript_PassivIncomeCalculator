@@ -88,29 +88,13 @@ const AssetFocusDashboardContainer: React.FC = () => {
       return combined;
     }
 
-    // Für 1W: Zeige die letzten 5 Tage mit Daten, pro Tag nur den letzten Wert (gleichmäßige X-Achse)
+    // Für 1W: Zeige ALLE kombinierten Datenpunkte (intraday + daily, mit type-Flag)
     if (assetFocus.timeRange === '1W' && newSystemData.length > 0) {
       Logger.info(`Using combined 1W history from usePortfolioHistoryView: ${newSystemData.length} points`);
-      // Gruppiere nach Tag und nimm pro Tag den letzten Wert
-      const byDay: Record<string, typeof newSystemData[0]> = {};
-      [...newSystemData]
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .forEach(point => {
-          const day = point.date.slice(0, 10); // YYYY-MM-DD
-          byDay[day] = point; // Überschreibt, sodass der letzte Wert pro Tag bleibt
-        });
-      // Nimm die letzten 5 Tage mit Daten
-      const days = Object.keys(byDay).sort((a, b) => new Date(b).getTime() - new Date(a).getTime()).slice(0, 5);
-      const result = days
-        .map(day => byDay[day])
-        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-        .map(point => ({
-          date: point.date,
-          value: point.value,
-          transactions: point.transactions || []
-        }));
-      Logger.info(`1W: Showing last ${days.length} days (one value per day), ${result.length} points`);
-      return result;
+      // Sortiere alle Punkte nach Datum/Zeit
+      const sorted = [...newSystemData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      Logger.info(`1W: Showing all combined points (intraday + daily), ${sorted.length} points`);
+      return sorted;
     }
 
     // Für längere Zeiträume wie gehabt

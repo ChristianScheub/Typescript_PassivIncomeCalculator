@@ -41,7 +41,7 @@ export const StockApiSettingsSection: React.FC<StockApiSettingsSectionProps> = (
 }) => {
   const { t } = useTranslation();
   const provider = providerInfo[selectedProvider];
-  if (!provider || !provider.requiresApiKey) return null;
+  if (!(provider?.requiresApiKey)) return null;
 
   return (
     <div>
