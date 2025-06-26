@@ -1,5 +1,5 @@
+import { PortfolioRecommendation } from '@/types/domains/analytics';
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
-import { PortfolioRecommendation } from '../interfaces/IAnalyticsService';
 
 export const generateAssetRecommendations = (
   assets: Asset[],

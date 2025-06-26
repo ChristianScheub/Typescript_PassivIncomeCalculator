@@ -1,7 +1,7 @@
 import { Transaction as Asset } from '@/types/domains/assets';
 import { Liability } from '@/types/domains/financial';
-import { PortfolioRecommendation } from '../interfaces/IAnalyticsService';
 import calculatorService from '../../../../financial/calculations/compositeCalculatorService';
+import { PortfolioRecommendation } from '@/types/domains/analytics';
 
 export const generateLiabilityRecommendations = (
   assets: Asset[],

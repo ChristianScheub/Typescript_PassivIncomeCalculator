@@ -2,12 +2,8 @@ import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import analyticsService from "@service/domain/analytics/calculations/financialAnalyticsService";
-import { RecommendationPriority } from "@service/domain/analytics/calculations/financialAnalyticsService/interfaces/IAnalyticsService";
-import {
-  PortfolioCategory,
-  PortfolioSubCategory,
-} from "@service/domain/analytics/reporting/recentActivityService/types";
+import { recommendationService } from "@service/domain/analytics/calculations/recommendationService";
+import { PortfolioRecommendation, RecommendationPriority } from "@/types/domains/analytics";
 import { CollapsibleSection } from "@/ui/common";
 import { Target } from "lucide-react";
 
@@ -29,13 +25,12 @@ const PortfolioHubRecommendations: React.FC<
   );
 
   // Generate recommendations using analyticsService
-  const recommendations = useMemo(() => {
-    return analyticsService.generateRecommendations(
+  const recommendations: PortfolioRecommendation[] = useMemo(() => {
+    return recommendationService.generatePlanningRecommendations(
       assets,
-      liabilities,
-      expenses,
       income,
-      [] // assetDefinitions - can be enhanced later
+      expenses,
+      liabilities
     );
   }, [assets, income, expenses, liabilities]);
 
@@ -87,7 +82,7 @@ const PortfolioHubRecommendations: React.FC<
         defaultExpanded={false}
       >
         <div className="space-y-3">
-          {recommendations.map((recommendation, index) => (
+          {recommendations.map((recommendation: PortfolioRecommendation, index: number) => (
             <div
               key={`${recommendation.category}-${index}`}
               className={`p-4 rounded-lg border-l-4 ${getPriorityColor(

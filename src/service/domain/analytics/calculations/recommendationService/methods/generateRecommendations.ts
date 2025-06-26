@@ -1,11 +1,11 @@
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
 import { Liability, Expense, Income } from '@/types/domains/financial/';
-import { PortfolioRecommendation } from '../interfaces/IAnalyticsService';
 import { generateAssetRecommendations } from './generateAssetRecommendations';
 import { generateIncomeRecommendations } from './generateIncomeRecommendations';
 import { generateExpenseRecommendations } from './generateExpenseRecommendations';
 import { generateLiabilityRecommendations } from './generateLiabilityRecommendations';
 import { generatePlanningRecommendations } from './generatePlanningRecommendations';
+import { PortfolioRecommendation } from '@/types/domains/analytics';
 
 export const generateRecommendations = (
   assets: Asset[],

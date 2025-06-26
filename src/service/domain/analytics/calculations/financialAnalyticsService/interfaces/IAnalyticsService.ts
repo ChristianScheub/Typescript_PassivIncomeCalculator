@@ -20,11 +20,4 @@ export interface IAnalyticsService {
 
   calculateRatios: (summary: import('@/types/domains/analytics/reporting').FinancialSummary) => import('@/types/domains/analytics/reporting').FinancialRatios;
 
-  generateRecommendations: (
-    assets: Asset[],
-    liabilities: Liability[],
-    expenses: Expense[],
-    income: Income[],
-    assetDefinitions?: AssetDefinition[]
-  ) => import('@/types/domains/analytics/reporting').PortfolioRecommendation[];
 }
