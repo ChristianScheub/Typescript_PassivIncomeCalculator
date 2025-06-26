@@ -39,3 +39,5 @@ export interface IStockAPIService {
    */
   getIntradayHistory: (symbol: string, days?: number) => Promise<StockHistory>;
 }
+
+// Hinweis: Das Interface bleibt für Typsicherheit erhalten, Implementierung ist jetzt functional object pattern.

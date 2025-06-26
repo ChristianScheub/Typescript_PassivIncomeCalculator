@@ -8,11 +8,7 @@ import { usePortfolioIntradayView, usePortfolioHistoryView } from '../../hooks/u
 import AssetDashboardView from '@/view/finance-hub/overview/AssetDashboardView';
 import AssetDetailModal from '@/view/finance-hub/overview/AssetDetailModal';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
-import stockAPIService, {
-  createStockAPIServiceMethod,
-  getStockAPIServiceMethod,
-  getAvailableProvidersMethod
-} from '@/service/domain/assets/market-data/stockAPIService';
+import stockAPIService from '@/service/domain/assets/market-data/stockAPIService';
 import { useAsyncOperation } from '../../utils/containerUtils';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 import { addIntradayPriceHistory } from '../../utils/priceHistoryUtils';
@@ -201,30 +197,6 @@ const AssetFocusDashboardContainer: React.FC = () => {
       async () => {
         const stockDefinitions = assetDefinitions.filter((def: any) => def.type === 'stock' && def.ticker);
         Logger.info(`Found ${stockDefinitions.length} stock definitions to update`);
-        
-        // Ensure Stock API service is configured with Redux state
-        try {
-          let service = getStockAPIServiceMethod();
-          Logger.info(`Initial Stock API service state: ${!!service}`);
-          
-          if (!service) {
-            Logger.info(`Creating Stock API service with Redux config...`);
-            createStockAPIServiceMethod(apiConfig.selectedProvider, apiConfig.apiKeys);
-            service = getStockAPIServiceMethod();
-            Logger.info(`Stock API service after creation: ${!!service}`);
-          }
-          
-          if (service) {
-            const providers = getAvailableProvidersMethod(apiConfig.apiKeys);
-            Logger.info(`Available providers: ${JSON.stringify(providers.map(p => ({id: p.id, configured: p.isConfigured})))}`);
-          } else {
-            Logger.error(`Failed to create Stock API service - cannot proceed with intraday history update`);
-            return;
-          }
-        } catch (error) {
-          Logger.error(`Error configuring Stock API service: ${JSON.stringify(error)}`);
-          return;
-        }
         
         if (stockDefinitions.length === 0) {
           Logger.warn("No stock definitions found with ticker symbols");

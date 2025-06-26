@@ -1,14 +1,13 @@
-import { IStockAPIService } from './interfaces/IStockAPIService';
-import { IStockAPIServiceManager } from './StockAPIService';
-import { createStockAPIServiceMethod } from './methods/createStockAPIService';
-import { getStockAPIServiceMethod } from './methods/createStockAPIService';
-import { getAvailableProvidersMethod } from './methods/getAvailableProviders';
-import stockAPIService from './StockAPIService';
+import { getCurrentStockPrice } from './methods/getCurrentStockPrice';
+import { getHistory } from './methods/getHistory';
+import { getHistory30Days } from './methods/getHistory30Days';
+import { getIntradayHistory } from './methods/getIntradayHistory';
 
-// Export the service interface and implementation
-export type { IStockAPIService };
-export type { IStockAPIServiceManager };
-export { stockAPIService };
+export const stockAPIService = {
+  getCurrentStockPrice,
+  getHistory,
+  getHistory30Days,
+  getIntradayHistory,
+};
+
 export default stockAPIService;
-// Export helpers for direct use if needed
-export { createStockAPIServiceMethod, getStockAPIServiceMethod, getAvailableProvidersMethod };

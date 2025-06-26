@@ -1,8 +1,6 @@
 import { AssetDefinition } from "@/types/domains/assets";
 import Logger from "@/service/shared/logging/Logger/logger";
-import stockAPIService, {
-  createStockAPIServiceMethod,
-} from "../../../domain/assets/market-data/stockAPIService";
+import stockAPIService from "../../../domain/assets/market-data/stockAPIService";
 import {
   updateAssetDefinitionPrice,
   cleanupOldPriceHistory,
@@ -10,7 +8,6 @@ import {
 import { IStockAPIService } from "../../../domain/assets/market-data/stockAPIService/interfaces/IStockAPIService";
 import { StockHistoryEntry } from "@/types/domains/assets/market-data";
 import { TimeRangePeriod } from "@/types/shared/time";
-import { getStore } from "@/store";
 
 /**
  * Helper class to update stock prices in batch
@@ -45,25 +42,38 @@ export class StockPriceUpdater {
     );
 
     try {
-      // Get Redux state for provider/apiKeys
-      const store = getStore();
-      const apiConfig = store.getState().apiConfig;
-      const stockAPI = createStockAPIServiceMethod(
-        apiConfig.selectedProvider,
-        apiConfig.apiKeys
-      );
+      // stockAPIService ist jetzt ein Objekt, keine Factory mehr!
+      const stockAPI = stockAPIService;
       const updatedDefinitions: AssetDefinition[] = [];
 
       for (const definition of stockDefinitionsToUpdate) {
         try {
-          const updatedDefinition =
-            await StockPriceUpdater.updateSingleDefinition(
-              definition,
-              stockAPI
-            );
-          if (updatedDefinition) {
-            updatedDefinitions.push(updatedDefinition);
-          }
+          // Inline logic from updateSingleDefinition
+          const priceData = await stockAPI.getCurrentStockPrice(definition.ticker!);
+          if (!priceData?.price) continue;
+
+          const newPrice = priceData.price;
+
+          // Use utility function to update price and manage history
+          const updatedDefinition = updateAssetDefinitionPrice(
+            definition,
+            newPrice,
+            "api"
+          );
+
+          // Clean up old price history to prevent unlimited growth
+          const finalDefinition = {
+            ...updatedDefinition,
+            priceHistory: cleanupOldPriceHistory(updatedDefinition.priceHistory),
+          };
+
+          Logger.infoService(
+            `Updated price for ${definition.ticker} (${definition.fullName}): ${newPrice}`
+          );
+          Logger.infoService(
+            `Price history entries: ${finalDefinition.priceHistory?.length || 0}`
+          );
+          updatedDefinitions.push(finalDefinition);
         } catch (error) {
           Logger.error(
             `Failed to update price for ${definition.ticker}: ${error}`
@@ -85,37 +95,6 @@ export class StockPriceUpdater {
         "Stock API service not available. Please check your API configuration in Settings."
       );
     }
-  }
-
-  private static async updateSingleDefinition(
-    definition: AssetDefinition,
-    stockAPI: IStockAPIService
-  ): Promise<AssetDefinition | null> {
-    const priceData = await stockAPI.getCurrentStockPrice(definition.ticker!);
-    if (!priceData?.price) return null;
-
-    const newPrice = priceData.price;
-
-    // Use utility function to update price and manage history
-    const updatedDefinition = updateAssetDefinitionPrice(
-      definition,
-      newPrice,
-      "api"
-    );
-
-    // Clean up old price history to prevent unlimited growth
-    const finalDefinition = {
-      ...updatedDefinition,
-      priceHistory: cleanupOldPriceHistory(updatedDefinition.priceHistory),
-    };
-
-    Logger.infoService(
-      `Updated price for ${definition.ticker} (${definition.fullName}): ${newPrice}`
-    );
-    Logger.infoService(
-      `Price history entries: ${finalDefinition.priceHistory?.length || 0}`
-    );
-    return finalDefinition;
   }
 
   /**
@@ -146,13 +125,8 @@ export class StockPriceUpdater {
       `Fetching 30-day historical data for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`
     );
 
-    // Get Redux state for provider/apiKeys
-    const store = getStore();
-    const apiConfig = store.getState().apiConfig;
-    const stockAPI = createStockAPIServiceMethod(
-      apiConfig.selectedProvider,
-      apiConfig.apiKeys
-    );
+    // stockAPIService ist jetzt ein Objekt, keine Factory mehr!
+    const stockAPI = stockAPIService;
     const updatedDefinitions: AssetDefinition[] = [];
 
     for (const definition of stockDefinitionsToUpdate) {
@@ -234,13 +208,8 @@ export class StockPriceUpdater {
     );
 
     try {
-      // Get Redux state for provider/apiKeys
-      const store = getStore();
-      const apiConfig = store.getState().apiConfig;
-      const stockAPI = createStockAPIServiceMethod(
-        apiConfig.selectedProvider,
-        apiConfig.apiKeys
-      );
+      // stockAPIService ist jetzt ein Objekt, keine Factory mehr!
+      const stockAPI = stockAPIService;
       const updatedDefinitions: AssetDefinition[] = [];
 
       for (const definition of stockDefinitionsToUpdate) {

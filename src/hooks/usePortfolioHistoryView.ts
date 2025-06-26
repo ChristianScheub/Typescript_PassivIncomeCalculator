@@ -19,6 +19,37 @@ function getPortfolioHistoryWorker() {
 }
 
 /**
+ * Generic utility to recalculate portfolio history and intraday data using the worker and persist results.
+ * Returns: { intraday, history }
+ */
+export async function recalculatePortfolioHistoryAndIntraday({ assetDefinitions, portfolioPositions }: { assetDefinitions: any[]; portfolioPositions: any[] }) {
+  return new Promise<{ intraday: any[]; history: any[] }>((resolve, reject) => {
+    const worker = getPortfolioHistoryWorker();
+    worker.postMessage({
+      type: 'calculateAll',
+      params: { assetDefinitions, portfolioPositions }
+    });
+    const handleWorkerMessage = async (event: MessageEvent) => {
+      const { type, intraday, history, error } = event.data || {};
+      if (type === 'resultAll') {
+        await Promise.all([
+          portfolioHistoryService.bulkAddPortfolioIntradayData(intraday),
+          portfolioHistoryService.bulkAddPortfolioHistory(history)
+        ]);
+        Logger.infoService('✅ Bulk persisted intraday and history data from worker');
+        worker.removeEventListener('message', handleWorkerMessage);
+        resolve({ intraday, history });
+      } else if (type === 'error') {
+        Logger.error('❌ Worker error: ' + error);
+        worker.removeEventListener('message', handleWorkerMessage);
+        reject(error);
+      }
+    };
+    worker.addEventListener('message', handleWorkerMessage);
+  });
+}
+
+/**
  * Hook for accessing portfolio intraday data with proper Redux integration
  * - Now uses a Web Worker for all calculations
  * - Updates Redux after DB loads for better performance
@@ -161,15 +192,6 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
   const [portfolioHistoryData, setPortfolioHistoryData] = useState<Array<{ date: string; value: number; change: number; changePercentage: number }>>([]);
   const isLoadingRef = useRef(false);
 
-  // --- Worker Singleton ---
-  let portfolioHistoryWorker: Worker | null = null;
-  function getPortfolioHistoryWorker() {
-    if (!portfolioHistoryWorker) {
-      portfolioHistoryWorker = new PortfolioHistoryWorker();
-    }
-    return portfolioHistoryWorker;
-  }
-
   useEffect(() => {
     if (!timeRange || timeRange === '1D' || !isHydrated) {
       return;
@@ -194,43 +216,18 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         }));
       } else {
         Logger.infoService(`⚠️ No portfolio history data in IndexedDB for ${timeRange}, triggering worker calculation...`);
-        // Trigger worker for both intraday and history
-        const worker = getPortfolioHistoryWorker();
-        worker.postMessage({
-          type: 'calculateAll',
-          params: {
-            assetDefinitions,
-            portfolioPositions: portfolioCache.positions
-          }
-        });
-        const handleWorkerMessage = async (event: MessageEvent) => {
-          const { type, intraday, history, error } = event.data || {};
-          if (type === 'resultAll') {
-            // Bulk persist both datasets
-            await Promise.all([
-              portfolioHistoryService.bulkAddPortfolioIntradayData(intraday),
-              portfolioHistoryService.bulkAddPortfolioHistory(history)
-            ]);
-            Logger.infoService('✅ Bulk persisted intraday and history data from worker');
-            // Optionally update Redux intraday state if needed
-            dispatch(setPortfolioIntradayData(intraday));
-            dispatch(setPortfolioIntradayStatus('succeeded'));
-            // Update local state for history
-            setPortfolioHistoryData(history.map((point: any) => ({
-              date: point.date,
-              value: point.value,
-              change: point.totalReturn,
-              changePercentage: point.totalReturnPercentage
-            })) as any);
-            worker.removeEventListener('message', handleWorkerMessage);
-          } else if (type === 'error') {
-            Logger.error('❌ Worker error: ' + error);
-            worker.removeEventListener('message', handleWorkerMessage);
-          }
-          isLoadingRef.current = false;
-        };
-        worker.addEventListener('message', handleWorkerMessage);
-        return [];
+        // Nutze die generische Utility
+        const { intraday, history } = await recalculatePortfolioHistoryAndIntraday({ assetDefinitions, portfolioPositions: portfolioCache.positions });
+        // Redux-Update für Intraday
+        dispatch(setPortfolioIntradayData(intraday));
+        dispatch(setPortfolioIntradayStatus('succeeded'));
+        // Update local state für history
+        return history.map((point: any) => ({
+          date: point.date,
+          value: point.value,
+          change: point.totalReturn,
+          changePercentage: point.totalReturnPercentage
+        }));
       }
     }
 
@@ -388,14 +385,13 @@ export function usePortfolioHistoryRecalculation() {
       Logger.infoService('⚠️ Cannot trigger recalculation - missing portfolio or asset definitions');
       return;
     }
-
     Logger.infoService('🔄 Manually triggering portfolio history recalculation...');
-    
     try {
-      // Worker-based calculation logic here...
-      
+      await recalculatePortfolioHistoryAndIntraday({
+        assetDefinitions,
+        portfolioPositions: portfolioCache.positions
+      });
       Logger.infoService('✅ Portfolio history recalculation completed');
-      
     } catch (error) {
       Logger.error('❌ Portfolio history recalculation failed: ' + JSON.stringify(error));
       throw error;
@@ -404,9 +400,3 @@ export function usePortfolioHistoryRecalculation() {
 
   return { triggerRecalculation };
 }
-
-// TODO: Implement worker communication for portfolio history calculation
-// 1. Initialisiere den Worker (z. B. const worker = new Worker(...))
-// 2. Sende Daten an den Worker (worker.postMessage(...))
-// 3. Empfange Ergebnis (worker.onmessage = ...)
-// 4. Speichere Ergebnis in IndexedDB

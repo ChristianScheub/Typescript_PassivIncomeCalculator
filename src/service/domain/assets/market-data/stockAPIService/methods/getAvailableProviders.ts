@@ -3,6 +3,9 @@ import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
 /**
  * Get available API providers with their configuration status (Redux-driven)
  */
+// Deprecated: Siehe neues Functional Object Pattern im index.ts
+export {};
+
 export const getAvailableProvidersMethod = (apiKeys: {
   [K in StockAPIProvider]?: string;
 }): Array<{

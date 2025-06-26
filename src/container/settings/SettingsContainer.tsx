@@ -7,8 +7,6 @@ import { clearAllLiabilities } from "../../store/slices/liabilitiesSlice";
 import { clearAllExpenses } from "../../store/slices/expensesSlice";
 import { clearAllIncome } from "../../store/slices/incomeSlice";
 import { clearAllAssetCategories } from "../../store/slices/assetCategoriesSlice";
-import { clearAllCache } from "../../store/slices/calculatedDataSlice";
-import { clearAllCharts } from "../../store/slices/customAnalyticsSlice";
 import sqliteService from "../../service/infrastructure/sqlLiteService";
 import { StoreNames } from "../../service/infrastructure/sqlLiteService/interfaces/ISQLiteService";
 import Logger from "../../service/shared/logging/Logger/logger";
@@ -22,7 +20,6 @@ import deleteDataService from '../../service/application/workflows/deleteDataSer
 import { t } from "i18next";
 import { ConfirmationDialogState } from "../../ui/dialog/types";
 import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '../../store/slices/snackbarSlice';
-import { useCalculatedDataCache } from '../../hooks/useCalculatedDataCache';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";

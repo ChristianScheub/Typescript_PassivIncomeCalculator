@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { store } from './store';
-import { Snackbar } from "@mui/material";
 
 // Layouts
 import MobileLayout from './layouts/MobileLayout';
