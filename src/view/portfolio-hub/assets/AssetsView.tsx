@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import { EmptyStateView } from "./EmptyStateAssetView";
+import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
 
 interface PortfolioData {
   positions: PortfolioPosition[];
@@ -457,10 +458,10 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="space-y-6">
       {/* Header */}
       <ViewHeader
-        title={t("navigation.assets")}
+        title={t("assets.title")}
         onBack={onBack}
         rightContent={
           <HeaderButtons
@@ -503,6 +504,8 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
           handleViewModeChange={handleViewModeChange}
         />
       )}
+
+      <PortfolioHubRecommendations context="assets" />
 
       {/* Assets/Portfolio List */}
       <AssetsList

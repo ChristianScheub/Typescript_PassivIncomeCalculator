@@ -17,11 +17,10 @@ export const generateLiabilityRecommendations = (
   const totalAssetValue = calculatorService.calculateTotalAssetValue(assets);
   const totalDebt = calculatorService.calculateTotalDebt(liabilities);
   const debtToAssetRatio = totalAssetValue > 0 ? (totalDebt / totalAssetValue) * 100 : 0;
-  const highInterestLiabilities = findHighInterestLiabilities(liabilities);
-  const longTermLiabilities = findLongTermLiabilities(liabilities);
 
   // 23. High Interest Rate
-  if (highInterestLiabilities.length > 0) {
+  if (liabilities.filter(l => (l.interestRate || 0) > 10).length > 0) {
+    const highInterestLiabilities = liabilities.filter(l => (l.interestRate || 0) > 10);
     const maxInterestRate = Math.max(...highInterestLiabilities.map(l => l.interestRate || 0));
     recommendations.push({
       id: 'reduce-high-interest-debt',
@@ -31,7 +30,7 @@ export const generateLiabilityRecommendations = (
       descriptionKey: 'recommendations.liabilities.reduceHighInterestDebt.description',
       actionCategory: 'liabilities',
       actionSubCategory: 'optimization',
-      metadata: { 
+      metadata: {
         count: highInterestLiabilities.length,
         maxRate: Math.round(maxInterestRate * 100) / 100
       }
@@ -39,21 +38,28 @@ export const generateLiabilityRecommendations = (
   }
 
   // 24. Accelerate Debt Repayment
-  if (longTermLiabilities.length > 0) {
+  const longTermLiabilities40 = liabilities.filter(liability => {
+    if (!liability.startDate || !liability.endDate) return false;
+    const startDate = new Date(liability.startDate);
+    const endDate = new Date(liability.endDate);
+    const termInYears = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
+    return termInYears > 40;
+  });
+  if (longTermLiabilities40.length > 0) {
     recommendations.push({
       id: 'accelerate-debt-repayment',
       category: 'liabilities',
-      priority: 'medium',
+      priority: 'low',
       titleKey: 'recommendations.liabilities.accelerateDebtRepayment.title',
       descriptionKey: 'recommendations.liabilities.accelerateDebtRepayment.description',
       actionCategory: 'liabilities',
       actionSubCategory: 'repayment',
-      metadata: { count: longTermLiabilities.length }
+      metadata: { count: longTermLiabilities40.length }
     });
   }
 
   // 25. Debt Consolidation
-  if (liabilities.length > 3) {
+  if (liabilities.length > 6) {
     recommendations.push({
       id: 'consider-debt-consolidation',
       category: 'liabilities',
@@ -67,7 +73,7 @@ export const generateLiabilityRecommendations = (
   }
 
   // 26. Debt-to-Asset Ratio
-  if (debtToAssetRatio > 50) {
+  if (debtToAssetRatio > 80) {
     recommendations.push({
       id: 'reduce-debt-ratio',
       category: 'liabilities',
@@ -84,18 +90,4 @@ export const generateLiabilityRecommendations = (
 };
 
 // Helper functions
-const findHighInterestLiabilities = (liabilities: Liability[]): Liability[] => {
-  return liabilities.filter(liability => (liability.interestRate || 0) > 8);
-};
-
-const findLongTermLiabilities = (liabilities: Liability[]): Liability[] => {
-  return liabilities.filter(liability => {
-    if (!liability.startDate || !liability.endDate) return false;
-    
-    const startDate = new Date(liability.startDate);
-    const endDate = new Date(liability.endDate);
-    const termInYears = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365);
-    
-    return termInYears > 20;
-  });
-};
+// Removed unused helper functions for high interest and long term liabilities as their logic is now directly in the main function.

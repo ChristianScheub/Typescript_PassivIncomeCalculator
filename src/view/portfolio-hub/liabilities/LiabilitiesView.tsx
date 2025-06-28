@@ -11,6 +11,7 @@ import { Plus,Landmark } from "lucide-react";
 import formatService from "@service/infrastructure/formatService";
 import { Liability } from '@/types/domains/financial';
 import { LoadingSpinner } from '@/ui/feedback/LoadingSpinner';
+import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
 
 interface LiabilitiesViewProps {
   liabilities: Liability[];
@@ -78,6 +79,8 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
         </div>
       </div>
 
+      <PortfolioHubRecommendations context="liabilities" />
+
       {/* Liabilities List */}
       {liabilities.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,7 +139,22 @@ const LiabilitiesView: React.FC<LiabilitiesViewProps> = ({
       >
         <MaterialLiabilityForm
           initialData={editingLiability || undefined}
-          onSubmit={editingLiability ? onUpdateLiability : onAddLiability}
+          onSubmit={(data) => {
+            const now = new Date().toISOString();
+            const liability = {
+              ...data,
+              id: editingLiability?.id || Date.now().toString(),
+              createdAt: editingLiability?.createdAt || now,
+              updatedAt: now,
+            };
+            if (editingLiability) {
+              onUpdateLiability(liability);
+            } else {
+              onAddLiability(liability);
+            }
+            onSetIsAddingLiability(false);
+            onSetEditingLiability(null);
+          }}
         />
       </Modal>
 

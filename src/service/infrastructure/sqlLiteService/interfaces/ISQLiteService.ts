@@ -67,6 +67,6 @@ export interface ISQLiteService {
   add<K extends StoreNames>(storeName: K, item: FinanceDB[K]['value']): Promise<string>;
   update<K extends StoreNames>(storeName: K, item: FinanceDB[K]['value']): Promise<string>;
   remove(storeName: StoreNames, id: string): Promise<void>;
-  exportData(): Promise<string>;
+  exportData(storeNames?: StoreNames[]): Promise<string>;
   importData(jsonData: string): Promise<void>;
 }

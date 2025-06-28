@@ -1,10 +1,12 @@
 import { Expense, Income } from '@/types/domains/financial/';
 import calculatorService from '../../../../financial/calculations/compositeCalculatorService';
 import { PortfolioRecommendation } from '@/types/domains/analytics';
+import { Transaction as Asset } from '@/types/domains/assets/';
 
 export const generateExpenseRecommendations = (
   expenses: Expense[],
-  income: Income[]
+  income: Income[],
+  assets: Asset[] = []
 ): PortfolioRecommendation[] => {
   const recommendations: PortfolioRecommendation[] = [];
 
@@ -95,8 +97,8 @@ export const generateExpenseRecommendations = (
   }
 
   // 22. Emergency Buffer
-  const emergencyExpenses = findEmergencyExpenses(expenses);
-  if (emergencyExpenses.length === 0) {
+  const hasEmergencyBuffer = hasCashEmergencyBuffer(assets, totalMonthlyExpenses);
+  if (!hasEmergencyBuffer) {
     recommendations.push({
       id: 'create-emergency-buffer',
       category: 'expenses',
@@ -105,7 +107,7 @@ export const generateExpenseRecommendations = (
       descriptionKey: 'recommendations.expenses.createEmergencyBuffer.description',
       actionCategory: 'expenses',
       actionSubCategory: 'emergency',
-      metadata: { suggestedAmount: Math.round(totalMonthlyExpenses * 3) }
+      metadata: { suggestedAmount: Math.round(totalMonthlyExpenses) }
     });
   }
 
@@ -152,7 +154,10 @@ const findSeasonalExpenses = (_expenses: Expense[]): Expense[] => {
   return [];
 };
 
-const findEmergencyExpenses = (_expenses: Expense[]): Expense[] => {
-  // TODO: Find emergency or buffer expenses
-  return [];
+// Helper function: Prüft, ob genug Cash für mindestens 1 Monat Ausgaben vorhanden ist
+const hasCashEmergencyBuffer = (assets: Asset[], monthlyExpenses: number): boolean => {
+  // Suche nach Assets mit AssetType "cash"
+  const cashAssets = assets.filter(asset => asset.type === 'cash');
+  const totalCash = cashAssets.reduce((sum, asset) => sum + (asset.value || 0), 0);
+  return totalCash >= monthlyExpenses;
 };

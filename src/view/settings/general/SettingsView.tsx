@@ -59,7 +59,7 @@ interface SettingsViewProps {
   onCloseConfirmDialog: () => void;
   onApiToggle: (enabled: boolean) => void;
   onDividendApiToggle: (enabled: boolean) => void;
-  onExportData: () => void;
+  onExportData: (storeNames: string[]) => void;
   onImportData: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onToggleLogs: () => void;
   onRefreshLogs: () => void;
@@ -198,6 +198,27 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   const exportButtonText = getButtonText(exportStatus, t, 'settings.exporting', 'settings.exported', 'settings.export');
   const importButtonText = getButtonText(importStatus, t, 'settings.importing', 'settings.imported', 'settings.import');
   const apiKeyButtonText = getButtonText(apiKeyStatus, t, 'settings.saving', 'settings.saved', 'settings.saveApiKey');
+
+  // Unterstützte Stores für gezielten Export/Import
+  const STORE_OPTIONS = [
+    { key: 'transactions', label: t('settings.transactions') },
+    { key: 'assetDefinitions', label: t('settings.assetDefinitions') },
+    { key: 'assetCategories', label: t('settings.assetCategories') },
+    { key: 'assetCategoryOptions', label: t('settings.assetCategoryOptions') },
+    { key: 'assetCategoryAssignments', label: t('settings.assetCategoryAssignments') },
+    { key: 'liabilities', label: t('settings.liabilities') },
+    { key: 'expenses', label: t('settings.expenses') },
+    { key: 'income', label: t('settings.income') },
+    { key: 'exchangeRates', label: t('settings.exchangeRates') },
+  ];
+
+  const [selectedStores, setSelectedStores] = useState<string[]>(STORE_OPTIONS.map(opt => opt.key));
+
+  const handleStoreToggle = (key: string) => {
+    setSelectedStores((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -388,23 +409,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         defaultExpanded={false}
       >
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{t('settings.exportData')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('settings.exportDescription')}
-              </p>
-            </div>
-            <Button
-              onClick={onExportData}
-              disabled={exportStatus === 'loading'}
-              className="flex items-center space-x-2"
-            >
-              <Download size={16} />
-              <span>{exportButtonText}</span>
-            </Button>
-          </div>
-
+          {/* Import Button */}
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium">{t('settings.importData')}</h3>
@@ -418,13 +423,12 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             <div className="relative">
               <input
                 type="file"
-                accept=".json"
+                accept="application/json"
                 onChange={onImportData}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 disabled={importStatus === 'loading'}
               />
               <Button
-                variant="outline"
                 disabled={importStatus === 'loading'}
                 className="flex items-center space-x-2"
               >
@@ -433,6 +437,72 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               </Button>
             </div>
           </div>
+          {/* Export Button */}
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-medium">{t('settings.exportData')}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('settings.exportDescription')}
+              </p>
+            </div>
+            <Button
+              onClick={() => onExportData(selectedStores)}
+              disabled={exportStatus === 'loading' || selectedStores.length === 0}
+              className="flex items-center space-x-2"
+            >
+              <Download size={16} />
+              <span>{exportButtonText}</span>
+            </Button>
+          </div>
+                    {/* Store Auswahl Collapsible */}
+          <CollapsibleSection
+            title={t('settings.selectDataSets')}
+            icon={null}
+            defaultExpanded={false}
+          >
+            <div className="mb-2">
+              {/* Chips für ausgewählte Stores */}
+              <div className="flex flex-wrap gap-2 mb-2">
+                {selectedStores.map(key => {
+                  const label = STORE_OPTIONS.find(opt => opt.key === key)?.label || key;
+                  return (
+                    <span key={key} className="flex items-center bg-blue-600 text-white rounded-full px-3 py-1 text-sm mr-1 mb-1">
+                      {label}
+                      <button
+                        type="button"
+                        className="ml-2 text-white hover:text-gray-200 focus:outline-none"
+                        onClick={() => setSelectedStores(selectedStores.filter(k => k !== key))}
+                        aria-label={`Remove ${label}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  );
+                })}
+              </div>
+              {/* Multi-Select Input */}
+              <div className="relative w-full max-w-md">
+                <select
+                  multiple
+                  value={selectedStores}
+                  onChange={e => {
+                    const options = Array.from(e.target.selectedOptions).map(opt => opt.value);
+                    setSelectedStores(options);
+                  }}
+                  className="block w-full border border-blue-400 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
+                  size={Math.min(STORE_OPTIONS.length, 6)}
+                >
+                  {STORE_OPTIONS.map(opt => (
+                    <option key={opt.key} value={opt.key} className="py-1">
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">{t('settings.selectDataSetsHint')}</p>
+            </div>
+          </CollapsibleSection>
         </div>
       </CollapsibleSection>
 

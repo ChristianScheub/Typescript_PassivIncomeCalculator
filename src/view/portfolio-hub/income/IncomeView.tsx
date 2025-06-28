@@ -11,6 +11,7 @@ import { Plus,CreditCard } from "lucide-react";
 import formatService from "@service/infrastructure/formatService";
 import { Income } from '@/types/domains/financial';
 import { LoadingSpinner } from "../../../ui/feedback/LoadingSpinner";
+import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
 
 interface IncomeViewProps {
   status: string;
@@ -80,6 +81,8 @@ const IncomeView: React.FC<IncomeViewProps> = ({
           </div>
         </div>
       </div>
+
+      <PortfolioHubRecommendations context="income" />
 
       {items.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -334,7 +334,6 @@
     "clearDividendHistoryDesc": "Löscht den gesamten Dividendenverlauf, das Dividendenwachstum und die Dividendenprognose aller Assets.",
     "clearDividendHistoryTitle": "Dividendenverlauf wirklich löschen?",
     "clearDividendHistoryConfirm": "Möchtest du wirklich den Dividendenverlauf, das Dividendenwachstum und die Dividendenprognose aller Assets unwiderruflich löschen?",
-
     "snackbar": {
       "dividendHistoryCleared": "Dividendenverlauf erfolgreich gelöscht.",
       "dividendHistoryClearError": "Fehler beim Löschen des Dividendenverlaufs.",
@@ -367,7 +366,18 @@
       "reduxCacheCleared": "Redux-Cache gelöscht.",
       "reduxCacheClearError": "Fehler beim Löschen des Redux-Caches.",
       "eurConversionInfo": "Kurse werden automatisch in EUR umgerechnet."
-    }
+    },
+    "transactions": "Transaktionen",
+    "assetDefinitions": "Asset-Definitionen",
+    "assetCategories": "Asset-Kategorien",
+    "assetCategoryOptions": "Asset-Kategorie-Optionen",
+    "assetCategoryAssignments": "Asset-Kategorie-Zuordnungen",
+    "liabilities": "Verbindlichkeiten",
+    "expenses": "Ausgaben",
+    "income": "Einkommen",
+    "exchangeRates": "Wechselkurse",
+    "selectDataSets": "Daten für den Import",
+    "selectDataSetsHint": "Wählen Sie die zu exportierenden Datenbereiche aus."
   },
 
   "pages": {
@@ -542,7 +552,9 @@
     "selectOption": "Option auswählen",
     "noCategoriesAvailable": "Keine Kategorien verfügbar. Erstellen Sie zuerst Kategorien.",
     "optionsForCategory": "Optionen für diese Kategorie",
-    "previewOptions": "Optionen-Vorschau"
+    "previewOptions": "Optionen-Vorschau",
+    "assets": "Vermögen",
+    "liabilities": "Verbindlichkeiten"
   },
 
   "assets": {
@@ -1381,71 +1393,67 @@
   },
   "recommendations": {
     "assets": {
-      "sectorDiversification": {
-        "title": "Sektor-Diversifikation verbessern",
-        "description": "Ihr Portfolio ist in bestimmten Sektoren konzentriert. Erwägen Sie eine Streuung über verschiedene Sektoren."
+      "singleAssetRisk": {
+        "title": "Klumpenrisiko: Einzelwert zu hoch",
+        "description": "Einzelne Assets machen mehr als 30% des Portfolios aus. Streuen Sie Ihr Portfolio, um das Risiko zu reduzieren."
       },
-      "geographicalDiversification": {
-        "title": "Geografische Diversifikation hinzufügen",
-        "description": "Ihre Assets sind geografisch konzentriert. Erwägen Sie internationale Diversifikation zur Risikominderung."
+      "sectorRisk": {
+        "title": "Sektorrisiko: Konzentration in einem Sektor",
+        "description": "Ein Sektor macht mehr als 40% Ihres Portfolios aus. Diversifizieren Sie über verschiedene Sektoren."
       },
-      "assetTypeDiversification": {
-        "title": "Asset-Typen diversifizieren",
-        "description": "Ihr Portfolio könnte von Diversifikation über verschiedene Anlageklassen profitieren (Aktien, Anleihen, Immobilien)."
+      "countryRisk": {
+        "title": "Länderrisiko: Regionale Konzentration",
+        "description": "Ein Land macht mehr als 60% Ihres Portfolios aus. Internationale Diversifikation kann das Risiko senken."
       },
-      "undervaluedAssets": {
-        "title": "Unterbewertete Assets überprüfen",
-        "description": "Einige Ihrer Assets könnten unterbewertet sein. Überlegen Sie, ob es Zeit für Rebalancing oder Aufstockung ist."
+      "cashTooHigh": {
+        "title": "Hohe Cashquote",
+        "description": "Ihr Bargeldanteil ist über 30%. Prüfen Sie, ob Sie überschüssige Liquidität investieren möchten."
       },
-      "portfolioRebalancing": {
-        "title": "Portfolio rebalancieren",
-        "description": "Ihre Portfolio-Allokation ist von den Zielen abgewichen. Erwägen Sie Rebalancing für das gewünschte Risikoprofil."
+      "dividendYieldLow": {
+        "title": "Niedrige Dividendenrendite",
+        "description": "Die durchschnittliche Dividendenrendite liegt unter 1%. Prüfen Sie, ob dividendenstärkere Assets sinnvoll sind."
+      },
+      "speculativeAssets": {
+        "title": "Hoher Anteil spekulativer Assets",
+        "description": "Mehr als 20% Ihres Portfolios sind spekulativ (z.B. Krypto, Hochrisiko). Prüfen Sie Ihr Risikoprofil."
       },
       "lossPositions": {
-        "title": "Verlustpositionen überprüfen",
-        "description": "Sie haben Assets in Verlustpositionen. Erwägen Sie Tax-Loss-Harvesting oder das Reduzieren underperformender Investments."
+        "title": "Verlustpositionen im Portfolio",
+        "description": "Einige Assets liegen über 40% im Minus. Überprüfen Sie, ob Handlungsbedarf besteht."
       },
-      "updateAssetPrices": {
-        "title": "Asset-Preise aktualisieren",
-        "description": "Einige Asset-Preise könnten veraltet sein. Aktualisieren Sie Preise für genaue Portfolio-Bewertungen."
-      },
-      "assetCategories": {
-        "title": "Asset-Kategorien vervollständigen",
-        "description": "Einigen Assets fehlen vollständige Kategorisierungen. Fügen Sie Sektor- und Länderinformationen für bessere Analysen hinzu."
+      "rebalancing": {
+        "title": "Rebalancing empfohlen",
+        "description": "Ihr Aktienanteil ist sehr hoch oder niedrig. Ein Rebalancing kann helfen, das gewünschte Risikoprofil zu halten."
       }
     },
     "income": {
       "increasePassiveIncome": {
         "title": "Passives Einkommen steigern",
-        "description": "Ihr passives Einkommen ist niedrig im Verhältnis zu den Ausgaben. Erwägen Sie Dividenden-Aktien oder REITs."
+        "description": "Ihr passives Einkommen macht weniger als 10 % Ihres Gesamteinkommens aus. Mehr passives Einkommen (z. B. durch Dividenden, Miete oder Zinsen) erhöht Ihre finanzielle Unabhängigkeit."
       },
       "addDividendAssets": {
         "title": "Dividenden-Assets hinzufügen",
-        "description": "Sie haben wenige dividendenzahlende Assets. Erwägen Sie Dividenden-Aktien oder -Fonds für regelmäßiges Einkommen."
+        "description": "Sie besitzen Assets, aber keine davon zahlen Dividenden. Dividendenwerte bringen regelmäßiges passives Einkommen."
       },
       "optimizeRentalIncome": {
         "title": "Mieteinnahmen optimieren",
-        "description": "Ihre Mietobjekte könnten mehr Einkommen generieren. Erwägen Sie Verbesserungen oder Mietoptimierung."
+        "description": "Ein erheblicher Teil Ihrer Immobilien generiert keine Mieteinnahmen. Prüfen Sie Leerstand oder Optimierungsmöglichkeiten, um die Rendite zu steigern."
       },
       "diversifyIncomeSources": {
         "title": "Einkommensquellen diversifizieren",
-        "description": "Sie sind stark von einzelnen Einkommensquellen abhängig. Fügen Sie diversifizierte Streams hinzu, um Einkommensrisiko zu reduzieren."
+        "description": "Sie haben weniger als zwei Einkommensquellen. Mehrere Einkommensströme machen Sie unabhängiger und reduzieren das Risiko."
       },
       "addInterestIncome": {
-        "title": "Zinseinkommen hinzufügen",
-        "description": "Erwägen Sie festverzinsliche Investments wie Anleihen oder CDs für stabiles Zinseinkommen."
-      },
-      "planIncomeGrowth": {
-        "title": "Einkommenswachstum planen",
-        "description": "Ihre aktuelle Einkommenswachstumstrajektorie könnte verbessert werden. Erwägen Sie Karriereförderung oder Kompetenzentwicklung."
+        "title": "Einkommensgenerierende Assets ergänzen",
+        "description": "Sie haben viele Assets, aber keines davon generiert Einkommen (z. B. Zinsen, Dividenden oder Miete). Ergänzen Sie Ihr Portfolio um solche Werte für mehr Stabilität."
       },
       "developSideHustle": {
         "title": "Nebeneinkommen entwickeln",
-        "description": "Ein Nebenbusiness oder Freelance-Arbeit könnte zusätzliche Einkommensströme bieten."
+        "description": "Ein Nebenjob oder Business kann Ihr Haupteinkommen ergänzen und Ihre finanzielle Sicherheit erhöhen."
       },
       "optimizeIncomeTiming": {
         "title": "Einkommens-Timing optimieren",
-        "description": "Erwägen Sie das Timing der Einkommensrealisierung für Steueroptimierung und Cashflow-Management."
+        "description": "Unregelmäßige Einkünfte erschweren die Planung. Optimieren Sie das Timing für besseren Cashflow und Übersicht."
       }
     },
     "expenses": {
@@ -1493,18 +1501,6 @@
       }
     },
     "planning": {
-      "buildEmergencyFund": {
-        "title": "Notfallfonds aufbauen",
-        "description": "Bauen Sie einen Notfallfonds auf, der 3-6 Monate Ausgaben abdeckt, für finanzielle Sicherheit."
-      },
-      "improveCashflow": {
-        "title": "Cashflow verbessern",
-        "description": "Ihr monatlicher Cashflow könnte verbessert werden. Fokussieren Sie sich auf Einkommenserhöhung oder Ausgabenreduzierung."
-      },
-      "increaseRetirementSavings": {
-        "title": "Alterssparen erhöhen",
-        "description": "Ihre aktuelle Sparrate könnte für Rentenziele nicht ausreichen. Erwägen Sie höhere Beiträge."
-      },
       "workTowardFinancialIndependence": {
         "title": "Auf finanzielle Unabhängigkeit hinarbeiten",
         "description": "Sie machen gute Fortschritte. Fokussieren Sie sich auf die Optimierung Ihres Wegs zur finanziellen Unabhängigkeit."

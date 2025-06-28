@@ -159,7 +159,7 @@ const PortfolioOverviewView: React.FC<PortfolioOverviewViewProps> = ({
         </Card>
 
         {/* Portfolio Overview Section - Recent Activities & Recommendations */}
-        <PortfolioHubRecommendations onCategoryChange={onCategoryChange} />
+        <PortfolioHubRecommendations context="hub" />
         <br />
         {/* Portfolio Categories Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">

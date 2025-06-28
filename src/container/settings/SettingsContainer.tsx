@@ -104,12 +104,13 @@ const SettingsContainer: React.FC = () => {
 
   const handleRefreshLogs = loadLogs;
 
-  const handleExportData = async () => {
+  // Neue Exportfunktion mit Store-Auswahl
+  const handleExportData = async (storeNames: string[]) => {
     try {
       Logger.info("Data export started");
-
       setExportStatus("loading");
-      const data = await sqliteService.exportData();
+      // StoreNames korrekt typisieren
+      const data = await sqliteService.exportData(storeNames as StoreNames[]);
       handleFileDownload(data);
       setExportStatus("success");
       setTimeout(() => setExportStatus("idle"), 2000);

@@ -25,8 +25,8 @@ const sqliteService: ISQLiteService = {
   },
 
   // Import/Export Operations
-  exportData: async (): Promise<string> => {
-    return importExportOperations.exportData();
+  exportData: async (storeNames?: StoreNames[]): Promise<string> => {
+    return importExportOperations.exportData(storeNames);
   },
 
   importData: async (jsonData: string): Promise<void> => {

@@ -11,6 +11,7 @@ import { SwipeableCard } from "../../../ui/common/SwipeableCard";
 import formatService from "@service/infrastructure/formatService";
 import { Expense } from "../../../types/domains/financial/entities";
 import { Plus,ReceiptText } from "lucide-react";
+import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
 
 interface ExpensesViewProps {
   expenses: Expense[];
@@ -73,6 +74,7 @@ const ExpensesView: React.FC<ExpensesViewProps> = ({
           <p className="text-sm opacity-90">{t('expenses.summary')}</p>
         </div>
       </div>
+      <PortfolioHubRecommendations context="expenses" />
 
       {/* Expenses List */}
       {expenses.length > 0 ? (

@@ -1,7 +1,7 @@
 import { PortfolioRecommendation } from '@/types/domains/analytics';
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
 
-// Hilfsfunktionen für Portfolio-Analysen
+// Helper functions for portfolio analysis
 function getTotalValue(assetDefinitions: AssetDefinition[]): number {
   return assetDefinitions.reduce((sum, asset) => sum + (asset.currentPrice || 0), 0);
 }
@@ -39,7 +39,7 @@ function getCashQuote(assetDefinitions: AssetDefinition[]): number {
 }
 
 function getDividendYield(assetDefinitions: AssetDefinition[]): number {
-  // Annahme: dividendInfo.amount ist Jahresdividende, currentPrice ist aktuell
+  // Assumption: dividendInfo.amount is annual dividend, currentPrice is current
   const dividendSum = assetDefinitions
     .filter(a => a.dividendInfo && typeof a.dividendInfo.amount === 'number')
     .reduce((sum, a) => sum + (a.dividendInfo!.amount || 0), 0);
@@ -48,7 +48,7 @@ function getDividendYield(assetDefinitions: AssetDefinition[]): number {
 }
 
 function getSpeculativeQuote(assetDefinitions: AssetDefinition[]): number {
-  // Annahme: type === 'crypto' oder riskLevel === 'high' ist spekulativ
+  // Assumption: type === 'crypto' or riskLevel === 'high' is speculative
   const total = getTotalValue(assetDefinitions);
   const speculative = assetDefinitions.filter(a => a.type === 'crypto' || a.riskLevel === 'high').reduce((sum, a) => sum + (a.currentPrice || 0), 0);
   return total > 0 ? (speculative / total) * 100 : 0;
@@ -65,7 +65,7 @@ export const generateAssetRecommendations = (
   const recommendations: PortfolioRecommendation[] = [];
   const total = getTotalValue(assetDefinitions);
 
-  // 1. Klumpenrisiko (Einzelwert >30%)
+  // 1. Concentration risk (single asset >30%)
   const riskyAssets = assetDefinitions.filter(a => total > 0 && (a.currentPrice || 0) / total > 0.3);
   if (riskyAssets.length > 0) {
     recommendations.push({
@@ -80,7 +80,7 @@ export const generateAssetRecommendations = (
     });
   }
 
-  // 2. Sektorrisiko (Sektor >40%)
+  // 2. Sector risk (sector >40%)
   const sectorAlloc = getSectorAllocation(assetDefinitions);
   const maxSector = Object.entries(sectorAlloc).reduce((max, curr) => curr[1] > max[1] ? curr : max, ["", 0]);
   if (maxSector[1] > 40) {
@@ -96,7 +96,7 @@ export const generateAssetRecommendations = (
     });
   }
 
-  // 3. Regionale Diversifikation (Land >60%)
+  // 3. Regional diversification (country >60%)
   const countryAlloc = getCountryAllocation(assetDefinitions);
   const maxCountry = Object.entries(countryAlloc).reduce((max, curr) => curr[1] > max[1] ? curr : max, ["", 0]);
   if (maxCountry[1] > 60) {
@@ -112,7 +112,7 @@ export const generateAssetRecommendations = (
     });
   }
 
-  // 4. Cashquote zu hoch/niedrig
+  // 4. Cash ratio too high
   const cashQuote = getCashQuote(assetDefinitions);
   if (cashQuote > 30) {
     recommendations.push({
@@ -125,20 +125,9 @@ export const generateAssetRecommendations = (
       actionSubCategory: 'management',
       metadata: { cashQuote: Math.round(cashQuote) }
     });
-  } else if (cashQuote < 2) {
-    recommendations.push({
-      id: 'cash-too-low',
-      category: 'assets',
-      priority: 'low',
-      titleKey: 'recommendations.assets.cashTooLow.title',
-      descriptionKey: 'recommendations.assets.cashTooLow.description',
-      actionCategory: 'assets',
-      actionSubCategory: 'management',
-      metadata: { cashQuote: Math.round(cashQuote) }
-    });
   }
 
-  // 5. Dividendenrendite unter 1% (nur wenn Dividenden vorhanden)
+  // 5. Dividend yield below 1% (only if dividends exist)
   const divYield = getDividendYield(assetDefinitions);
   if (divYield > 0 && divYield < 1) {
     recommendations.push({
@@ -153,7 +142,7 @@ export const generateAssetRecommendations = (
     });
   }
 
-  // 6. Spekulative Assets >20%
+  // 6. Speculative assets >20%
   const specQuote = getSpeculativeQuote(assetDefinitions);
   if (specQuote > 20) {
     recommendations.push({
@@ -168,7 +157,7 @@ export const generateAssetRecommendations = (
     });
   }
 
-  // 7. Verlustpositionen >40% im Minus
+  // 7. Loss positions >40% down
   const lossPositions = getLossPositions(assets);
   if (lossPositions.length > 0) {
     recommendations.push({
@@ -183,7 +172,7 @@ export const generateAssetRecommendations = (
     });
   }
 
-  // 8. Rebalancing-Hinweis (wenn Aktienquote >90% oder <30%)
+  // 8. Rebalancing hint (if stock ratio >90% or <30%)
   const stockValue = assetDefinitions.filter(a => a.type === 'stock').reduce((sum, a) => sum + (a.currentPrice || 0), 0);
   const stockQuote = total > 0 ? (stockValue / total) * 100 : 0;
   if (stockQuote > 90 || stockQuote < 30) {

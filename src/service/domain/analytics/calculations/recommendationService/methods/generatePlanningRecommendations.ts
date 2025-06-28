@@ -16,28 +16,6 @@ export const generatePlanningRecommendations = (
   const totalMonthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
   const monthlyCashFlow = totalMonthlyIncome - totalMonthlyExpenses;
   const passiveIncome = calculatorService.calculatePassiveIncome(income, assets);
-  const cashAssets = findCashAssets(assets);
-  const retirementAssets = findRetirementAssets(assets);
-
-  // 27. Emergency Fund
-  const emergencyFundNeeded = totalMonthlyExpenses * 3;
-  const currentCashValue = cashAssets.reduce((sum, asset) => sum + (asset.value || 0), 0);
-  if (currentCashValue < emergencyFundNeeded) {
-    recommendations.push({
-      id: 'build-emergency-fund',
-      category: 'planning',
-      priority: 'high',
-      titleKey: 'recommendations.planning.buildEmergencyFund.title',
-      descriptionKey: 'recommendations.planning.buildEmergencyFund.description',
-      actionCategory: 'assets',
-      actionSubCategory: 'management',
-      metadata: { 
-        needed: Math.round(emergencyFundNeeded),
-        current: Math.round(currentCashValue),
-        shortfall: Math.round(emergencyFundNeeded - currentCashValue)
-      }
-    });
-  }
 
   // 28. Cashflow Improvement
   if (monthlyCashFlow < 0) {
@@ -52,27 +30,6 @@ export const generatePlanningRecommendations = (
       metadata: { 
         deficit: Math.round(Math.abs(monthlyCashFlow)),
         incomeNeeded: Math.round(totalMonthlyExpenses - totalMonthlyIncome)
-      }
-    });
-  }
-
-  // 29. Retirement Planning
-  const totalAssetValue = calculatorService.calculateTotalAssetValue(assets);
-  const retirementValue = retirementAssets.reduce((sum, asset) => sum + (asset.value || 0), 0);
-  const retirementPercentage = totalAssetValue > 0 ? (retirementValue / totalAssetValue) * 100 : 0;
-  
-  if (retirementPercentage < 10 && assets.length > 0) {
-    recommendations.push({
-      id: 'increase-retirement-savings',
-      category: 'planning',
-      priority: 'medium',
-      titleKey: 'recommendations.planning.increaseRetirementSavings.title',
-      descriptionKey: 'recommendations.planning.increaseRetirementSavings.description',
-      actionCategory: 'assets',
-      actionSubCategory: 'retirement',
-      metadata: { 
-        currentPercentage: Math.round(retirementPercentage),
-        suggestedIncrease: Math.round(10 - retirementPercentage)
       }
     });
   }
@@ -96,20 +53,4 @@ export const generatePlanningRecommendations = (
   }
 
   return recommendations;
-};
-
-// Helper functions
-const findCashAssets = (assets: Asset[]): Asset[] => {
-  return assets.filter(asset => asset.type === 'cash');
-};
-
-const findRetirementAssets = (assets: Asset[]): Asset[] => {
-  // This is a simplified check - in reality, you might have specific retirement account types
-  // or tags to identify retirement assets
-  return assets.filter(asset => 
-    asset.name.toLowerCase().includes('retirement') ||
-    asset.name.toLowerCase().includes('401k') ||
-    asset.name.toLowerCase().includes('ira') ||
-    asset.name.toLowerCase().includes('pension')
-  );
 };

@@ -4,30 +4,30 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { recommendationService } from "@service/domain/analytics/calculations/recommendationService";
 import { generateAssetRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateAssetRecommendations";
-import { PortfolioRecommendation, RecommendationPriority } from "@/types/domains/analytics";
+import { generateIncomeRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateIncomeRecommendations";
+import { generateExpenseRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateExpenseRecommendations";
+import { generateLiabilityRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateLiabilityRecommendations";
+import { PortfolioRecommendation, RecommendationPriority, RecommendationCategory } from "@/types/domains/analytics";
 import { CollapsibleSection } from "@/ui/common";
 import { Target } from "lucide-react";
 
 interface PortfolioHubRecommendationsProps {
   className?: string;
+  context?: "hub" | "assets" | "income" | "expenses" | "liabilities";
 }
 
-const PortfolioHubRecommendations: React.FC<
-  PortfolioHubRecommendationsProps
-> = ({ className }) => {
+const PortfolioHubRecommendations: React.FC<PortfolioHubRecommendationsProps> = ({ className, context = "hub" }) => {
   const { t } = useTranslation();
 
   // Get data from Redux store
   const assets = useSelector((state: RootState) => state.transactions.items);
   const income = useSelector((state: RootState) => state.income.items);
   const expenses = useSelector((state: RootState) => state.expenses.items);
-  const liabilities = useSelector(
-    (state: RootState) => state.liabilities.items
-  );
+  const liabilities = useSelector((state: RootState) => state.liabilities.items);
   const assetDefinitions = useSelector((state: RootState) => state.assetDefinitions.items);
 
-  // Generate recommendations using both planning and asset logic
-  const recommendations: PortfolioRecommendation[] = useMemo(() => {
+  // Generate all recommendations
+  const allRecommendations: PortfolioRecommendation[] = useMemo(() => {
     return [
       ...recommendationService.generatePlanningRecommendations(
         assets,
@@ -38,9 +38,33 @@ const PortfolioHubRecommendations: React.FC<
       ...generateAssetRecommendations(
         assets,
         assetDefinitions
+      ),
+      ...generateIncomeRecommendations(
+        assets,
+        income,
+        assetDefinitions
+      ),
+      ...generateExpenseRecommendations(
+        expenses,
+        income,
+        assets
+      ),
+      ...generateLiabilityRecommendations(
+        assets,
+        liabilities
       )
     ];
   }, [assets, income, expenses, liabilities, assetDefinitions]);
+
+  // Filter recommendations by context
+  const recommendations = useMemo(() => {
+    if (context === "hub") return allRecommendations;
+    if (context === "assets") return allRecommendations.filter(r => r.category === "assets");
+    if (context === "income") return allRecommendations.filter(r => r.category === "income");
+    if (context === "expenses") return allRecommendations.filter(r => r.category === "expenses");
+    if (context === "liabilities") return allRecommendations.filter(r => r.category === "liabilities");
+    return allRecommendations;
+  }, [allRecommendations, context]);
 
   // Helper function to get priority styling
   const getPriorityColor = (priority: RecommendationPriority) => {

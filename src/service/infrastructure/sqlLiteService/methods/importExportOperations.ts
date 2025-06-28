@@ -106,126 +106,90 @@ const createExportLogMessage = (data: ExportData): string => {
   return `Exporting complete backup: ${counts.join(', ')}`;
 };
 
+// Unterstützte Store-Namen für flexiblen Import/Export
+const SUPPORTED_STORES: StoreNames[] = [
+  'transactions',
+  'assetDefinitions',
+  'assetCategories',
+  'assetCategoryOptions',
+  'assetCategoryAssignments',
+  'liabilities',
+  'expenses',
+  'income',
+  'exchangeRates'
+];
+
+// Neue Validierung: Mindestens ein unterstützter Store als Array
+const validatePartialData = (data: unknown): void => {
+  if (!data || typeof data !== 'object') {
+    Logger.error('Invalid data structure - not an object');
+    throw new Error('Invalid backup file format: not an object');
+  }
+  const exportData = data as Record<string, unknown>;
+  const found = SUPPORTED_STORES.some(store => Array.isArray(exportData[store]));
+  if (!found) {
+    Logger.error('No supported data arrays found in import');
+    throw new Error('Invalid backup file: No supported data arrays found');
+  }
+  // Optional: Warnung für Stores, die keine Arrays sind, aber vorhanden
+  SUPPORTED_STORES.forEach(store => {
+    if (exportData[store] !== undefined && !Array.isArray(exportData[store])) {
+      Logger.warn(`${store} exists but is not an array, skipping`);
+    }
+  });
+};
+
+// Importiert alle Stores, die im JSON als Array vorhanden sind
+const importAnyStores = async (data: ExportData): Promise<void> => {
+  for (const storeName of SUPPORTED_STORES) {
+    const storeData = data[storeName];
+    if (storeData && Array.isArray(storeData)) {
+      Logger.infoService(`Importing ${storeData.length} ${storeName}`);
+      for (const item of storeData) {
+        await dbOperations.update(storeName, item as any);
+      }
+      Logger.infoService(`${storeName} import completed successfully`);
+    }
+  }
+};
+
 export const importExportOperations = {
-  async exportData(): Promise<string> {
-    // Export all data stores including new ones
-    const transactions = await dbOperations.getAll('transactions');
-    const assetDefinitions = await dbOperations.getAll('assetDefinitions');
-    const assetCategories = await dbOperations.getAll('assetCategories');
-    const assetCategoryOptions = await dbOperations.getAll('assetCategoryOptions');
-    const assetCategoryAssignments = await dbOperations.getAll('assetCategoryAssignments');
-    const liabilities = await dbOperations.getAll('liabilities');
-    const expenses = await dbOperations.getAll('expenses');
-    const income = await dbOperations.getAll('income');
-    const exchangeRates = await dbOperations.getAll('exchangeRates');
-
-    const data = {
-      transactions,
-      assetDefinitions,
-      assetCategories,
-      assetCategoryOptions,
-      assetCategoryAssignments,
-      liabilities,
-      expenses,
-      income,
-      exchangeRates,
-      exportDate: new Date().toISOString(),
-      version: '3.0.0', // Major version bump for clean architecture
-    };
-
-    Logger.infoService(createExportLogMessage(data));
+  // Exportiert alle oder nur ausgewählte Stores
+  async exportData(storeNames?: StoreNames[]): Promise<string> {
+    const stores = storeNames && storeNames.length > 0 ? storeNames : SUPPORTED_STORES;
+    // Typ erweitern, damit Metadaten erlaubt sind
+    const data: Partial<Record<StoreNames, unknown[]>> & { exportDate?: string; version?: string } = {};
+    for (const store of stores) {
+      data[store] = await dbOperations.getAll(store);
+    }
+    data.exportDate = new Date().toISOString();
+    data.version = '3.1.0';
+    Logger.infoService(
+      `Exporting backup: ${stores.map(s => `${data[s]?.length || 0} ${s}`).join(', ')}`
+    );
     return JSON.stringify(data, null, 2);
   },
 
+  // Neue Validierung für Teilmengen
   validateData(data: unknown): void {
-    if (!data || typeof data !== 'object') {
-      Logger.error('Invalid data structure - not an object');
-      throw new Error('Invalid backup file format: not an object');
-    }
-
-    const exportData = data as Record<string, unknown>;
-
-    // Check for transactions array
-    const hasTransactions = Array.isArray(exportData.transactions);
-    
-    if (!hasTransactions) {
-      Logger.error('Invalid data structure - transactions array not found');
-      throw new Error('Invalid backup file format: transactions array not found');
-    }
-    
-    const requiredArrays = ['liabilities', 'expenses', 'income'];
-    const optionalArrays = ['assetDefinitions', 'assetCategories', 'assetCategoryOptions', 'assetCategoryAssignments', 'exchangeRates'];
-
-    for (const arrayName of requiredArrays) {
-      if (!Array.isArray(exportData[arrayName])) {
-        Logger.error(`Invalid data structure - ${arrayName} is not an array or missing`);
-        throw new Error(`Invalid backup file format: ${arrayName} is not an array or missing`);
-      }
-    }
-
-    // Validate optional arrays if they exist
-    for (const arrayName of optionalArrays) {
-      if (exportData[arrayName] !== undefined && !Array.isArray(exportData[arrayName])) {
-        Logger.error(`Invalid data structure - ${arrayName} exists but is not an array`);
-        throw new Error(`Invalid backup file format: ${arrayName} exists but is not an array`);
-      }
-    }
+    validatePartialData(data);
   },
 
+  // Importiert beliebige Teilmengen
   async importData(jsonData: string): Promise<void> {
     try {
       Logger.infoService('Starting data import process');
       const parsedData = JSON.parse(jsonData);
-      
       this.validateData(parsedData);
-      
       const data = parsedData as ExportData;
-      const flags = getImportDataFlags(data);
-      
-      Logger.infoService(`Import format: ${flags.isV2Format ? 'v2.x (complete)' : 'v1.x (partial)'}`);
-      Logger.infoService(createValidationLogMessage(data, flags));
-
-      // Import core data stores
-      await importCoreDataStores(data);
-
-      // Import optional data stores
-      if (flags.hasAssetDefinitions) {
-        await importExistingDataStore(data, 'assetDefinitions', 'asset definitions');
-      } else {
-        logMissingDataStore('asset definitions');
-      }
-
-      if (flags.hasAssetCategories) {
-        await importExistingDataStore(data, 'assetCategories', 'asset categories');
-      } else {
-        logMissingDataStore('asset categories');
-      }
-
-      if (flags.hasAssetCategoryOptions) {
-        await importExistingDataStore(data, 'assetCategoryOptions', 'asset category options');
-      } else {
-        logMissingDataStore('asset category options');
-      }
-
-      if (flags.hasAssetCategoryAssignments) {
-        await importExistingDataStore(data, 'assetCategoryAssignments', 'asset category assignments');
-      } else {
-        logMissingDataStore('asset category assignments');
-      }
-
-      if (flags.hasExchangeRates) {
-        await importExistingDataStore(data, 'exchangeRates', 'exchange rates');
-      } else {
-        logMissingDataStore('exchange rates');
-      }
-
+      Logger.infoService('Importing stores: ' + SUPPORTED_STORES.filter(s => Array.isArray(data[s])).join(', '));
+      await importAnyStores(data);
       Logger.infoService('Data import completed successfully');
     } catch (error) {
       Logger.errorStack('Import error details', error as Error);
       if (error instanceof SyntaxError) {
         throw new Error('Invalid JSON file format. Please check your backup file.');
       }
-      
       throw error instanceof Error ? error : new Error();
     }
   }

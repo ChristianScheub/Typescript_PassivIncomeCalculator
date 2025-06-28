@@ -33,7 +33,7 @@ export const generateIncomeRecommendations = (
   Logger.infoService(`Income recommendations: passiveFromAssets=${passiveIncomeFromAssets}, passiveFromSources=${passiveIncomeFromSources}, ratio=${passiveRatio.toFixed(1)}%`);
 
   // 9. Passive Income Increase
-  if (passiveRatio < 30) {
+  if (passiveRatio < 10) {
     recommendations.push({
       id: 'increase-passive-income',
       category: 'income',
@@ -64,7 +64,10 @@ export const generateIncomeRecommendations = (
   // 11. Rental Income Optimization
   const realEstateAssets = findRealEstateAssets(assets, assetDefinitions);
   const assetsWithoutIncome = findAssetsWithoutIncome(realEstateAssets, assetDefinitions);
-  if (assetsWithoutIncome.length > 0) {
+  if (
+    (realEstateAssets.length < 4 && assetsWithoutIncome.length >= 2) ||
+    (realEstateAssets.length >= 4 && assetsWithoutIncome.length / realEstateAssets.length > 0.4)
+  ) {
     recommendations.push({
       id: 'optimize-rental-income',
       category: 'income',
@@ -92,8 +95,17 @@ export const generateIncomeRecommendations = (
   }
 
   // 13. Interest Income
-  const bondAssets = findBondAssets(assets, assetDefinitions);
-  if (bondAssets.length === 0 && assets.length > 5) {
+  // Now: If user has >5 assets, but none generate any income (no bonds, no dividend stocks, no rental, etc.)
+  const incomeGeneratingAssets = assets.filter(asset => {
+    // This should be replaced with real logic: asset generates income if it's a bond, dividend stock, or rental property
+    // For now, we assume findBondAssets, findDividendAssets, and realEstateAssets with income
+    return (
+      findBondAssets([asset], assetDefinitions).length > 0 ||
+      findDividendAssets([asset], assetDefinitions).length > 0 ||
+      (findRealEstateAssets([asset], assetDefinitions).length > 0 && findAssetsWithoutIncome([asset], assetDefinitions).length === 0)
+    );
+  });
+  if (incomeGeneratingAssets.length === 0 && assets.length > 5) {
     recommendations.push({
       id: 'add-interest-income',
       category: 'income',
@@ -102,21 +114,6 @@ export const generateIncomeRecommendations = (
       descriptionKey: 'recommendations.income.addInterestIncome.description',
       actionCategory: 'assets',
       actionSubCategory: 'management'
-    });
-  }
-
-  // 14. Income Growth Planning
-  const incomeWithoutGrowth = findIncomeWithoutGrowth(income, assetDefinitions);
-  if (incomeWithoutGrowth.length > 0) {
-    recommendations.push({
-      id: 'plan-income-growth',
-      category: 'income',
-      priority: 'medium',
-      titleKey: 'recommendations.income.planIncomeGrowth.title',
-      descriptionKey: 'recommendations.income.planIncomeGrowth.description',
-      actionCategory: 'income',
-      actionSubCategory: 'planning',
-      metadata: { count: incomeWithoutGrowth.length }
     });
   }
 
@@ -170,11 +167,6 @@ const findAssetsWithoutIncome = (_assets: Asset[], _assetDefinitions: AssetDefin
 
 const findBondAssets = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Asset[] => {
   // TODO: Find bond assets
-  return [];
-};
-
-const findIncomeWithoutGrowth = (_income: Income[], _assetDefinitions: AssetDefinition[]): Income[] => {
-  // TODO: Find income sources without growth configuration
   return [];
 };
 
