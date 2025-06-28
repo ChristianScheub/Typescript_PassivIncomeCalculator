@@ -376,7 +376,7 @@
     "expenses": "Ausgaben",
     "income": "Einkommen",
     "exchangeRates": "Wechselkurse",
-    "selectDataSets": "Daten für den Import",
+    "selectDataSets": "Daten für den Export",
     "selectDataSetsHint": "Wählen Sie die zu exportierenden Datenbereiche aus."
   },
 

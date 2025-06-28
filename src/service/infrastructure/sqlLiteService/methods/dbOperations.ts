@@ -30,9 +30,19 @@ export const dbOperations = {
     } catch (error) {
       // Log full error object and all properties
       // eslint-disable-next-line no-console
+      let errorString = '';
+      if (typeof error === 'object' && error !== null) {
+        try {
+          errorString = JSON.stringify(error);
+        } catch {
+          errorString = error?.toString ? error.toString() : String(error);
+        }
+      } else {
+        errorString = String(error);
+      }
       console.error('[DB UPDATE ERROR]', {
         error,
-        errorString: error?.toString ? error.toString() : undefined,
+        errorString,
         errorJSON: (() => { try { return JSON.stringify(error); } catch { return undefined; } })(),
         errorStack: (error as any)?.stack,
         errorKeys: (typeof error === 'object' && error !== null) ? Object.keys(error) : undefined,

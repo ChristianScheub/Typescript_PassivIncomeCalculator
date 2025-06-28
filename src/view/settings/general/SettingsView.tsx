@@ -15,6 +15,7 @@ import clsx from 'clsx';
 import { Toggle } from '@/ui/common/Toggle';
 import { DividendApiSettingsSection } from './DividendApiSettingsSection';
 import { StockApiSettingsSection } from './StockApiSettingsSection';
+import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 
 interface ProviderInfo {
   name: string;
@@ -153,6 +154,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onPortfolioHistoryRefresh,
 }) => {
   const { t } = useTranslation();
+  const isDesktop = useDeviceCheck();
+  const isSmartphone = !isDesktop;
   const [showApiKey, setShowApiKey] = useState(false);
   const [tempApiKeys, setTempApiKeys] = useState<Record<StockAPIProvider, string>>({
     [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? '',
@@ -213,12 +216,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   ];
 
   const [selectedStores, setSelectedStores] = useState<string[]>(STORE_OPTIONS.map(opt => opt.key));
-
-  const handleStoreToggle = (key: string) => {
-    setSelectedStores((prev) =>
-      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
-    );
-  };
 
   return (
     <div className="space-y-6">
@@ -420,25 +417,25 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 <p className="text-sm text-red-500 mt-1">{importError}</p>
               )}
             </div>
-            <div className="relative">
-              <input
-                type="file"
-                accept="application/json"
-                onChange={onImportData}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                disabled={importStatus === 'loading'}
-              />
+            <div className={isSmartphone ? '!w-[10vw] min-w-[48px] max-w-[80px] flex justify-center' : 'relative'} style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}>
               <Button
                 disabled={importStatus === 'loading'}
-                className="flex items-center space-x-2"
+                className={`flex items-center space-x-2${isSmartphone ? ' justify-center' : ''}`}
+                style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}
               >
                 <Upload size={16} />
-                <span>{importButtonText}</span>
+                {!isSmartphone && <span>{importButtonText}</span>}
+                <input
+                  type="file"
+                  accept="application/json"
+                  onChange={onImportData}
+                  className="hidden"
+                  disabled={importStatus === 'loading'}
+                />
               </Button>
             </div>
           </div>
           {/* Export Button */}
-          
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-medium">{t('settings.exportData')}</h3>
@@ -446,22 +443,25 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                 {t('settings.exportDescription')}
               </p>
             </div>
-            <Button
-              onClick={() => onExportData(selectedStores)}
-              disabled={exportStatus === 'loading' || selectedStores.length === 0}
-              className="flex items-center space-x-2"
-            >
-              <Download size={16} />
-              <span>{exportButtonText}</span>
-            </Button>
+            <div className={isSmartphone ? '!w-[10vw] min-w-[48px] max-w-[80px] flex justify-center' : ''} style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}>
+              <Button
+                onClick={() => onExportData(selectedStores)}
+                disabled={exportStatus === 'loading' || selectedStores.length === 0}
+                className={`flex items-center space-x-2${isSmartphone ? ' justify-center' : ''}`}
+                style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}
+              >
+                <Download size={16} />
+                {!isSmartphone && <span>{exportButtonText}</span>}
+              </Button>
+            </div>
           </div>
-                    {/* Store Auswahl Collapsible */}
-          <CollapsibleSection
-            title={t('settings.selectDataSets')}
-            icon={null}
-            defaultExpanded={false}
-          >
-            <div className="mb-2">
+
+          {/* Store Auswahl Collapsible (jetzt als <details>) */}
+          <details className="mb-2 border border-blue-200 dark:border-blue-700 rounded-lg bg-blue-50 dark:bg-blue-900/10 px-4 py-2">
+            <summary className="cursor-pointer font-medium text-blue-700 dark:text-blue-300 py-2 select-none">
+              {t('settings.selectDataSets')}
+            </summary>
+            <div className="mt-2">
               {/* Chips für ausgewählte Stores */}
               <div className="flex flex-wrap gap-2 mb-2">
                 {selectedStores.map(key => {
@@ -502,7 +502,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               </div>
               <p className="text-xs text-gray-400 mt-1">{t('settings.selectDataSetsHint')}</p>
             </div>
-          </CollapsibleSection>
+          </details>
         </div>
       </CollapsibleSection>
 

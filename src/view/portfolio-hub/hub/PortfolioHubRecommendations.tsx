@@ -7,7 +7,7 @@ import { generateAssetRecommendations } from "@service/domain/analytics/calculat
 import { generateIncomeRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateIncomeRecommendations";
 import { generateExpenseRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateExpenseRecommendations";
 import { generateLiabilityRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateLiabilityRecommendations";
-import { PortfolioRecommendation, RecommendationPriority, RecommendationCategory } from "@/types/domains/analytics";
+import { PortfolioRecommendation, RecommendationPriority } from "@/types/domains/analytics";
 import { CollapsibleSection } from "@/ui/common";
 import { Target } from "lucide-react";
 
