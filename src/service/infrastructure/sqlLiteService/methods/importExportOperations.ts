@@ -3,7 +3,6 @@ import { dbOperations } from './dbOperations';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { ExportData } from '@/types/domains/database/import-export';
 
-// Unterstützte Store-Namen für flexiblen Import/Export
 const SUPPORTED_STORES: StoreNames[] = [
   'transactions',
   'assetDefinitions',
@@ -16,7 +15,6 @@ const SUPPORTED_STORES: StoreNames[] = [
   'exchangeRates'
 ];
 
-// Neue Validierung: Mindestens ein unterstützter Store als Array
 const validatePartialData = (data: unknown): void => {
   if (!data || typeof data !== 'object') {
     Logger.error('Invalid data structure - not an object');
