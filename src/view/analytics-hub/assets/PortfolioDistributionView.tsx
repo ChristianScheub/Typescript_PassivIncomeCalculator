@@ -8,6 +8,8 @@ interface PortfolioDistributionViewProps {
   countryAllocation: Array<{ name: string; value: number; percentage: number }>;
 }
 
+const safeArray = <T,>(arr: T[] | undefined | null): T[] => Array.isArray(arr) ? arr : [];
+
 const PortfolioDistributionView: React.FC<PortfolioDistributionViewProps> = ({
   assetAllocation,
   sectorAllocation,
@@ -20,7 +22,7 @@ const PortfolioDistributionView: React.FC<PortfolioDistributionViewProps> = ({
       {/* Asset Type Distribution */}
       <GenericPieChart
         title={t('analytics.assetTypeDistribution')}
-        data={assetAllocation}
+        data={safeArray(assetAllocation)}
         nameKey="name"
         valueKey="value"
         translationKey="assets.types"
@@ -30,7 +32,7 @@ const PortfolioDistributionView: React.FC<PortfolioDistributionViewProps> = ({
       {/* Sector Distribution */}
       <GenericPieChart
         title={t('analytics.sectorDistribution')}
-        data={sectorAllocation}
+        data={safeArray(sectorAllocation)}
         nameKey="name"
         valueKey="value"
         emptyStateMessage={t('analytics.noSectorData')}
@@ -40,7 +42,7 @@ const PortfolioDistributionView: React.FC<PortfolioDistributionViewProps> = ({
       {/* Country Distribution */}
       <GenericPieChart
         title={t('analytics.countryDistribution')}
-        data={countryAllocation}
+        data={safeArray(countryAllocation)}
         nameKey="name"
         valueKey="value"
         emptyStateMessage={t('analytics.noCountryData')}

@@ -16,8 +16,10 @@ interface AssetDetailViewProps {
   getAssetTypeLabel: (type: string) => string;
 }
 
-export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
+// Helper: Accept assetDefinition as prop for all detail fields
+export const AssetDetailView: React.FC<AssetDetailViewProps & { assetDefinition?: any }> = ({
   asset,
+  assetDefinition,
   isOpen,
   onClose,
   getAssetTypeLabel
@@ -162,13 +164,13 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
               </div>
 
               <div className="space-y-3">
-                {asset.assetDefinition?.currentPrice && (
+                {assetDefinition?.currentPrice && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       {t('assets.currentPrice')}:
                     </span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {formatService.formatCurrency(asset.assetDefinition.currentPrice || 0)}
+                      {formatService.formatCurrency(assetDefinition.currentPrice || 0)}
                     </span>
                   </div>
                 )}
@@ -184,13 +186,13 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
                   </div>
                 )}
 
-                {asset.country && (
+                {assetDefinition?.country && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       {t('assets.country')}:
                     </span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {asset.country}
+                      {assetDefinition.country}
                     </span>
                   </div>
                 )}
@@ -199,34 +201,34 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
           </div>
 
           {/* Price History */}
-          {featureFlag_Debug_View&& asset.assetDefinition?.priceHistory && asset.assetDefinition.priceHistory.length > 0 && (
+          {featureFlag_Debug_View&& assetDefinition?.priceHistory && assetDefinition.priceHistory.length > 0 && (
             <PriceHistoryView
-              priceHistory={asset.assetDefinition.priceHistory}
+              priceHistory={assetDefinition.priceHistory}
               showSourceIcons={true}
               maxEntries={9000}
             />
           )}
 
           {/* Price Chart */}
-          {asset.assetDefinition?.priceHistory && asset.assetDefinition.priceHistory.length > 1 && (
+          {assetDefinition?.priceHistory && assetDefinition.priceHistory.length > 1 && (
             <PriceChart
-              priceHistory={asset.assetDefinition.priceHistory}
-              ticker={asset.assetDefinition.ticker}
+              priceHistory={assetDefinition.priceHistory}
+              ticker={assetDefinition.ticker}
               transactions={asset.transactions}
             />
           )}
 
           {/* Dividend History */}
-          {asset.assetDefinition?.dividendHistory && asset.assetDefinition.dividendHistory.length > 0 && (
+          {assetDefinition?.dividendHistory && assetDefinition.dividendHistory.length > 0 && (
             <DividendHistoryView
-              dividendHistory={asset.assetDefinition.dividendHistory}
+              dividendHistory={assetDefinition.dividendHistory}
               maxEntries={9000}
               showSourceIcons={true}
             />
           )}
 
           {/* Asset Information - Country, Sector, Description */}
-          {asset.assetDefinition && (
+          {assetDefinition && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
                 <Package className="h-5 w-5 mr-2" />
@@ -235,86 +237,86 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Key asset information: Country, Sector, Description */}
-                  {asset.assetDefinition.country && (
+                  {assetDefinition.country && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {t('assets.country')}:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {asset.assetDefinition.country}
+                        {assetDefinition.country}
                       </span>
                     </div>
                   )}
 
-                  {asset.assetDefinition.sector && (
+                  {assetDefinition.sector && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {t('assets.sector')}:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {asset.assetDefinition.sector}
+                        {assetDefinition.sector}
                       </span>
                     </div>
                   )}
 
-                  {asset.assetDefinition.ticker && (
+                  {assetDefinition.ticker && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {t('assets.ticker')}:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {asset.assetDefinition.ticker}
+                        {assetDefinition.ticker}
                       </span>
                     </div>
                   )}
 
-                  {asset.assetDefinition.exchange && (
+                  {assetDefinition.exchange && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {t('assets.exchange')}:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {asset.assetDefinition.exchange}
+                        {assetDefinition.exchange}
                       </span>
                     </div>
                   )}
 
-                  {asset.assetDefinition.isin && (
+                  {assetDefinition.isin && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {t('assets.isin')}:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {asset.assetDefinition.isin}
+                        {assetDefinition.isin}
                       </span>
                     </div>
                   )}
 
-                  {asset.assetDefinition.wkn && (
+                  {assetDefinition.wkn && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {t('assets.wkn')}:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {asset.assetDefinition.wkn}
+                        {assetDefinition.wkn}
                       </span>
                     </div>
                   )}
 
-                  {asset.assetDefinition.riskLevel && (
+                  {assetDefinition.riskLevel && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {t('assets.riskLevel')}:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {t(`assets.riskLevels.${asset.assetDefinition.riskLevel}`)}
+                        {t(`assets.riskLevels.${assetDefinition.riskLevel}`)}
                       </span>
                     </div>
                   )}
                 </div>
 
                 {/* Description */}
-                {asset.assetDefinition.description && (
+                {assetDefinition.description && (
                   <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
                     <div className="mb-2">
                       <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -322,13 +324,13 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
                       </span>
                     </div>
                     <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
-                      {asset.assetDefinition.description}
+                      {assetDefinition.description}
                     </p>
                   </div>
                 )}
 
                 {/* Dividend Information */}
-                {asset.assetDefinition.dividendInfo && (
+                {assetDefinition.dividendInfo && (
                   <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-600">
                     <div className="mb-3">
                       <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -341,7 +343,7 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
                           {t('assets.dividendAmount')}:
                         </span>
                         <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
-                          {formatService.formatCurrency(asset.assetDefinition.dividendInfo.amount)}
+                          {formatService.formatCurrency(assetDefinition.dividendInfo.amount)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center">
@@ -349,7 +351,7 @@ export const AssetDetailView: React.FC<AssetDetailViewProps> = ({
                           {t('assets.frequency')}:
                         </span>
                         <span className="text-xs font-medium text-gray-900 dark:text-gray-100">
-                          {t(`assets.frequencies.${asset.assetDefinition.dividendInfo.frequency}`)}
+                          {t(`assets.frequencies.${assetDefinition.dividendInfo.frequency}`)}
                         </span>
                       </div>
                     </div>

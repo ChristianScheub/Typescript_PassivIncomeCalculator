@@ -58,17 +58,20 @@ export const addAssetDefinition = createAsyncThunk(
   'assetDefinitions/addAssetDefinition',
   async (assetDefinitionData: Omit<AssetDefinition, 'id' | 'createdAt' | 'updatedAt'>) => {
     Logger.info(`Adding asset definition to database: ${assetDefinitionData.name}`);
-    
     try {
+      // Ensure sector and sectors are always set
+      const safeAssetDefinitionData = {
+        ...assetDefinitionData,
+        sectors: Array.isArray(assetDefinitionData.sectors) ? assetDefinitionData.sectors : [],
+      };
       // Erstellen einer neuen Asset-Definition mit ID und Zeitstempeln
       const newAssetDefinition: AssetDefinition = {
-        ...assetDefinitionData,
+        ...safeAssetDefinitionData,
         dividendHistory: assetDefinitionData.dividendHistory ?? [],
         id: Date.now().toString(), // Temporäre ID, wird von der Datenbank überschrieben
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      
       // Speichern in der Datenbank
       const savedId = await sqliteService.add('assetDefinitions', newAssetDefinition);
       const savedDefinition = { ...newAssetDefinition, id: savedId };
@@ -87,9 +90,14 @@ export const updateAssetDefinition = createAsyncThunk(
     Logger.info(`Updating asset definition in database: ${assetDefinition.name}`);
     try {
       Logger.info('[DEBUG] Vor DeepClean: ' + JSON.stringify(assetDefinition));
+      // Ensure sector and sectors are always set
+      const safeAssetDefinition = {
+        ...assetDefinition,
+        sectors: Array.isArray(assetDefinition.sectors) ? assetDefinition.sectors : [],
+      };
       // Aktualisierung des updatedAt-Feldes
       const updatedDefinition = {
-        ...assetDefinition,
+        ...safeAssetDefinition,
         dividendHistory: assetDefinition.dividendHistory ?? [],
         updatedAt: new Date().toISOString(),
       };
@@ -203,7 +211,7 @@ const assetDefinitionsSlice = createSlice({
       })
       .addCase(fetchAssetDefinitions.fulfilled, (state, action) => {
         state.status = 'succeeded';
-        state.items = action.payload;
+        state.items = action.payload.slice().sort((a, b) => a.name.localeCompare(b.name));
       })
       .addCase(fetchAssetDefinitions.rejected, (state, action) => {
         state.status = 'failed';

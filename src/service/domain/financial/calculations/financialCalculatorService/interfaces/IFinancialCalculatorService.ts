@@ -42,6 +42,6 @@ export interface IFinancialCalculatorService {
   ) => MonthlyProjection[];
 
   // Portfolio Analytics
-  calculatePortfolioAnalytics: (positions: PortfolioPosition[]) => PortfolioAnalyticsData;
-  calculateIncomeAnalytics: (positions: PortfolioPosition[]) => IncomeAnalyticsData;
+  calculatePortfolioAnalytics: (positions: PortfolioPosition[], assetDefinitions?: any[]) => PortfolioAnalyticsData;
+  calculateIncomeAnalytics: (positions: PortfolioPosition[], assetDefinitions?: any[]) => IncomeAnalyticsData;
 }

@@ -41,10 +41,10 @@ export interface AssetDefinition extends BaseEntity {
   fullName: string;
   type: AssetType;
   country?: string;
+  countries?: CountryAllocation[]; // Multi-country support
   continent?: string;
   currency?: string;
-  sector?: string; // Single sector for backward compatibility
-  sectors?: SectorAllocation[]; // New multi-sector support
+  sectors?: SectorAllocation[]; // Only multi-sector support
   exchange?: string;
   isin?: string;
   wkn?: string;
@@ -124,3 +124,8 @@ export interface Transaction extends BaseEntity {
 
 // Alias für Rückwärtskompatibilität während der Migration
 export type Asset = Transaction;
+
+export interface CountryAllocation {
+  country: string;
+  percentage: number;
+}

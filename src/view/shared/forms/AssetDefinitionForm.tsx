@@ -28,10 +28,8 @@ const assetDefinitionSchema = z.object({
   type: z.enum(["stock", "bond", "real_estate", "crypto", "cash", "other"]),
   country: z.string().optional(),
   continent: z.string().optional(),
-  sector: z.string().optional(),
-
-  // Multi-sector support
-  useMultipleSectors: z.boolean().optional(),
+  // sector: z.string().optional(), // removed
+  // Multi-sector support only
   sectors: z
     .array(
       z.object({
@@ -141,10 +139,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           type: editingDefinition.type,
           country: editingDefinition.country || "",
           continent: editingDefinition.continent || "",
-          sector: editingDefinition.sector || "",
-          useMultipleSectors: !!(
-            editingDefinition.sectors && editingDefinition.sectors.length > 0
-          ),
+          // sector: editingDefinition.sector || "", // removed
           sectors: editingDefinition.sectors || [],
           exchange: editingDefinition.exchange || "",
           isin: editingDefinition.isin || "",
@@ -198,9 +193,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           rentalPaymentMonths: [],
           dividendCustomAmounts: {},
           rentalCustomAmounts: {},
-          useMultipleSectors: false,
           sectors: [],
-          useDividendApi: false,
         },
   });
 
@@ -284,9 +277,6 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           percentage: sector.percentage
         }));
         setSectors(convertedSectors);
-      } else if (editingDefinition.sector) {
-        // If only single sector exists, convert to multi-sector format but keep toggle off
-        setSectors([{ sectorName: editingDefinition.sector, percentage: 100 }]);
       } else {
         setSectors([{ sectorName: "", percentage: 100 }]);
       }
@@ -296,13 +286,13 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         fullName: editingDefinition.fullName,
         ticker: editingDefinition.ticker || "",
         type: editingDefinition.type,
-        country: editingDefinition.country || "",
+        country: editingDefinition.country || "", // <-- explizit immer setzen
         continent: editingDefinition.continent || "",
-        sector: editingDefinition.sector || "",
-        useMultipleSectors: !!(
-          editingDefinition.sectors && editingDefinition.sectors.length > 0
-        ),
-        sectors: editingDefinition.sectors || [],
+        // sectors: editingDefinition.sectors || [],
+        sectors: editingDefinition.sectors && editingDefinition.sectors.length > 0 ? editingDefinition.sectors.map(sector => ({
+          sectorName: sector.sectorName || sector.sector || "",
+          percentage: sector.percentage
+        })) : [],
         exchange: editingDefinition.exchange || "",
         isin: editingDefinition.isin || "",
         wkn: editingDefinition.wkn || "",
@@ -352,9 +342,9 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         riskLevel: "medium",
         dividendFrequency: "quarterly",
         rentalFrequency: "monthly",
-        useMultipleSectors: false,
         sectors: [],
         useDividendApi: false,
+        country: "", // <-- explizit auch beim Reset auf leer setzen
       });
     }
   }, [editingDefinition, reset]);
@@ -377,16 +367,13 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       type: data.type,
       country: data.country || undefined,
       continent: data.continent || undefined,
-      sector: data.useMultipleSectors ? undefined : data.sector || undefined, // Only use single sector if multi-sector is disabled
-      sectors: data.useMultipleSectors
-        ? data.sectors?.filter((s) => s.sectorName.trim() !== "").map(s => ({
-            sector: s.sectorName,
-            sectorName: s.sectorName,
-            percentage: s.percentage,
-            value: 0, // Will be calculated later
-            count: 0, // Will be calculated later
-          }))
-        : undefined, // Only use sectors if multi-sector is enabled
+      sectors: (data.sectors || []).filter((s) => s.sectorName.trim() !== "").map(s => ({
+        sector: s.sectorName,
+        sectorName: s.sectorName,
+        percentage: s.percentage,
+        value: 0, // Will be calculated later
+        count: 0, // Will be calculated later
+      })),
       exchange: data.exchange || undefined,
       isin: data.isin || undefined,
       wkn: data.wkn || undefined,
@@ -715,7 +702,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         />
 
         {/* Asset Categories Section */}
-        <OptionalSection title={t("categories.assetCategories")}>
+        <OptionalSection title={t("categories.assetCategories")}> 
           <AssetCategoryAssignmentSelector
             assetDefinitionId={editingDefinition?.id}
             categories={categories}

@@ -253,13 +253,13 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                     </div>
 
                     <div className="space-y-2 text-sm">
-                      {definition.sector && (
+                      {definition.sectors && definition.sectors.length > 0 && (
                         <div className="flex justify-between">
                           <span className="text-gray-600 dark:text-gray-400">
                             {t("assets.sector")}:
                           </span>
                           <span className="text-gray-900 dark:text-gray-100">
-                            {definition.sector}
+                            {definition.sectors.map(s => s.sectorName).join(', ')}
                           </span>
                         </div>
                       )}
@@ -382,20 +382,20 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
               // Transform sectors data to match SectorAllocation interface
               const transformedData = {
                 ...data,
-                sectors: data.sectors?.map(sector => ({
-                  sector: sector.sectorName || "", // Ensure string, never undefined
+                sectors: (data.sectors || []).map(sector => ({
+                  sector: sector.sectorName || "",
                   sectorName: sector.sectorName,
                   value: 0, // Will be calculated later
                   percentage: sector.percentage,
                   count: 0, // Will be calculated later
-                })) || undefined
+                })),
               };
 
               // Transform category assignments to include required fields
               const transformedCategoryAssignments = categoryAssignments.map(assignment => ({
                 ...assignment,
-                name: assignment.name || `${assignment.categoryId}-${assignment.categoryOptionId}`, // Generate a name if not provided
-                assetDefinitionId: editingDefinition?.id || '', // Will be set after creation for new definitions
+                name: assignment.name || `${assignment.categoryId}-${assignment.categoryOptionId}`,
+                assetDefinitionId: editingDefinition?.id || '',
                 categoryId: assignment.categoryId || '',
                 categoryOptionId: assignment.categoryOptionId || ''
               }));

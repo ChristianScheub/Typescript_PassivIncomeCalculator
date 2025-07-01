@@ -4,11 +4,19 @@ import {
   IncomeAnalyticsData 
 } from '@/types/domains/analytics/calculations';
 import Logger from "@/service/shared/logging/Logger/logger";
+import { AssetDefinition } from '@/types/domains/assets';
+import { SectorAllocation } from '@/types/domains/portfolio/allocations';
+import { getCountryAllocationWeighted } from '@/utils/portfolioUtils';
 
 
 
-export const calculatePortfolioAnalytics = (positions: PortfolioPosition[]): PortfolioAnalyticsData => {
+export const calculatePortfolioAnalytics = (
+  positions: PortfolioPosition[],
+  assetDefinitions?: AssetDefinition[]
+): PortfolioAnalyticsData => {
   Logger.infoService('Calculating portfolio analytics from positions');
+  // Defensive: assetDefinitions fallback
+  const safeAssetDefinitions: AssetDefinition[] = Array.isArray(assetDefinitions) ? assetDefinitions : [];
   
   // Calculate total portfolio value for percentage calculations
   const totalValue = positions.reduce((sum, pos) => sum + pos.currentValue, 0);
@@ -44,25 +52,24 @@ export const calculatePortfolioAnalytics = (positions: PortfolioPosition[]): Por
   // Sector Allocation - Supporting both single and multi-sector assets
   const sectorMap = new Map<string, number>();
   positions.forEach(position => {
+    const assetDef = safeAssetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
     // Check if asset has multi-sector allocation
-    const sectors = position.assetDefinition?.sectors;
+    const sectors = assetDef?.sectors;
     if (sectors && sectors.length > 0) {
-      // Multi-sector asset: distribute value proportionally
-      sectors.forEach(sectorAllocation => {
-        const sectorName = sectorAllocation.sectorName || 'Unknown';
+      sectors.forEach((sectorAllocation: SectorAllocation) => {
+        const sectorName = sectorAllocation.sectorName || sectorAllocation.sector || 'Unknown';
         const proportionalValue = (position.currentValue * sectorAllocation.percentage) / 100;
         const currentValue = sectorMap.get(sectorName) || 0;
         sectorMap.set(sectorName, currentValue + proportionalValue);
       });
     } else {
       // Single sector asset
-      const sector = position.sector || 'Unknown';
+      const sector = position.sector || (assetDef && 'sector' in assetDef ? (assetDef as any).sector : undefined) || 'Unknown';
       const currentValue = sectorMap.get(sector) || 0;
       sectorMap.set(sector, currentValue + position.currentValue);
     }
   });
-
-  const sectorAllocation = Array.from(sectorMap.entries())
+  const sectorAllocation = Array.from([...sectorMap.entries()])
     .map(([sector, value]) => ({
       name: sector,
       value,
@@ -70,21 +77,37 @@ export const calculatePortfolioAnalytics = (positions: PortfolioPosition[]): Por
     }))
     .sort((a, b) => b.value - a.value);
 
-  // Country Allocation
-  const countryMap = new Map<string, number>();
-  positions.forEach(position => {
-    const country = position.country || 'Unknown';
-    const currentValue = countryMap.get(country) || 0;
-    countryMap.set(country, currentValue + position.currentValue);
-  });
-
-  const countryAllocation = Array.from(countryMap.entries())
-    .map(([country, value]) => ({
-      name: country,
-      value,
-      percentage: (value / totalValue) * 100
-    }))
-    .sort((a, b) => b.value - a.value);
+  // Country Allocation (multi-country support)
+  const usedAssetDefinitions = positions
+    .map(pos => safeAssetDefinitions.find((def: AssetDefinition) => def.id === pos.assetDefinitionId))
+    .filter((def): def is AssetDefinition => Boolean(def));
+  let countryAllocation: { name: string; value: number; percentage: number }[] = [];
+  if (usedAssetDefinitions.length > 0) {
+    // Use weighted allocation utility
+    const weighted = getCountryAllocationWeighted(usedAssetDefinitions);
+    countryAllocation = Object.entries(weighted)
+      .map(([country, percentage]) => {
+        // Calculate value from percentage and totalValue
+        const value = (percentage / 100) * totalValue;
+        return { name: country, value, percentage };
+      })
+      .sort((a, b) => b.value - a.value);
+  } else {
+    // Fallback: legacy single-country logic
+    const countryMap = new Map<string, number>();
+    positions.forEach(position => {
+      const country = position.country || 'Unknown';
+      const currentValue = countryMap.get(country) || 0;
+      countryMap.set(country, currentValue + position.currentValue);
+    });
+    countryAllocation = Array.from(countryMap.entries())
+      .map(([country, value]) => ({
+        name: country,
+        value,
+        percentage: (value / totalValue) * 100
+      }))
+      .sort((a, b) => b.value - a.value);
+  }
 
   // Category Allocation
   const categoryMap = new Map<string, number>();
@@ -183,8 +206,12 @@ export const calculatePortfolioAnalytics = (positions: PortfolioPosition[]): Por
 
 
 
-export const calculateIncomeAnalytics = (positions: PortfolioPosition[]): IncomeAnalyticsData => {
+export const calculateIncomeAnalytics = (
+  positions: PortfolioPosition[],
+  assetDefinitions?: AssetDefinition[]
+): IncomeAnalyticsData => {
   Logger.infoService('Calculating income analytics from positions');
+  const safeAssetDefinitions: AssetDefinition[] = Array.isArray(assetDefinitions) ? assetDefinitions : [];
   
   // Calculate total monthly income for percentage calculations
   const totalIncome = positions.reduce((sum, pos) => sum + pos.monthlyIncome, 0);
@@ -222,19 +249,19 @@ export const calculateIncomeAnalytics = (positions: PortfolioPosition[]): Income
   const sectorIncomeMap = new Map<string, number>();
   positions.forEach(position => {
     if (position.monthlyIncome > 0) {
+      const assetDef = safeAssetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
       // Check if asset has multi-sector allocation
-      const sectors = position.assetDefinition?.sectors;
+      const sectors = assetDef?.sectors;
       if (sectors && sectors.length > 0) {
-        // Multi-sector asset: distribute income proportionally
-        sectors.forEach(sectorAllocation => {
-          const sectorName = sectorAllocation.sectorName || 'Unknown';
+        sectors.forEach((sectorAllocation: SectorAllocation) => {
+          const sectorName = sectorAllocation.sectorName || sectorAllocation.sector || 'Unknown';
           const proportionalIncome = (position.monthlyIncome * sectorAllocation.percentage) / 100;
           const currentIncome = sectorIncomeMap.get(sectorName) || 0;
           sectorIncomeMap.set(sectorName, currentIncome + proportionalIncome);
         });
       } else {
         // Single sector asset
-        const sector = position.sector || 'Unknown';
+        const sector = position.sector || (assetDef && 'sector' in assetDef ? (assetDef as any).sector : undefined) || 'Unknown';
         const currentIncome = sectorIncomeMap.get(sector) || 0;
         sectorIncomeMap.set(sector, currentIncome + position.monthlyIncome);
       }
@@ -249,21 +276,32 @@ export const calculateIncomeAnalytics = (positions: PortfolioPosition[]): Income
     }))
     .sort((a, b) => b.value - a.value);
 
-  // Country Income Distribution
-  const countryIncomeMap = new Map<string, number>();
+  // Country Income Distribution (multi-country support)
+  const byCountry: Record<string, number> = {};
   positions.forEach(position => {
     if (position.monthlyIncome > 0) {
-      const country = position.country || 'Unknown';
-      const currentIncome = countryIncomeMap.get(country) || 0;
-      countryIncomeMap.set(country, currentIncome + position.monthlyIncome);
+      const asset = safeAssetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
+      const income = position.monthlyIncome;
+      if (!asset) return;
+      if (asset.countries && asset.countries.length > 0) {
+        asset.countries.forEach((alloc: { country: string; percentage: number }) => {
+          const country = alloc.country || 'Unknown';
+          const countryIncomeValue = income * (alloc.percentage / 100);
+          byCountry[country] = (byCountry[country] || 0) + countryIncomeValue;
+        });
+      } else if (asset.country) {
+        const country = asset.country;
+        byCountry[country] = (byCountry[country] || 0) + income;
+      } else {
+        byCountry['Unknown'] = (byCountry['Unknown'] || 0) + income;
+      }
     }
   });
-
-  const countryIncome = Array.from(countryIncomeMap.entries())
-    .map(([country, income]) => ({
+  const countryIncome = Object.entries(byCountry)
+    .map(([country, value]) => ({
       name: country,
-      value: income,
-      percentage: (income / totalIncome) * 100
+      value,
+      percentage: totalIncome > 0 ? (value / totalIncome) * 100 : 0
     }))
     .sort((a, b) => b.value - a.value);
 

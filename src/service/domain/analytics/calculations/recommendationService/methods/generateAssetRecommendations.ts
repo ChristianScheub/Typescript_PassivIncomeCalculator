@@ -1,5 +1,6 @@
 import { PortfolioRecommendation } from '@/types/domains/analytics';
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
+import { getCountryAllocationWeighted } from '@/utils/portfolioUtils';
 
 // Helper functions for portfolio analysis
 function getTotalValue(assetDefinitions: AssetDefinition[]): number {
@@ -10,26 +11,19 @@ function getSectorAllocation(assetDefinitions: AssetDefinition[]): Record<string
   const total = getTotalValue(assetDefinitions);
   const bySector: Record<string, number> = {};
   assetDefinitions.forEach(asset => {
-    const sector = asset.sector || 'Unbekannt';
-    bySector[sector] = (bySector[sector] || 0) + (asset.currentPrice || 0);
+    if (Array.isArray(asset.sectors) && asset.sectors.length > 0) {
+      asset.sectors.forEach(sectorAlloc => {
+        const sector = sectorAlloc.sectorName || sectorAlloc.sector || 'Unbekannt';
+        bySector[sector] = (bySector[sector] || 0) + (asset.currentPrice || 0) * (sectorAlloc.percentage / 100);
+      });
+    } else {
+      bySector['Unbekannt'] = (bySector['Unbekannt'] || 0) + (asset.currentPrice || 0);
+    }
   });
   Object.keys(bySector).forEach(sector => {
     bySector[sector] = total > 0 ? (bySector[sector] / total) * 100 : 0;
   });
   return bySector;
-}
-
-function getCountryAllocation(assetDefinitions: AssetDefinition[]): Record<string, number> {
-  const total = getTotalValue(assetDefinitions);
-  const byCountry: Record<string, number> = {};
-  assetDefinitions.forEach(asset => {
-    const country = asset.country || 'Unbekannt';
-    byCountry[country] = (byCountry[country] || 0) + (asset.currentPrice || 0);
-  });
-  Object.keys(byCountry).forEach(country => {
-    byCountry[country] = total > 0 ? (byCountry[country] / total) * 100 : 0;
-  });
-  return byCountry;
 }
 
 function getCashQuote(assetDefinitions: AssetDefinition[]): number {
@@ -97,7 +91,7 @@ export const generateAssetRecommendations = (
   }
 
   // 3. Regional diversification (country >60%)
-  const countryAlloc = getCountryAllocation(assetDefinitions);
+  const countryAlloc = getCountryAllocationWeighted(assetDefinitions);
   const maxCountry = Object.entries(countryAlloc).reduce((max, curr) => curr[1] > max[1] ? curr : max, ["", 0]);
   if (maxCountry[1] > 60) {
     recommendations.push({

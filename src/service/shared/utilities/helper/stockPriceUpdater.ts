@@ -41,60 +41,66 @@ export class StockPriceUpdater {
       `Updating prices for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`
     );
 
-    try {
-      // stockAPIService ist jetzt ein Objekt, keine Factory mehr!
-      const stockAPI = stockAPIService;
-      const updatedDefinitions: AssetDefinition[] = [];
+    // Fehlerhafte Ticker sammeln
+    const failedTickers: { ticker: string; name: string }[] = [];
+    const updatedDefinitions: AssetDefinition[] = [];
+    // stockAPIService ist jetzt ein Objekt, keine Factory mehr!
+    const stockAPI = stockAPIService;
 
-      for (const definition of stockDefinitionsToUpdate) {
-        try {
-          // Inline logic from updateSingleDefinition
-          const priceData = await stockAPI.getCurrentStockPrice(definition.ticker!);
-          if (!priceData?.price) continue;
+    for (const definition of stockDefinitionsToUpdate) {
+      try {
+        // Inline logic from updateSingleDefinition
+        const priceData = await stockAPI.getCurrentStockPrice(definition.ticker!);
+        if (!priceData?.price) throw new Error("No price data available");
 
-          const newPrice = priceData.price;
+        const newPrice = priceData.price;
 
-          // Use utility function to update price and manage history
-          const updatedDefinition = updateAssetDefinitionPrice(
-            definition,
-            newPrice,
-            "api"
-          );
+        // Use utility function to update price and manage history
+        const updatedDefinition = updateAssetDefinitionPrice(
+          definition,
+          newPrice,
+          "api"
+        );
 
-          // Clean up old price history to prevent unlimited growth
-          const finalDefinition = {
-            ...updatedDefinition,
-            priceHistory: cleanupOldPriceHistory(updatedDefinition.priceHistory),
-          };
+        // Clean up old price history to prevent unlimited growth
+        const finalDefinition = {
+          ...updatedDefinition,
+          priceHistory: cleanupOldPriceHistory(updatedDefinition.priceHistory),
+        };
 
-          Logger.infoService(
-            `Updated price for ${definition.ticker} (${definition.fullName}): ${newPrice}`
-          );
-          Logger.infoService(
-            `Price history entries: ${finalDefinition.priceHistory?.length || 0}`
-          );
-          updatedDefinitions.push(finalDefinition);
-        } catch (error) {
-          Logger.error(
-            `Failed to update price for ${definition.ticker}: ${error}`
-          );
-          throw error;
-        }
+        Logger.infoService(
+          `Updated price for ${definition.ticker} (${definition.fullName}): ${newPrice}`
+        );
+        Logger.infoService(
+          `Price history entries: ${finalDefinition.priceHistory?.length || 0}`
+        );
+        updatedDefinitions.push(finalDefinition);
+      } catch (error) {
+        Logger.error(
+          `Failed to update price for ${definition.ticker}: ${error}`
+        );
+        failedTickers.push({ ticker: definition.ticker!, name: definition.fullName });
+        // NICHT throwen, sondern weitermachen
       }
-
-      Logger.infoService(
-        `Successfully updated ${updatedDefinitions.length} stock definition prices`
-      );
-      Logger.infoService(
-        `StockPriceUpdater: Updated prices for ${updatedDefinitions.length} stock definitions`
-      );
-      return updatedDefinitions;
-    } catch (error) {
-      Logger.error(`Stock API service not available: ${error}`);
-      throw new Error(
-        "Stock API service not available. Please check your API configuration in Settings."
-      );
     }
+
+    Logger.infoService(
+      `Successfully updated ${updatedDefinitions.length} stock definition prices`
+    );
+    Logger.infoService(
+      `StockPriceUpdater: Updated prices for ${updatedDefinitions.length} stock definitions`
+    );
+
+    // Am Ende: Alert für fehlgeschlagene Ticker
+    if (failedTickers.length > 0) {
+      const msg =
+        "Für folgende Assets konnte kein Preis abgerufen werden:\n" +
+        failedTickers.map(f => `${f.ticker} (${f.name})`).join("\n");
+      // eslint-disable-next-line no-alert
+      alert(msg);
+    }
+
+    return updatedDefinitions;
   }
 
   /**
@@ -207,84 +213,96 @@ export class StockPriceUpdater {
       `Updating historical data (${period}) for ${stockDefinitionsToUpdate.length} stock definitions`
     );
 
-    try {
-      // stockAPIService ist jetzt ein Objekt, keine Factory mehr!
-      const stockAPI = stockAPIService;
-      const updatedDefinitions: AssetDefinition[] = [];
+    // Fehlerhafte Ticker sammeln
+    const failedTickers: { ticker: string; name: string }[] = [];
+    const updatedDefinitions: AssetDefinition[] = [];
+    // stockAPIService ist jetzt ein Objekt, keine Factory mehr!
+    const stockAPI = stockAPIService;
 
-      for (const definition of stockDefinitionsToUpdate) {
-        try {
-          // Use the fetchChart method directly through the YahooAPIService to support custom periods
-          const historicalData = await this.fetchHistoricalDataWithPeriod(
-            stockAPI,
-            definition.ticker!,
-            period
+    for (const definition of stockDefinitionsToUpdate) {
+      try {
+        // Use the fetchChart method directly through the YahooAPIService to support custom periods
+        const historicalData = await this.fetchHistoricalDataWithPeriod(
+          stockAPI,
+          definition.ticker!,
+          period
+        );
+
+        if (historicalData?.data && historicalData.data.length > 0) {
+          // Convert historical data to price history format and update definition
+          const priceHistory =
+            historicalData.data?.map((entry: StockHistoryEntry) => ({
+              date: entry.date,
+              price: entry.close,
+              source: "api" as const,
+            })) || [];
+
+          const updatedDefinition = {
+            ...definition,
+            priceHistory: [
+              ...(definition.priceHistory || []),
+              ...priceHistory,
+            ]
+              .filter(
+                (entry, index, arr) =>
+                  // Remove duplicates by date and source
+                  arr.findIndex(
+                    (e) => e.date === entry.date && e.source === entry.source
+                  ) === index
+              )
+              .sort(
+                (a, b) =>
+                  new Date(b.date).getTime() - new Date(a.date).getTime()
+              ),
+            lastPriceUpdate: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          };
+
+          // Clean up old entries
+          const finalDefinition = {
+            ...updatedDefinition,
+            priceHistory: cleanupOldPriceHistory(
+              updatedDefinition.priceHistory,
+              1000
+            ), // Keep more entries for longer periods
+          };
+
+          updatedDefinitions.push(finalDefinition);
+          Logger.infoService(
+            `Updated historical data (${period}) for ${definition.ticker} (${definition.fullName}): ${historicalData.data.length} entries`
           );
-
-          if (historicalData?.data && historicalData.data.length > 0) {
-            // Convert historical data to price history format and update definition
-            const priceHistory =
-              historicalData.data?.map((entry: StockHistoryEntry) => ({
-                date: entry.date,
-                price: entry.close,
-                source: "api" as const,
-              })) || [];
-
-            const updatedDefinition = {
-              ...definition,
-              priceHistory: [
-                ...(definition.priceHistory || []),
-                ...priceHistory,
-              ]
-                .filter(
-                  (entry, index, arr) =>
-                    // Remove duplicates by date and source
-                    arr.findIndex(
-                      (e) => e.date === entry.date && e.source === entry.source
-                    ) === index
-                )
-                .sort(
-                  (a, b) =>
-                    new Date(b.date).getTime() - new Date(a.date).getTime()
-                ),
-              lastPriceUpdate: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            };
-
-            // Clean up old entries
-            const finalDefinition = {
-              ...updatedDefinition,
-              priceHistory: cleanupOldPriceHistory(
-                updatedDefinition.priceHistory,
-                1000
-              ), // Keep more entries for longer periods
-            };
-
-            updatedDefinitions.push(finalDefinition);
-            Logger.infoService(
-              `Updated historical data (${period}) for ${definition.ticker} (${definition.fullName}): ${historicalData.data.length} entries`
-            );
-          }
-        } catch (error) {
+        } else {
+          failedTickers.push({ ticker: definition.ticker!, name: definition.fullName });
           Logger.error(
-            `Failed to update historical data for ${definition.ticker}: ${error}`
+            `No historical data for ${definition.ticker} (${definition.fullName}) in period ${period}`
           );
-          throw error;
         }
+      } catch (error) {
+        Logger.error(
+          `Failed to update historical data for ${definition.ticker}: ${error}`
+        );
+        failedTickers.push({ ticker: definition.ticker!, name: definition.fullName });
+        // NICHT throwen, sondern weitermachen
       }
-
-      Logger.infoService(
-        `Successfully updated historical data (${period}) for ${updatedDefinitions.length} stock definitions`
-      );
-      return updatedDefinitions;
-    } catch (error) {
-      Logger.error(
-        `Stock API service not available for historical data: ${error}`
-      );
-      throw new Error(
-        "Stock API service not available. Please check your API configuration in Settings."
-      );
     }
+
+    Logger.infoService(
+      `Successfully updated historical data (${period}) for ${updatedDefinitions.length} stock definitions`
+    );
+    Logger.infoService(
+      `StockPriceUpdater: Updated historical data for ${updatedDefinitions.length} stock definitions`
+    );
+
+    // Am Ende: Alert für fehlgeschlagene Ticker
+    if (failedTickers.length > 0) {
+      const msg =
+        "Für folgende Assets konnte keine Historie abgerufen werden:\n" +
+        failedTickers.map(f => `${f.ticker} (${f.name})`).join("\n");
+      // eslint-disable-next-line no-alert
+      alert(msg);
+    }
+
+    return updatedDefinitions;
   }
 
   /**

@@ -2,7 +2,7 @@ import { IFinancialCalculatorService } from './interfaces/IFinancialCalculatorSe
 import { calculateNetWorth } from './methods/calculateNetWorth';
 import { calculateMonthlyCashFlow } from './methods/calculateCashFlow';
 import { calculateProjections, calculateProjectionsWithCache } from '../../../analytics/calculations/financialAnalyticsService/methods/calculateProjections';
-import { calculatePortfolioAnalytics, calculateIncomeAnalytics } from '../../../analytics/calculations/financialAnalyticsService/methods/calculatePortfolioAnalytics';
+import { calculatePortfolioAnalytics as rawCalculatePortfolioAnalytics, calculateIncomeAnalytics as rawCalculateIncomeAnalytics } from '../../../analytics/calculations/financialAnalyticsService/methods/calculatePortfolioAnalytics';
 
 /**
  * Financial Calculator Service that coordinates complex financial calculations
@@ -20,8 +20,8 @@ const financialCalculatorService: IFinancialCalculatorService = {
   calculateProjectionsWithCache,
 
   // Portfolio Analytics
-  calculatePortfolioAnalytics,
-  calculateIncomeAnalytics,
+  calculatePortfolioAnalytics: (positions, assetDefinitions = []) => rawCalculatePortfolioAnalytics(positions, assetDefinitions),
+  calculateIncomeAnalytics: (positions, assetDefinitions = []) => rawCalculateIncomeAnalytics(positions, assetDefinitions),
 };
 
 // Export the service interface

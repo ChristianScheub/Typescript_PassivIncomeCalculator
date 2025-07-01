@@ -10,7 +10,8 @@ src/service/
 │   ├── assets/                      # Asset Management Domain
 │   ├── financial/                   # Financial Operations Domain  
 │   ├── portfolio/                   # Portfolio Management Domain
-│   └── analytics/                   # Analytics & Reporting Domain
+│   ├── analytics/                   # Analytics & Reporting Domain
+│   └── ai/                          # AI & Machine Learning Domain
 ├── application/                     # Application Services (Use Cases)
 │   ├── workflows/                   # Complex Business Processes
 │   ├── orchestration/               # Service Coordination
@@ -108,6 +109,24 @@ analytics/
 - Activity tracking & reporting
 - Business intelligence reporting
 
+### 🤖 AI Domain (`domain/ai/`)
+Artificial Intelligence and Machine Learning services.
+
+**Structure:**
+```
+ai/
+├── llm/
+│   └── llmService/                  # Generic LLM service for WebLLM integration
+└── insights/
+    └── financialInsightsService/    # Financial AI insights & recommendations
+```
+
+**Key Responsibilities:**
+- LLM model loading and inference
+- Financial data analysis using AI
+- AI-powered insights generation
+- Natural language financial recommendations
+
 ## Application Services
 
 ### 🔄 Workflows (`application/workflows/`)
@@ -171,6 +190,7 @@ The service architecture **mirrors the type structure** (`src/types/domains/`) t
 | `types/domains/financial/` | `service/domain/financial/` | Financial operations |
 | `types/domains/portfolio/` | `service/domain/portfolio/` | Portfolio management |
 | `types/domains/analytics/` | `service/domain/analytics/` | Analytics & reporting |
+| `types/domains/ai/` | `service/domain/ai/` | AI & machine learning |
 
 ## Usage
 
@@ -201,6 +221,23 @@ import { deleteDataService, cacheRefreshService } from '@/service/application';
 
 // Portfolio history calculations
 import { PortfolioHistoryCalculationService } from '@/service/application/portfolioHistoryCalculation';
+```
+
+### AI Services
+```typescript
+// Use AI services for insights and recommendations
+import { llmService, financialInsightsService } from '@/service';
+import { getModelConfig } from '@/config/aiModelConfig';
+
+// Initialize LLM model (loaded on-demand in settings)
+const modelConfig = getModelConfig();
+await llmService.loadModel(modelConfig);
+
+// Generate financial insights from Redux state
+const insights = await financialInsightsService.generateInsightsFromReduxState({
+  reduxState: store.getState(),
+  requestType: 'general'
+});
 ```
 
 ### Infrastructure Services

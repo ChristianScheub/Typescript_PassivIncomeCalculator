@@ -892,7 +892,25 @@
     "clearIncome": "Clear Income",
     "clearIncomeDesc": "Remove all income source records",
     "clearReduxCache": "Clear Redux Cache",
-    "clearReduxCacheDesc": "Reset all cached calculations and temporary data in memory"
+    "clearReduxCacheDesc": "Reset all cached calculations and temporary data in memory",
+    "ai": {
+      "title": "AI Assistant",
+      "enable_ai": "Enable AI Assistant",
+      "enable_ai_description": "Enable AI-powered financial insights and chat features",
+      "model_status": "Model Status",
+      "loaded_model": "Loaded Model",
+      "mode": "Mode",
+      "size": "Size",
+      "select_model": "Select AI Model",
+      "load_model": "Load Model",
+      "loading_model": "Loading Model...",
+      "recommended": "Recommended",
+      "how_it_works": "How it works",
+      "how_it_works_1": "Models run entirely in your browser - no data leaves your device",
+      "how_it_works_2": "TinyLlama is optimized for local inference and fast responses",
+      "how_it_works_3": "Your financial data is analyzed locally for personalized insights",
+      "how_it_works_4": "Models are downloaded once and cached for offline use"
+    }
   },
   "milestones": {
     "title": "Financial Milestones",
@@ -1270,5 +1288,120 @@
     "ytd.description": "Data since the beginning of the year",
     "max": "Maximum",
     "max.description": "All available historical data"
+  },
+  "noIncomeData": "No income data available",
+  "noSectorIncomeData": "No sector income data available",
+  "noCountryIncomeData": "No country income data available",
+  "useMultipleCountries": "Use multiple countries",
+  "totalPercentage": "Total",
+  "percentageMustBe100": "Total must be 100%",
+  "ai": {
+    "insights": {
+      "title": "AI Insights",
+      "subtitle": "Financial recommendations powered by AI",
+      "generate": "Generate Insights",
+      "regenerate": "Regenerate Insights",
+      "generating": "Generating insights...",
+      "noModel": "AI model not loaded",
+      "modelLoading": "Loading AI model...",
+      "modelLoaded": "AI model ready",
+      "modelError": "Failed to load AI model",
+      "error": {
+        "generation_failed": "Failed to generate insights. Please try again.",
+        "no_data": "Insufficient data for analysis"
+      },
+      "summary": {
+        "title": "AI Analysis Summary"
+      },
+      "confidence": "Confidence",
+      "generated_at": "Generated at",
+      "impact": "Expected Impact",
+      "scores": {
+        "title": "Financial Health Scores",
+        "risk": "Risk Score",
+        "diversification": "Diversification",
+        "liquidity": "Liquidity"
+      },
+      "recommendations": {
+        "title": "AI Recommendations",
+        "diversification": "Improve Portfolio Diversification",
+        "diversification_desc": "Your portfolio could benefit from broader asset allocation across different sectors and regions.",
+        "emergency_fund": "Build Emergency Fund",
+        "emergency_fund_desc": "Consider building an emergency fund covering 3-6 months of expenses for financial security.",
+        "investment_strategy": "Optimize Investment Strategy",
+        "investment_strategy_desc": "Review your investment approach to align with your long-term financial goals."
+      },
+      "priority": {
+        "high": "High",
+        "medium": "Medium", 
+        "low": "Low"
+      }
+    },
+    "chat": {
+      "title": "AI Financial Chat",
+      "subtitle": "Chat with your AI financial advisor",
+      "welcome": "Hello! I'm your AI financial advisor. I can help you analyze your portfolio, plan your finances, and answer any questions about your financial situation. How can I assist you today?",
+      "empty_state": "Start a conversation by typing a message below",
+      "input_placeholder": "Ask me about your finances...",
+      "typing": "AI is thinking...",
+      "clear": "Clear Chat",
+      "disclaimer": "AI responses are for informational purposes only and should not replace professional financial advice.",
+      "context": {
+        "title": "Current Financial Context"
+      },
+      "suggestions": {
+        "title": "Suggested Questions",
+        "portfolio_analysis": "How is my portfolio performing?",
+        "savings_advice": "How can I improve my savings rate?",
+        "risk_assessment": "What's my current risk level?",
+        "investment_strategy": "What investment strategy should I follow?"
+      },
+      "error": {
+        "message_failed": "Failed to send message. Please try again.",
+        "sorry": "I'm sorry, I encountered an error. Please try asking your question again.",
+        "no_response": "No response received from AI"
+      }
+    },
+    "model": {
+      "status": "AI Model Status",
+      "states": {
+        "unloaded": "Not loaded",
+        "loading": "Loading...",
+        "loaded": "Ready",
+        "error": "Error"
+      }
+    },
+    "responses": {
+      "recommendations": "Recommendations",
+      "confidence": "Confidence",
+      "dataUsed": "Data Used",
+      "generatedAt": "Generated",
+      "noInsights": "No insights generated",
+      "requestTypes": {
+        "general": "General Analysis",
+        "portfolio": "Portfolio Analysis", 
+        "budget": "Budget Analysis",
+        "forecast": "Forecast Analysis",
+        "custom": "Custom Analysis"
+      }
+    },
+    "settings": {
+      "title": "AI Settings",
+      "enable_ai": "Enable AI",
+      "enable_ai_description": "Enable local AI model for financial insights and chat",
+      "model_status": "Model Status",
+      "loaded_model": "Loaded Model",
+      "mode": "Mode",
+      "size": "Size",
+      "select_model": "Select AI Model",
+      "recommended": "Recommended",
+      "load_model": "Load Model",
+      "loading_model": "Loading Model...",
+      "how_it_works": "How it works",
+      "how_it_works_1": "AI runs completely local in your browser",
+      "how_it_works_2": "No data is sent to external servers",
+      "how_it_works_3": "First load may take a few minutes",
+      "how_it_works_4": "Model stays loaded until you refresh the page"
+    }
   }
 }

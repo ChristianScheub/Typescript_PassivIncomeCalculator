@@ -329,6 +329,24 @@
     "clearIncomeDesc": "Alle Einkommensquellen-Aufzeichnungen entfernen",
     "clearReduxCache": "Redux Cache löschen",
     "clearReduxCacheDesc": "Alle zwischengespeicherten Berechnungen und temporären Daten im Arbeitsspeicher zurücksetzen",
+    "ai": {
+      "title": "KI-Assistent",
+      "enable_ai": "KI-Assistent aktivieren",
+      "enable_ai_description": "KI-gestützte Finanzeinblicke und Chat-Funktionen aktivieren",
+      "model_status": "Modell-Status",
+      "loaded_model": "Geladenes Modell",
+      "mode": "Modus",
+      "size": "Größe",
+      "select_model": "KI-Modell auswählen",
+      "load_model": "Modell laden",
+      "loading_model": "Modell wird geladen...",
+      "recommended": "Empfohlen",
+      "how_it_works": "So funktioniert es",
+      "how_it_works_1": "Modelle laufen vollständig in Ihrem Browser - keine Daten verlassen Ihr Gerät",
+      "how_it_works_2": "TinyLlama ist für lokale Inferenz und schnelle Antworten optimiert",
+      "how_it_works_3": "Ihre Finanzdaten werden lokal für personalisierte Einblicke analysiert",
+      "how_it_works_4": "Modelle werden einmal heruntergeladen und für Offline-Nutzung zwischengespeichert"
+    },
     "clearAllDataConfirm": "Sind Sie sicher, dass Sie ALLE Daten löschen möchten? Dies wird sämtliche Einstellungen und Daten unwiderruflich entfernen.",
     "clearDividendHistory": "Dividendenverlauf löschen",
     "clearDividendHistoryDesc": "Löscht den gesamten Dividendenverlauf, das Dividendenwachstum und die Dividendenprognose aller Assets.",
@@ -721,7 +739,10 @@
     },
     "updateStockPrices": "Aktienkurse aktualisieren",
     "useDividendApi": "Dividenden-API verwenden",
-    "fetchDividendsFromApi": "Dividenden per API abrufen"
+    "fetchDividendsFromApi": "Dividenden per API abrufen",
+    "useMultipleCountries":"Mehrere Länder verwenden",
+    "totalPercentage": "Gesamtanteil",
+    "percentageMustBe100":"Summe muss 100% sein"
   },
   "paymentFrequency": {
     "monthly": "Monatlich",
@@ -1057,6 +1078,7 @@
       }
     },
     "overview": {
+      "net_worth": "Nettovermögen",
       "title": "Finanz-Übersicht",
       "subtitle": "Vollständige Übersicht Ihrer finanziellen Situation",
       "keyMetrics": "Wichtige Finanzkennzahlen",
@@ -1542,5 +1564,79 @@
     "ytd.description": "Daten seit Jahresbeginn",
     "max": "Maximum",
     "max.description": "Alle verfügbaren historischen Daten"
+  },
+  "useMultipleCountries": "Mehrere Länder verwenden",
+  "totalPercentage": "Summe",
+  "percentageMustBe100": "Summe muss 100% sein",
+  "ai": {
+    "insights": {
+      "title": "KI-Einblicke",
+      "subtitle": "Finanzempfehlungen powered by KI",
+      "generate": "Einblicke generieren",
+      "generating": "Generiere Einblicke...",
+      "noModel": "KI-Modell nicht geladen",
+      "modelLoading": "Lade KI-Modell...",
+      "modelLoaded": "KI-Modell bereit",
+      "modelError": "Fehler beim Laden des KI-Modells",
+      "error": "Fehler beim Generieren der Einblicke",
+      "retry": "Wiederholen",
+      "clearError": "Fehler löschen"
+    },
+    "chat": {
+      "title": "KI-Chat",
+      "subtitle": "Sprechen Sie über Ihre Finanzen mit der KI",
+      "welcome": "Hallo! Ich bin Ihr persönlicher Finanzassistent. Wie kann ich Ihnen heute bei Ihren Finanzfragen helfen?",
+      "clear": "Chat löschen",
+      "typing": "KI schreibt...",
+      "input_placeholder": "Fragen Sie mich etwas über Ihre Finanzen...",
+      "disclaimer": "KI-Antworten sind nur Vorschläge und keine Finanzberatung.",
+      "empty_state": "Stellen Sie Ihre erste Frage, um zu beginnen!",
+      "mode": {
+        "financial_overview": "Finanzüberblick",
+        "all_assets": "Alle Assets",
+        "financial_overview_description": "Umfassende Finanzanalyse mit Einkommen, Ausgaben und Portfolio-Übersicht",
+        "all_assets_description": "Detaillierte Asset-Analyse mit spezifischen Informationen zu jedem Investment"
+      },
+      "context": {
+        "title": "Finanzkontext",
+        "assets_title": "Asset-Portfolio",
+        "assets_description": "Die KI analysiert {{count}} Assets in Ihrem Portfolio"
+      },
+      "suggestions": {
+        "title": "Vorgeschlagene Fragen",
+        "portfolio_analysis": "Wie steht es um mein Portfolio?",
+        "savings_advice": "Wie kann ich mehr sparen?",
+        "risk_assessment": "Wie riskant ist mein Portfolio?",
+        "investment_strategy": "Was ist meine beste Investitionsstrategie?"
+      },
+      "error": {
+        "no_response": "Keine Antwort erhalten",
+        "message_failed": "Nachricht konnte nicht gesendet werden",
+        "sorry": "Entschuldigung, es gab einen Fehler beim Verarbeiten Ihrer Anfrage."
+      }
+    },
+    "responses": {
+      "recommendations": "Empfehlungen",
+      "confidence": "Zuverlässigkeit",
+      "dataUsed": "Verwendete Daten",
+      "generatedAt": "Erstellt",
+      "noInsights": "Keine Einblicke generiert",
+      "requestTypes": {
+        "general": "Allgemeine Analyse",
+        "portfolio": "Portfolio-Analyse",
+        "budget": "Budget-Analyse",
+        "forecast": "Prognose-Analyse",
+        "custom": "Benutzerdefinierte Analyse"
+      }
+    },
+    "model": {
+      "status": "Status",
+      "states": {
+        "unloaded": "Nicht geladen",
+        "loading": "Lädt...",
+        "loaded": "Bereit",
+        "error": "Fehler"
+      }
+    }
   }
 }

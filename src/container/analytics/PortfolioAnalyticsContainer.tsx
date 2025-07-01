@@ -17,6 +17,8 @@ const PortfolioAnalyticsContainer: React.FC<PortfolioAnalyticsContainerProps> = 
   
   // Get portfolio data from Redux cache (should be available after initialization)
   const portfolioCache = useAppSelector(selectPortfolioCache);
+  // NEU: AssetDefinitions aus Store laden
+  const assetDefinitions = useAppSelector((state) => state.assetDefinitions.items);
 
   // Note: Portfolio cache should be available after app initialization
   // If not available, the app initialization will handle recalculation
@@ -48,13 +50,13 @@ const PortfolioAnalyticsContainer: React.FC<PortfolioAnalyticsContainerProps> = 
     const filtered = selectedAssetType === 'all' 
       ? portfolioCache.positions 
       : portfolioCache.positions.filter(position => position.type === selectedAssetType);
-    
+    // Fix: AssetDefinitions an calculatePortfolioAnalytics/incomeAnalytics übergeben
     return {
-      portfolioAnalytics: calculatorService.calculatePortfolioAnalytics(filtered),
-      incomeAnalytics: calculatorService.calculateIncomeAnalytics(filtered),
+      portfolioAnalytics: calculatorService.calculatePortfolioAnalytics(filtered, assetDefinitions || []),
+      incomeAnalytics: calculatorService.calculateIncomeAnalytics(filtered, assetDefinitions || []),
       filteredPositions: filtered
     };
-  }, [portfolioCache?.positions, selectedAssetType]);
+  }, [portfolioCache?.positions, selectedAssetType, assetDefinitions]);
 
   const handleTabChange = (tab: AnalyticsTab) => {
     setSelectedTab(tab);

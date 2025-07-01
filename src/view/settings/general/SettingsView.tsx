@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent } from '@/ui/common/Card';
 import { CollapsibleSection } from '@/ui/common/CollapsibleSection';
 import { Button } from '@/ui/common/Button';
 import { ButtonGroup } from '@/ui/common/ButtonGroup';
-import { Download, Upload, Key, ChevronRight, Trash, Monitor } from 'lucide-react';
+import { Download, Upload, Key, ChevronRight, Trash, Monitor, Brain } from 'lucide-react';
 import DebugSettings from '@/ui/specialized/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '../../../config/featureFlags';
 import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
@@ -15,6 +15,7 @@ import clsx from 'clsx';
 import { Toggle } from '@/ui/common/Toggle';
 import { DividendApiSettingsSection } from './DividendApiSettingsSection';
 import { StockApiSettingsSection } from './StockApiSettingsSection';
+import { AISettingsContainer } from '../../../container/settings/AISettingsContainer';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 
 interface ProviderInfo {
@@ -263,6 +264,15 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           </div>
         </div>
       </CollapsibleSection>
+
+      {/* AI Assistant Configuration */}
+      <CollapsibleSection
+        title={t('settings.ai.title')}
+        icon={<Brain size={20} />}
+        defaultExpanded={false}
+      >
+        <AISettingsContainer />
+      </CollapsibleSection>
       
       {/* API Configuration */}
       <CollapsibleSection
@@ -418,21 +428,33 @@ const SettingsView: React.FC<SettingsViewProps> = ({
               )}
             </div>
             <div className={isSmartphone ? '!w-[10vw] min-w-[48px] max-w-[80px] flex justify-center' : 'relative'} style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}>
-              <Button
-                disabled={importStatus === 'loading'}
-                className={`flex items-center space-x-2${isSmartphone ? ' justify-center' : ''}`}
-                style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}
-              >
-                <Upload size={16} />
-                {!isSmartphone && <span>{importButtonText}</span>}
-                <input
-                  type="file"
-                  accept="application/json"
-                  onChange={onImportData}
-                  className="hidden"
-                  disabled={importStatus === 'loading'}
-                />
-              </Button>
+              {/* File-Input per Button-Ref triggern */}
+              {(() => {
+                const fileInputRef = useRef<HTMLInputElement>(null);
+                return (
+                  <>
+                    <input
+                      ref={fileInputRef}
+                      id="import-file-input"
+                      type="file"
+                      accept="application/json"
+                      onChange={onImportData}
+                      className="hidden"
+                      disabled={importStatus === 'loading'}
+                    />
+                    <Button
+                      type="button"
+                      disabled={importStatus === 'loading'}
+                      className={`flex items-center space-x-2${isSmartphone ? ' justify-center' : ''}`}
+                      style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload size={16} />
+                      {!isSmartphone && <span>{importButtonText}</span>}
+                    </Button>
+                  </>
+                );
+              })()}
             </div>
           </div>
           {/* Export Button */}

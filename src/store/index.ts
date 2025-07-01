@@ -14,6 +14,7 @@ import snackbarReducer from './slices/snackbarSlice';
 import dashboardSettingsReducer from './slices/dashboardSettingsSlice';
 import calculatedDataReducer, { markStoreHydrated, validateCacheOnStartup } from './slices/calculatedDataSlice';
 import portfolioIntradayReducer from './slices/portfolioIntradaySlice';
+import aiConfigReducer from './slices/aiConfigSlice';
 import dataChangeMiddleware from './middleware/dataChangeMiddleware';
 import portfolioCacheMiddleware from './middleware/portfolioCacheMiddleware';
 import calculatedDataCacheMiddleware from './middleware/calculatedDataCacheMiddleware';
@@ -150,6 +151,7 @@ export const store = configureStore({
     dashboardSettings: dashboardSettingsReducer,
     calculatedData: calculatedDataReducer,
     portfolioIntraday: portfolioIntradayReducer,
+    aiConfig: aiConfigReducer,
   },
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   preloadedState: persistedState as any,

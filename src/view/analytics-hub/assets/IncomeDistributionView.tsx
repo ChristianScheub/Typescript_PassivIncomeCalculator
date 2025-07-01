@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import GenericPieChart from '@/ui/charts/pieCharts/GenericPieChart';
+import type { PieChartData } from '@/types/shared/charts';
 
 interface IncomeDistributionData {
   name: string;
@@ -14,6 +15,11 @@ interface IncomeDistributionViewProps {
   countryIncome: IncomeDistributionData[];
 }
 
+const mapToPieChartData = (arr: IncomeDistributionData[]): PieChartData[] =>
+  Array.isArray(arr)
+    ? arr.map(item => ({ ...item }))
+    : [];
+
 const IncomeDistributionView: React.FC<IncomeDistributionViewProps> = ({
   assetTypeIncome,
   sectorIncome,
@@ -26,7 +32,7 @@ const IncomeDistributionView: React.FC<IncomeDistributionViewProps> = ({
       {/* Asset Type Income Distribution */}
       <GenericPieChart
         title={t('analytics.assetTypeIncomeDistribution')}
-        data={assetTypeIncome}
+        data={mapToPieChartData(assetTypeIncome)}
         nameKey="name"
         valueKey="value"
         translationKey="assets.types"
@@ -36,7 +42,7 @@ const IncomeDistributionView: React.FC<IncomeDistributionViewProps> = ({
       {/* Sector Income Distribution */}
       <GenericPieChart
         title={t('analytics.sectorIncomeDistribution')}
-        data={sectorIncome}
+        data={mapToPieChartData(sectorIncome)}
         nameKey="name"
         valueKey="value"
         emptyStateMessage={t('analytics.noSectorIncomeData')}
@@ -46,7 +52,7 @@ const IncomeDistributionView: React.FC<IncomeDistributionViewProps> = ({
       {/* Country Income Distribution */}
       <GenericPieChart
         title={t('analytics.countryIncomeDistribution')}
-        data={countryIncome}
+        data={mapToPieChartData(countryIncome)}
         nameKey="name"
         valueKey="value"
         emptyStateMessage={t('analytics.noCountryIncomeData')}

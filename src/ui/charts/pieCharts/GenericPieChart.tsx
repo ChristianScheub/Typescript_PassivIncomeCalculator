@@ -20,6 +20,8 @@ interface GenericPieChartProps {
   showDirectLabels?: boolean; // Whether to show labels directly on chart without translation
 }
 
+const safeArray = <T,>(arr: T[] | undefined | null): T[] => Array.isArray(arr) ? arr : [];
+
 const GenericPieChart: React.FC<GenericPieChartProps> = ({
   title,
   data,
@@ -36,12 +38,14 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
   // Use theme-aware colors
   const colors = theme === 'dark' ? COLORS_DARK : COLORS_LIGHT;
 
-  // Use ChartTooltip from the shared components
+  const safeData = safeArray(data).filter(
+    (item) => item && typeof item[nameKey] !== 'undefined' && typeof item[valueKey] === 'number'
+  );
 
   return (
     <Card title={title}>
       <div className="w-full">
-        {data.length > 0 ? (
+        {safeData.length > 0 ? (
           <div className="flex flex-col">
             {/* Chart container with proper spacing */}
             <div className="h-[280px] w-full">
@@ -58,7 +62,7 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
                     </text>
                   )}
                   <Pie
-                    data={data}
+                    data={safeData}
                     cx="50%"
                     cy={showTitle ? "60%" : "50%"}
                     outerRadius={showTitle ? 85 : 100}
@@ -66,7 +70,7 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
                     fill="#8884d8"
                     dataKey={valueKey}
                   >
-                    {data.map((item: PieChartData, index: number) => (
+                    {safeData.map((item: PieChartData, index: number) => (
                       <Cell key={`cell-${item[nameKey]}`} fill={colors[index % colors.length]} />
                     ))}
                   </Pie>
@@ -77,22 +81,18 @@ const GenericPieChart: React.FC<GenericPieChartProps> = ({
                     nameKey={nameKey}
                     valueKey={valueKey}
                     translationPrefix={translationKey}
-                    // showDirectLabels is not used in ChartTooltip
                   />} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
-
             {/* Legend - Single column layout for better readability */}
             <div className="mt-6 space-y-3 px-4 max-h-48 overflow-y-auto">
-              {data.map((item: PieChartData, index: number) => {
-                // Use translation if key is provided and showDirectLabels is false
+              {safeData.map((item: PieChartData, index: number) => {
                 const displayName = !showDirectLabels && translationKey 
                   ? t(`${translationKey}.${item[nameKey]}`)
-                  : item[nameKey];
-                  
+                  : item[nameKey] ?? '-';
                 return (
-                  <div key={item[nameKey]} className="flex items-center space-x-3 py-1">
+                  <div key={item[nameKey] ?? index} className="flex items-center space-x-3 py-1">
                     <div 
                       className="w-4 h-4 rounded-full flex-shrink-0" 
                       style={{ backgroundColor: colors[index % colors.length] }}

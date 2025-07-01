@@ -10,6 +10,8 @@ import PerformanceAnalyticsContainer from './PerformanceAnalyticsContainer';
 import AssetCalendarContainer from '../assets/AssetCalendarContainer'; // Use the main Asset Calendar Container
 import OverviewAnalyticsContainer from './OverviewAnalyticsContainer';
 import AnalyticsHubView from '@/view/analytics-hub/AnalyticsHubView';
+import AIAnalyticsContainer from './AIAnalyticsContainer';
+import type { AIAnalyticsCategory } from '@/types/domains/analytics/ai';
 
 // Re-export types for external use
 export type { AnalyticsCategory, AnalyticsSubCategory };
@@ -33,6 +35,7 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
   // Analytics navigation state
   const [selectedCategory, setSelectedCategory] = useState<AnalyticsCategory>('overview');
   const [selectedSubCategory, setSelectedSubCategory] = useState<AnalyticsSubCategory>('dashboard');
+  const [aiCategory, setAICategory] = useState<AIAnalyticsCategory | null>(null);
   const [navigationHistory, setNavigationHistory] = useState<Array<{ category: AnalyticsCategory; subCategory: AnalyticsSubCategory }>>([]);
   
   // Get data for analytics insights
@@ -89,6 +92,9 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
       setSelectedSubCategory(defaultSubCategories[category]);
     }
 
+    // Reset AI category when changing analytics category
+    setAICategory(null);
+
     // Track analytics history if not going to hub dashboard
     if (!(category === 'overview' && (!subCategory || subCategory === 'dashboard'))) {
       const finalSubCategory = subCategory || defaultSubCategories[category];
@@ -96,6 +102,15 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
       // Add analytics activity using the new service
       recentActivityService.addAnalyticsActivity(category, finalSubCategory);
     }
+  };
+
+  const handleAINavigation = (category: AIAnalyticsCategory) => {
+    Logger.info(`Analytics Hub: Navigating to AI ${category}`);
+    
+    // Add current position to history
+    setNavigationHistory(prev => [...prev, { category: selectedCategory, subCategory: selectedSubCategory }]);
+    
+    setAICategory(category);
   };
 
   const handleBackToHub = () => {
@@ -110,18 +125,29 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
       setSelectedSubCategory('dashboard');
     }
     
+    // Reset AI category
+    setAICategory(null);
+    
     // Scroll to top when navigating back
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Check if we should render a specific analytics container
   const shouldRenderContainer = () => {
+    // Show AI container if AI category is selected
+    if (aiCategory) return true;
     // Only show hub view for overview/dashboard, all other combinations should render specific containers
     return !(selectedCategory === 'overview' && selectedSubCategory === 'dashboard');
   };
 
   // Render specific analytics containers
   const renderAnalyticsContainer = () => {
+    // If AI category is selected, render AI container
+    if (aiCategory) {
+      Logger.info(`Analytics Hub: Rendering AI container for ${aiCategory}`);
+      return <AIAnalyticsContainer category={aiCategory} onBack={handleBackToHub} />;
+    }
+
     Logger.info(`Analytics Hub: Rendering container for ${selectedCategory} - ${selectedSubCategory}`);
     
     switch (selectedCategory) {
@@ -197,6 +223,7 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
       selectedSubCategory={selectedSubCategory}
       quickInsights={quickInsights}
       onCategoryChange={handleCategoryChange}
+      onAINavigation={handleAINavigation}
       onBack={onBack}
     />
   );

@@ -43,6 +43,11 @@ export interface LiabilityFormData extends FieldValues {
   startDate: string;
 }
 
+export interface CountryAllocation {
+  country: string;
+  percentage: number;
+}
+
 export interface AssetDefinitionFormData extends FieldValues {
   name: string;
   symbol: string;
@@ -53,6 +58,9 @@ export interface AssetDefinitionFormData extends FieldValues {
   industry?: string;
   description?: string;
   isActive: boolean;
+  country?: string; // Optional country field (single country mode)
+  countries?: CountryAllocation[]; // Multi-country mode
+  multiCountry?: boolean; // UI toggle state
 }
 
 export interface AssetFormData extends FieldValues {

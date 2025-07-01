@@ -111,7 +111,6 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
     totalReturn: totalReturn,
     totalReturnPercentage: totalReturnPercentage,
     transactions: relatedTransactions, // Include ALL related transactions
-    sector: assetDefinition.sector || '',
     country: assetDefinition.country || '',
     categoryAssignments: [], // Can be empty or populated if available
     transactionCount: relatedTransactions.length,
@@ -132,6 +131,7 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
   return (
     <AssetDetailView
       asset={portfolioPosition}
+      assetDefinition={assetDefinition}
       isOpen={isOpen}
       onClose={onClose}
       getAssetTypeLabel={getAssetTypeLabel}

@@ -42,12 +42,16 @@ import {
   Calendar
 } from 'lucide-react';
 import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analytics/AnalyticsHubContainer';
+import AIInsightsCard from '@/ui/analytics/ai/AIInsightsCard';
+import AIChatCard from '@/ui/analytics/ai/AIChatCard';
+import type { AIAnalyticsCategory } from '@/types/domains/analytics/ai';
 
 interface AnalyticsOverviewSectionProps {
   onCategoryChange: (category: AnalyticsCategory, subCategory?: AnalyticsSubCategory) => void;
+  onAINavigation?: (category: AIAnalyticsCategory) => void;
 }
 
-const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onCategoryChange }) => {
+const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onCategoryChange, onAINavigation }) => {
   const { t } = useTranslation();
   
   // Get real data from Redux store
@@ -289,6 +293,18 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({ onC
               </div>
             );
           })}
+
+          {/* AI Insights Card */}
+          <AIInsightsCard 
+            onClick={() => onAINavigation?.('insights')}
+            className="p-3 rounded-lg"
+          />
+
+          {/* AI Chat Card */}
+          <AIChatCard 
+            onClick={() => onAINavigation?.('chat')}
+            className="p-3 rounded-lg"
+          />
         </CardContent>
       </Card>
     </div>

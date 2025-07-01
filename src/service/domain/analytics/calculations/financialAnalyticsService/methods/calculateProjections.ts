@@ -5,11 +5,42 @@ import {
 } from '@/types/domains/financial';
 import { Transaction as Asset } from '@/types/domains/assets';
 import { CalculatorProjection } from '@/types/domains/analytics/calculations';
+import { MonthlyProjection } from '@/types/domains/analytics/projections';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { calculateTotalMonthlyExpenses } from '../../../../financial/expenses/expenseCalculatorService/methods/calculateExpenses';
 import { calculateTotalMonthlyLiabilityPayments } from '../../../../financial/liabilities/liabilityCalculatorService/methods/calculateLiabilities';
 import { calculatePassiveIncome, calculateTotalMonthlyIncome } from '../../../../financial/income/incomeCalculatorService/methods/calculateIncome';
 import { calculateTotalAssetIncomeForMonth } from '../../../../assets/calculations/assetCalculatorService/methods/calculateAssetIncome';
+
+function mapCalculatorToMonthlyProjection(
+  projections: any[]
+): MonthlyProjection[] {
+  let cumulativeCashFlow = 0;
+  return projections.map((p) => {
+    cumulativeCashFlow += p.netCashFlow ?? 0;
+    const dateObj = p.month ? new Date(p.month) : new Date();
+    return {
+      month: dateObj.getMonth() + 1,
+      year: dateObj.getFullYear(),
+      totalIncome: p.incomeTotal ?? 0,
+      totalExpenses: p.expenseTotal ?? 0,
+      totalLiabilities: p.liabilityPayments ?? 0,
+      netCashFlow: p.netCashFlow ?? 0,
+      cumulativeCashFlow,
+      assetIncomeBreakdown: {
+        dividends: p.assetIncome ?? 0,
+        bonds: 0,
+        realEstate: 0,
+        crypto: 0,
+        commodities: 0,
+        other: 0,
+      },
+      expenseBreakdown: {},
+      liabilityBreakdown: {},
+      date: p.month ?? new Date().toISOString(),
+    };
+  });
+}
 
 export const calculateProjections = (
   income: Income[],
@@ -17,7 +48,7 @@ export const calculateProjections = (
   liabilities: Liability[],
   assets: Asset[] = [],
   months = 12
-): CalculatorProjection[] => {
+): MonthlyProjection[] => {
   const projections: CalculatorProjection[] = [];
   
   // Calculate monthly income
@@ -69,7 +100,7 @@ export const calculateProjections = (
   }
 
   Logger.infoService(`Projections calculated - months: ${months}, final accumulated savings: ${accumulatedSavings}`);
-  return projections;
+  return mapCalculatorToMonthlyProjection(projections);
 };
 
 // Optimierte Version die gecachte Werte aus dem Redux Store verwendet
@@ -82,7 +113,7 @@ export const calculateProjectionsWithCache = (
   },
   monthlyAssetIncomeCache: Record<number, number>,
   months = 12
-): CalculatorProjection[] => {
+): MonthlyProjection[] => {
   const projections: CalculatorProjection[] = [];
   
   Logger.infoService(`Starting cached projection calculations - using cached base values and monthly asset income`);
@@ -125,5 +156,5 @@ export const calculateProjectionsWithCache = (
   }
 
   Logger.cache(`Cached projections calculated - months: ${months}, final accumulated savings: ${accumulatedSavings}`);
-  return projections;
+  return mapCalculatorToMonthlyProjection(projections);
 };

@@ -116,7 +116,10 @@ export class AppInitializationService {
     // Step 2: Ensure financial summary is computed
     await this._ensureFinancialSummary(dispatch, state);
 
-    // Step 3: Wait a tick to allow all state updates to propagate
+    // Step 3: Initialize LLM model
+    await this._initializeLLMModel();
+
+    // Step 4: Wait a tick to allow all state updates to propagate
     await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
@@ -210,6 +213,20 @@ export class AppInitializationService {
       Logger.info(
         "AppInitialization: No financial data found, skipping financial summary calculation"
       );
+    }
+  }
+
+  private async _initializeLLMModel(): Promise<void> {
+    try {
+      Logger.info("AppInitialization: LLM model initialization skipped - models are loaded on-demand");
+      // Note: Models are now loaded on-demand via the settings page
+      // No automatic model loading at app startup to improve performance
+    } catch (error) {
+      Logger.error(
+        "AppInitialization: LLM model initialization failed: " +
+          JSON.stringify(error)
+      );
+      // Don't throw - app can still work without LLM
     }
   }
 

@@ -6,6 +6,7 @@ import AnalyticsQuickInsightsSection from './hub/AnalyticsQuickInsightsSection';
 import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analytics/AnalyticsHubContainer';
 import AnalyticsOverviewSection from './hub/AnalyticsOverviewSection';
 import AnalyticsCategoriesSection from './hub/AnalyticsCategoriesSection';
+import type { AIAnalyticsCategory } from '@/types/domains/analytics/ai';
 
 interface QuickInsights {
   totalAssetValue: number;
@@ -25,6 +26,7 @@ interface AnalyticsHubViewProps {
   selectedSubCategory: AnalyticsSubCategory;
   quickInsights: QuickInsights;
   onCategoryChange: (category: AnalyticsCategory, subCategory?: AnalyticsSubCategory) => void;
+  onAINavigation?: (category: AIAnalyticsCategory) => void;
   onBack?: () => void;
 }
 
@@ -33,6 +35,7 @@ const AnalyticsHubView: React.FC<AnalyticsHubViewProps> = ({
   selectedSubCategory,
   quickInsights,
   onCategoryChange,
+  onAINavigation,
   onBack
 }) => {
   const { t } = useTranslation();
@@ -57,6 +60,7 @@ const AnalyticsHubView: React.FC<AnalyticsHubViewProps> = ({
         {/* Overview Section - Recent Analytics, Recommendations etc. */}
         <AnalyticsOverviewSection 
           onCategoryChange={onCategoryChange}
+          onAINavigation={onAINavigation}
         />
 
         {/* Main Categories Grid */}

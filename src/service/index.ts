@@ -14,6 +14,11 @@ export { financialCalculatorService } from './domain/financial';
 export { compositeCalculatorService } from './domain/financial';
 export { exchangeService } from './domain/financial';
 
+// AI services
+// Note: llmService is deprecated, use modelManager directly instead
+export { modelManager } from './domain/ai';
+export { financialInsightsService } from './domain/ai';
+
 // Analytics services
 export { default as recentActivityService } from './domain/analytics/reporting/recentActivityService';
 

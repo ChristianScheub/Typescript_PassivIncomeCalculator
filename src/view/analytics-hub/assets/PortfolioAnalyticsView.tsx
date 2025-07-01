@@ -28,6 +28,8 @@ interface PortfolioAnalyticsViewProps {
   onBack: () => void;
 }
 
+const safeArray = <T,>(arr: T[] | undefined | null): T[] => Array.isArray(arr) ? arr : [];
+
 const PortfolioAnalyticsView: React.FC<PortfolioAnalyticsViewProps> = ({
   selectedTab,
   selectedAssetType,
@@ -55,21 +57,21 @@ const PortfolioAnalyticsView: React.FC<PortfolioAnalyticsViewProps> = ({
       case 'asset_distribution':
         return (
           <PortfolioDistributionView
-            assetAllocation={assetAllocation}
-            sectorAllocation={sectorAllocation}
-            countryAllocation={countryAllocation}
+            assetAllocation={safeArray(assetAllocation)}
+            sectorAllocation={safeArray(sectorAllocation)}
+            countryAllocation={safeArray(countryAllocation)}
           />
         );
       case 'income_distribution':
         return (
           <IncomeDistributionView
-            assetTypeIncome={assetTypeIncome}
-            sectorIncome={sectorIncome}
-            countryIncome={countryIncome}
+            assetTypeIncome={safeArray(assetTypeIncome)}
+            sectorIncome={safeArray(sectorIncome)}
+            countryIncome={safeArray(countryIncome)}
           />
         );
       case 'custom':
-        return <CustomAnalyticsView filteredPositions={portfolioPositions} />;
+        return <CustomAnalyticsView filteredPositions={safeArray(portfolioPositions)} />;
       default:
         return null;
     }
