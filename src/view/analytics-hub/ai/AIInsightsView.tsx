@@ -53,19 +53,19 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
     return "text-red-600 dark:text-red-400";
   };
 
-  // Extracted variant for Badge
-  const badgeVariant = modelStatus === "loaded"
-    ? "success"
-    : modelStatus === "loading"
-    ? "warning"
-    : "destructive";
+  // Extracted nested ternary operation into an independent statement
+  const badgeVariant = (() => {
+    if (modelStatus === "loaded") return "success";
+    if (modelStatus === "loading") return "warning";
+    return "destructive";
+  })();
 
-  // Extracted button text
-  const buttonText = isGenerating
-    ? t("ai.insights.generating")
-    : insights
-    ? t("ai.insights.regenerate")
-    : t("ai.insights.generate");
+  // Extracted button text logic into an independent statement
+  const buttonText = (() => {
+    if (isGenerating) return t("ai.insights.generating");
+    if (insights) return t("ai.insights.regenerate");
+    return t("ai.insights.generate");
+  })();
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

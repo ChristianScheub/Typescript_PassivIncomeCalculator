@@ -107,15 +107,14 @@ Finanzübersicht:
     // Einfache Strukturierung der AI-Antwort
     const lines = aiResponse.split('\n').filter(line => line.trim());
     
-    // Extrahiere Empfehlungen (Zeilen die mit - oder • beginnen)
+    // Refactored to use RegExp.exec() for better readability and maintainability
     const recommendations = lines
-      .filter(line => line.trim().match(/^[-•*]\s*/))
+      .filter(line => /^[-•*]\s*/.exec(line.trim()))
       .map(line => line.trim().replace(/^[-•*]\s*/, ''))
       .filter(rec => rec.length > 10); // Nur sinnvolle Empfehlungen
 
-    // Hauptinhalt ohne Empfehlungen
     const mainContent = lines
-      .filter(line => !line.trim().match(/^[-•*]\s*/))
+      .filter(line => !/^[-•*]\s*/.exec(line.trim()))
       .join(' ')
       .trim();
 

@@ -127,7 +127,8 @@ export class ModelManager {
     }
 
     // Finde die Benutzer-Frage am Anfang
-    const questionMatch = prompt.match(/^User Question: (.+?)(?=\n|$)/);
+    // Refactored to use RegExp.exec() for better readability and maintainability
+    const questionMatch = /^User Question: (.+?)(?=\n|$)/.exec(prompt);
     const userQuestion = questionMatch ? questionMatch[1] : '';
 
     // Behalte die wichtigsten Teile bei

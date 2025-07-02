@@ -31,6 +31,12 @@ import { executeAsyncOperation } from "@/utils/containerUtils";
 import { showSuccessSnackbar } from "@/store/slices/snackbarSlice";
 import { DividendFrequency } from '@/types/shared/base/enums';
 
+// Type alias for category assignment without system fields
+type CreateCategoryAssignment = Omit<
+  AssetCategoryAssignment,
+  "id" | "createdAt" | "updatedAt"
+>;
+
 // Type for the asset definition data when creating
 // type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
 import { PriceEntry } from "@/ui/dialog/AddPriceEntryDialog";
@@ -84,10 +90,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
 
   // Helper to add category assignments
   const addCategoryAssignments = async (
-    assignments: Omit<
-      AssetCategoryAssignment,
-      "id" | "createdAt" | "updatedAt"
-    >[],
+    assignments: CreateCategoryAssignment[],
     assetId: string
   ) => {
     if (assignments.length > 0 && assetId) {
@@ -105,10 +108,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
 
   const addDefinition = async (
     data: CreateAssetDefinitionData,
-    categoryAssignments: Omit<
-      AssetCategoryAssignment,
-      "id" | "createdAt" | "updatedAt"
-    >[]
+    categoryAssignments: CreateCategoryAssignment[]
   ) => {
     await executeAsyncOperation(
       "add asset definition",
@@ -138,10 +138,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
 
   const updateDefinition = async (
     data: Partial<AssetDefinition>,
-    categoryAssignments: Omit<
-      AssetCategoryAssignment,
-      "id" | "createdAt" | "updatedAt"
-    >[]
+    categoryAssignments: CreateCategoryAssignment[]
   ) => {
     if (!editingDefinition) return;
     await executeAsyncOperation(

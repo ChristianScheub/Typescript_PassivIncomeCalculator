@@ -29,8 +29,9 @@ export class AlphaVantageAPIService implements IStockAPIService {
       if (response.status !== 200) {
         throw new Error(`Alpha Vantage API error! status: ${response.status}`);
       }
-      const quote = response.data["Global Quote"];
-      if (!quote || !quote["05. price"]) {
+      // Refactored to use optional chaining for concise and readable code
+      const quote = response.data?.["Global Quote"];
+      if (!quote?.["05. price"]) {
         throw new Error(`No price data available for ${symbol}`);
       }
       return {

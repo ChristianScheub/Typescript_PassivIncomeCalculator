@@ -147,6 +147,18 @@ export class AIContextService {
     
     const { income, expenses, liabilities, assetFocusData, financialSummary } = financialData;
     
+    function formatIncomeDetails(income: any[]): string {
+      return income.map((inc: any) => `${inc.name || 'Unnamed'}: €${(inc.amount || 0).toLocaleString()}`).join(', ');
+    }
+
+    function formatExpenseDetails(expenses: any[]): string {
+      return expenses.map((exp: any) => `${exp.name || 'Unnamed'}: €${(exp.paymentSchedule?.amount || 0).toLocaleString()}`).join(', ');
+    }
+
+    function formatLiabilityDetails(liabilities: any[]): string {
+      return liabilities.map((lib: any) => `${lib.name || 'Unnamed'}: €${(lib.currentBalance || 0).toLocaleString()}`).join(', ');
+    }
+
     return `User Question: ${userQuestion}
 Background Context:
 
@@ -166,15 +178,15 @@ ${AIContextService.createAssetSummary(assetFocusData)}
 
 Income Sources:
 - Income Streams: ${income.length}
-${income.length > 0 ? `- Income Details: ${income.map((inc: any) => `${inc.name || 'Unnamed'}: €${(inc.amount || 0).toLocaleString()}`).join(', ')}` : ''}
+${income.length > 0 ? `- Income Details: ${formatIncomeDetails(income)}` : ''}
 
 Expenses:
 - Expense Items: ${expenses.length}
-${expenses.length > 0 ? `- Expense Details: ${expenses.map((exp: any) => `${exp.name || 'Unnamed'}: €${(exp.paymentSchedule?.amount || 0).toLocaleString()}`).join(', ')}` : ''}
+${expenses.length > 0 ? `- Expense Details: ${formatExpenseDetails(expenses)}` : ''}
 
 Liabilities:
 - Liability Items: ${liabilities.length}
-${liabilities.length > 0 ? `- Liability Details: ${liabilities.map((lib: any) => `${lib.name || 'Unnamed'}: €${(lib.currentBalance || 0).toLocaleString()}`).join(', ')}` : ''}
+${liabilities.length > 0 ? `- Liability Details: ${formatLiabilityDetails(liabilities)}` : ''}
 
 === END Background Information ===`;
   }
