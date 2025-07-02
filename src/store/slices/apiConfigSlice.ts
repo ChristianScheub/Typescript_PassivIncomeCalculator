@@ -1,9 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { StockAPIProvider } from '@/types/shared/base/enums';
 
-// Type alias for backward compatibility
-export type StockAPIProviderType = StockAPIProvider;
-
 interface ApiConfigState {
   isEnabled: boolean;
   isDividendApiEnabled: boolean; // NEU

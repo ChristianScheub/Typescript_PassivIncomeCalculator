@@ -11,11 +11,8 @@ export interface ExchangeRate {
   source?: string;
 }
 
-// Stock API provider types
-export type StockAPIProvider = 'yahoo' | 'alphavantage' | 'finnhub' | 'mock';
-
 export interface StockAPIConfig {
-  provider: StockAPIProvider;
+  provider: import('@/types/shared/base/enums').StockAPIProvider;
   apiKey?: string;
   baseUrl?: string;
   rateLimit?: number;

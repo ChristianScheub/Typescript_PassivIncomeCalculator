@@ -168,6 +168,13 @@ export const AIChatContainer: React.FC<AIChatContainerProps> = ({ onBack }) => {
     t('ai.chat.suggestions.investment_strategy')
   ];
 
+  // Wrapper function to handle async operation without returning promise
+  const handleSendMessageWrapper = () => {
+    handleSendMessage().catch((error) => {
+      Logger.error('AIChatContainer: Error in handleSendMessage wrapper: ' + error);
+    });
+  };
+
   // Props for the view component - using the updated AIChatViewProps with viewMode
   const viewProps: AIChatViewProps = {
     onBack,
@@ -182,7 +189,7 @@ export const AIChatContainer: React.FC<AIChatContainerProps> = ({ onBack }) => {
     messagesEndRef,
     inputRef,
     onInputChange: setInputValue,
-    onSendMessage: handleSendMessage,
+    onSendMessage: handleSendMessageWrapper,
     onKeyPress: handleKeyPress,
     onClearChat: clearChat,
     onSuggestedQuestionClick: handleSuggestedQuestionClick,

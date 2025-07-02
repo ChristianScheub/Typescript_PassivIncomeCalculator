@@ -4,6 +4,7 @@ import { useAppSelector } from "@/hooks/redux";
 import { useLLMService } from "@/hooks/useLLMService";
 import AIInsightsView from "@/view/analytics-hub/ai/AIInsightsView";
 import type { AIInsightsViewProps } from "@/types/domains/analytics/ai";
+import Logger from "@/service/shared/logging/Logger/logger";
 
 interface AIInsightsContainerProps {
   onBack: () => void;
@@ -117,6 +118,13 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
     }
   };
 
+  // Wrapper function to handle async operation without returning promise
+  const handleGenerateInsightsWrapper = () => {
+    handleGenerateInsights().catch((error) => {
+      Logger.error('AIInsightsContainer: Error in handleGenerateInsights wrapper: ' + error);
+    });
+  };
+
   const viewProps: AIInsightsViewProps = {
     onBack,
     modelStatus,
@@ -127,7 +135,7 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
     financialMetrics,
     netWorth,
     savingsRate,
-    onGenerateInsights: handleGenerateInsights,
+    onGenerateInsights: handleGenerateInsightsWrapper,
   };
 
   return <AIInsightsView {...viewProps} />;

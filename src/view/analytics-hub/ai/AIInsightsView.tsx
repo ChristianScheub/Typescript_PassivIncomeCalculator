@@ -53,6 +53,20 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
     return "text-red-600 dark:text-red-400";
   };
 
+  // Extracted variant for Badge
+  const badgeVariant = modelStatus === "loaded"
+    ? "success"
+    : modelStatus === "loading"
+    ? "warning"
+    : "destructive";
+
+  // Extracted button text
+  const buttonText = isGenerating
+    ? t("ai.insights.generating")
+    : insights
+    ? t("ai.insights.regenerate")
+    : t("ai.insights.generate");
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-4">
@@ -71,13 +85,7 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
               {t("ai.model.status")}:
             </span>{" "}
             <Badge
-              variant={
-                modelStatus === "loaded"
-                  ? "success"
-                  : modelStatus === "loading"
-                  ? "warning"
-                  : "destructive"
-              }
+              variant={badgeVariant}
             >
               {t(`ai.model.states.${modelStatus}`)}
             </Badge>
@@ -284,13 +292,7 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
             <RefreshCw
               className={`h-4 w-4 ${isGenerating ? "animate-spin" : ""}`}
             />
-            <span>
-              {isGenerating
-                ? t("ai.insights.generating")
-                : insights
-                ? t("ai.insights.regenerate")
-                : t("ai.insights.generate")}
-            </span>
+            <span>{buttonText}</span>
           </Button>
         </div>
       </div>

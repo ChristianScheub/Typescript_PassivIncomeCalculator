@@ -7,8 +7,7 @@ import type {
   FinancialInsightResponse 
 } from '@/types/domains/ai';
 import type { RootState } from '@/store';
-import { financialInsightsService } from '@service';
-import { modelManager } from '@service';
+import { financialInsightsService,modelManager } from '@service';
 import Logger from '@service/shared/logging/Logger/logger';
 
 /**

@@ -58,8 +58,7 @@ export class AlphaVantageAPIService implements IStockAPIService {
       if (response.status !== 200) {
         throw new Error(`Alpha Vantage API error! status: ${response.status}`);
       }
-      const meta = response.data["Meta Data"];
-      const series = response.data[`Time Series (${interval})`];
+      const series = response.data?.[`Time Series (${interval})`];
       if (!series) throw new Error('No intraday data found');
       const entries: StockHistoryEntry[] = Object.entries(series).map(([date, values]: [string, any]) => ({
         date: date.split(' ')[0],

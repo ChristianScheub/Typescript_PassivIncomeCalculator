@@ -6,9 +6,9 @@ import { Button } from '@/ui/common/Button';
 import { ButtonGroup } from '@/ui/common/ButtonGroup';
 import { Download, Upload, Key, ChevronRight, Trash, Monitor, Brain } from 'lucide-react';
 import DebugSettings from '@/ui/specialized/DebugSettings';
-import { featureFlag_Debug_Settings_View } from '@featureFlags';
-import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
-import { DashboardMode } from '@/store/slices/dashboardSettingsSlice';
+import { featureFlag_Debug_Settings_View } from '@/config/featureFlags';
+import { StockAPIProvider } from '@/types/shared/base/enums';
+import { DashboardMode } from '@/types/shared/analytics';
 import { ConfirmationDialog } from '@/ui/dialog/ConfirmationDialog';
 import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '@/ui/common/ClearButton';
 import clsx from 'clsx';
@@ -217,6 +217,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   ];
 
   const [selectedStores, setSelectedStores] = useState<string[]>(STORE_OPTIONS.map(opt => opt.key));
+
+  // Move fileInputRef to the top level of the component
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="space-y-6">
@@ -429,32 +432,25 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
             <div className={isSmartphone ? '!w-[10vw] min-w-[48px] max-w-[80px] flex justify-center' : 'relative'} style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}>
               {/* File-Input per Button-Ref triggern */}
-              {(() => {
-                const fileInputRef = useRef<HTMLInputElement>(null);
-                return (
-                  <>
-                    <input
-                      ref={fileInputRef}
-                      id="import-file-input"
-                      type="file"
-                      accept="application/json"
-                      onChange={onImportData}
-                      className="hidden"
-                      disabled={importStatus === 'loading'}
-                    />
-                    <Button
-                      type="button"
-                      disabled={importStatus === 'loading'}
-                      className={`flex items-center space-x-2${isSmartphone ? ' justify-center' : ''}`}
-                      style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}
-                      onClick={() => fileInputRef.current?.click()}
-                    >
-                      <Upload size={16} />
-                      {!isSmartphone && <span>{importButtonText}</span>}
-                    </Button>
-                  </>
-                );
-              })()}
+              <input
+                ref={fileInputRef}
+                id="import-file-input"
+                type="file"
+                accept="application/json"
+                onChange={onImportData}
+                className="hidden"
+                disabled={importStatus === 'loading'}
+              />
+              <Button
+                type="button"
+                disabled={importStatus === 'loading'}
+                className={`flex items-center space-x-2${isSmartphone ? ' justify-center' : ''}`}
+                style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload size={16} />
+                {!isSmartphone && <span>{importButtonText}</span>}
+              </Button>
             </div>
           </div>
           {/* Export Button */}

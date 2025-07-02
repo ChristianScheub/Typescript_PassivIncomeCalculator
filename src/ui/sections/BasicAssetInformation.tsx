@@ -18,21 +18,24 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
 
   // Multi-country state and handlers
   const [multiCountry, setMultiCountry] = useState(false);
-  const [countries, setCountries] = useState([{ country: watch('country') || '', percentage: 100 }]);
+  const [countries, setCountries] = useState([{ id: Date.now(), country: watch('country') || '', percentage: 100 }]);
 
   // Synchronisiere countries, wenn sich das Land im Formular ändert (z.B. durch Reset)
   React.useEffect(() => {
     // Nur wenn nicht multiCountry, damit User-Eingaben nicht überschrieben werden
     if (!multiCountry) {
-      setCountries([{ country: watch('country') || '', percentage: 100 }]);
+      setCountries([{ id: Date.now(), country: watch('country') || '', percentage: 100 }]);
     }
     // eslint-disable-next-line
   }, [watch('country')]);
 
-  const handleCountryChange = (idx: number, field: 'country' | 'percentage', value: string | number) => {
+  const handleCountryChange = (id: number, field: 'country' | 'percentage', value: string | number) => {
     setCountries(prev => {
       const updated = [...prev];
-      updated[idx] = { ...updated[idx], [field]: value };
+      const index = updated.findIndex(country => country.id === id);
+      if (index !== -1) {
+        updated[index] = { ...updated[index], [field]: value };
+      }
       if (!multiCountry && field === 'country') {
         setValue('country', value as string);
       }
@@ -41,11 +44,11 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
   };
 
   const addCountry = () => {
-    setCountries(prev => [...prev, { country: '', percentage: 0 }]);
+    setCountries(prev => [...prev, { id: Date.now(), country: '', percentage: 0 }]);
   };
 
-  const removeCountry = (idx: number) => {
-    setCountries(prev => prev.filter((_, i) => i !== idx));
+  const removeCountry = (id: number) => {
+    setCountries(prev => prev.filter(country => country.id !== id));
   };
 
   const totalPercentage = countries.reduce((sum, c) => sum + (typeof c.percentage === 'number' ? c.percentage : 0), 0);
@@ -116,7 +119,7 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
               label={t("assets.country")}
               name="country"
               value={countries[0]?.country || ''}
-              onChange={v => handleCountryChange(0, 'country', v as string)}
+              onChange={v => handleCountryChange(countries[0].id, 'country', v as string)}
               placeholder={t("assets.countryPlaceholder")}
               error={errors.country?.message}
             />
@@ -142,20 +145,20 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
               />
               <span className="ml-3 text-gray-700 dark:text-gray-300">{t('assets.useMultipleCountries') || 'Mehrere Länder'}</span>
             </div>
-            {countries.map((c, idx) => (
-              <div key={idx} className="flex items-center gap-2 mb-2">
+            {countries.map((c) => (
+              <div key={c.id} className="flex items-center gap-2 mb-2">
                 <StandardFormField
                   label={t('assets.country')}
-                  name={`countries[${idx}].country`}
+                  name={`countries[${c.id}].country`}
                   value={c.country}
-                  onChange={v => handleCountryChange(idx, 'country', v as string)}
+                  onChange={v => handleCountryChange(c.id, 'country', v as string)}
                 />
                 <StandardFormField
                   label={t('assets.percentage')}
-                  name={`countries[${idx}].percentage`}
+                  name={`countries[${c.id}].percentage`}
                   type="number"
                   value={c.percentage}
-                  onChange={v => handleCountryChange(idx, 'percentage', Number(v))}
+                  onChange={v => handleCountryChange(c.id, 'percentage', Number(v))}
                   min={0}
                   max={100}
                 />
@@ -165,7 +168,7 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
                     variant="destructive"
                     size="iconSm"
                     aria-label={t('common.remove')}
-                    onClick={() => removeCountry(idx)}
+                    onClick={() => removeCountry(c.id)}
                   >
                     <span aria-hidden>✕</span>
                   </Button>

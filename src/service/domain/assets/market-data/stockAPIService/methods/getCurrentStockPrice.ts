@@ -1,6 +1,6 @@
 import { StockPrice } from '@/types/domains/assets/';
 import { store } from '@/store';
-import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
+import { StockAPIProvider } from '@/types/shared/base/enums';
 import { FinnhubAPIService } from '../providers/FinnhubAPIService';
 import { YahooAPIService } from '../providers/YahooAPIService';
 import { AlphaVantageAPIService } from '../providers/AlphaVantageAPIService';

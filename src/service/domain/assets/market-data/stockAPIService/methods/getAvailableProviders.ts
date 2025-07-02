@@ -1,4 +1,4 @@
-import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
+import { StockAPIProvider } from '@/types/shared/base/enums';
 
 /**
  * Get available API providers with their configuration status (Redux-driven)

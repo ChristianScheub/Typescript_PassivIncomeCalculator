@@ -161,7 +161,8 @@ export async function refreshAllCaches(): Promise<void> {
         }
         
     } catch (error) {
-        Logger.error("Failed to refresh ALL caches: " + JSON.stringify(error));
-        throw error;
+        const errorMessage = error instanceof Error ? error : new Error(JSON.stringify(error));
+        Logger.error("Failed to refresh ALL caches: " + errorMessage.message);
+        throw errorMessage;
     }
 }

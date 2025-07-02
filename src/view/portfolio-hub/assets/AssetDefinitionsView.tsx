@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AssetDefinition } from "@/types/domains/assets";
 import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
 import { ViewHeader } from "@/ui/layout/ViewHeader";
 import { Plus,Wallet, RefreshCw, History } from "lucide-react";
@@ -11,7 +10,7 @@ import { TimeRangeSelectionDialog } from "@/ui/dialog/TimeRangeSelectionDialog";
 import { TimeRangePeriod } from "@/types/shared/time";
 import { AddPriceEntryDialog, PriceEntry } from "@/ui/dialog/AddPriceEntryDialog";
 import { SwipeableCard } from "@/ui/common/SwipeableCard";
-import { CreateAssetDefinitionData } from '@/types/domains/assets';
+import { CreateAssetDefinitionData,AssetDefinition } from '@/types/domains/assets';
 import { CreateAssetCategoryAssignmentData } from '@/types/domains/assets/categories';
 import { AssetDefinitionForm } from "@/view/shared/forms/AssetDefinitionForm";
 

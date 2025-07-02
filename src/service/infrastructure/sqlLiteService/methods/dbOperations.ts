@@ -1,3 +1,4 @@
+import Logger from '@/service/shared/logging/Logger/logger';
 import { StoreNames, FinanceDB } from '../interfaces/ISQLiteService';
 import { initDatabase } from './initDatabase';
 
@@ -28,28 +29,7 @@ export const dbOperations = {
       console.log('[DB UPDATE] Success:', result);
       return result;
     } catch (error) {
-      // Log full error object and all properties
-      // eslint-disable-next-line no-console
-      let errorString = '';
-      if (typeof error === 'object' && error !== null) {
-        try {
-          errorString = JSON.stringify(error);
-        } catch {
-          errorString = error?.toString ? error.toString() : String(error);
-        }
-      } else {
-        errorString = String(error);
-      }
-      console.error('[DB UPDATE ERROR]', {
-        error,
-        errorString,
-        errorJSON: (() => { try { return JSON.stringify(error); } catch { return undefined; } })(),
-        errorStack: (error as any)?.stack,
-        errorKeys: (typeof error === 'object' && error !== null) ? Object.keys(error) : undefined,
-        item,
-        itemKeys: Object.keys(item),
-        storeName
-      });
+      Logger.errorStack('[DB UPDATE ERROR]', error instanceof Error ? error : new Error(String(error)));
       throw error;
     }
   },

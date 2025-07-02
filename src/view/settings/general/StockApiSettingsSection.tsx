@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/ui/common/Button';
 import { Eye, EyeOff } from 'lucide-react';
-import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
+import { StockAPIProvider } from '@/types/shared/base/enums';
 
 interface StockApiSettingsSectionProps {
   providerInfo: Record<StockAPIProvider, {

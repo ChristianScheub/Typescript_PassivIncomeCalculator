@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { setApiEnabled, setDividendApiEnabled, setApiKey, setSelectedProvider, StockAPIProvider, setSelectedDiviProvider, setDividendApiKey } from "@/store/slices/apiConfigSlice";
-import { setDashboardMode, DashboardMode, loadDashboardSettingsFromStorage } from "@/store/slices/dashboardSettingsSlice";
+import { setApiEnabled, setDividendApiEnabled, setApiKey, setSelectedProvider, setSelectedDiviProvider, setDividendApiKey } from "@/store/slices/apiConfigSlice";
+import { setDashboardMode, loadDashboardSettingsFromStorage } from "@/store/slices/dashboardSettingsSlice";
 import { clearAllTransactions } from "@/store/slices/transactionsSlice";
 import { clearAllExpenses } from "@/store/slices/expensesSlice";
 import { clearAllIncome } from "@/store/slices/incomeSlice";
@@ -21,6 +21,8 @@ import { ConfirmationDialogState } from "@/ui/dialog/types";
 import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/snackbarSlice';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 import { clearAllLiabilities } from "@/store/slices/liabilitiesSlice";
+import { DashboardMode } from "@/types/shared/analytics";
+import { StockAPIProvider } from '@/types/shared/base/enums';
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";
 type AsyncOperationStatus = "idle" | "loading" | "success" | "error";
