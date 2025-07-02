@@ -21,7 +21,8 @@ import { useAppInitialization } from './hooks/useAppInitialization';
 import { useAutoPortfolioHistoryUpdate } from './hooks/useAutoPortfolioHistoryUpdate';
 import { ErrorScreenAppStart } from '@/ui/appStart/appStartError';
 import { LoadingScreenAppStart } from '@/ui/appStart/appStartLoading';
-import GlobalSnackbar from './ui/components/GlobalSnackbar';
+import GlobalSnackbar from '@/ui/components/GlobalSnackbar';
+import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 
 // Main App Content with initialization check
 const AppContent = () => {
@@ -41,7 +42,7 @@ const AppContent = () => {
   }
 
   // Detect if mobile view (could be enhanced with a proper hook)
-  const isMobile = window.innerWidth < 768;
+  const isMobile = useDeviceCheck();
   const Layout = isMobile ? MobileLayout : DesktopLayout;
 
   return (

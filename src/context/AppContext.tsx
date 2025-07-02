@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
 
 type Theme = 'light' | 'dark';
 
@@ -12,7 +13,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setTheme] = useState<Theme>('light');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const isDesktop = useDeviceCheck();
+  const isMobile = !isDesktop;
 
   // Theme toggler
   const toggleTheme = () => {
@@ -40,16 +42,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setTheme('dark');
       document.documentElement.classList.add('dark');
     }
-  }, []);
-
-  // Responsive detection
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const value = useMemo(() => ({
