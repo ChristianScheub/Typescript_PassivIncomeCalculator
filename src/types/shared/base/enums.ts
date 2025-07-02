@@ -40,3 +40,12 @@ export type ProcessingStatus = 'idle' | 'loading' | 'success' | 'error';
 export type Theme = 'light' | 'dark' | 'auto';
 export type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type Variant = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
+
+// API Provider enums
+export enum StockAPIProvider {
+  FINNHUB = 'finnhub',
+  YAHOO = 'yahoo',
+  ALPHA_VANTAGE = 'alpha_vantage'
+}
+
+export type DividendApiProvider = 'yahoo' | 'finnhub';

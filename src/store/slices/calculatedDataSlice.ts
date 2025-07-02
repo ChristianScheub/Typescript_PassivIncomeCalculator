@@ -5,11 +5,9 @@ import portfolioHistoryService from '@/service/domain/portfolio/history/portfoli
 import assetFocusService from '@/service/domain/dashboard/assetFocusService';
 import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
-import { AssetFocusTimeRange } from './dashboardSettingsSlice';
 import { generatePortfolioInputHash, simpleHash } from '@/utils/hashUtils';
 import { isFinancialSummaryAllZero } from '@/utils/isFinancialSummaryValid';
-
-// Types for cached data
+import { AssetFocusTimeRange } from '@/types/shared/analytics';
 export interface CachedPortfolioHistory {
   timeRange: AssetFocusTimeRange;
   data: PortfolioHistoryPoint[];

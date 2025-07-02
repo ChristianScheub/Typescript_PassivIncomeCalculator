@@ -7,17 +7,7 @@ export type ChartType = 'pie' | 'bar' | 'line';
 export type AnalyticsDataSource = 'assetValue' | 'income' | 'growth'; // Renamed to avoid conflict
 export type GroupBy = 'assetType' | 'sector' | 'country' | 'category' | 'categoryOptions' | 'specificCategory' | 'assetDefinition';
 
-export interface CustomAnalyticsConfig {
-  id: string;
-  name: string;
-  chartType: ChartType;
-  dataSource: AnalyticsDataSource;
-  groupBy: GroupBy;
-  specificCategoryId?: string; // Only used when groupBy is 'specificCategory'
-  filters?: Record<string, unknown>;
-  isActive: boolean;
-  sortOrder: number;
-}
+
 
 // Financial summary for analytics
 export interface FinancialSummary {

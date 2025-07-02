@@ -1,8 +1,10 @@
 /**
  * Theme hook types
+ * Re-exports the main Theme type for consistency
  */
 
-export type Theme = 'light' | 'dark';
+import type { Theme } from '../base/enums';
+export type { Theme } from '../base/enums';
 
 export interface ThemeConfig {
   theme: Theme;

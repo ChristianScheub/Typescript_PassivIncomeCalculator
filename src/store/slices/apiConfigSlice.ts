@@ -1,10 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export enum StockAPIProvider {
-  FINNHUB = 'finnhub',
-  YAHOO = 'yahoo',
-  ALPHA_VANTAGE = 'alpha_vantage'
-}
+import { StockAPIProvider } from '@/types/shared/base/enums';
 
 // Type alias for backward compatibility
 export type StockAPIProviderType = StockAPIProvider;

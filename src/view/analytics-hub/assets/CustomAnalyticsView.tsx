@@ -10,9 +10,10 @@ import {
   updateChart, 
   removeChart, 
   openConfigPanel, 
-  closeConfigPanel,
-  ChartType, CustomAnalyticsConfig, DataSource, GroupBy
+  closeConfigPanel
 } from '@/store/slices/customAnalyticsSlice';
+import { CustomAnalyticsConfig } from '@/types/domains/analytics/charts';
+import { ChartType, DataSource, GroupBy } from '@/types/shared/analytics';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { 
   AllocationData, 

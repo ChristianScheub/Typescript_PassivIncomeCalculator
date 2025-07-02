@@ -29,6 +29,7 @@ import { TimeRangePeriod } from "@/types/shared/time";
 import { deepCleanObject } from "@/utils/deepCleanObject";
 import { executeAsyncOperation } from "@/utils/containerUtils";
 import { showSuccessSnackbar } from "@/store/slices/snackbarSlice";
+import { DividendFrequency } from '@/types/shared/base/enums';
 
 // Type for the asset definition data when creating
 // type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
@@ -39,18 +40,6 @@ import { calculatePortfolioIntradayDataDirect } from "@/store/slices/portfolioIn
 interface AssetDefinitionsContainerProps {
   onBack?: () => void;
 }
-
-// Type alias for asset types
-export type AssetTypeAlias =
-  | "stock"
-  | "real_estate"
-  | "bond"
-  | "cash"
-  | "crypto"
-  | "other";
-
-// Type alias for dividend frequency
-export type DividendFrequency = "monthly" | "quarterly" | "annually" | "custom";
 
 const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   onBack,

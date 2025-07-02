@@ -1,13 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
-
-type Theme = 'light' | 'dark';
-
-interface AppContextType {
-  theme: Theme;
-  toggleTheme: () => void;
-  isMobile: boolean;
-}
+import { Theme } from '@/types/shared/base/enums';
+import { AppContextType } from '@/types/shared/ui/context';
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 

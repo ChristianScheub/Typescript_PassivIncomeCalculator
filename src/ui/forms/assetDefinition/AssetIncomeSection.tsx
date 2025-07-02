@@ -5,9 +5,7 @@ import { Toggle } from "../../common/Toggle";
 import { StandardFormField } from "../StandardFormWrapper";
 import { CustomAmountsSection } from "../../specialized/CustomAmountsSection";
 import { MonthSelector } from "../MonthSelector";
-
-// Definiere einen Typ für die erlaubten Frequenzen
-type PaymentFrequencyType = "monthly" | "quarterly" | "annually" | "custom" | "none";
+import { PaymentFrequency } from '@/types/shared/base/enums';
 
 interface AssetIncomeSectionProps {
   type: "dividend" | "rental";
@@ -15,8 +13,8 @@ interface AssetIncomeSectionProps {
   onHasIncomeChange: (checked: boolean) => void;
   amount: number | undefined;
   onAmountChange: (value: number) => void;
-  frequency: PaymentFrequencyType | undefined;
-  onFrequencyChange: (value: PaymentFrequencyType) => void;
+  frequency: PaymentFrequency | undefined;
+  onFrequencyChange: (value: PaymentFrequency) => void;
   paymentMonths: number[];
   onPaymentMonthChange: (month: number, checked: boolean) => void;
   customAmounts: Record<string, number>;
@@ -108,7 +106,7 @@ export const AssetIncomeSection: React.FC<AssetIncomeSectionProps> = ({
                 { value: "custom", label: t("paymentFrequency.custom") },
               ]}
               value={frequency}
-              onChange={(value) => onFrequencyChange(value as PaymentFrequencyType)}
+              onChange={(value) => onFrequencyChange(value as PaymentFrequency)}
             />
           </div>
 

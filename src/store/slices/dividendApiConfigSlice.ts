@@ -1,6 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export type DividendApiProvider = 'yahoo' | 'finnhub';
+import { DividendApiProvider } from '@/types/shared/base/enums';
 
 interface DividendApiConfigState {
   enabled: boolean;

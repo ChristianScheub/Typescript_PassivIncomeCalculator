@@ -1,10 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { DashboardMode, AssetFocusTimeRange } from '@/types/shared/analytics';
 
 // Simple logger for debugging
 const log = (message: string) => console.log(`[DashboardSettings] ${message}`);
-
-export type DashboardMode = 'smartSummary' | 'assetFocus';
-export type AssetFocusTimeRange = '1D' | '1W' | '1M' | '3M' | '1Y' | 'ALL';
 
 interface DashboardSettingsState {
   mode: DashboardMode;

@@ -88,3 +88,12 @@ export interface RechartsDotProps {
   r: number;
   payload?: unknown;
 }
+
+// Chart types for custom analytics
+export type ChartType = 'pie' | 'bar' | 'line' | 'donut' | 'area';
+export type DataSource = 'assetValue' | 'income' | 'growth';
+export type GroupBy = 'assetType' | 'sector' | 'country' | 'category' | 'categoryOptions' | 'specificCategory' | 'assetDefinition';
+
+// Dashboard types
+export type DashboardMode = 'smartSummary' | 'assetFocus';
+export type AssetFocusTimeRange = '1D' | '1W' | '1M' | '3M' | '1Y' | 'ALL';

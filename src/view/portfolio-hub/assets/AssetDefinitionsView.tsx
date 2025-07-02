@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AssetCategoryAssignment } from "@/types/domains/assets/categories";
 import { AssetDefinition } from "@/types/domains/assets";
 import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
 import { ViewHeader } from "@/ui/layout/ViewHeader";
@@ -13,9 +12,8 @@ import { TimeRangePeriod } from "@/types/shared/time";
 import { AddPriceEntryDialog, PriceEntry } from "@/ui/dialog/AddPriceEntryDialog";
 import { SwipeableCard } from "@/ui/common/SwipeableCard";
 import { CreateAssetDefinitionData } from '@/types/domains/assets';
+import { CreateAssetCategoryAssignmentData } from '@/types/domains/assets/categories';
 import { AssetDefinitionForm } from "@/view/shared/forms/AssetDefinitionForm";
-
-type CreateCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
 
 interface AssetDefinitionsViewProps {
   assetDefinitions: AssetDefinition[];
@@ -36,11 +34,11 @@ interface AssetDefinitionsViewProps {
   onBack?: () => void;
   onAddDefinitionWithCategories?: (
     data: CreateAssetDefinitionData,
-    categoryAssignments: CreateCategoryAssignmentData[]
+    categoryAssignments: CreateAssetCategoryAssignmentData[]
   ) => void;
   onUpdateDefinitionWithCategories?: (
     data: AssetDefinition,
-    categoryAssignments: CreateCategoryAssignmentData[]
+    categoryAssignments: CreateAssetCategoryAssignmentData[]
   ) => void;
   onAddPriceEntry?: (definitionId: string, entry: PriceEntry) => void;
   onFetchDividendsFromApi?: (definition: AssetDefinition) => void;

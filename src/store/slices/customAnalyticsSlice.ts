@@ -1,20 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-
-export type ChartType = 'pie' | 'bar' | 'line';
-export type DataSource = 'assetValue' | 'income' | 'growth';
-export type GroupBy = 'assetType' | 'sector' | 'country' | 'category' | 'categoryOptions' | 'specificCategory' | 'assetDefinition';
-
-export interface CustomAnalyticsConfig {
-  id: string;
-  chartType: ChartType;
-  dataSource: DataSource;
-  groupBy: GroupBy;
-  title: string;
-  selectedCategoryId?: string;
-  selectedCategoryOptionId?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { CustomAnalyticsConfig } from '@/types/domains/analytics/charts';
 
 interface CustomAnalyticsState {
   charts: CustomAnalyticsConfig[];

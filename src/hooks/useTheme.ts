@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Theme } from '@/types/shared/hooks/theme';
+import { Theme } from '@/types/shared/base/enums';
 
 export const useTheme = () => {
   const [theme, setTheme] = useState<Theme>(() => {
