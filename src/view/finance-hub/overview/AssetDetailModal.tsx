@@ -1,10 +1,10 @@
 import React from 'react';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
-import { AssetDetailView } from '../../portfolio-hub/assets/AssetDetailView';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { formatService } from '@/service';
 import { DividendFrequency } from '@/types/shared/base/enums';
 import { useAppSelector } from '@/hooks/redux';
+import { AssetDetailView } from '@/view/portfolio-hub/assets/AssetDetailView';
 
 interface AssetDetailModalProps {
   asset: Asset | null;

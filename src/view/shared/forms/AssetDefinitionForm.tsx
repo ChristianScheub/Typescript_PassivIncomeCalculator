@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AssetDefinition, AssetCategoryAssignment } from "@/types/domains/assets";
 import { AssetType, DividendFrequency, PaymentFrequency } from "@/types/shared/base/enums";
-import { updateAssetDefinitionPrice } from "../../../utils/priceHistoryUtils";
+import { SectorAllocation } from "@/types/domains/portfolio/allocations";
+import { updateAssetDefinitionPrice } from "@/utils/priceHistoryUtils";
 import {
   StandardFormWrapper,
   OptionalSection,
@@ -108,9 +109,9 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
   const [categoryAssignments, setCategoryAssignments] = useState<
     Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">[]
   >([]);
-  const [sectors, setSectors] = useState<
-    { sectorName: string; percentage: number }[]
-  >([{ sectorName: "", percentage: 100 }]);
+  const [sectors, setSectors] = useState<SectorAllocation[]>([
+    { sector: "", sectorName: "", percentage: 100, value: 0, count: 0 }
+  ]);
 
   // Get category data from Redux store
   const {
@@ -257,13 +258,23 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
 
   const updateSector = (
     index: number,
-    field: "sectorName" | "percentage",
+    field: "sector" | "percentage",
     value: string | number
   ) => {
     const newSectors = [...sectors];
-    newSectors[index] = { ...newSectors[index], [field]: value };
+    if (field === "sector") {
+      newSectors[index] = { 
+        ...newSectors[index], 
+        sector: value as string,
+        sectorName: value as string // Keep both for compatibility
+      };
+    } else if (field === "percentage") {
+      newSectors[index] = { 
+        ...newSectors[index], 
+        percentage: value as number
+      };
+    }
     setSectors(newSectors);
-    setValue("sectors", newSectors);
   };
 
   // Reset form when editingDefinition changes
@@ -271,14 +282,18 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     if (editingDefinition) {
       // Initialize sectors state based on editing definition
       if (editingDefinition.sectors && editingDefinition.sectors.length > 0) {
-        // Convert SectorAllocation to local state format
+        // Convert SectorAllocation to proper SectorAllocation format
         const convertedSectors = editingDefinition.sectors.map(sector => ({
+          sector: sector.sector || sector.sectorName || "",
           sectorName: sector.sectorName || sector.sector || "",
-          percentage: sector.percentage
+          percentage: sector.percentage,
+          value: sector.value || 0,
+          count: sector.count || 0,
+          color: sector.color
         }));
         setSectors(convertedSectors);
       } else {
-        setSectors([{ sectorName: "", percentage: 100 }]);
+        setSectors([{ sector: "", sectorName: "", percentage: 100, value: 0, count: 0 }]);
       }
 
       // Reset form with editing definition data
@@ -336,7 +351,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       reset(resetData);
     } else {
       // Reset to default values when not editing
-      setSectors([{ sectorName: "", percentage: 100 }]);
+      setSectors([{ sector: "", sectorName: "", percentage: 100, value: 0, count: 0 }]);
       reset({
         type: "stock",
         riskLevel: "medium",
@@ -523,7 +538,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     // Submit the form and reset state
     onSubmit(finalDefinitionData, categoryAssignments);
     reset();
-    setSectors([{ sectorName: "", percentage: 100 }]);
+    setSectors([{ sector: "", sectorName: "", percentage: 100, value: 0, count: 0 }]);
     setCategoryAssignments([]);
     onClose();
   };

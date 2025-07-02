@@ -4,7 +4,7 @@ import { getCachedDividendData } from "@/utils/dividendCacheUtils";
 import {
   calculateDividendSchedule,
   calculateDividendForMonth,
-} from "../../domain/financial/income/incomeCalculatorService/methods/calculatePayment";
+} from "@/service/domain/financial/income/incomeCalculatorService/methods/calculatePayment";
 import { getCurrentQuantity } from "@/utils/transactionCalculations";
 
 // Helper: Stock dividend calculation with breakdown

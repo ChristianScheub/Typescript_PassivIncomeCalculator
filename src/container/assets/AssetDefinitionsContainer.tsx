@@ -33,7 +33,7 @@ import { showSuccessSnackbar } from "@/store/slices/snackbarSlice";
 // Type for the asset definition data when creating
 // type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
 import { PriceEntry } from "@/ui/dialog/AddPriceEntryDialog";
-import { addPriceToHistory } from "../../utils/priceHistoryUtils";
+import { addPriceToHistory } from "@/utils/priceHistoryUtils";
 import { calculatePortfolioIntradayDataDirect } from "@/store/slices/portfolioIntradaySlice";
 
 interface AssetDefinitionsContainerProps {

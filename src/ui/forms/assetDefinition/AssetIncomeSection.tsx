@@ -3,8 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Card } from "../../common/Card";
 import { Toggle } from "../../common/Toggle";
 import { StandardFormField } from "../StandardFormWrapper";
-import { MonthSelector } from "../../forms/MonthSelector";
 import { CustomAmountsSection } from "../../specialized/CustomAmountsSection";
+import { MonthSelector } from "../MonthSelector";
 
 // Definiere einen Typ für die erlaubten Frequenzen
 type PaymentFrequencyType = "monthly" | "quarterly" | "annually" | "custom" | "none";
@@ -83,7 +83,7 @@ export const AssetIncomeSection: React.FC<AssetIncomeSectionProps> = ({
               name={`${type}Amount`}
               type="number"
               value={amount}
-              onChange={onAmountChange}
+              onChange={(value) => onAmountChange(typeof value === 'number' ? value : parseFloat(String(value)) || 0)}
               step={0.01}
               min={0}
             />
@@ -108,7 +108,7 @@ export const AssetIncomeSection: React.FC<AssetIncomeSectionProps> = ({
                 { value: "custom", label: t("paymentFrequency.custom") },
               ]}
               value={frequency}
-              onChange={onFrequencyChange}
+              onChange={(value) => onFrequencyChange(value as PaymentFrequencyType)}
             />
           </div>
 

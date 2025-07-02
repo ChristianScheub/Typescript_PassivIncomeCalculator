@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AssetCategoryAssignment } from "@/types/domains/assets/categories";
 import { AssetDefinition } from "@/types/domains/assets";
-import { AssetDefinitionForm } from "../../shared/forms/AssetDefinitionForm";
 import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
 import { ViewHeader } from "@/ui/layout/ViewHeader";
 import { Plus,Wallet, RefreshCw, History } from "lucide-react";
@@ -14,6 +13,7 @@ import { TimeRangePeriod } from "@/types/shared/time";
 import { AddPriceEntryDialog, PriceEntry } from "@/ui/dialog/AddPriceEntryDialog";
 import { SwipeableCard } from "@/ui/common/SwipeableCard";
 import { CreateAssetDefinitionData } from '@/types/domains/assets';
+import { AssetDefinitionForm } from "@/view/shared/forms/AssetDefinitionForm";
 
 type CreateCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
 

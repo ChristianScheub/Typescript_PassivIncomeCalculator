@@ -6,7 +6,7 @@ import { formatService } from '@service';
 import { PriceHistoryView } from '@/ui/components/PriceHistoryView';
 import { PriceChart } from '@/ui/components/PriceChart';
 import { DividendHistoryView } from '@/ui/components/DividendHistoryView';
-import { featureFlag_Debug_View } from '../../../config/featureFlags';
+import { featureFlag_Debug_View } from '@featureFlags';
 import { IconButton } from '@/ui/common';
 
 interface AssetDetailViewProps {

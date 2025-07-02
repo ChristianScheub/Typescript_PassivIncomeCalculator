@@ -1,6 +1,6 @@
-import sqliteService from '../../../../../infrastructure/sqlLiteService';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { refreshExchangeRateMethod } from './refreshExchangeRate';
+import sqliteService from "@/service/infrastructure/sqlLiteService";
 
 /**
  * Get today's USD to EUR exchange rate

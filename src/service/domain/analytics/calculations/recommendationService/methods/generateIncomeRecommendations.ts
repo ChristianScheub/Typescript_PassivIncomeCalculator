@@ -1,8 +1,8 @@
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
 import { Income } from '@/types/domains/financial/';
-import calculatorService from '../../../../financial/calculations/compositeCalculatorService';
-import Logger from '../../../../../shared/logging/Logger/logger';
+import { calculatorService } from '@/service/';
 import { PortfolioRecommendation } from '@/types/domains/analytics';
+import Logger from '@/service/shared/logging/Logger/logger';
 
 export const generateIncomeRecommendations = (
   assets: Asset[],

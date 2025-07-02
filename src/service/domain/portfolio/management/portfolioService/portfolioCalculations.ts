@@ -5,7 +5,7 @@ import Logger from "@/service/shared/logging/Logger/logger";
 import { calculatorService } from '../../../../index';
 import { getCurrentQuantity, getCurrentValue } from '@/utils/transactionCalculations';
 import { formatCurrency } from '../../../../infrastructure/formatService/methods/formatCurrency';
-import { formatPercentage } from '../../../../infrastructure/formatService/methods/formatPercentage';
+import { formatPercentage } from '@/service/infrastructure/formatService/methods/formatPercentage';
 
 export const calculatePortfolioPositions = (
   assets: Asset[],
@@ -117,7 +117,7 @@ export const calculatePortfolioPositions = (
       name: assetDefinition?.fullName || firstTransaction.name,
       ticker: assetDefinition?.ticker,
       type: assetDefinition?.type || firstTransaction.type,
-      sector: assetDefinition?.sector,
+      sectors: assetDefinition?.sectors?.map(sectorAllocation => sectorAllocation.sector),
       country: assetDefinition?.country,
       
       totalQuantity,

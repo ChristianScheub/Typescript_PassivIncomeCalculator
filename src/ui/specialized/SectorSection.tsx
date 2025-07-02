@@ -2,13 +2,13 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { OptionalSection } from "../forms/StandardFormWrapper";
 import { UseFormSetValue } from "react-hook-form";
-import { SectorAllocation } from "../../types";
+import { SectorAllocation } from "@/types/domains/portfolio/allocations";
 
 interface SectorSectionProps {
   setValue: UseFormSetValue<any>;
   sectors: SectorAllocation[];
   setSectors: (sectors: SectorAllocation[]) => void;
-  updateSector: (index: number, field: "sectorName" | "percentage", value: string | number) => void;
+  updateSector: (index: number, field: "sector" | "percentage", value: string | number) => void;
 }
 
 export const SectorSection: React.FC<SectorSectionProps> = ({
@@ -20,7 +20,7 @@ export const SectorSection: React.FC<SectorSectionProps> = ({
   const { t } = useTranslation();
 
   const addSector = () => {
-    const newSectors = [...sectors, { sectorName: "", percentage: 0 }];
+    const newSectors = [...sectors, { sector: "", value: 0, percentage: 0, count: 0 }];
     setSectors(newSectors);
     setValue("sectors", newSectors);
   };
@@ -42,7 +42,7 @@ export const SectorSection: React.FC<SectorSectionProps> = ({
     <OptionalSection title={t("assets.sectors")}>
       <div className="space-y-4">
         {sectors.map((sector: SectorAllocation, index: number) => (
-          <div key={`sector-${sector.sectorName}-${index}`} className="space-y-3">
+          <div key={`sector-${sector.sector}-${index}`} className="space-y-3">
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                 {t("assets.sectorName")} {index + 1}
@@ -50,8 +50,8 @@ export const SectorSection: React.FC<SectorSectionProps> = ({
               <input
                 type="text"
                 placeholder={t("assets.sectorPlaceholder")}
-                value={sector.sectorName}
-                onChange={(e) => updateSector(index, "sectorName", e.target.value)}
+                value={sector.sector}
+                onChange={(e) => updateSector(index, "sector", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               />
             </div>

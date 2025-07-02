@@ -6,7 +6,7 @@ import { Button } from '@/ui/common/Button';
 import { ButtonGroup } from '@/ui/common/ButtonGroup';
 import { Download, Upload, Key, ChevronRight, Trash, Monitor, Brain } from 'lucide-react';
 import DebugSettings from '@/ui/specialized/DebugSettings';
-import { featureFlag_Debug_Settings_View } from '../../../config/featureFlags';
+import { featureFlag_Debug_Settings_View } from '@featureFlags';
 import { StockAPIProvider } from '@/store/slices/apiConfigSlice';
 import { DashboardMode } from '@/store/slices/dashboardSettingsSlice';
 import { ConfirmationDialog } from '@/ui/dialog/ConfirmationDialog';
@@ -15,8 +15,8 @@ import clsx from 'clsx';
 import { Toggle } from '@/ui/common/Toggle';
 import { DividendApiSettingsSection } from './DividendApiSettingsSection';
 import { StockApiSettingsSection } from './StockApiSettingsSection';
-import { AISettingsContainer } from '../../../container/settings/AISettingsContainer';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
+import { AISettingsContainer } from '@/container/settings/AISettingsContainer';
 
 interface ProviderInfo {
   name: string;

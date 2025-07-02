@@ -1,7 +1,7 @@
 import { Transaction as Asset } from '@/types/domains/assets/';
 import { Income, Expense, Liability } from '@/types/domains/financial/';
-import calculatorService from '../../../../financial/calculations/compositeCalculatorService';
 import { PortfolioRecommendation } from '@/types/domains/analytics';
+import { calculatorService } from '@/service';
 
 export const generatePlanningRecommendations = (
   assets: Asset[],

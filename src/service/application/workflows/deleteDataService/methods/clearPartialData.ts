@@ -4,7 +4,7 @@ import { clearAllLiabilities } from '@/store/slices/liabilitiesSlice';
 import { clearAllExpenses } from '@/store/slices/expensesSlice';
 import { clearAllIncome } from '@/store/slices/incomeSlice';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { StoreNames } from '../../../../infrastructure/sqlLiteService';
+import { StoreNames } from '@/types/domains/database';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';
 
 export async function clearPartialData(): Promise<void> {

@@ -4,7 +4,7 @@ import formatService from "@/service/infrastructure/formatService";
 import {
   getHighestMilestone,
   getMilestoneKey,
-} from "../../utils/milestoneUtils";
+} from "@/utils/milestoneUtils";
 import "./milestones.css";
 
 interface TotalExpenseCoverageProps {

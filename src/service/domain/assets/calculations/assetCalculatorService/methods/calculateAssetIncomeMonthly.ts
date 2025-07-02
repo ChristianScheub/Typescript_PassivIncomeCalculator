@@ -1,8 +1,8 @@
-import { Asset } from "..'@/types/domains/assets/entities";
+import { Asset } from "@/types/domains/assets/entities";
 import Logger from "@/service/shared/logging/Logger/logger";
 import {
   calculateDividendForMonth,
-} from "../../../../financial/income/incomeCalculatorService/methods/calculatePayment";
+} from "@/service/domain/financial/income/incomeCalculatorService/methods/calculatePayment";
 import { getCachedDividendData } from "@/utils/dividendCacheUtils";
 import { getCurrentQuantity } from "@/utils/transactionCalculations";
 import { calculateAssetMonthlyIncome } from "./calculateAssetIncomeCore";

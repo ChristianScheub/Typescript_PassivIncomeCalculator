@@ -1,7 +1,7 @@
 import { Transaction as Asset } from "@/types/domains/assets/entities";
-import { calculateAssetMonthlyIncomeWithCache } from "../../../../../shared/calculations/assetIncomeCalculations";
-import { calculateTotalAssetIncomeForMonthFromCache } from "../../../../../shared/cache/assetIncomeCacheUtils";
 import Logger from "@/service/shared/logging/Logger/logger";
+import { calculateAssetMonthlyIncomeWithCache } from "@/service/shared/calculations/assetIncomeCalculations";
+import { calculateTotalAssetIncomeForMonthFromCache } from "@/service/shared/cache/assetIncomeCacheUtils";
 
 // New function to calculate total asset income for a specific month with cache
 export const calculateTotalAssetIncomeForMonthWithCache = (

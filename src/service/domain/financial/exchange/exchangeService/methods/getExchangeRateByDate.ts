@@ -1,4 +1,4 @@
-import sqliteService from '../../../../../infrastructure/sqlLiteService';
+import sqliteService from "@/service/infrastructure/sqlLiteService";
 import Logger from "@/service/shared/logging/Logger/logger";
 
 /**

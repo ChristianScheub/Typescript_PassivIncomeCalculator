@@ -1,8 +1,8 @@
 import { store } from '@/store';
 import { invalidatePortfolioCache } from '@/store/slices/transactionsSlice';
 import Logger from "@/service/shared/logging/Logger/logger";
-import sqliteService from '../../../../infrastructure/sqlLiteService';
 import { clearPortfolioHistory } from './clearPortfolioHistory';
+import sqliteService from '@/service/infrastructure/sqlLiteService';
 
 export async function clearPriceHistory(): Promise<void> {
     Logger.infoService("Starting to clear price history");

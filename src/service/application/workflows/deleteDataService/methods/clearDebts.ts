@@ -1,8 +1,8 @@
 import { store } from '@/store';
 import { clearAllLiabilities } from '@/store/slices/liabilitiesSlice';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { StoreNames } from '../../../../infrastructure/sqlLiteService';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';
+import { StoreNames } from '@/types/domains/database';
 
 export async function clearDebts(): Promise<void> {
     Logger.infoService("Starting to clear debts");

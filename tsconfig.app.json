@@ -22,6 +22,7 @@
       "@container/*": ["src/container/*"],
       "@view/*": ["src/view/*"],
       "@hooks/*": ["src/hooks/*"],
+      "@featureFlags/*": ["src/config/featureFlags/*"],
     },
 
     /* Bundler mode */

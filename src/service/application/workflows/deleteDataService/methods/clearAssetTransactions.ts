@@ -1,7 +1,7 @@
 import { store } from '@/store';
 import { clearAllTransactions, invalidatePortfolioCache } from '@/store/slices/transactionsSlice';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { StoreNames } from '../../../../infrastructure/sqlLiteService';
+import { StoreNames } from '@/types/domains/database';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';
 
 export async function clearAssetTransactions(): Promise<void> {

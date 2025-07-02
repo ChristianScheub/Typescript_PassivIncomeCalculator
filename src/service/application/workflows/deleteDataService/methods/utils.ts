@@ -1,5 +1,6 @@
-import sqliteService, { StoreNames } from '../../../../infrastructure/sqlLiteService';
+import sqliteService from "@/service/infrastructure/sqlLiteService";
 import Logger from "@/service/shared/logging/Logger/logger";
+import { StoreNames } from "@/types/domains/database";
 
 export async function clearSQLiteStores(stores: StoreNames[]): Promise<void> {
     for (const store of stores) {

@@ -1,11 +1,11 @@
 import { AssetDefinition } from "@/types/domains/assets";
 import Logger from "@/service/shared/logging/Logger/logger";
-import stockAPIService from "../../../domain/assets/market-data/stockAPIService";
+import stockAPIService from "@/service/domain/assets/market-data/stockAPIService";
 import {
   updateAssetDefinitionPrice,
   cleanupOldPriceHistory,
 } from "@/utils/priceHistoryUtils";
-import { IStockAPIService } from "../../../domain/assets/market-data/stockAPIService/interfaces/IStockAPIService";
+import { IStockAPIService } from "@/service/domain/assets/market-data/stockAPIService/interfaces/IStockAPIService";
 import { StockHistoryEntry } from "@/types/domains/assets/market-data";
 import { TimeRangePeriod } from "@/types/shared/time";
 

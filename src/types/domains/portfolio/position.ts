@@ -11,7 +11,7 @@ export interface PortfolioPosition {
   name: string;
   ticker?: string;
   type: string;
-  sector?: string;
+  sectors?: string[];
   country?: string;
   currency?: string;
   

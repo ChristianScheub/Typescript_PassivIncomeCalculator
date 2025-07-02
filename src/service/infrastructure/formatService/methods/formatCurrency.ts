@@ -1,4 +1,4 @@
-import { getCurrency } from '../../../domain/assets/market-data/stockAPIService/utils/fetch';
+import { getCurrency } from "@/service/domain/assets/market-data/stockAPIService/utils/fetch";
 
 export const formatCurrency = (amount: number): string => {
   const currency = getCurrency();

@@ -4,7 +4,7 @@ import { IncomeAllocation } from '@/types/domains/portfolio/allocations';
 import { Income } from '@/types/domains/financial/entities';
 import { calculateIncomeAllocation as sharedCalculateIncomeAllocation, calculateAssetAllocation } from '../../../../../shared/calculations/allocationCalculations';
 import { calculateMonthlyIncome } from '../methods/calculateIncome';
-import { calculateAssetMonthlyIncomeWithCache } from '../../../../../shared/calculations/assetIncomeCalculations';
+import { calculateAssetMonthlyIncomeWithCache } from '@/service/shared/calculations/assetIncomeCalculations';
 
 export const calculateIncomeAllocation = (income: Income[], assets: Asset[]): IncomeAllocation[] => {
   // Use cache-aware calculation and extract just the monthly amount

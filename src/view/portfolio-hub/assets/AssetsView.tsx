@@ -5,7 +5,7 @@ import { AssetFormData } from "@/types/domains/forms/form-data";
 import { TranslationProps } from "@/types/shared/ui/view-props";
 import { Card, CardContent } from "@/ui/common/Card";
 import { PortfolioPosition } from "@/types/domains/portfolio/position";
-import { AssetTransactionForm } from "../../shared/forms/AssetTransactionForm";
+import { AssetTransactionForm } from "@/view/shared/forms/AssetTransactionForm";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
 import { MobileAssetSummaryCard } from "@/ui/layout/MobileAssetSummaryCard";
 import { DesktopAssetSummaryCards } from "@/ui/layout/DesktopAssetSummaryCards";
@@ -372,8 +372,8 @@ const AssetsList: React.FC<{
                     {asset.assetDefinition.ticker && (
                       <span className="mr-2">Ticker: {asset.assetDefinition.ticker}</span>
                     )}
-                    {asset.assetDefinition.sector && (
-                      <span>Sektor: {asset.assetDefinition.sector}</span>
+                    {asset.assetDefinition.sectors && asset.assetDefinition.sectors.length > 0 && (
+                      <span>Sektoren: {asset.assetDefinition.sectors.map(s => s.sector).join(', ')}</span>
                     )}
                   </div>
                 )}

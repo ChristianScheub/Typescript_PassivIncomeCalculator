@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/ui/common/Card";
 import { ViewHeader } from "@/ui/layout/ViewHeader";
 import { MotivationalEmptyState } from "@/ui/feedback/EnhancedEmptyState";
 import { Modal } from "@/ui/common/Modal";
-import { MaterialIncomeForm } from "../../../container/forms/MaterialIncomeForm";
+import { MaterialIncomeForm } from "@/container/forms/MaterialIncomeForm";
 import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
 import { SwipeableCard } from "@/ui/common/SwipeableCard";
 import { Plus,CreditCard } from "lucide-react";

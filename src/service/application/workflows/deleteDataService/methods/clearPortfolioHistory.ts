@@ -1,4 +1,4 @@
-import portfolioHistoryService from '../../../../infrastructure/sqlLitePortfolioHistory';
+import portfolioHistoryService from "@/service/infrastructure/sqlLitePortfolioHistory";
 import Logger from "@/service/shared/logging/Logger/logger";
 
 /**

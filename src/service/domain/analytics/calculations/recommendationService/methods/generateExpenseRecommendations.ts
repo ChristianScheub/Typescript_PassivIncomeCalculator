@@ -1,5 +1,5 @@
 import { Expense, Income } from '@/types/domains/financial/';
-import calculatorService from '../../../../financial/calculations/compositeCalculatorService';
+import { calculatorService } from '@/service/';
 import { PortfolioRecommendation } from '@/types/domains/analytics';
 import { Transaction as Asset } from '@/types/domains/assets/';
 

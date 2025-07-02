@@ -2,7 +2,7 @@ import { store } from '@/store';
 import { clearAllAssetCategories } from '@/store/slices/assetCategoriesSlice';
 import { invalidatePortfolioCache } from '@/store/slices/transactionsSlice';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { StoreNames } from '../../../../infrastructure/sqlLiteService';
+import { StoreNames } from '@/types/domains/database';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';
 
 export async function clearAssetDefinitions(): Promise<void> {
