@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAppSelector, useAppDispatch } from '../../hooks/redux';
+import { useAppSelector, useAppDispatch } from '@/hooks/redux';
 import { updateForecastValues } from '@/store/slices/forecastSlice';
 import Logger from '@/service/shared/logging/Logger/logger';
 import ForecastView from '@/view/shared/components/ForecastView';

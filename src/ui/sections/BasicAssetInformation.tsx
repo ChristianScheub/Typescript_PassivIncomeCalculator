@@ -4,7 +4,7 @@ import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { RequiredSection } from '../forms/StandardFormWrapper';
 import { getAssetTypeOptions } from '../../constants';
 import { BasicAssetInformationProps } from '@/types/shared/ui/asset-sections';
-import { AssetType } from '../../types/shared/base/enums';
+import { AssetType } from '@/types/shared/base/enums';
 import { Button } from "../common/Button";
 import { Toggle } from '../common';
 

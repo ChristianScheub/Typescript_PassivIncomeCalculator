@@ -8,7 +8,7 @@ import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { TransactionsState } from '@/types/domains/financial/state';
 import { calculatePortfolioPositions, calculatePortfolioTotals } from '@service/domain/portfolio/management/portfolioService/portfolioCalculations';
 import sqliteService from '@service/infrastructure/sqlLiteService';
-import { v4 as uuidv4 } from '../../utils/uuid';
+import { v4 as uuidv4 } from '@/utils/uuid';
 import Logger from '@service/shared/logging/Logger/logger';
 
 export interface PortfolioCache {

@@ -1,4 +1,4 @@
-import { store } from '../../../../../store';
+import { store } from '@/store';
 import { clearAllTransactions } from '@/store/slices/transactionsSlice';
 import { clearAllLiabilities } from '@/store/slices/liabilitiesSlice';
 import { clearAllExpenses } from '@/store/slices/expensesSlice';

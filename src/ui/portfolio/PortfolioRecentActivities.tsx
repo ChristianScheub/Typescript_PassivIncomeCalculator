@@ -13,7 +13,7 @@ import {
   Star 
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
-import { recentActivityService } from '../../service';
+import { recentActivityService } from '@/service';
 import type { PortfolioCategory, PortfolioSubCategory } from '@/service/domain/analytics/reporting/recentActivityService/types';
 
 interface PortfolioRecentActivitiesProps {

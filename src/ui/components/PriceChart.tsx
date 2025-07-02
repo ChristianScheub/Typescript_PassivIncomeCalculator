@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { TrendingUp, ChevronDown, ChevronUp } from 'lucide-react';
 import { PriceHistoryEntry, Asset, Transaction } from '@/types/domains/assets/';
 import formatService from '@service/infrastructure/formatService';
-import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtils';
+import { calculateHistoricalPortfolioValues } from '@/utils/priceHistoryUtils';
 
 interface PriceChartProps {
   priceHistory: PriceHistoryEntry[];

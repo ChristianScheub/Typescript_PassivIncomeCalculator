@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card } from '../../common/Card';
 import { MonthlyProjection } from '@/types/domains/analytics';
-import { formatService } from '../../../service';
+import { formatService } from '@/service';
 import { CashFlowTooltipPayload, CashFlowPayload } from '@/types/shared/charts';
 
 interface BarChartCashFlowProjectionProps {

@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useAppSelector } from '../../hooks/redux';
+import { useAppSelector } from '@/hooks/redux';
 import PortfolioAnalyticsView from '@/view/analytics-hub/assets/PortfolioAnalyticsView';
 import { calculatorService } from '@/service/';
 import { AssetType } from '@/types/shared/base/enums';

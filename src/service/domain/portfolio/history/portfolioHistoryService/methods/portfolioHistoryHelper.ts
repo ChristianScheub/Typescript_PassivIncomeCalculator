@@ -1,4 +1,4 @@
-import { Transaction as Asset, AssetDefinition } from '../../../../../../types/domains/assets';
+import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets';
 import { getCurrentQuantity } from '@/utils/transactionCalculations';
 import { calculatePortfolioValueForDate } from './calculatePortfolioValueForDate';
 import Logger from "@/service/shared/logging/Logger/logger";

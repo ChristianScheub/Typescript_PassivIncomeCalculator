@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { usePortfolioHistoryView } from '../../hooks/usePortfolioHistoryView';
+import { usePortfolioHistoryView } from '@/hooks/usePortfolioHistoryView';
 import { PortfolioHistoryView } from '@/view/portfolio-hub/PortfolioHistoryView';
 import { ViewHeader } from '@/ui/layout/ViewHeader';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';

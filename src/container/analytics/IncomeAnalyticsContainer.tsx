@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useAppSelector } from '../../hooks/redux';
+import { useAppSelector } from '@/hooks/redux';
 import IncomeAnalyticsView from '@/view/analytics-hub/income/IncomeAnalyticsView';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import { Income } from '@/types/domains/financial/entities';

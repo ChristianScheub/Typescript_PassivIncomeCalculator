@@ -1,6 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
 import { Trash2, Edit } from 'lucide-react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 interface SwipeableCardProps {
   children: React.ReactNode;

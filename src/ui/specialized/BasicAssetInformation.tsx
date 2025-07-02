@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { AssetType } from "../../types/shared/";
+import { AssetType } from "@/types/shared/";
 import { FormGrid, StandardFormField } from "../forms/FormGrid";
 import { getAssetTypeOptions } from "../../constants";
 

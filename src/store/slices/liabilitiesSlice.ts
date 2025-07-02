@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Liability } from '@/types/domains/financial/';
 import sqliteService from '@service/infrastructure/sqlLiteService';
-import { v4 as uuidv4 } from '../../utils/uuid';
+import { v4 as uuidv4 } from '@/utils/uuid';
 import Logger from '@service/shared/logging/Logger/logger';
 import { hydrateStore } from '../actions/hydrateAction';
 

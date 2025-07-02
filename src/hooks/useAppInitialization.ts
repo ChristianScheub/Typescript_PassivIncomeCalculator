@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAppDispatch,useAppSelector } from './redux';
 import { appInitializationService } from '../service/application/orchestration/initService/appInitialization';
-import { store } from '../store';
+import { store } from '@/store';
 import Logger from '@/service/shared/logging/Logger/logger';
 
 interface UseAppInitializationResult {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 import { Label } from './Label';
 import { Input, InputProps } from './Input';
 import { Select, SelectProps } from './Select';

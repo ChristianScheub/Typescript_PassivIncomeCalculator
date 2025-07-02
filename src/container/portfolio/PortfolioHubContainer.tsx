@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useAppSelector } from '../../hooks/redux';
+import { useAppSelector } from '@/hooks/redux';
 import { selectPortfolioCache } from '@/store/slices/transactionsSlice';
 import AssetsContainer from '../assets/AssetsContainer';
 import LiabilitiesContainer from '../finance/LiabilitiesContainer';
@@ -10,7 +10,7 @@ import recentActivityService from '@/service/domain/analytics/reporting/recentAc
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import Logger from '@/service/shared/logging/Logger/logger';
 import PortfolioOverviewContainer from './PortfolioOverviewContainer';
-import { PortfolioCategory, PortfolioSubCategory } from "../../types/domains/analytics/reporting";
+import { PortfolioCategory, PortfolioSubCategory } from "@/types/domains/analytics/reporting";
 
 
 interface NavigationHistoryItem {

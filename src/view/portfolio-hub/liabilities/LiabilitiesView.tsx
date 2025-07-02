@@ -1,12 +1,12 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
-import { Card, CardContent } from "../../../ui/common/Card";
-import { ViewHeader } from "../../../ui/layout/ViewHeader";
-import { MotivationalEmptyState } from "../../../ui/feedback/EnhancedEmptyState";
-import { Modal } from "../../../ui/common/Modal";
+import { Card, CardContent } from "@/ui/common/Card";
+import { ViewHeader } from "@/ui/layout/ViewHeader";
+import { MotivationalEmptyState } from "@/ui/feedback/EnhancedEmptyState";
+import { Modal } from "@/ui/common/Modal";
 import { MaterialLiabilityForm } from "../../../container/forms/MaterialLiabilityForm";
-import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
-import { SwipeableCard } from "../../../ui/common/SwipeableCard";
+import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
+import { SwipeableCard } from "@/ui/common/SwipeableCard";
 import { Plus,Landmark } from "lucide-react";
 import formatService from "@service/infrastructure/formatService";
 import { Liability } from '@/types/domains/financial';

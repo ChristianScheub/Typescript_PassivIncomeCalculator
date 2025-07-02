@@ -1,20 +1,20 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { AssetCategory, AssetCategoryOption } from "../../../types/domains/assets/categories";
-import { CategoryFormData, OptionFormData } from "../../../types/shared/ui/view-props";
+import { AssetCategory, AssetCategoryOption } from "@/types/domains/assets/categories";
+import { CategoryFormData, OptionFormData } from "@/types/shared/ui/view-props";
 import { Plus, Trash2 } from "lucide-react";
-import { Modal } from "../../../ui/common/Modal";
-import { ActionButtonGroup } from "../../../ui/common/ActionButtonGroup";
-import { Button } from "../../../ui/common/Button";
-import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
-import { ViewHeader } from "../../../ui/layout/ViewHeader";
-import { IconButton } from "../../../ui/common";
+import { Modal } from "@/ui/common/Modal";
+import { ActionButtonGroup } from "@/ui/common/ActionButtonGroup";
+import { Button } from "@/ui/common/Button";
+import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
+import { ViewHeader } from "@/ui/layout/ViewHeader";
+import { IconButton } from "@/ui/common";
 import {
   StandardFormWrapper,
   RequiredSection,
   FormGrid,
   StandardFormField,
-} from "../../../ui/forms/StandardFormWrapper";
+} from "@/ui/forms/StandardFormWrapper";
 
 interface AssetCategoryManagerViewProps {
   categories: AssetCategory[];

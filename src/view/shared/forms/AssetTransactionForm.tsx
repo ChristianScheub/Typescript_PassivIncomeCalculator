@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '../../../hooks/redux';
-import { useSharedForm } from '../../../hooks/useSharedForm';
+import { useAppSelector } from '@/hooks/redux';
+import { useSharedForm } from '@/hooks/useSharedForm';
 import { AssetDefinition,Asset } from '@/types/domains/assets/entities';
 import { AssetFormData } from '@/types/domains/forms/form-data';
-import { createAssetTransactionSchema } from '../../../utils/validationSchemas';
+import { createAssetTransactionSchema } from '@/utils/validationSchemas';
 import { Modal } from '@/ui/common/Modal';
 import { 
   StandardFormWrapper,
@@ -15,7 +15,7 @@ import {
 } from '@/ui/forms/StandardFormWrapper';
 import { AssetSearchBar, SelectedAssetInfo } from '@/ui/components';
 import { FormFieldValue } from '@/types/shared/ui/specialized';
-import { formatService } from '../../../service';
+import { formatService } from '@/service';
 
 const assetTransactionSchema = createAssetTransactionSchema();
 

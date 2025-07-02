@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { FormGrid, StandardFormField } from "../forms/FormGrid";
-import { AssetType } from "../../types/shared/";
+import { AssetType } from "@/types/shared/";
 import { UseFormSetValue } from "react-hook-form";
 
 interface AdditionalInformationSectionProps {

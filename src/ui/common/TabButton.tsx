@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, ButtonProps } from './Button';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 interface TabButtonProps extends Omit<ButtonProps, 'variant'> {
   /** Whether this tab is currently active */

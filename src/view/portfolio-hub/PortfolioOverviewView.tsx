@@ -10,14 +10,14 @@ import {
   BarChart3,
   ArrowRight,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/common/Card";
-import { Button } from "../../ui/common/Button";
-import { ViewHeader } from "../../ui/layout/ViewHeader";
-import { PortfolioRecentActivities } from "../../ui/portfolio/PortfolioRecentActivities";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/common/Card";
+import { Button } from "@/ui/common/Button";
+import { ViewHeader } from "@/ui/layout/ViewHeader";
+import { PortfolioRecentActivities } from "@/ui/portfolio/PortfolioRecentActivities";
 import formatService from "@service/infrastructure/formatService";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
 import PortfolioHubRecommendations from "./hub/PortfolioHubRecommendations";
-import { PortfolioCategory, PortfolioSubCategory } from "../../types/domains/analytics/reporting";
+import { PortfolioCategory, PortfolioSubCategory } from "@/types/domains/analytics/reporting";
 
 interface PortfolioSummary {
   totalAssetValue: number;

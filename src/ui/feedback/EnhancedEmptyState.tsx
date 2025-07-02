@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from '../common/Card';
 import { Button } from '../common/Button';
 import { Plus, ArrowRight, TrendingUp, Target, Lightbulb } from 'lucide-react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 interface BaseEmptyStateProps {
   className?: string;

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
-import { useAppSelector } from '../../hooks/redux';
-import { calculatorService } from '../../service';
+import { useAppSelector } from '@/hooks/redux';
+import { calculatorService } from '@/service';
 import MilestonesView from '@/view/analytics-hub/milestones/MilestonesView';
 import { Expense, Liability } from '@/types/domains/financial';
 

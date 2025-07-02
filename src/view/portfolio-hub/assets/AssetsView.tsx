@@ -1,20 +1,20 @@
 import React, { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Asset } from "../../../types/domains/assets/entities";
-import { AssetFormData } from "../../../types/domains/forms/form-data";
-import { TranslationProps } from "../../../types/shared/ui/view-props";
-import { Card, CardContent } from "../../../ui/common/Card";
-import { PortfolioPosition } from "../../../types/domains/portfolio/position";
+import { Asset } from "@/types/domains/assets/entities";
+import { AssetFormData } from "@/types/domains/forms/form-data";
+import { TranslationProps } from "@/types/shared/ui/view-props";
+import { Card, CardContent } from "@/ui/common/Card";
+import { PortfolioPosition } from "@/types/domains/portfolio/position";
 import { AssetTransactionForm } from "../../shared/forms/AssetTransactionForm";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
-import { MobileAssetSummaryCard } from "../../../ui/layout/MobileAssetSummaryCard";
-import { DesktopAssetSummaryCards } from "../../../ui/layout/DesktopAssetSummaryCards";
+import { MobileAssetSummaryCard } from "@/ui/layout/MobileAssetSummaryCard";
+import { DesktopAssetSummaryCards } from "@/ui/layout/DesktopAssetSummaryCards";
 import { PortfolioView } from "../PortfolioView";
 import { AssetDetailView } from "./AssetDetailView";
-import TabSelector from "../../../ui/navigation/TabSelector";
-import { HeaderButtonGroup } from "../../../ui/common/HeaderButtonGroup";
-import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
-import { ViewHeader } from "../../../ui/layout/ViewHeader";
+import TabSelector from "@/ui/navigation/TabSelector";
+import { HeaderButtonGroup } from "@/ui/common/HeaderButtonGroup";
+import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
+import { ViewHeader } from "@/ui/layout/ViewHeader";
 import formatService from "@service/infrastructure/formatService";
 import { 
   TrendingUp, 
@@ -23,7 +23,7 @@ import {
   BarChart3,
   Plus
 } from "lucide-react";
-import { SwipeableCard } from "../../../ui/common/SwipeableCard";
+import { SwipeableCard } from "@/ui/common/SwipeableCard";
 import { EmptyStateView } from "./EmptyStateAssetView";
 import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
 

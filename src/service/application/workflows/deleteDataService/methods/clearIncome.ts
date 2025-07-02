@@ -1,4 +1,4 @@
-import { store } from '../../../../../store';
+import { store } from '@/store';
 import { clearAllIncome } from '@/store/slices/incomeSlice';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { StoreNames } from '../../../../infrastructure/sqlLiteService';

@@ -21,6 +21,7 @@
       "@ui/*": ["src/ui/*"],
       "@container/*": ["src/container/*"],
       "@view/*": ["src/view/*"],
+      "@hooks/*": ["src/hooks/*"],
     },
 
     /* Bundler mode */

@@ -1,4 +1,4 @@
-import { store } from '../../../../../store';
+import { store } from '@/store';
 import { clearAllAssetCategories } from '@/store/slices/assetCategoriesSlice';
 import { invalidatePortfolioCache } from '@/store/slices/transactionsSlice';
 import Logger from "@/service/shared/logging/Logger/logger";

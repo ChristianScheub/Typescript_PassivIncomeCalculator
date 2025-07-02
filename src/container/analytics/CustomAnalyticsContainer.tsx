@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useAppSelector } from '../../hooks/redux';
+import { useAppSelector } from '@/hooks/redux';
 import CustomAnalyticsView from '@/view/analytics-hub/custom/CustomAnalyticsView';
 
 interface CustomAnalyticsContainerProps {

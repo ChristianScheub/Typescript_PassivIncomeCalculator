@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
-import { RootState } from "../../store";
+import { RootState } from "@/store";
 import {
   addAssetDefinition,
   updateAssetDefinition,

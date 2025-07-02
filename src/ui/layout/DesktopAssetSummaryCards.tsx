@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { formatService } from '../../service';
+import { formatService } from '@/service';
 import { Wallet, Calendar, TrendingUp } from 'lucide-react';
 
 interface DesktopAssetSummaryCardsProps {

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { AssetDefinition } from '@/types/domains/assets';
 import { PortfolioPosition } from '@/types/domains/portfolio';
-import { getCurrentQuantity } from '../../utils/transactionCalculations';
+import { getCurrentQuantity } from '@/utils/transactionCalculations';
 import Logger from '@/service/shared/logging/Logger/logger';
 import portfolioHistoryService, { 
   PortfolioIntradayPoint 

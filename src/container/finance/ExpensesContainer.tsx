@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { addExpense, updateExpense, deleteExpense } from '@/store/slices/expensesSlice';
 import { Expense } from '@/types/domains/financial';
 import { ExpenseFormData } from '@/types/domains/forms/form-data';
 import { useTranslation } from 'react-i18next';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import ExpensesView from '@/view/portfolio-hub/expenses/ExpensesView';
-import { sortExpenses, SortOrder } from '../../utils/sortingUtils';
-import { useAsyncOperation } from '../../utils/containerUtils';
+import { sortExpenses, SortOrder } from '@/utils/sortingUtils';
+import { useAsyncOperation } from '@/utils/containerUtils';
 
 const ExpensesContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();

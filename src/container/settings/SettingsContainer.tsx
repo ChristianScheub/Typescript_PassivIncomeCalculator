@@ -1,26 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux";
-import { setApiEnabled, setDividendApiEnabled, setApiKey, setSelectedProvider, StockAPIProvider, setSelectedDiviProvider, setDividendApiKey } from "../../store/slices/apiConfigSlice";
-import { setDashboardMode, DashboardMode, loadDashboardSettingsFromStorage } from "../../store/slices/dashboardSettingsSlice";
-import { clearAllTransactions } from "../../store/slices/transactionsSlice";
-import { clearAllLiabilities } from "../../store/slices/liabilitiesSlice";
-import { clearAllExpenses } from "../../store/slices/expensesSlice";
-import { clearAllIncome } from "../../store/slices/incomeSlice";
-import { clearAllAssetCategories } from "../../store/slices/assetCategoriesSlice";
-import sqliteService from "../../service/infrastructure/sqlLiteService";
-import { StoreNames } from "../../service/infrastructure/sqlLiteService/interfaces/ISQLiteService";
-import Logger from "../../service/shared/logging/Logger/logger";
-import SettingsView from "../../view/settings/general/SettingsView";
-import { handleFileDownload } from "../../service/shared/utilities/helper/downloadFile";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { setApiEnabled, setDividendApiEnabled, setApiKey, setSelectedProvider, StockAPIProvider, setSelectedDiviProvider, setDividendApiKey } from "@/store/slices/apiConfigSlice";
+import { setDashboardMode, DashboardMode, loadDashboardSettingsFromStorage } from "@/store/slices/dashboardSettingsSlice";
+import { clearAllTransactions } from "@/store/slices/transactionsSlice";
+import { clearAllExpenses } from "@/store/slices/expensesSlice";
+import { clearAllIncome } from "@/store/slices/incomeSlice";
+import { clearAllAssetCategories } from "@/store/slices/assetCategoriesSlice";
+import sqliteService from "@/service/infrastructure/sqlLiteService";
+import { StoreNames } from "@/service/infrastructure/sqlLiteService/interfaces/ISQLiteService";
+import Logger from "@/service/shared/logging/Logger/logger";
+import SettingsView from "@/view/settings/general/SettingsView";
+import { handleFileDownload } from "@/service/shared/utilities/helper/downloadFile";
 import {
   setCurrency as setGlobalCurrency,
   getCurrency,
-} from "../../service/domain/assets/market-data/stockAPIService/utils/fetch";
-import deleteDataService from '../../service/application/workflows/deleteDataService';
+} from "@/service/domain/assets/market-data/stockAPIService/utils/fetch";
+import deleteDataService from '@/service/application/workflows/deleteDataService';
 import { t } from "i18next";
-import { ConfirmationDialogState } from "../../ui/dialog/types";
-import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '../../store/slices/snackbarSlice';
+import { ConfirmationDialogState } from "@/ui/dialog/types";
+import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/snackbarSlice';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
+import { clearAllLiabilities } from "@/store/slices/liabilitiesSlice";
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";
 type AsyncOperationStatus = "idle" | "loading" | "success" | "error";

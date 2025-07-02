@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Transaction, PriceHistoryEntry } from '@/types/domains/assets/';
 import { formatCurrency } from '@service/infrastructure/formatService/methods/formatCurrency';
 import { TrendingUp, TrendingDown, Calendar, Database, Upload } from 'lucide-react';
-import { calculateHistoricalPortfolioValues } from '../../utils/priceHistoryUtils';
+import { calculateHistoricalPortfolioValues } from '@/utils/priceHistoryUtils';
 
 interface PriceHistoryViewProps {
   priceHistory: PriceHistoryEntry[];

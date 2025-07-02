@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 import { LoadingSpinner } from '../feedback/LoadingSpinner';
 import { RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';

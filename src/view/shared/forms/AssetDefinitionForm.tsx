@@ -9,17 +9,17 @@ import {
   OptionalSection,
   FormGrid,
   StandardFormField,
-} from "../../../ui/forms/StandardFormWrapper";
-import { Modal } from "../../../ui/common/Modal";
-import { Toggle } from "../../../ui/common/Toggle";
-import { AssetCategoryAssignmentSelector } from "../../../ui/specialized/AssetCategoryAssignmentSelector";
+} from "@/ui/forms/StandardFormWrapper";
+import { Modal } from "@/ui/common/Modal";
+import { Toggle } from "@/ui/common/Toggle";
+import { AssetCategoryAssignmentSelector } from "@/ui/specialized/AssetCategoryAssignmentSelector";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
-import { useAppSelector } from "../../../hooks/redux";
-import { BasicAssetInformation } from "../../../ui/sections";
-import { SectorSection } from "../../../ui/specialized/SectorSection";
-import { AdditionalInformationSection } from "../../../ui/specialized/AdditionalInformationSection";
-import { AssetIncomeSection } from "../../../ui/forms/assetDefinition/AssetIncomeSection";
+import { useAppSelector } from "@/hooks/redux";
+import { BasicAssetInformation } from "@/ui/sections";
+import { SectorSection } from "@/ui/specialized/SectorSection";
+import { AdditionalInformationSection } from "@/ui/specialized/AdditionalInformationSection";
+import { AssetIncomeSection } from "@/ui/forms/assetDefinition/AssetIncomeSection";
 
 // Add useDividendApi to schema
 const assetDefinitionSchema = z.object({

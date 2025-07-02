@@ -1,4 +1,4 @@
-import { Asset } from "../../../../../../types/domains/assets/entities";
+import { Asset } from "..'@/types/domains/assets/entities";
 import Logger from "@/service/shared/logging/Logger/logger";
 import {
   calculateDividendForMonth,

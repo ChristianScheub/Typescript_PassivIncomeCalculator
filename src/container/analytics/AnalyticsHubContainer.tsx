@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useAppSelector } from '../../hooks/redux';
+import { useAppSelector } from '@/hooks/redux';
 import Logger from '@/service/shared/logging/Logger/logger';
 import recentActivityService from '@/service/domain/analytics/reporting/recentActivityService';
 import { AnalyticsCategory, AnalyticsSubCategory } from '@/types/domains/analytics/reporting';

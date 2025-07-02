@@ -1,5 +1,5 @@
 import Logger from '@/service/shared/logging/Logger/logger';
-import { store } from '../store';
+import { store } from '@/store';
 import { showErrorSnackbar } from '@/store/slices/snackbarSlice';
 
 // Zentrale Konfiguration für Snackbar-Anzeige bei verschiedenen Operationen

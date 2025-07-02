@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AssetCategoryAssignment } from "../../../types/domains/assets/categories";
-import { AssetDefinition } from "../../../types/domains/assets";
+import { AssetCategoryAssignment } from "@/types/domains/assets/categories";
+import { AssetDefinition } from "@/types/domains/assets";
 import { AssetDefinitionForm } from "../../shared/forms/AssetDefinitionForm";
-import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
-import { ViewHeader } from "../../../ui/layout/ViewHeader";
+import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
+import { ViewHeader } from "@/ui/layout/ViewHeader";
 import { Plus,Wallet, RefreshCw, History } from "lucide-react";
-import { IconButton } from "../../../ui/common";
+import { IconButton } from "@/ui/common";
 import { Tooltip } from "@mui/material";
-import { formatService } from "../../../service";
-import { TimeRangeSelectionDialog } from "../../../ui/dialog/TimeRangeSelectionDialog";
-import { TimeRangePeriod } from "../../../types/shared/time";
-import { AddPriceEntryDialog, PriceEntry } from "../../../ui/dialog/AddPriceEntryDialog";
-import { SwipeableCard } from "../../../ui/common/SwipeableCard";
+import { formatService } from "@/service";
+import { TimeRangeSelectionDialog } from "@/ui/dialog/TimeRangeSelectionDialog";
+import { TimeRangePeriod } from "@/types/shared/time";
+import { AddPriceEntryDialog, PriceEntry } from "@/ui/dialog/AddPriceEntryDialog";
+import { SwipeableCard } from "@/ui/common/SwipeableCard";
 import { CreateAssetDefinitionData } from '@/types/domains/assets';
 
 type CreateCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;

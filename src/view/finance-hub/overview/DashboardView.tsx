@@ -7,17 +7,17 @@ import {
   AlertTriangle,
   BarChart3,
 } from "lucide-react";
-import TotalExpenseCoverage from "../../../ui/milestones/TotalExpenseCoverage";
+import TotalExpenseCoverage from "@/ui/milestones/TotalExpenseCoverage";
 import PortfolioHistoryCard from "./PortfolioHistoryCard";
 import MonthlyBreakdownCard from "./MonthlyBreakdownCard";
-import { CollapsibleSection } from "../../../ui/common/CollapsibleSection";
-import { QuickActionsCard } from "../../../ui/dashboard/QuickActionsCard";
-import { MiniAnalyticsCard } from "../../../ui/dashboard/MiniAnalyticsCard";
-import { MilestoneCard } from "../../../ui/dashboard/MilestoneCard";
-import { AlertsCard } from "../../../ui/dashboard/AlertsCard";
-import { PullToRefresh } from "../../../ui/common/PullToRefresh";
-import { NetWorthSnapshot } from "../../../ui/dashboard/NetWorthSnapshot";
-import { FinancialSummary, UIAlert } from "../../../types/domains/analytics/reporting";
+import { CollapsibleSection } from "@/ui/common/CollapsibleSection";
+import { QuickActionsCard } from "@/ui/dashboard/QuickActionsCard";
+import { MiniAnalyticsCard } from "@/ui/dashboard/MiniAnalyticsCard";
+import { MilestoneCard } from "@/ui/dashboard/MilestoneCard";
+import { AlertsCard } from "@/ui/dashboard/AlertsCard";
+import { PullToRefresh } from "@/ui/common/PullToRefresh";
+import { NetWorthSnapshot } from "@/ui/dashboard/NetWorthSnapshot";
+import { FinancialSummary, UIAlert } from "@/types/domains/analytics/reporting";
 
 interface QuickAction {
   id: string;

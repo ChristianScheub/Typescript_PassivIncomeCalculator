@@ -13,7 +13,7 @@ import {
 } from '../../../../shared/cache/assetIncomeCacheUtils';
 import { calculateAssetMonthlyIncomeWithCache } from '../../../../shared/calculations/assetIncomeCalculations';
 import Logger from '../../../../shared/logging/Logger/logger';
-import type { Asset } from '../../../../../types/domains/assets/entities';
+import type { Asset } from '@/types/domains/assets/entities';
 
 // Type for cache data that needs to be updated
 interface CacheUpdateData {

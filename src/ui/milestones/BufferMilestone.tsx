@@ -2,8 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent, CardHeader, CardTitle } from '../common/Card';
 import { Shield } from 'lucide-react';
-import { formatService } from '../../service';
-import { getHighestBufferMilestone, getBufferMilestoneKey } from '../../utils/milestoneUtils';
+import { formatService } from '@/service';
+import { getHighestBufferMilestone, getBufferMilestoneKey } from '@/utils/milestoneUtils';
 import './milestones.css';
 
 interface BufferMilestoneProps {

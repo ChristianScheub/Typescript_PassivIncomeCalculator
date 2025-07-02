@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { addIncome, updateIncome, deleteIncome } from '@/store/slices/incomeSlice';
 import { Income } from '@/types/domains/financial';
 import { useTranslation } from 'react-i18next';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import IncomeView from '@/view/portfolio-hub/income/IncomeView';
-import { sortIncome, SortOrder } from '../../utils/sortingUtils';
-import { useAsyncOperation } from '../../utils/containerUtils';
+import { sortIncome, SortOrder } from '@/utils/sortingUtils';
+import { useAsyncOperation } from '@/utils/containerUtils';
 
 const IncomeContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();

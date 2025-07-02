@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import formatService from "../../service/infrastructure/formatService";
+import formatService from "@/service/infrastructure/formatService";
 import {
   getHighestMilestone,
   getMilestoneKey,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { 
   addTransaction, 
   updateTransaction, 
@@ -22,7 +22,7 @@ import AssetDefinitionsContainer from './AssetDefinitionsContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
 import { AssetCategoryContainer } from './AssetCategoryContainer';
 import { PortfolioHistoryContainer } from './PortfolioHistoryContainer';
-import { useAsyncOperation } from '../../utils/containerUtils';
+import { useAsyncOperation } from '@/utils/containerUtils';
 
 const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();

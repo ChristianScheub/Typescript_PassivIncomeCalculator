@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, ButtonProps } from './Button';
-import { cn } from '../../utils/cn';
+import { cn } from '@/utils/cn';
 
 export interface IconButtonProps extends Omit<ButtonProps, 'children' | 'startIcon' | 'endIcon'> {
   /** Icon to display */

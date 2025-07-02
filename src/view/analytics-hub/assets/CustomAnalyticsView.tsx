@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useAppSelector } from '../../../hooks/redux';
-import { compositeCalculatorService as calculatorService } from '../../../service';
+import { useAppSelector } from '@/hooks/redux';
+import { compositeCalculatorService as calculatorService } from '@/service';
 import { Button, ButtonGroup } from '@/ui/common';
 import { IconButton } from '@/ui/common/IconButton';
 import { 

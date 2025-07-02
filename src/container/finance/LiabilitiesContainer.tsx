@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useAppDispatch, useAppSelector } from '../../hooks/redux';
+import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { addLiability, updateLiability, deleteLiability } from '@/store/slices/liabilitiesSlice';
 import { Liability } from '@/types/domains/financial';
 import { useTranslation } from 'react-i18next';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import LiabilitiesView from '@/view/portfolio-hub/liabilities/LiabilitiesView';
-import { sortLiabilitiesByPayment, SortOrder } from '../../utils/sortingUtils';
-import { useAsyncOperation } from '../../utils/containerUtils';
+import { sortLiabilitiesByPayment, SortOrder } from '@/utils/sortingUtils';
+import { useAsyncOperation } from '@/utils/containerUtils';
 
 const LiabilitiesContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
