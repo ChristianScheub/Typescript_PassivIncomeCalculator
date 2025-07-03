@@ -27,36 +27,32 @@ import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck
 // Main App Content with initialization check
 const AppContent = () => {
   const { isInitialized, isInitializing, initializationError } = useAppInitialization();
+  const isDesktop = useDeviceCheck();
   
   // Auto-update portfolio history when assets change
   useAutoPortfolioHistoryUpdate();
 
-  // Show error screen if initialization failed
   if (initializationError) {
     return <ErrorScreenAppStart error={initializationError} />;
   }
 
-  // Show loading screen while initializing
   if (isInitializing || !isInitialized) {
     return <LoadingScreenAppStart />;
   }
 
-  // Detect if mobile view (could be enhanced with a proper hook)
-  const isMobile = useDeviceCheck();
-  const Layout = isMobile ? MobileLayout : DesktopLayout;
+  // Render the appropriate layout
+  const Layout = isDesktop ? DesktopLayout : MobileLayout;
 
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<DashboardContainer />} />
-          <Route path="/portfolio" element={<PortfolioHubContainer />} />
-          <Route path="/analytics" element={<AnalyticsHubContainer />} />
-          <Route path="/settings" element={<SettingsContainer />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<DashboardContainer />} />
+        <Route path="/portfolio" element={<PortfolioHubContainer />} />
+        <Route path="/analytics" element={<AnalyticsHubContainer />} />
+        <Route path="/settings" element={<SettingsContainer />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Layout>
   );
 };
 
@@ -65,8 +61,10 @@ function App() {
     <Provider store={store}>
       <AppProvider>
         <ThemeProvider>
-          <AppContent />
-          <GlobalSnackbar /> 
+          <Router>
+            <AppContent />
+            <GlobalSnackbar />
+          </Router>
         </ThemeProvider>
       </AppProvider>
     </Provider>
