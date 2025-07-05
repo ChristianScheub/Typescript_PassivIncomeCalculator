@@ -2,29 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ViewHeader } from '@/ui/layout/ViewHeader';
 import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
-import AnalyticsQuickInsightsSection from './hub/AnalyticsQuickInsightsSection';
-import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analytics/AnalyticsHubContainer';
+import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analyticsHub/AnalyticsHubContainer';
 import AnalyticsOverviewSection from './hub/AnalyticsOverviewSection';
 import AnalyticsCategoriesSection from './hub/AnalyticsCategoriesSection';
 import type { AIAnalyticsCategory } from '@/types/domains/analytics/ai';
 
-interface QuickInsights {
-  totalAssetValue: number;
-  monthlyIncome: number;
-  totalExpenses: number;
-  totalLiabilities: number;
-  netWorth: number;
-  monthlyCashFlow: number;
-  assetsCount: number;
-  incomeSourcesCount: number;
-  expenseCategoriesCount: number;
-  liabilitiesCount: number;
-}
-
 interface AnalyticsHubViewProps {
   selectedCategory: AnalyticsCategory;
-  selectedSubCategory: AnalyticsSubCategory;
-  quickInsights: QuickInsights;
   onCategoryChange: (category: AnalyticsCategory, subCategory?: AnalyticsSubCategory) => void;
   onAINavigation?: (category: AIAnalyticsCategory) => void;
   onBack?: () => void;
@@ -32,8 +16,6 @@ interface AnalyticsHubViewProps {
 
 const AnalyticsHubView: React.FC<AnalyticsHubViewProps> = ({
   selectedCategory,
-  selectedSubCategory,
-  quickInsights,
   onCategoryChange,
   onAINavigation,
   onBack
@@ -50,11 +32,6 @@ const AnalyticsHubView: React.FC<AnalyticsHubViewProps> = ({
           subtitle={t('analytics.hub.subtitle')}
           onBack={onBack}
           isMobile={!isDesktop}
-        />
-
-        {/* Quick Insights Section */}
-        <AnalyticsQuickInsightsSection 
-          insights={quickInsights}
         />
 
         {/* Overview Section - Recent Analytics, Recommendations etc. */}

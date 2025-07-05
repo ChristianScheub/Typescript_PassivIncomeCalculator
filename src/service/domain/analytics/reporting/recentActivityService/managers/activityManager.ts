@@ -76,11 +76,42 @@ export const createActivityManager = (config: ActivityServiceConfig) => {
     return getActivities(undefined, maxEntries);
   };
 
+  const replaceAnalyticsActivity = (
+    oldCategory: string,
+    oldSubCategory: string,
+    newCategory: string,
+    newSubCategory: string
+  ): void => {
+    try {
+      let activities = storageManager.loadActivities('analytics');
+      
+      // Remove the old analytics activity with matching category/subcategory
+      activities = activities.filter(activity => {
+        if (activity.type === 'analytics') {
+          const analyticsActivity = activity as any;
+          return !(analyticsActivity.category === oldCategory && 
+                  analyticsActivity.subCategory === oldSubCategory);
+        }
+        return true;
+      });
+      
+      // Create and add the new analytics activity
+      const newActivity = activityFactory.createAnalyticsActivity(newCategory as any, newSubCategory as any);
+      activities.unshift(newActivity);
+      
+      storageManager.saveActivities('analytics', activities);
+      Logger.info(`Replaced analytics activity: ${oldCategory}/${oldSubCategory} -> ${newCategory}/${newSubCategory}`);
+    } catch (error) {
+      Logger.error(`Error replacing analytics activity: ${JSON.stringify(error as Error)}`);
+    }
+  };
+
   return {
     addActivity,
     getActivities,
     clearActivities,
     getRecentActivities,
+    replaceAnalyticsActivity,
     activityFactory
   };
 };

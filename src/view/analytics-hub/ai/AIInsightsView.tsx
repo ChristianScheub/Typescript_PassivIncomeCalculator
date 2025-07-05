@@ -53,20 +53,6 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
     return "text-red-600 dark:text-red-400";
   };
 
-  // Extracted nested ternary operation into an independent statement
-  const badgeVariant = (() => {
-    if (modelStatus === "loaded") return "success";
-    if (modelStatus === "loading") return "warning";
-    return "destructive";
-  })();
-
-  // Extracted button text logic into an independent statement
-  const buttonText = (() => {
-    if (isGenerating) return t("ai.insights.generating");
-    if (insights) return t("ai.insights.regenerate");
-    return t("ai.insights.generate");
-  })();
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-4">
@@ -85,7 +71,13 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
               {t("ai.model.status")}:
             </span>{" "}
             <Badge
-              variant={badgeVariant}
+              variant={
+                modelStatus === "loaded"
+                  ? "success"
+                  : modelStatus === "loading"
+                  ? "warning"
+                  : "destructive"
+              }
             >
               {t(`ai.model.states.${modelStatus}`)}
             </Badge>
@@ -292,7 +284,13 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
             <RefreshCw
               className={`h-4 w-4 ${isGenerating ? "animate-spin" : ""}`}
             />
-            <span>{buttonText}</span>
+            <span>
+              {isGenerating
+                ? t("ai.insights.generating")
+                : insights
+                ? t("ai.insights.regenerate")
+                : t("ai.insights.generate")}
+            </span>
           </Button>
         </div>
       </div>

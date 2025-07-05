@@ -1,18 +1,21 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
-import { ViewHeader } from "@/ui/layout/ViewHeader";
+import { AssetCategoryAssignment } from "../../../types/domains/assets/categories";
+import { AssetDefinition } from "../../../types/domains/assets";
+import { AssetDefinitionForm } from "../forms/AssetDefinitionForm";
+import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
+import { ViewHeader } from "../../../ui/layout/ViewHeader";
 import { Plus,Wallet, RefreshCw, History } from "lucide-react";
-import { IconButton } from "@/ui/common";
+import { IconButton } from "../../../ui/common";
 import { Tooltip } from "@mui/material";
-import { formatService } from "@/service";
-import { TimeRangeSelectionDialog } from "@/ui/dialog/TimeRangeSelectionDialog";
-import { TimeRangePeriod } from "@/types/shared/time";
-import { AddPriceEntryDialog, PriceEntry } from "@/ui/dialog/AddPriceEntryDialog";
-import { SwipeableCard } from "@/ui/common/SwipeableCard";
-import { CreateAssetDefinitionData,AssetDefinition } from '@/types/domains/assets';
-import { CreateAssetCategoryAssignmentData } from '@/types/domains/assets/categories';
-import { AssetDefinitionForm } from "@/view/shared/forms/AssetDefinitionForm";
+import { formatService } from "../../../service";
+import { TimeRangeSelectionDialog } from "../../../ui/dialog/TimeRangeSelectionDialog";
+import { TimeRangePeriod } from "../../../types/shared/time";
+import { AddPriceEntryDialog, PriceEntry } from "../../../ui/dialog/AddPriceEntryDialog";
+import { SwipeableCard } from "../../../ui/common/SwipeableCard";
+import { CreateAssetDefinitionData } from '@/types/domains/assets';
+
+type CreateCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
 
 interface AssetDefinitionsViewProps {
   assetDefinitions: AssetDefinition[];
@@ -33,11 +36,11 @@ interface AssetDefinitionsViewProps {
   onBack?: () => void;
   onAddDefinitionWithCategories?: (
     data: CreateAssetDefinitionData,
-    categoryAssignments: CreateAssetCategoryAssignmentData[]
+    categoryAssignments: CreateCategoryAssignmentData[]
   ) => void;
   onUpdateDefinitionWithCategories?: (
     data: AssetDefinition,
-    categoryAssignments: CreateAssetCategoryAssignmentData[]
+    categoryAssignments: CreateCategoryAssignmentData[]
   ) => void;
   onAddPriceEntry?: (definitionId: string, entry: PriceEntry) => void;
   onFetchDividendsFromApi?: (definition: AssetDefinition) => void;

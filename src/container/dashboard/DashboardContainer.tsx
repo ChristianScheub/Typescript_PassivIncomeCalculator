@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector, useAppDispatch } from '@/hooks/redux';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { loadDashboardSettingsFromStorage } from '@/store/slices/dashboardSettingsSlice';
 import { 
   selectFinancialSummary
@@ -10,10 +10,10 @@ import DashboardView from '@/view/finance-hub/overview/DashboardView';
 import AssetFocusDashboardContainer from './AssetDashboardContainer';
 import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
 import alertsService from '@/service/application/notifications/alertsService';
-import { useDashboardConfig } from '@/hooks/useDashboardConfig';
+import { useDashboardConfig } from '../../hooks/useDashboardConfig';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 import Logger from '@/service/shared/logging/Logger/logger';
-import { useAsyncOperation } from '@/utils/containerUtils';
+import { useAsyncOperation } from '../../utils/containerUtils';
 
 const DashboardContainer: React.FC = () => {
   const { t } = useTranslation();

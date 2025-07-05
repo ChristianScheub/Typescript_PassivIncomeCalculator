@@ -5,6 +5,7 @@ import { addTransactionActivity } from './methods/addTransactionActivity';
 import { getRecentActivities } from './methods/getRecentActivities';
 import { getActivitiesByType } from './methods/getActivitiesByType';
 import { clearActivities } from './methods/clearActivities';
+import { replaceAnalyticsActivity } from './methods/replaceAnalyticsActivity';
 
 const recentActivityService: IRecentActivityService = {
   addAnalyticsActivity,
@@ -12,7 +13,8 @@ const recentActivityService: IRecentActivityService = {
   addTransactionActivity,
   getRecentActivities,
   getActivitiesByType,
-  clearActivities
+  clearActivities,
+  replaceAnalyticsActivity
 };
 
 export type { IRecentActivityService };

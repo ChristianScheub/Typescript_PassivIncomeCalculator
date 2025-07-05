@@ -8,8 +8,6 @@ import DesktopLayout from './layouts/DesktopLayout';
 
 // Pages
 import DashboardContainer from './container/dashboard/DashboardContainer';
-import PortfolioHubContainer from './container/portfolio/PortfolioHubContainer';
-import AnalyticsHubContainer from './container/analytics/AnalyticsHubContainer';
 import SettingsContainer from './container/settings/SettingsContainer';
 
 // Context
@@ -23,6 +21,8 @@ import { ErrorScreenAppStart } from '@/ui/appStart/appStartError';
 import { LoadingScreenAppStart } from '@/ui/appStart/appStartLoading';
 import GlobalSnackbar from '@/ui/components/GlobalSnackbar';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
+import PortfolioHubContainer from './container/portfolioHub/portfolio/PortfolioHubContainer';
+import AnalyticsHubContainer from './container/analyticsHub/AnalyticsHubContainer';
 
 // Main App Content with initialization check
 const AppContent = () => {

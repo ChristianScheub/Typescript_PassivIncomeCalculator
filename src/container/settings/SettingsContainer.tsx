@@ -21,8 +21,8 @@ import { ConfirmationDialogState } from "@/ui/dialog/types";
 import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/snackbarSlice';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 import { clearAllLiabilities } from "@/store/slices/liabilitiesSlice";
+import { StockAPIProvider } from "@/types/shared";
 import { DashboardMode } from "@/types/shared/analytics";
-import { StockAPIProvider } from '@/types/shared/base/enums';
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";
 type AsyncOperationStatus = "idle" | "loading" | "success" | "error";

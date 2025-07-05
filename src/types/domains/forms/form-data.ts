@@ -2,6 +2,7 @@
  * Specific form data types for different entities
  */
 
+import { PaymentFrequency } from '@/types/shared';
 import { FieldValues } from 'react-hook-form';
 
 export interface ExpenseFormData extends FieldValues {
@@ -11,7 +12,7 @@ export interface ExpenseFormData extends FieldValues {
   endDate?: string;
   notes?: string;
   paymentSchedule: {
-    frequency: 'monthly' | 'quarterly' | 'annually' | 'custom';
+    frequency: PaymentFrequency;
     amount: number;
     months?: number[];
     customAmounts?: Record<string, number>;

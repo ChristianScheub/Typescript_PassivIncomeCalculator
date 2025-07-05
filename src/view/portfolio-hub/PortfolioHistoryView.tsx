@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
-import { formatService } from '@/service';
+import { formatService } from '../../service';
 import { ChartTooltip } from '@/ui/charts/ChartTooltips';
 import { TabButton, TabGroup } from '@/ui/common';
 import { ChartEmptyState } from '@/ui/feedback/EnhancedEmptyState';

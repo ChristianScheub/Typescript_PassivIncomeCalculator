@@ -10,7 +10,7 @@ import {
   Calendar,
   ArrowRight
 } from 'lucide-react';
-import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analytics/AnalyticsHubContainer';
+import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analyticsHub/AnalyticsHubContainer';
 
 interface AnalyticsCategoryCard {
   id: AnalyticsCategory;
@@ -38,51 +38,6 @@ const AnalyticsCategoriesSection: React.FC<AnalyticsCategoriesSectionProps> = ({
   const { t } = useTranslation();
 
   const analyticsCategories: AnalyticsCategoryCard[] = [
-    {
-      id: 'overview',
-      titleKey: 'analytics.hub.categories.overview.title',
-      descriptionKey: 'analytics.hub.categories.overview.description',
-      icon: BarChart3,
-      color: 'text-blue-500',
-      bgColor: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800',
-      subCategories: [
-        {
-          id: 'dashboard',
-          titleKey: 'analytics.hub.categories.overview.dashboard',
-          descriptionKey: 'analytics.hub.categories.overview.dashboardDesc'
-        },
-        {
-          id: 'summary',
-          titleKey: 'analytics.hub.categories.overview.summary',
-          descriptionKey: 'analytics.hub.categories.overview.summaryDesc'
-        }
-      ]
-    },
-    {
-      id: 'forecasting',
-      titleKey: 'analytics.hub.categories.forecasting.title',
-      descriptionKey: 'analytics.hub.categories.forecasting.description',
-      icon: TrendingUp,
-      color: 'text-green-500',
-      bgColor: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
-      subCategories: [
-        {
-          id: 'cashflow',
-          titleKey: 'analytics.hub.categories.forecasting.cashflow',
-          descriptionKey: 'analytics.hub.categories.forecasting.cashflowDesc'
-        },
-        {
-          id: 'portfolio',
-          titleKey: 'analytics.hub.categories.forecasting.portfolio',
-          descriptionKey: 'analytics.hub.categories.forecasting.portfolioDesc'
-        },
-        {
-          id: 'scenarios',
-          titleKey: 'analytics.hub.categories.forecasting.scenarios',
-          descriptionKey: 'analytics.hub.categories.forecasting.scenariosDesc'
-        }
-      ]
-    },
     {
       id: 'milestones',
       titleKey: 'analytics.hub.categories.milestones.title',
@@ -135,6 +90,31 @@ const AnalyticsCategoriesSection: React.FC<AnalyticsCategoriesSectionProps> = ({
           id: 'geographic',
           titleKey: 'analytics.hub.categories.distributions.geographic',
           descriptionKey: 'analytics.hub.categories.distributions.geographicDesc'
+        }
+      ]
+    },
+        {
+      id: 'forecasting',
+      titleKey: 'analytics.hub.categories.forecasting.title',
+      descriptionKey: 'analytics.hub.categories.forecasting.description',
+      icon: TrendingUp,
+      color: 'text-green-500',
+      bgColor: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
+      subCategories: [
+        {
+          id: 'cashflow',
+          titleKey: 'analytics.hub.categories.forecasting.cashflow',
+          descriptionKey: 'analytics.hub.categories.forecasting.cashflowDesc'
+        },
+        {
+          id: 'portfolio',
+          titleKey: 'analytics.hub.categories.forecasting.portfolio',
+          descriptionKey: 'analytics.hub.categories.forecasting.portfolioDesc'
+        },
+        {
+          id: 'scenarios',
+          titleKey: 'analytics.hub.categories.forecasting.scenarios',
+          descriptionKey: 'analytics.hub.categories.forecasting.scenariosDesc'
         }
       ]
     },
@@ -208,14 +188,13 @@ const AnalyticsCategoriesSection: React.FC<AnalyticsCategoriesSectionProps> = ({
                 isSelected ? 'ring-2 ring-blue-500 shadow-lg' : ''
               }`}
               onClick={() => {
-                // For overview category, navigate to summary to show the actual overview analytics
-                if (category.id === 'overview') {
-                  onCategoryChange(category.id, 'summary');
-                } else {
-                  // For other categories, use first subcategory as default
-                  const defaultSubCategory = category.subCategories[0]?.id;
-                  onCategoryChange(category.id, defaultSubCategory);
-                }
+                  // For distributions, don't set a default subcategory - show overview instead
+                  if (category.id === 'distributions') {
+                    onCategoryChange(category.id);
+                  } else {
+                    const defaultSubCategory = category.subCategories[0]?.id;
+                    onCategoryChange(category.id, defaultSubCategory);
+                  }
               }}
             >
               <CardContent className="p-6">

@@ -45,27 +45,6 @@ const AIChatView: React.FC<AIChatViewProps> = ({
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
 
-  // Extracted nested ternary operation into an independent statement
-  const badgeVariant = (() => {
-    if (modelStatus === "loaded") return "success";
-    if (modelStatus === "loading") return "warning";
-    return "destructive";
-  })();
-
-  // Updated suggested questions key to avoid using array index
-  const renderSuggestedQuestions = () => (
-    suggestedQuestions.map((question) => (
-      <button
-        key={question}
-        onClick={() => onSuggestedQuestionClick(question)}
-        className="text-left p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm transition-colors"
-        disabled={isTyping || modelStatus !== 'loaded'}
-      >
-        {question}
-      </button>
-    ))
-  );
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4 py-4">
@@ -84,7 +63,7 @@ const AIChatView: React.FC<AIChatViewProps> = ({
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('ai.model.status')}: 
               </span>
-              <Badge variant={badgeVariant}>
+              <Badge variant={modelStatus === 'loaded' ? 'success' : modelStatus === 'loading' ? 'warning' : 'destructive'}>
                 {t(`ai.model.states.${modelStatus}`)}
               </Badge>
             </div>
@@ -267,7 +246,16 @@ const AIChatView: React.FC<AIChatViewProps> = ({
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {renderSuggestedQuestions()}
+                {suggestedQuestions.map((question, index) => (
+                  <button
+                    key={index}
+                    onClick={() => onSuggestedQuestionClick(question)}
+                    className="text-left p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm transition-colors"
+                    disabled={isTyping || modelStatus !== 'loaded'}
+                  >
+                    {question}
+                  </button>
+                ))}
               </div>
             </CardContent>
           </Card>

@@ -94,6 +94,8 @@ export type AnalyticsSubCategory =
   | 'historical'
   | 'calendar' 
   | 'history' 
+  | 'liabilities'
+  | 'distributions'
   | 'timeline';
 
 export type PortfolioCategory = 

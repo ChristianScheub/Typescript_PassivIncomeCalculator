@@ -5,13 +5,13 @@ import { Card, CardContent } from "@/ui/common/Card";
 import { ViewHeader } from "@/ui/layout/ViewHeader";
 import { MotivationalEmptyState } from "@/ui/feedback/EnhancedEmptyState";
 import { Modal } from "@/ui/common/Modal";
-import { MaterialExpenseForm } from "@/container/forms/MaterialExpenseForm";
 import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
 import { SwipeableCard } from "@/ui/common/SwipeableCard";
 import formatService from "@service/infrastructure/formatService";
 import { Expense } from "@/types/domains/financial/entities";
 import { Plus,ReceiptText } from "lucide-react";
 import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
+import { MaterialExpenseForm } from "@/container/portfolioHub/forms/MaterialExpenseForm";
 
 interface ExpensesViewProps {
   expenses: Expense[];

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 // Payment Schedule Schema
 export const createPaymentScheduleSchema = () => z.object({
-  frequency: z.enum(['monthly', 'quarterly', 'annually', 'custom'] as const, {
+  frequency: z.enum(['monthly', 'quarterly', 'annually', 'custom', 'none'] as const, {
     required_error: "Payment frequency is required",
     invalid_type_error: "Please select a valid payment frequency"
   }),

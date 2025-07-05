@@ -6,7 +6,7 @@ import { formatService } from '@service';
 import { PriceHistoryView } from '@/ui/components/PriceHistoryView';
 import { PriceChart } from '@/ui/components/PriceChart';
 import { DividendHistoryView } from '@/ui/components/DividendHistoryView';
-import { featureFlag_Debug_View } from '@/config/featureFlags';
+import { featureFlag_Debug_View } from '../../../config/featureFlags';
 import { IconButton } from '@/ui/common';
 
 interface AssetDetailViewProps {
@@ -175,13 +175,13 @@ export const AssetDetailView: React.FC<AssetDetailViewProps & { assetDefinition?
                   </div>
                 )}
 
-                {asset.sectors && asset.sectors.length > 0 && (
+                {asset.sector && (
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
                       {t('assets.sector')}:
                     </span>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {asset.sectors.join(', ')}
+                      {asset.sector}
                     </span>
                   </div>
                 )}
@@ -248,13 +248,13 @@ export const AssetDetailView: React.FC<AssetDetailViewProps & { assetDefinition?
                     </div>
                   )}
 
-                  {assetDefinition.sectors && assetDefinition.sectors.length > 0 && (
+                  {assetDefinition.sector && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {t('assets.sector')}:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {assetDefinition.sectors.join(', ')}
+                        {assetDefinition.sector}
                       </span>
                     </div>
                   )}

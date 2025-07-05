@@ -36,4 +36,12 @@ export interface IRecentActivityService {
 
   // Clear Methods
   clearActivities: (type?: ActivityType) => void;
+  
+  // Replace previous analytics activity with new one (for sub-navigation)
+  replaceAnalyticsActivity: (
+    oldCategory: AnalyticsCategory,
+    oldSubCategory: AnalyticsSubCategory,
+    newCategory: AnalyticsCategory,
+    newSubCategory: AnalyticsSubCategory
+  ) => void;
 }

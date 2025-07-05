@@ -1,17 +1,17 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '@/hooks/redux';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { setAssetFocusTimeRange, AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
 import { updateAssetDefinition } from '@/store/slices/assetDefinitionsSlice';
-import { usePortfolioHistory, useAssetFocusData, useFinancialSummary } from '@/hooks/useCalculatedDataCache';
-import { usePortfolioIntradayView, usePortfolioHistoryView } from '@/hooks/usePortfolioHistoryView';
+import { usePortfolioHistory, useAssetFocusData, useFinancialSummary } from '../../hooks/useCalculatedDataCache';
+import { usePortfolioIntradayView, usePortfolioHistoryView } from '../../hooks/usePortfolioHistoryView';
 import AssetDashboardView from '@/view/finance-hub/overview/AssetDashboardView';
 import AssetDetailModal from '@/view/finance-hub/overview/AssetDetailModal';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
 import stockAPIService from '@/service/domain/assets/market-data/stockAPIService';
-import { useAsyncOperation } from '@/utils/containerUtils';
+import { useAsyncOperation } from '../../utils/containerUtils';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
-import { addIntradayPriceHistory } from '@/utils/priceHistoryUtils';
+import { addIntradayPriceHistory } from '../../utils/priceHistoryUtils';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { useTranslation } from 'react-i18next';
 

@@ -28,7 +28,7 @@ export interface Income extends BaseEntity {
 export interface IncomeFormData {
   name: string;
   type: 'salary' | 'interest' | 'side_hustle' | 'other';
-  paymentFrequency: 'monthly' | 'quarterly' | 'annually' | 'custom';
+  paymentFrequency: PaymentFrequency;
   amount: number;
   isPassive: boolean;
   customSchedule?: number[];
