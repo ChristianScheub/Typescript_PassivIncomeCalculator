@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { updateForecastValues } from '@/store/slices/forecastSlice';
 import Logger from '@/service/shared/logging/Logger/logger';
-import ForecastView from '@/view/shared/components/ForecastView';
+import ForecastView from '@/view/analytics-hub/ForecastView';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 
 interface ForecastContainerProps {
