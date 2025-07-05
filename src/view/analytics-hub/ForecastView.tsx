@@ -1,10 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MonthlyProjection } from '@/types/domains/analytics';
-import { ViewHeader } from '@/ui/layout/ViewHeader';
-import BarChartCashFlowProjection from '@/ui/charts/barCharts/BarChartCashFlowProjection';
-import BarChartNetCashFlow from '@/ui/charts/barCharts/BarChartNetCashFlow';
-import BarChartExpenseCoverage from '@/ui/charts/barCharts/BarChartExpenseCoverage';
+import { ViewHeader } from '@ui/shared';
+import { BarChartCashFlowProjection,BarChartExpenseCoverage ,BarChartNetCashFlow} from '@/ui/portfolioHub';
 
 interface ForecastViewProps {
   isLoading: boolean;

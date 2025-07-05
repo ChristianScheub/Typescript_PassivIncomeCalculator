@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ViewHeader } from '@/ui/layout/ViewHeader';
+import { ViewHeader } from '@ui/shared';
 import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
 import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analyticsHub/AnalyticsHubContainer';
 import AnalyticsOverviewSection from './hub/AnalyticsOverviewSection';

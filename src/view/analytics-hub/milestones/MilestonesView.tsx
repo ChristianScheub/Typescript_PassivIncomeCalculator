@@ -6,15 +6,10 @@ import {
   CardHeader,
   CardTitle,
   CardContent,
-} from "../../../ui/common/Card";
-import { ViewHeader } from "../../../ui/layout/ViewHeader";
-import BufferMilestone from "../../../ui/milestones/BufferMilestone";
-import DebtBreaker from "../../../ui/milestones/DebtBreaker";
-import DebtCoverage from "../../../ui/milestones/DebtCoverage";
-import FixedCostFreedom from "../../../ui/milestones/FixedCostFreedom";
-import LeisureMilestone from "../../../ui/milestones/LeisureMilestone";
-import TotalExpenseCoverage from "../../../ui/milestones/TotalExpenseCoverage";
+} from "../../../ui/shared/Card";
+import { ViewHeader } from "../../../ui/shared/ViewHeader";
 import { DebtEntry, DebtWithCoverage } from "../../../types/domains/financial/calculations";
+import { BufferMilestone,TotalExpenseCoverage,LeisureMilestone,FixedCostFreedom,DebtCoverage,DebtBreaker } from "@/ui/portfolioHub";
 
 interface MilestonesViewProps {
   liquidAssets: number;

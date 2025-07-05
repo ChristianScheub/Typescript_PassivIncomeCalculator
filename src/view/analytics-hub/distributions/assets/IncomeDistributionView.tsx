@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import GenericPieChart from '@/ui/charts/pieCharts/GenericPieChart';
 import type { PieChartData } from '@/types/shared/charts';
+import { GenericPieChart } from '@/ui/portfolioHub';
 
 interface IncomeDistributionData {
   name: string;

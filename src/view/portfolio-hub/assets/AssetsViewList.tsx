@@ -1,10 +1,10 @@
 import { Asset } from "@/types/domains/assets";
 import { TranslationProps } from "@/types/shared/ui/view-props";
 import { PortfolioData } from "./AssetsView";
-import { SwipeableCard } from "@/ui/common/SwipeableCard";
+import { SwipeableCard } from "@/ui/portfolioHub/common/SwipeableCard";
 import { EmptyStateView } from "./EmptyStateAssetView";
 import { PortfolioView } from "../PortfolioView";
-import { Card, CardContent } from "@/ui/common/Card";
+import { Card, CardContent } from "@/ui/shared/Card";
 import { formatService } from "@/service";
 import { PortfolioPosition } from "@/types/domains/portfolio/position";
 

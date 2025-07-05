@@ -1,22 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, CardTitle, CardContent } from '@/ui/common/Card';
-import { CollapsibleSection } from '@/ui/common/CollapsibleSection';
-import { Button } from '@/ui/common/Button';
-import { ButtonGroup } from '@/ui/common/ButtonGroup';
+import { Card, CardHeader, CardTitle, CardContent, CollapsibleSection,Toggle,ConfirmationDialog } from '@ui/shared';
+import { Button } from '@ui/shared';
+import { ButtonGroup } from '@ui/shared';
 import { Download, Upload, Key, ChevronRight, Trash, Monitor, Brain } from 'lucide-react';
-import DebugSettings from '@/ui/specialized/DebugSettings';
+import DebugSettings from '@/ui/settings/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '@/config/featureFlags';
 import { StockAPIProvider } from '@/types/shared/base/enums';
 import { DashboardMode } from '@/types/shared/analytics';
-import { ConfirmationDialog } from '@/ui/dialog/ConfirmationDialog';
-import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '@/ui/common/ClearButton';
 import clsx from 'clsx';
-import { Toggle } from '@/ui/common/Toggle';
 import { DividendApiSettingsSection } from './DividendApiSettingsSection';
 import { StockApiSettingsSection } from './StockApiSettingsSection';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 import { AISettingsContainer } from '@/container/settings/AISettingsContainer';
+import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '@/ui/settings';
 
 interface ProviderInfo {
   name: string;

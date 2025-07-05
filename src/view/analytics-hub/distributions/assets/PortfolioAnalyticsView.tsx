@@ -1,11 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import TabSelector from '@/ui/navigation/TabSelector';
 import PortfolioDistributionView from './PortfolioDistributionView';
 import IncomeDistributionView from './IncomeDistributionView';
 import CustomAnalyticsView from './CustomAnalyticsView';
-import { ViewHeader } from '@/ui/layout/ViewHeader';
-import { AssetTypeFilterCard } from '@/ui/specialized/AssetTypeFilterCard';
+import { TabSelector, ViewHeader } from '@ui/shared';
+import { AssetTypeFilterCard } from '@ui/shared';
 import { AllocationData } from '@/types/domains/analytics/calculations';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { AssetType } from '@/types/shared';

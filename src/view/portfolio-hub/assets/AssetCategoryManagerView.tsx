@@ -3,18 +3,14 @@ import { useTranslation } from "react-i18next";
 import { AssetCategory, AssetCategoryOption } from "../../../types/domains/assets/categories";
 import { CategoryFormData, OptionFormData } from "../../../types/shared/ui/view-props";
 import { Plus, Trash2 } from "lucide-react";
-import { Modal } from "../../../ui/common/Modal";
-import { ActionButtonGroup } from "../../../ui/common/ActionButtonGroup";
-import { Button } from "../../../ui/common/Button";
-import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
-import { ViewHeader } from "../../../ui/layout/ViewHeader";
-import { IconButton } from "../../../ui/common";
-import {
-  StandardFormWrapper,
-  RequiredSection,
-  FormGrid,
-  StandardFormField,
-} from "../../../ui/forms/StandardFormWrapper";
+import { Modal } from "../../../ui/portfolioHub/dialog/Modal";
+import { ActionButtonGroup } from "../../../ui/portfolioHub/ActionButtonGroup";
+import { Button } from "../../../ui/shared/Button";
+import FloatingBtn, { ButtonAlignment } from "../../../ui/shared/floatingBtn";
+import { ViewHeader } from "../../../ui/shared/ViewHeader";
+import { FormGrid, RequiredSection, StandardFormWrapper } from "@/ui/portfolioHub";
+import { StandardFormField } from "@/ui/portfolioHub/forms";
+import { IconButton } from "@/ui/shared";
 
 interface AssetCategoryManagerViewProps {
   categories: AssetCategory[];

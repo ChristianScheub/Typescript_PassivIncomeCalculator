@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import formatService from "@service/infrastructure/formatService";
 import { RechartsClickData } from '@/types/shared/charts';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
-import { ViewHeader } from '@/ui/layout/ViewHeader';
-import { AssetTypeFilterCard } from '@/ui/specialized/AssetTypeFilterCard';
-import { CollapsibleSection } from '@/ui/common/CollapsibleSection';
+import { ViewHeader } from '@ui/shared';
+import { AssetTypeFilterCard } from '@ui/shared';
+import { CollapsibleSection } from '@ui/shared';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Cell } from 'recharts';
 import { AssetType } from '@/types/shared';
 

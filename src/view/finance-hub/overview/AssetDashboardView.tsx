@@ -1,12 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { PullToRefresh } from '@/ui/common/PullToRefresh';
-import { NetWorthSnapshot } from '@/ui/dashboard/NetWorthSnapshot';
-import { Button } from '@/ui/common/Button';
-import { ButtonGroup } from '@/ui/common/ButtonGroup';
-import { IconButton } from '@/ui/common/IconButton';
+import { PullToRefresh } from '@ui/startHub';
+import { NetWorthSnapshot } from '@ui/startHub';
+import { Button } from '@ui/shared';
+import { ButtonGroup } from '@ui/shared';
+import { IconButton } from '@ui/shared';
 import { History } from 'lucide-react';
-import { AssetPositionsList, AssetWithValue } from '@/ui/components/AssetPositionsList';
+import { AssetPositionsList, AssetWithValue } from '@ui/portfolioHub';
 import { AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';

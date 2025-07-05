@@ -10,6 +10,7 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
       '@/types': path.resolve(__dirname, './src/types/index'),
       '@service': path.resolve(__dirname, './src/service'),
+      '@ui': path.resolve(__dirname, './src/ui'),
     },
   },
   optimizeDeps: {

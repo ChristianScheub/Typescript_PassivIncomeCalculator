@@ -17,9 +17,9 @@ import { ThemeProvider } from './theme/ThemeProvider';
 // Initialization
 import { useAppInitialization } from './hooks/useAppInitialization';
 import { useAutoPortfolioHistoryUpdate } from './hooks/useAutoPortfolioHistoryUpdate';
-import { ErrorScreenAppStart } from '@/ui/appStart/appStartError';
-import { LoadingScreenAppStart } from '@/ui/appStart/appStartLoading';
-import GlobalSnackbar from '@/ui/components/GlobalSnackbar';
+import { ErrorScreenAppStart } from '@/ui/shared/appStart/appStartError';
+import { LoadingScreenAppStart } from '@/ui/shared/appStart/appStartLoading';
+import GlobalSnackbar from '@/ui/shared/GlobalSnackbar';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 import PortfolioHubContainer from './container/portfolioHub/portfolio/PortfolioHubContainer';
 import AnalyticsHubContainer from './container/analyticsHub/AnalyticsHubContainer';

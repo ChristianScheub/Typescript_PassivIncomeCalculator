@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/ui/common/Button';
+import { Button } from '@ui/shared';
 import { Eye, EyeOff } from 'lucide-react';
 import { StockAPIProvider } from '@/types/shared/base/enums';
 

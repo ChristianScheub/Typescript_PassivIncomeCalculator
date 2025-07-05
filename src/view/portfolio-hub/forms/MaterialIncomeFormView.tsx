@@ -2,16 +2,10 @@ import React from 'react';
 import { IncomeType, PaymentFrequency } from '@/types/shared/base/enums';
 import { UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { FormFieldValue } from '@/types/shared/ui/specialized';
-import { 
-  StandardFormWrapper,
-  RequiredSection,
-  FormGrid,
-  StandardFormField,
-  CustomScheduleSection
-} from '@/ui/forms/StandardFormWrapper';
-import { OptionalFieldsSection } from '@/ui/forms';
 import { useTranslation } from 'react-i18next';
 import { getPaymentFrequencyOptions, getIncomeTypeOptions } from '../../../constants';
+import { CustomScheduleSection, FormGrid, OptionalFieldsSection, RequiredSection, StandardFormWrapper } from '@/ui/portfolioHub';
+import { StandardFormField } from '@/ui/portfolioHub/forms';
 
 // Define the IncomeFormData interface for the form
 interface IncomeFormData {

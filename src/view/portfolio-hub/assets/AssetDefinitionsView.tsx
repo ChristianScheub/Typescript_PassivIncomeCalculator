@@ -4,17 +4,16 @@ import { AssetDefinition } from "../../../types/domains/assets";
 import { AssetCategoryAssignment } from "../../../types/domains/assets/categories";
 import { CreateAssetDefinitionData } from "../../../types/domains/assets/create-asset-definition-data";
 import { AssetDefinitionForm } from "../forms/AssetDefinitionForm";
-import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
-import { ViewHeader } from "../../../ui/layout/ViewHeader";
+import FloatingBtn, { ButtonAlignment } from "../../../ui/shared/floatingBtn";
+import { ViewHeader } from "../../../ui/shared/ViewHeader";
 import { Plus, Wallet, RefreshCw, History, DollarSign } from "lucide-react";
-import { IconButton } from "../../../ui/common";
 import { Tooltip } from "@mui/material";
 import { formatService } from "../../../service";
-import { TimeRangeSelectionDialog } from "../../../ui/dialog/TimeRangeSelectionDialog";
 import { TimeRangePeriod } from "../../../types/shared/time";
-import { AddPriceEntryDialog, PriceEntry } from "../../../ui/dialog/AddPriceEntryDialog";
-import { SwipeableCard } from "../../../ui/common";
-import { SearchInput } from "@/ui/components/inputs/SearchInput";
+import { SearchInput } from "@/ui/portfolioHub/inputs/SearchInput";
+import { IconButton } from "@/ui/shared";
+import { AddPriceEntryDialog, SwipeableCard, TimeRangeSelectionDialog } from "@/ui/portfolioHub";
+import { PriceEntry } from "@/ui/portfolioHub/dialog/AddPriceEntryDialog";
 
 
 interface AssetDefinitionsViewProps {

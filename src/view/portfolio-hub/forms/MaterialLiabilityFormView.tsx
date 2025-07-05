@@ -1,16 +1,12 @@
 import React from 'react';
 import { LiabilityType, PaymentFrequency } from '@/types/shared/base/enums';
 import { UseFormSetValue } from 'react-hook-form';
-import { 
-  StandardFormWrapper,
-  RequiredSection,
-  FormGrid,
-  StandardFormField,
-  CustomScheduleSection
-} from '@/ui/forms/StandardFormWrapper';
-import { OptionalFieldsSection } from '@/ui/forms';
 import { useTranslation } from 'react-i18next';
 import { getPaymentFrequencyOptions, getLiabilityTypeOptions } from '../../../constants';
+import { CustomScheduleSection, OptionalFieldsSection,StandardFormWrapper,
+  RequiredSection,
+  FormGrid } from '@/ui/portfolioHub';
+import { StandardFormField } from '@/ui/portfolioHub/forms';
 
 // Define the LiabilityFormData interface for the form
 interface LiabilityFormData {

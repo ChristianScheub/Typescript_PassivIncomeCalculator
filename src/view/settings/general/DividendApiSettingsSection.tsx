@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Key, Eye, EyeOff } from 'lucide-react';
-import { CollapsibleSection } from '@/ui/common/CollapsibleSection';
-import { Toggle } from '@/ui/common/Toggle';
-import { Button } from '@/ui/common/Button';
+import { Toggle,Button,CollapsibleSection } from '@ui/shared';
 import { useTranslation } from 'react-i18next';
 import sqliteService from '@service/infrastructure/sqlLiteService';
 import { calculateDividendCAGRForYears, generateDividendForecast } from '@/utils/dividendHistoryUtils';

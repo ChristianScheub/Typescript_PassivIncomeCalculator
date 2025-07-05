@@ -1,10 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import TabSelector from '@/ui/navigation/TabSelector';
 import LiabilityMonthlyAnalyticsView from './LiabilityMonthlyAnalyticsView';
 import LiabilityAnnualAnalyticsView from './LiabilityAnnualAnalyticsView';
 import LiabilityMoreAnalyticsView from './LiabilityMoreAnalyticsView';
-import { ViewHeader } from '@/ui/layout/ViewHeader';
+import { TabSelector, ViewHeader } from '@ui/shared';
 
 type LiabilityAnalyticsTab = 'monthly' | 'annual' | 'more';
 

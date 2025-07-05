@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ViewHeader } from '@/ui/layout/ViewHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/Card';
+import { ViewHeader } from '@ui/shared';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/shared';
 import { 
   PieChart, 
   TrendingUp, 

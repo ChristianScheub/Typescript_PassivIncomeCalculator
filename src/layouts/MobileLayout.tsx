@@ -1,6 +1,6 @@
 import React from 'react';
 import { Home, Briefcase, BarChart3 } from 'lucide-react';
-import { NavLinkItem } from '@/ui/navigation/NavLinkItem';
+import { NavLinkItem } from '@/ui/shared/navigation/NavLinkItem';
 import { useTranslation } from 'react-i18next';
 
 interface MobileLayoutProps {

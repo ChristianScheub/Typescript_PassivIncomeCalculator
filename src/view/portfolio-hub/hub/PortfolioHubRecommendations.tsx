@@ -8,8 +8,8 @@ import { generateIncomeRecommendations } from "@service/domain/analytics/calcula
 import { generateExpenseRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateExpenseRecommendations";
 import { generateLiabilityRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateLiabilityRecommendations";
 import { PortfolioRecommendation, RecommendationPriority } from "@/types/domains/analytics";
-import { CollapsibleSection } from "@/ui/common";
 import { Target } from "lucide-react";
+import { CollapsibleSection } from "@/ui/shared";
 
 interface PortfolioHubRecommendationsProps {
   className?: string;

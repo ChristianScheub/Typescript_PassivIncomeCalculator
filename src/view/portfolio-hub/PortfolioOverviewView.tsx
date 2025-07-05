@@ -10,10 +10,10 @@ import {
   BarChart3,
   ArrowRight,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../ui/common/Card";
-import { Button } from "../../ui/common/Button";
-import { ViewHeader } from "../../ui/layout/ViewHeader";
-import { PortfolioRecentActivities } from "../../ui/portfolio/PortfolioRecentActivities";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/shared/Card";
+import { Button } from "../../ui/shared/Button";
+import { ViewHeader } from "../../ui/shared/ViewHeader";
+import { PortfolioRecentActivities } from "../../ui/portfolioHub/PortfolioRecentActivities";
 import formatService from "@service/infrastructure/formatService";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
 import PortfolioHubRecommendations from "./hub/PortfolioHubRecommendations";

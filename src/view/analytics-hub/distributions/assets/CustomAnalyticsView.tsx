@@ -3,15 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useAppSelector } from '@/hooks/redux';
 import { compositeCalculatorService as calculatorService } from '@/service';
-import { Button, ButtonGroup } from '@/ui/common';
-import { IconButton } from '@/ui/common/IconButton';
+import { Button, ButtonGroup, IconButton } from '@ui/shared';
 import { 
   addChart, 
   updateChart, 
   removeChart, 
   openConfigPanel, 
-  closeConfigPanel,
-  ChartType, CustomAnalyticsConfig, DataSource, GroupBy
+  closeConfigPanel
 } from '@/store/slices/customAnalyticsSlice';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { 
@@ -20,8 +18,10 @@ import {
   IncomeAnalyticsData as ServiceIncomeAnalyticsData
 } from '@/types/domains/analytics/calculations';
 import { PieChartData } from '@/types/shared/charts';
-import GenericPieChart from '@/ui/charts/pieCharts/GenericPieChart';
 import { Plus, Trash2, Edit3, X } from 'lucide-react';
+import { GenericPieChart } from '@/ui/portfolioHub';
+import { CustomAnalyticsConfig } from '@/types/domains/analytics/charts';
+import { ChartType, DataSource, GroupBy } from '@/types/shared/analytics';
 
 /**
  * Chart data item that extends PieChartData with percentage for analytics views

@@ -1,8 +1,8 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { ViewHeader } from "@/ui/layout/ViewHeader";
-import { Card, CardContent, CardHeader, CardTitle } from "@/ui/common/Card";
-import { Button } from "@/ui/common/Button";
+import { ViewHeader } from "@/ui/shared/ViewHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/ui/shared/Card";
+import { Button } from "@/ui/shared/Button";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
 import type { AIInsightsViewProps } from "@/types/domains/analytics/ai";
 import {
@@ -17,7 +17,7 @@ import {
   DollarSign,
   PieChart,
 } from "lucide-react";
-import { Badge } from "@/ui/common/Badge";
+import { Badge } from "@/ui/shared/common/Badge";
 
 const AIInsightsView: React.FC<AIInsightsViewProps> = ({ 
   onBack,

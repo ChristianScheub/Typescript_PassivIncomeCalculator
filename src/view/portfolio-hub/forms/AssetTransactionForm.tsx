@@ -5,17 +5,11 @@ import { useSharedForm } from '../../../hooks/useSharedForm';
 import { AssetDefinition,Asset } from '@/types/domains/assets/entities';
 import { AssetFormData } from '@/types/domains/forms/form-data';
 import { createAssetTransactionSchema } from '../../../utils/validationSchemas';
-import { Modal } from '@/ui/common/Modal';
-import { 
-  StandardFormWrapper,
-  RequiredSection,
-  OptionalSection,
-  FormGrid,
-  StandardFormField
-} from '@/ui/forms/StandardFormWrapper';
-import { AssetSearchBar, SelectedAssetInfo } from '@/ui/components';
+import { Modal } from '@/ui/portfolioHub/dialog/Modal';
 import { FormFieldValue } from '@/types/shared/ui/specialized';
 import { formatService } from '../../../service';
+import { AssetSearchBar, SelectedAssetInfo } from '@/ui/portfolioHub';
+import { FormGrid, OptionalSection, RequiredSection, StandardFormField, StandardFormWrapper} from '@/ui/portfolioHub/forms';
 
 const assetTransactionSchema = createAssetTransactionSchema();
 
@@ -303,10 +297,9 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   { value: '', label: t('assets.selectAssetOption') },
                   ...filteredDefinitions.map((definition: AssetDefinition) => {
                     const tickerPart = definition.ticker ? ` (${definition.ticker})` : '';
-                    const sectorPart = definition.sector ? ` - ${definition.sector}` : '';
                     return {
                       value: definition.id,
-                      label: `${definition.fullName}${tickerPart}${sectorPart}`
+                      label: `${definition.fullName}${tickerPart}`
                     };
                   })
                 ]}

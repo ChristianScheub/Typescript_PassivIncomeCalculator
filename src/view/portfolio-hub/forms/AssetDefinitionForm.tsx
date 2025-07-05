@@ -1,25 +1,32 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AssetDefinition, AssetCategoryAssignment } from "@/types/domains/assets";
-import { AssetType, DividendFrequency, PaymentFrequency } from "@/types/shared/base/enums";
-import { updateAssetDefinitionPrice } from "../../../utils/priceHistoryUtils";
 import {
-  StandardFormWrapper,
-  OptionalSection,
-  FormGrid,
-  StandardFormField,
-} from "../../../ui/forms/StandardFormWrapper";
-import { Modal } from "../../../ui/common/Modal";
-import { Toggle } from "../../../ui/common/Toggle";
-import { AssetCategoryAssignmentSelector } from "../../../ui/specialized/AssetCategoryAssignmentSelector";
+  AssetDefinition,
+  AssetCategoryAssignment,
+} from "@/types/domains/assets";
+import {
+  AssetType,
+  DividendFrequency,
+  PaymentFrequency,
+} from "@/types/shared/base/enums";
+import { updateAssetDefinitionPrice } from "../../../utils/priceHistoryUtils";
+import { Modal } from "../../../ui/portfolioHub/dialog/Modal";
+import { Toggle } from "../../../ui/shared/common/Toggle";
+import { AssetCategoryAssignmentSelector } from "../../../ui/portfolioHub/forms/sections/AssetCategoryAssignmentSelector";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { useAppSelector } from "../../../hooks/redux";
-import { BasicAssetInformation } from "../../../ui/sections";
-import { SectorSection } from "../../../ui/specialized/SectorSection";
-import { AdditionalInformationSection } from "../../../ui/specialized/AdditionalInformationSection";
-import { AssetIncomeSection } from "../../../ui/forms/assetDefinition/AssetIncomeSection";
+import { BasicAssetInformation } from "../../../ui/portfolioHub/forms/sections";
+import { SectorSection } from "../../../ui/portfolioHub/forms/sections/SectorSection";
+import { AdditionalInformationSection } from "../../../ui/portfolioHub/forms/sections/AdditionalInformationSection";
+import { AssetIncomeSection } from "@/ui/portfolioHub";
+import {
+  StandardFormField,
+  StandardFormWrapper,
+  OptionalSection,
+  FormGrid,
+} from "@/ui/portfolioHub/forms";
 
 // Add useDividendApi to schema
 const assetDefinitionSchema = z.object({
@@ -83,8 +90,11 @@ const assetDefinitionSchema = z.object({
 // Type alias for form data from schema
 type AssetDefinitionFormData = z.infer<typeof assetDefinitionSchema>;
 
-// Type aliases for better maintainability 
-type CategoryAssignmentFormData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
+// Type aliases for better maintainability
+type CategoryAssignmentFormData = Omit<
+  AssetCategoryAssignment,
+  "id" | "createdAt" | "updatedAt"
+>;
 type OptionalAssetDefinition = AssetDefinition | null;
 
 interface AssetDefinitionFormProps {
@@ -151,7 +161,8 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           currentPrice: editingDefinition.currentPrice || undefined,
           lastPriceUpdate: editingDefinition.lastPriceUpdate || undefined,
           autoUpdatePrice: editingDefinition.autoUpdatePrice || false,
-          autoUpdateHistoricalPrices: editingDefinition.autoUpdateHistoricalPrices || false,
+          autoUpdateHistoricalPrices:
+            editingDefinition.autoUpdateHistoricalPrices || false,
 
           // Dividend fields
           hasDividend: !!editingDefinition.dividendInfo,
@@ -202,7 +213,8 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
   const hasRental = watch("hasRental");
   const hasBond = watch("hasBond");
   const useDividendApiRaw = watch("useDividendApi");
-  const useDividendApi = typeof useDividendApiRaw === 'boolean' ? useDividendApiRaw : false;
+  const useDividendApi =
+    typeof useDividendApiRaw === "boolean" ? useDividendApiRaw : false;
   const dividendPaymentMonths = watch("dividendPaymentMonths") || [];
   const rentalPaymentMonths = watch("rentalPaymentMonths") || [];
   const dividendCustomAmounts = watch("dividendCustomAmounts") || {};
@@ -272,9 +284,9 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       // Initialize sectors state based on editing definition
       if (editingDefinition.sectors && editingDefinition.sectors.length > 0) {
         // Convert SectorAllocation to local state format
-        const convertedSectors = editingDefinition.sectors.map(sector => ({
+        const convertedSectors = editingDefinition.sectors.map((sector) => ({
           sectorName: sector.sectorName || sector.sector || "",
-          percentage: sector.percentage
+          percentage: sector.percentage,
         }));
         setSectors(convertedSectors);
       } else {
@@ -289,10 +301,13 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         country: editingDefinition.country || "", // <-- explizit immer setzen
         continent: editingDefinition.continent || "",
         // sectors: editingDefinition.sectors || [],
-        sectors: editingDefinition.sectors && editingDefinition.sectors.length > 0 ? editingDefinition.sectors.map(sector => ({
-          sectorName: sector.sectorName || sector.sector || "",
-          percentage: sector.percentage
-        })) : [],
+        sectors:
+          editingDefinition.sectors && editingDefinition.sectors.length > 0
+            ? editingDefinition.sectors.map((sector) => ({
+                sectorName: sector.sectorName || sector.sector || "",
+                percentage: sector.percentage,
+              }))
+            : [],
         exchange: editingDefinition.exchange || "",
         isin: editingDefinition.isin || "",
         wkn: editingDefinition.wkn || "",
@@ -303,7 +318,8 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         currentPrice: editingDefinition.currentPrice || undefined,
         lastPriceUpdate: editingDefinition.lastPriceUpdate || undefined,
         autoUpdatePrice: editingDefinition.autoUpdatePrice || false,
-        autoUpdateHistoricalPrices: editingDefinition.autoUpdateHistoricalPrices || false,
+        autoUpdateHistoricalPrices:
+          editingDefinition.autoUpdateHistoricalPrices || false,
 
         hasDividend: !!editingDefinition.dividendInfo,
         dividendAmount: editingDefinition.dividendInfo?.amount || 0,
@@ -367,13 +383,15 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
       type: data.type,
       country: data.country || undefined,
       continent: data.continent || undefined,
-      sectors: (data.sectors || []).filter((s) => s.sectorName.trim() !== "").map(s => ({
-        sector: s.sectorName,
-        sectorName: s.sectorName,
-        percentage: s.percentage,
-        value: 0, // Will be calculated later
-        count: 0, // Will be calculated later
-      })),
+      sectors: (data.sectors || [])
+        .filter((s) => s.sectorName.trim() !== "")
+        .map((s) => ({
+          sector: s.sectorName,
+          sectorName: s.sectorName,
+          percentage: s.percentage,
+          value: 0, // Will be calculated later
+          count: 0, // Will be calculated later
+        })),
       exchange: data.exchange || undefined,
       isin: data.isin || undefined,
       wkn: data.wkn || undefined,
@@ -436,10 +454,10 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     if (data.hasDividend === false) {
       return {
         ...definitionData,
-        dividendInfo: undefined
+        dividendInfo: undefined,
       };
     }
-    
+
     // Skip adding dividend info if no valid amount or not enabled
     if (!data.hasDividend || !data.dividendAmount || data.dividendAmount <= 0) {
       return definitionData;
@@ -512,8 +530,15 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     const existingDefinition = editingDefinition || null;
 
     // Build the definition data step by step to reduce complexity
-    let finalDefinitionData = createBaseDefinitionData(data, existingDefinition);
-    finalDefinitionData = updatePriceHistoryIfNeeded(finalDefinitionData, data, existingDefinition);
+    let finalDefinitionData = createBaseDefinitionData(
+      data,
+      existingDefinition
+    );
+    finalDefinitionData = updatePriceHistoryIfNeeded(
+      finalDefinitionData,
+      data,
+      existingDefinition
+    );
     finalDefinitionData = addDividendInfoIfNeeded(finalDefinitionData, data);
     finalDefinitionData = addRentalInfoIfNeeded(finalDefinitionData, data);
     finalDefinitionData = addBondInfoIfNeeded(finalDefinitionData, data);
@@ -555,7 +580,12 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
               name="currentPrice"
               type="number"
               value={watch("currentPrice") || ""}
-              onChange={(value) => setValue("currentPrice", value ? parseFloat(value as string) : undefined)}
+              onChange={(value) =>
+                setValue(
+                  "currentPrice",
+                  value ? parseFloat(value as string) : undefined
+                )
+              }
               step={0.01}
               min={0}
               error={errors.currentPrice?.message}
@@ -565,39 +595,77 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
 
         {selectedType === "stock" && isApiEnabled && (
           <>
-          <div className="flex items-center justify-between mb-4">
-                <span className="text-gray-700 dark:text-gray-300">{t("assets.autoUpdatePrice")}</span>
-            <Toggle
-              checked={watch("autoUpdatePrice") || false}
-              onChange={(checked) => setValue("autoUpdatePrice", checked)}
-              id="autoUpdatePrice"
-              label={t("assets.autoUpdatePrice")}
-            />
-          </div>
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-700 dark:text-gray-300">{t("assets.autoUpdateHistoricalPrices")}</span>
-            <Toggle
-              checked={watch("autoUpdateHistoricalPrices") || false}
-              onChange={(checked) => setValue("autoUpdateHistoricalPrices", checked)}
-              id="autoUpdateHistoricalPrices"
-              label={t("assets.autoUpdateHistoricalPrices")}
-            />
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-gray-700 dark:text-gray-300">
+                {t("assets.autoUpdatePrice")}
+              </span>
+              <Toggle
+                checked={watch("autoUpdatePrice") || false}
+                onChange={(checked) => setValue("autoUpdatePrice", checked)}
+                id="autoUpdatePrice"
+                label={t("assets.autoUpdatePrice")}
+              />
+            </div>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-gray-700 dark:text-gray-300">
+                {t("assets.autoUpdateHistoricalPrices")}
+              </span>
+              <Toggle
+                checked={watch("autoUpdateHistoricalPrices") || false}
+                onChange={(checked) =>
+                  setValue("autoUpdateHistoricalPrices", checked)
+                }
+                id="autoUpdateHistoricalPrices"
+                label={t("assets.autoUpdateHistoricalPrices")}
+              />
             </div>
           </>
         )}
 
         <SectorSection
           setValue={setValue}
-          sectors={sectors}
-          setSectors={setSectors}
-          updateSector={updateSector}
+          sectors={sectors.map(s => ({
+            sector: s.sectorName, // map sectorName to sector
+            sectorName: s.sectorName, // keep for backward compatibility
+            percentage: s.percentage,
+            value: 0,
+            count: 0,
+          }))}
+          setSectors={(sectorAllocations) => {
+            setSectors(
+              sectorAllocations.map(sa => ({
+                sectorName: sa.sector || '',
+                percentage: sa.percentage,
+              }))
+            );
+            setValue('sectors', sectorAllocations.map(sa => ({
+              sectorName: sa.sector || '',
+              percentage: sa.percentage,
+            })));
+          }}
+          updateSector={(index, field, value) => {
+            // Accepts 'sector' or 'percentage' as field
+            const newSectors = [...sectors];
+            if (field === 'sector') {
+              newSectors[index] = { ...newSectors[index], sectorName: value as string };
+            } else if (field === 'percentage') {
+              newSectors[index] = { ...newSectors[index], percentage: value as number };
+            }
+            setSectors(newSectors);
+            setValue('sectors', newSectors.map(s => ({
+              sectorName: s.sectorName,
+              percentage: s.percentage,
+            })));
+          }}
         />
 
         {/* Dividend Section */}
         {selectedType === "stock" && (
-          <OptionalSection title={t("assets.dividendInformation")}>  
+          <OptionalSection title={t("assets.dividendInformation")}>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-gray-700 dark:text-gray-300">{t("assets.useDividendApi")}</span>
+              <span className="text-gray-700 dark:text-gray-300">
+                {t("assets.useDividendApi")}
+              </span>
               <Toggle
                 checked={useDividendApi}
                 onChange={(checked) => setValue("useDividendApi", checked)}
@@ -610,11 +678,15 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                 <AssetIncomeSection
                   type="dividend"
                   hasIncome={hasDividend}
-                  onHasIncomeChange={(checked) => setValue("hasDividend", checked)}
+                  onHasIncomeChange={(checked) =>
+                    setValue("hasDividend", checked)
+                  }
                   amount={watch("dividendAmount") || 0}
                   onAmountChange={(value) => setValue("dividendAmount", value)}
                   frequency={watch("dividendFrequency") as PaymentFrequency}
-                  onFrequencyChange={(value) => setValue("dividendFrequency", value as PaymentFrequency)}
+                  onFrequencyChange={(value) =>
+                    setValue("dividendFrequency", value as PaymentFrequency)
+                  }
                   paymentMonths={dividendPaymentMonths}
                   onPaymentMonthChange={handleDividendMonthChange}
                   customAmounts={dividendCustomAmounts}
@@ -636,7 +708,9 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                 amount={watch("rentalAmount") || 0}
                 onAmountChange={(value) => setValue("rentalAmount", value)}
                 frequency={watch("rentalFrequency") as PaymentFrequency}
-                onFrequencyChange={(value) => setValue("rentalFrequency", value as PaymentFrequency)}
+                onFrequencyChange={(value) =>
+                  setValue("rentalFrequency", value as PaymentFrequency)
+                }
                 paymentMonths={rentalPaymentMonths}
                 onPaymentMonthChange={handleRentalMonthChange}
                 customAmounts={rentalCustomAmounts}
@@ -651,7 +725,9 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
           <OptionalSection title={t("assets.bondInformation")}>
             <FormGrid columns={{ xs: "1fr", sm: "1fr" }}>
               <div className="flex items-center justify-between mb-4">
-                <span className="text-gray-700 dark:text-gray-300">{t("assets.hasBondInfo")}</span>
+                <span className="text-gray-700 dark:text-gray-300">
+                  {t("assets.hasBondInfo")}
+                </span>
                 <Toggle
                   checked={watch("hasBond") || false}
                   onChange={(checked) => setValue("hasBond", checked)}
@@ -667,7 +743,14 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                     name="interestRate"
                     type="number"
                     value={watch("interestRate")}
-                    onChange={(value) => setValue("interestRate", typeof value === 'string' ? parseFloat(value) : value as number)}
+                    onChange={(value) =>
+                      setValue(
+                        "interestRate",
+                        typeof value === "string"
+                          ? parseFloat(value)
+                          : (value as number)
+                      )
+                    }
                     step={0.01}
                     min={0}
                   />
@@ -677,7 +760,9 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                     name="maturityDate"
                     type="date"
                     value={watch("maturityDate")}
-                    onChange={(value) => setValue("maturityDate", value as string)}
+                    onChange={(value) =>
+                      setValue("maturityDate", value as string)
+                    }
                   />
 
                   <StandardFormField
@@ -685,7 +770,14 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
                     name="nominalValue"
                     type="number"
                     value={watch("nominalValue")}
-                    onChange={(value) => setValue("nominalValue", typeof value === 'string' ? parseFloat(value) : value as number)}
+                    onChange={(value) =>
+                      setValue(
+                        "nominalValue",
+                        typeof value === "string"
+                          ? parseFloat(value)
+                          : (value as number)
+                      )
+                    }
                     step={0.01}
                     min={0}
                   />
@@ -702,7 +794,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
         />
 
         {/* Asset Categories Section */}
-        <OptionalSection title={t("categories.assetCategories")}> 
+        <OptionalSection title={t("categories.assetCategories")}>
           <AssetCategoryAssignmentSelector
             assetDefinitionId={editingDefinition?.id}
             categories={categories}

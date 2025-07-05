@@ -6,13 +6,13 @@ import { TranslationProps } from "@/types/shared/ui/view-props";
 import { PortfolioPosition } from "@/types/domains/portfolio/position";
 import { AssetTransactionForm } from "../forms/AssetTransactionForm";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
-import { MobileAssetSummaryCard } from "@/ui/layout/MobileAssetSummaryCard";
-import { DesktopAssetSummaryCards } from "@/ui/layout/DesktopAssetSummaryCards";
+import { MobileAssetSummaryCard } from "@/ui/portfolioHub/MobileAssetSummaryCard";
+import { DesktopAssetSummaryCards } from "@/ui/portfolioHub/DesktopAssetSummaryCards";
 import { AssetDetailView } from "./AssetDetailView";
-import TabSelector from "@/ui/navigation/TabSelector";
-import { HeaderButtonGroup } from "@/ui/common/HeaderButtonGroup";
-import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
-import { ViewHeader } from "@/ui/layout/ViewHeader";
+import TabSelector from "@/ui/shared/navigation/TabSelector";
+import { HeaderButtonGroup } from "@/ui/portfolioHub/HeaderButtonGroup";
+import FloatingBtn, { ButtonAlignment } from "@/ui/shared/floatingBtn";
+import { ViewHeader } from "@/ui/shared/ViewHeader";
 import { 
   TrendingUp, 
   Settings,

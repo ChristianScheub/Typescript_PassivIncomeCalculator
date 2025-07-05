@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { NavLinkItem } from '@/ui/navigation/NavLinkItem';
+import { NavLinkItem } from '@/ui/shared/navigation/NavLinkItem';
 import { Home, Briefcase, BarChart3, Settings, Sun, Moon } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { useTranslation } from 'react-i18next';

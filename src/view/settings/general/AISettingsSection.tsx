@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Button } from "@/ui/common/Button";
-import { Badge } from "@/ui/common/Badge";
-import { Toggle } from "@/ui/common/Toggle";
+import { Toggle,Button,Badge } from "@ui/shared";
 import {
   AlertCircle,
   Brain,

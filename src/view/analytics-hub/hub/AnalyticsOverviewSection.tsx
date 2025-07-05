@@ -22,10 +22,9 @@ import {
   AnalyticsCategory,
   AnalyticsSubCategory,
 } from "@/container/analyticsHub/AnalyticsHubContainer";
-import AIInsightsCard from "@/ui/analytics/ai/AIInsightsCard";
-import AIChatCard from "@/ui/analytics/ai/AIChatCard";
+import { AIInsightsCard, AIChatCard } from "@ui/portfolioHub";
 import type { AIAnalyticsCategory } from "@/types/domains/analytics/ai";
-import { CollapsibleSection } from "@/ui/common";
+import { CollapsibleSection } from "@ui/shared";
 
 interface RecentAnalyticItem {
   title: string;

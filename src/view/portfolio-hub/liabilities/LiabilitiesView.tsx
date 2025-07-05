@@ -1,15 +1,14 @@
 import React from 'react';
 import { useTranslation } from "react-i18next";
-import { Card, CardContent } from "@/ui/common/Card";
-import { ViewHeader } from "@/ui/layout/ViewHeader";
-import { MotivationalEmptyState } from "@/ui/feedback/EnhancedEmptyState";
-import { Modal } from "@/ui/common/Modal";
-import FloatingBtn, { ButtonAlignment } from "@/ui/layout/floatingBtn";
-import { SwipeableCard } from "@/ui/common/SwipeableCard";
+import { Card, CardContent } from "@/ui/shared/Card";
+import { ViewHeader } from "@/ui/shared/ViewHeader";
+import { Modal } from "@/ui/portfolioHub/dialog/Modal";
+import FloatingBtn, { ButtonAlignment } from "@/ui/shared/floatingBtn";
+import { SwipeableCard } from "@/ui/portfolioHub/common/SwipeableCard";
 import { Plus,Landmark } from "lucide-react";
 import formatService from "@service/infrastructure/formatService";
 import { Liability } from '@/types/domains/financial';
-import { LoadingSpinner } from '@/ui/feedback/LoadingSpinner';
+import { LoadingSpinner, MotivationalEmptyState } from "@/ui/shared";
 import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
 import { MaterialLiabilityForm } from '@/container/portfolioHub/forms/MaterialLiabilityForm';
 

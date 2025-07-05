@@ -1,6 +1,6 @@
+import { GenericPieChart } from '@/ui/portfolioHub';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import GenericPieChart from '@/ui/charts/pieCharts/GenericPieChart';
 
 interface ExpenseAnnualAnalyticsViewProps {
   categoryBreakdown: Array<{ category: string; amount: number; percentage: number }>;

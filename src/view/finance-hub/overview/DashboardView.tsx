@@ -7,16 +7,12 @@ import {
   AlertTriangle,
   BarChart3,
 } from "lucide-react";
-import TotalExpenseCoverage from "@/ui/milestones/TotalExpenseCoverage";
+import { TotalExpenseCoverage } from "@ui/portfolioHub";
 import PortfolioHistoryCard from "./PortfolioHistoryCard";
 import MonthlyBreakdownCard from "./MonthlyBreakdownCard";
-import { CollapsibleSection } from "@/ui/common/CollapsibleSection";
-import { QuickActionsCard } from "@/ui/dashboard/QuickActionsCard";
-import { MiniAnalyticsCard } from "@/ui/dashboard/MiniAnalyticsCard";
-import { MilestoneCard } from "@/ui/dashboard/MilestoneCard";
-import { AlertsCard } from "@/ui/dashboard/AlertsCard";
-import { PullToRefresh } from "@/ui/common/PullToRefresh";
-import { NetWorthSnapshot } from "@/ui/dashboard/NetWorthSnapshot";
+import { CollapsibleSection } from "@ui/shared";
+import { QuickActionsCard, MilestoneCard, AlertsCard, PullToRefresh, NetWorthSnapshot } from "@ui/startHub";
+import { MiniAnalyticsCard } from "@ui/shared";
 import { FinancialSummary, UIAlert } from "@/types/domains/analytics/reporting";
 
 interface QuickAction {

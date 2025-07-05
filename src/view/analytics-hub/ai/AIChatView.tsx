@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ViewHeader } from '@/ui/layout/ViewHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/ui/common/Card';
-import { Button } from '@/ui/common/Button';
-import { Badge } from '@/ui/common/Badge';
+import { ViewHeader } from '@ui/shared';
+import { Card, CardContent, CardHeader, CardTitle } from '@ui/shared';
+import { Button } from '@ui/shared';
+import { Badge } from '@ui/shared';
 import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
 import type { AIChatViewProps } from '@/types/domains/analytics/ai';
 import { 

@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { X, TrendingUp, Calendar, DollarSign, Package, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { formatService } from '@service';
-import { PriceHistoryView } from '@/ui/components/PriceHistoryView';
-import { PriceChart } from '@/ui/components/PriceChart';
-import { DividendHistoryView } from '@/ui/components/DividendHistoryView';
+import { PriceHistoryView } from '@ui/portfolioHub';
+import { PriceChart } from '@ui/portfolioHub';
+import { DividendHistoryView } from '@ui/portfolioHub';
 import { featureFlag_Debug_View } from '../../../config/featureFlags';
-import { IconButton } from '@/ui/common';
+import { IconButton } from '@/ui/shared';
 
 interface AssetDetailViewProps {
   asset: PortfolioPosition;
@@ -175,14 +175,21 @@ export const AssetDetailView: React.FC<AssetDetailViewProps & { assetDefinition?
                   </div>
                 )}
 
-                {asset.sector && (
-                  <div className="flex justify-between items-center">
+                {assetDefinition?.sectors && assetDefinition.sectors.length > 0 && (
+                  <div className="flex flex-col gap-1">
                     <span className="text-sm text-gray-600 dark:text-gray-400">
-                      {t('assets.sector')}:
+                      {t('assets.sectors')}:
                     </span>
-                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {asset.sector}
-                    </span>
+                    {assetDefinition.sectors.map((sector: { sectorName?: string; sector?: string; percentage?: number }, idx: number) => (
+                      <div key={sector.sectorName || sector.sector || idx} className="flex justify-between items-center pl-2">
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
+                          {sector.sectorName || sector.sector}
+                        </span>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {sector.percentage != null ? `${sector.percentage}%` : ''}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 )}
 

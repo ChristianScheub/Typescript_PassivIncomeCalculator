@@ -1,5 +1,5 @@
 import { TranslationProps } from "@/types/shared/ui/view-props";
-import { MotivationalEmptyState } from "@/ui/feedback/EnhancedEmptyState";
+import { MotivationalEmptyState } from "@/ui/shared";
 import { TrendingUp } from "lucide-react";
 
 export const EmptyStateView: React.FC<{ 

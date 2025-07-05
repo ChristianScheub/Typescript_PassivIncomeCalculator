@@ -2,15 +2,15 @@ import React from 'react';
 import { AssetType } from '@/types/shared/base/enums';
 import { UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { MaterialAssetFormData } from '@/types/domains/assets';
-import { 
+import {
+  StandardFormField,
   StandardFormWrapper,
-  RequiredSection,
   OptionalSection,
-  StandardFormField
-} from '@/ui/forms/StandardFormWrapper';
-import { BasicAssetInformation } from '@/ui/sections';
-import { AssetSpecificFields } from '@/ui/specialized/AssetSpecificFields';
-import { AdditionalInformationSection } from '@/ui/specialized/AdditionalInformationSection';
+  RequiredSection
+} from "@/ui/portfolioHub/forms";
+import { BasicAssetInformation } from '@/ui/portfolioHub/forms/sections';
+import { AssetSpecificFields } from '@/ui/portfolioHub/forms/AssetSpecificFields';
+import { AdditionalInformationSection } from '@ui/portfolioHub';
 import { useTranslation } from 'react-i18next';
 
 interface MaterialAssetFormViewProps {

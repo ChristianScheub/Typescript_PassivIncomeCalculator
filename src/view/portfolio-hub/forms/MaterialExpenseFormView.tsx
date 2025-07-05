@@ -3,16 +3,16 @@ import { UseFormSetValue, FieldErrors } from 'react-hook-form';
 import { ExpenseFormData } from '@/types/domains/forms';
 import { FormFieldValue } from '@/types/shared/ui/specialized';
 import { ExpenseCategory, PaymentFrequency } from '@/types/shared/base/enums';
-import { 
-  StandardFormWrapper,
-  RequiredSection,
-  FormGrid,
+import {
   StandardFormField,
-  CustomScheduleSection
-} from '@/ui/forms/StandardFormWrapper';
-import { OptionalFieldsSection } from '@/ui/forms';
+  StandardFormWrapper,
+  FormGrid,
+  RequiredSection,
+  OptionalFieldsSection,
+} from "@/ui/portfolioHub/forms";
 import { useTranslation } from 'react-i18next';
 import { getPaymentFrequencyOptions, getExpenseCategoryOptions } from '../../../constants';
+import { CustomScheduleSection } from '@/ui/portfolioHub';
 
 interface MaterialExpenseFormViewProps {
   // Form state props
