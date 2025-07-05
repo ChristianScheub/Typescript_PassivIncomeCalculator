@@ -1,21 +1,21 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AssetCategoryAssignment } from "../../../types/domains/assets/categories";
 import { AssetDefinition } from "../../../types/domains/assets";
+import { AssetCategoryAssignment } from "../../../types/domains/assets/categories";
+import { CreateAssetDefinitionData } from "../../../types/domains/assets/create-asset-definition-data";
 import { AssetDefinitionForm } from "../forms/AssetDefinitionForm";
 import FloatingBtn, { ButtonAlignment } from "../../../ui/layout/floatingBtn";
 import { ViewHeader } from "../../../ui/layout/ViewHeader";
-import { Plus,Wallet, RefreshCw, History } from "lucide-react";
+import { Plus, Wallet, RefreshCw, History, DollarSign } from "lucide-react";
 import { IconButton } from "../../../ui/common";
 import { Tooltip } from "@mui/material";
 import { formatService } from "../../../service";
 import { TimeRangeSelectionDialog } from "../../../ui/dialog/TimeRangeSelectionDialog";
 import { TimeRangePeriod } from "../../../types/shared/time";
 import { AddPriceEntryDialog, PriceEntry } from "../../../ui/dialog/AddPriceEntryDialog";
-import { SwipeableCard } from "../../../ui/common/SwipeableCard";
-import { CreateAssetDefinitionData } from '@/types/domains/assets';
+import { SwipeableCard } from "../../../ui/common";
+import { SearchInput } from "@/ui/components/inputs/SearchInput";
 
-type CreateCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
 
 interface AssetDefinitionsViewProps {
   assetDefinitions: AssetDefinition[];
@@ -25,25 +25,21 @@ interface AssetDefinitionsViewProps {
   isUpdatingPrices: boolean;
   isUpdatingHistoricalData: boolean;
   isApiEnabled: boolean;
+  isDividendApiEnabled: boolean;  // Added this prop
   getAssetTypeIcon: (type: string) => React.ReactNode;
-  onAddDefinition: (data: CreateAssetDefinitionData) => void;
-  onUpdateDefinition: (data: AssetDefinition) => void;
+  onAddDefinition: (definition: CreateAssetDefinitionData) => void;
+  onUpdateDefinition: (definition: AssetDefinition) => void;
   onDeleteDefinition: (id: string) => void;
   onSetIsAddingDefinition: (isAdding: boolean) => void;
   onSetEditingDefinition: (definition: AssetDefinition | null) => void;
   onUpdateStockPrices: () => void;
-  onUpdateHistoricalData: (period?: TimeRangePeriod) => void;
+  onUpdateHistoricalData: () => void;
   onBack?: () => void;
-  onAddDefinitionWithCategories?: (
-    data: CreateAssetDefinitionData,
-    categoryAssignments: CreateCategoryAssignmentData[]
-  ) => void;
-  onUpdateDefinitionWithCategories?: (
-    data: AssetDefinition,
-    categoryAssignments: CreateCategoryAssignmentData[]
-  ) => void;
-  onAddPriceEntry?: (definitionId: string, entry: PriceEntry) => void;
-  onFetchDividendsFromApi?: (definition: AssetDefinition) => void;
+  onAddDefinitionWithCategories?: (definition: CreateAssetDefinitionData, categoryAssignments: AssetCategoryAssignment[]) => void;
+  onUpdateDefinitionWithCategories?: (definition: CreateAssetDefinitionData, categoryAssignments: AssetCategoryAssignment[]) => void;
+  onAddPriceEntry?: (assetDefinitionId: string, price: PriceEntry) => void;
+  onFetchDividendsForAsset?: (definition: AssetDefinition) => void;
+  onFetchAllDividends?: () => void;
 }
 
 export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
@@ -54,6 +50,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   isUpdatingPrices,
   isUpdatingHistoricalData,
   isApiEnabled,
+  isDividendApiEnabled,
   getAssetTypeIcon,
   onAddDefinition,
   onUpdateDefinition,
@@ -66,7 +63,8 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   onAddDefinitionWithCategories,
   onUpdateDefinitionWithCategories,
   onAddPriceEntry,
-  onFetchDividendsFromApi,
+  onFetchDividendsForAsset,
+  onFetchAllDividends,
 }) => {
   const { t } = useTranslation();
   
@@ -76,6 +74,20 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   // State for the add price entry dialog
   const [isAddPriceDialogOpen, setIsAddPriceDialogOpen] = useState(false);
   const [selectedDefinitionForPrice, setSelectedDefinitionForPrice] = useState<AssetDefinition | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  
+  // Filter asset definitions based on search query
+  const filteredAssetDefinitions = assetDefinitions.filter((definition) => {
+    if (!searchQuery) return true;
+    
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      definition.fullName.toLowerCase().includes(searchLower) ||
+      (definition.ticker?.toLowerCase().includes(searchLower)) ||
+      (definition.sectors?.some(s => s.sectorName?.toLowerCase().includes(searchLower))) ||
+      (definition.country?.toLowerCase().includes(searchLower))
+    );
+  });
 
   // Handle opening the time range dialog
   const handleHistoricalDataClick = () => {
@@ -85,7 +97,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   // Handle time range selection and close dialog
   const handleTimeRangeConfirm = (period: TimeRangePeriod) => {
     setIsTimeRangeDialogOpen(false);
-    onUpdateHistoricalData(period);
+    onUpdateHistoricalData();
   };
 
   // Handle dialog close without selection
@@ -190,11 +202,11 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                 </Tooltip>
               )}
 
-              {/* Button: Dividenden per API abrufen */}
-              {isApiEnabled && editingDefinition && editingDefinition.type === 'stock' && editingDefinition.useDividendApi && (
+              {/* Button for updating all dividends */}
+              {isApiEnabled && isDividendApiEnabled && (
                 <Tooltip 
-                  title={t("assets.fetchDividendsFromApi")}
-                  arrow
+                  title={t("assets.fetchAllDividendsFromApi")} 
+                  arrow 
                   componentsProps={{
                     tooltip: {
                       sx: {
@@ -209,11 +221,12 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                   }}
                 >
                   <IconButton
-                    onClick={() => onFetchDividendsFromApi?.(editingDefinition)}
-                    icon={<History className="h-4 w-4" />}
-                    aria-label={t("assets.fetchDividendsFromApi")}
+                    onClick={onFetchAllDividends}
+                    icon={<DollarSign className="h-4 w-4" />}
+                    aria-label={t("assets.fetchAllDividendsFromApi")}
                     variant="outline"
                     size="iconSm"
+                    className="ml-2"
                   />
                 </Tooltip>
               )}
@@ -222,10 +235,20 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
         />
         
         <div className="mb-6">
+          {/* Search Input */}
+          <div className="mb-4">
+            <SearchInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder={t("assets.searchPlaceholder") || "Search assets..."}
+              className="max-w-md mx-auto"
+            />
+          </div>
+
           {/* Asset Definitions List */}
-          {assetDefinitions.length > 0 ? (
+          {filteredAssetDefinitions.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {assetDefinitions.map((definition) => (
+              {filteredAssetDefinitions.map((definition) => (
                 <SwipeableCard
                   key={definition.id}
                   onEdit={() => onSetEditingDefinition(definition)}
@@ -345,16 +368,6 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
                         {t("assets.addPriceEntry")}
                       </button>
                     )}
-                    {/* Dividenden per API abrufen Button */}
-                    {isApiEnabled && definition.type === 'stock' && definition.useDividendApi && (
-                      <button
-                        className="mt-4 ml-2 px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs rounded transition-colors"
-                        onClick={() => onFetchDividendsFromApi?.(definition)}
-                        type="button"
-                      >
-                        {t("assets.fetchDividendsFromApi")}
-                      </button>
-                    )}
                   </div>
                 </SwipeableCard>
               ))}
@@ -393,12 +406,11 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
 
               // Transform category assignments to include required fields
               const transformedCategoryAssignments = categoryAssignments.map(assignment => ({
-                ...assignment,
                 name: assignment.name || `${assignment.categoryId}-${assignment.categoryOptionId}`,
                 assetDefinitionId: editingDefinition?.id || '',
                 categoryId: assignment.categoryId || '',
                 categoryOptionId: assignment.categoryOptionId || ''
-              }));
+              } as AssetCategoryAssignment));
 
               if (editingDefinition) {
                 // For updates, merge the form data with the existing definition's metadata

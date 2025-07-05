@@ -63,6 +63,9 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   const { isEnabled: isApiEnabled } = useAppSelector(
     (state) => state.apiConfig
   );
+  const isDividendApiEnabled = useAppSelector(
+    (state) => state.apiConfig.isDividendApiEnabled
+  ); // Added this selector
   const [isAddingDefinition, setIsAddingDefinition] = useState(false);
   const [editingDefinition, setEditingDefinition] =
     useState<AssetDefinition | null>(null);
@@ -467,6 +470,81 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
     );
   };
 
+  const handleFetchAllDividends = async () => {
+    await executeAsyncOperation(
+      "fetch all dividends",
+      async () => {
+        Logger.info("Starting dividend fetch for all eligible assets");
+        // Filter eligible assets (stocks with dividend API enabled)
+        const eligibleAssets = assetDefinitions.filter(
+          (def: AssetDefinition) => def.type === "stock" && def.useDividendApi
+        );
+
+        if (eligibleAssets.length === 0) {
+          Logger.info("No eligible assets found for dividend fetch");
+          return;
+        }
+
+        Logger.info(
+          `Found ${eligibleAssets.length} eligible assets for dividend update`
+        );
+
+        // Process each asset
+        for (const definition of eligibleAssets) {
+          try {
+            Logger.info(`Fetching dividends for ${definition.fullName}`);
+            const result = await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+              // @ts-ignore
+              fetchAndUpdateDividends(definition)
+            ).unwrap();
+
+            if (result) {
+              const resultToDispatch = { ...result };
+              if (resultToDispatch.dividendInfo) {
+                const { amount, lastDividendDate, paymentMonths } =
+                  resultToDispatch.dividendInfo;
+                const allowedFrequencies = [
+                  "monthly",
+                  "quarterly",
+                  "annually",
+                  "custom",
+                ] as const;
+                const rawFrequency = resultToDispatch.dividendInfo.frequency;
+                const frequency: DividendFrequency =
+                  allowedFrequencies.includes(rawFrequency as any)
+                    ? (rawFrequency as DividendFrequency)
+                    : "custom";
+                resultToDispatch.dividendInfo = {
+                  amount,
+                  frequency,
+                  lastDividendDate,
+                  paymentMonths,
+                };
+              }
+              await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+                updateAssetDefinition(resultToDispatch as AssetDefinition)
+              );
+              Logger.info(`Successfully updated dividends for ${definition.fullName}`);
+            }
+          } catch (error) {
+            Logger.error(`Error fetching dividends for ${definition.fullName}: ${error}`);
+            // Continue with next asset even if one fails
+          }
+        }
+      },
+      () =>
+        dispatch(
+          showSuccessSnackbar(
+            t(
+              "assets.fetchAllDividendsSuccess",
+              "Dividenden-Daten für alle Assets erfolgreich abgerufen"
+            )
+          )
+        ),
+      JSON.stringify(assetDefinitions.filter((def: AssetDefinition) => def.type === "stock" && def.useDividendApi))
+    );
+  };
+
   // Asset type icon helper (must be in scope for JSX)
   const getAssetTypeIcon = (type: string) => {
     switch (type) {
@@ -489,6 +567,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
       assetDefinitions={assetDefinitions}
       status={status}
       isApiEnabled={isApiEnabled}
+      isDividendApiEnabled={isDividendApiEnabled}
       isAddingDefinition={isAddingDefinition}
       onSetIsAddingDefinition={setIsAddingDefinition}
       editingDefinition={editingDefinition}
@@ -500,7 +579,8 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
       onUpdateDefinitionWithCategories={updateDefinition}
       onDeleteDefinition={handleDeleteDefinition}
       onAddPriceEntry={handleAddPriceEntry}
-      onFetchDividendsFromApi={handleFetchDividendsFromApi}
+      onFetchDividendsForAsset={handleFetchDividendsFromApi}
+      onFetchAllDividends={handleFetchAllDividends}
       onUpdateStockPrices={handleUpdateStockPrices}
       onUpdateHistoricalData={handleUpdateHistoricalData}
       isUpdatingPrices={isUpdatingPrices}

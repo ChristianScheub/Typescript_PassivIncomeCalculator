@@ -108,12 +108,6 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history, is
     }
     return t('dashboard.portfolioHistory') || 'Portfolio Verlauf';
   };
-  const getSubtitle = () => {
-    if (isIntradayView) {
-      return t('dashboard.last5DaysIntraday') || 'Letzte 5 Tage (Intraday)';
-    }
-    return t('dashboard.last30Days') || 'Letzte 30 Tage';
-  };
 
   // Now do the conditional return
   if (!transformedHistory || transformedHistory.length === 0) {
@@ -141,9 +135,6 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history, is
           <CardTitle className="text-xl">
             {getTitle()}
           </CardTitle>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {getSubtitle()}
-          </p>
         </div>
         <div className="flex flex-col items-end">
           <p className="text-2xl font-semibold text-gray-900 dark:text-gray-100">

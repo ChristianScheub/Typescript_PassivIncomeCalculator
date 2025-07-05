@@ -602,6 +602,7 @@
     "autoUpdatePrice": "Preis per API aktualisieren",
     "selectAsset": "Asset auswählen",
     "searchAssets": "Assets durchsuchen...",
+    "searchPlaceholder": "Asset Definitions durchsuchen...",
     "selectAssetOption": "Bitte Asset auswählen...",
     "transactionName": "Transaktionsname",
     "transactionNamePlaceholder": "z.B. Apple Aktien Kauf 2024",
