@@ -3,8 +3,8 @@ import {
     calculatePortfolioHistory,
     calculateAssetFocusData,
     calculateFinancialSummary
-} from '@/store/slices/calculatedDataSlice';
-import { AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
+} from '@/store/slices/cache';
+import { AssetFocusTimeRange } from '@/types/shared/analytics';
 import Logger from "@/service/shared/logging/Logger/logger";
 
 /**

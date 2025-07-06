@@ -9,7 +9,7 @@ import Logger from '@/service/shared/logging/Logger/logger';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { calculatorService } from '../../service';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '@/store/slices/transactionsSlice';
+import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '@/store/slices/domain';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { AssetDefinition } from '@/types/domains/assets/entities';
 import { DividendHistoryEntry } from '@/types/domains/assets/dividends';

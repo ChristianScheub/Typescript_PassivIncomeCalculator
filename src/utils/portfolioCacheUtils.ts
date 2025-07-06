@@ -1,5 +1,5 @@
 import Logger from '@/service/shared/logging/Logger/logger';
-import { PortfolioCache } from '@/store/slices/transactionsSlice';
+import { PortfolioCache } from '@/store/slices/domain';
 
 /**
  * Validates if a portfolio cache from localStorage is still valid

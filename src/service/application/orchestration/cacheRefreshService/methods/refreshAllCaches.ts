@@ -3,24 +3,24 @@ import {
     invalidatePortfolioCache, 
     calculatePortfolioData,
     fetchTransactions 
-} from '@/store/slices/transactionsSlice';
-import { fetchAssetDefinitions } from '@/store/slices/assetDefinitionsSlice';
+} from '@/store/slices/domain';
+import { fetchAssetDefinitions } from '@/store/slices/domain';
 import { 
     fetchAssetCategories,
     fetchAssetCategoryOptions,
     fetchAssetCategoryAssignments 
-} from '@/store/slices/assetCategoriesSlice';
-import { fetchLiabilities } from '@/store/slices/liabilitiesSlice';
-import { fetchExpenses } from '@/store/slices/expensesSlice';
-import { fetchIncome } from '@/store/slices/incomeSlice';
-import { updateForecastValues } from '@/store/slices/forecastSlice';
+} from '@/store/slices/domain';
+import { fetchLiabilities } from '@/store/slices/domain';
+import { fetchExpenses } from '@/store/slices/domain';
+import { fetchIncome } from '@/store/slices/domain';
+import { updateForecastValues } from '@/store/slices/cache';
 import { 
     clearAllCache as clearCalculatedDataCache
-} from '@/store/slices/calculatedDataSlice';
+} from '@/store/slices/cache';
 import { PortfolioHistoryHelper } from '@/service/domain/portfolio/history/portfolioHistoryService/methods/portfolioHistoryHelper';
 import recentActivityService from '@/service/domain/analytics/reporting/recentActivityService';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { calculatePortfolioIntradayDataDirect } from '@/store/slices/portfolioIntradaySlice';
+import { calculatePortfolioIntradayDataDirect } from '@/store/slices/cache';
 import PortfolioHistoryWorker from '@/workers/portfolioHistoryWorker.ts?worker';
 
 /**

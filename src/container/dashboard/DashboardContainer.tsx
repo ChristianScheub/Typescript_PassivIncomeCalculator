@@ -1,13 +1,11 @@
 import React, { useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import { loadDashboardSettingsFromStorage } from '@/store/slices/dashboardSettingsSlice';
+import { useAppSelector } from '../../hooks/redux';
 import { 
   selectFinancialSummary
-} from '@/store/slices/calculatedDataSlice';
+} from '@/store/slices/cache/calculatedDataSlice';
 import DashboardView from '@/view/finance-hub/overview/DashboardView';
-import AssetFocusDashboardContainer from './AssetDashboardContainer';
 import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
 import alertsService from '@/service/application/notifications/alertsService';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
@@ -18,11 +16,10 @@ import { useAsyncOperation } from '../../utils/containerUtils';
 const DashboardContainer: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const { executeAsyncOperation } = useAsyncOperation();
 
-  // Redux state
-  const { mode: dashboardMode } = useAppSelector(state => state.dashboardSettings);
+  // Redux state - dashboard is now always in 'smartSummary' mode  
+  const dashboardMode = 'smartSummary';
   
   // Cached financial summary from Redux (should be available after initialization)
   const financialSummaryCache = useAppSelector(selectFinancialSummary);
@@ -76,11 +73,8 @@ const DashboardContainer: React.FC = () => {
   }, [financialSummary, navigate, t]);
 
   // Effects
-  // Load dashboard settings from localStorage on mount
-  useEffect(() => {
-    dispatch(loadDashboardSettingsFromStorage());
-  }, [dispatch]);
-
+  // Dashboard settings are now auto-loaded via configSlice
+  
   // Debug: Log dashboard mode changes
   useEffect(() => {
     Logger.infoService(`DashboardContainer: Dashboard mode is '${dashboardMode}'`);
@@ -108,13 +102,7 @@ const DashboardContainer: React.FC = () => {
     }
   }, [executeAsyncOperation]);
 
-  // Dashboard mode routing
-  if (dashboardMode === 'assetFocus') {
-    Logger.infoService("DashboardContainer: Rendering AssetFocusDashboardContainer");
-    return <AssetFocusDashboardContainer />;
-  }
-
-  // Default: Smart Summary Dashboard
+  // Default: Smart Summary Dashboard (assetFocus mode removed)
   Logger.infoService("DashboardContainer: Rendering DashboardView (Smart Summary)");
   return (
     <DashboardView

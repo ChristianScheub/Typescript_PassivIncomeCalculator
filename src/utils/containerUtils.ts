@@ -1,6 +1,6 @@
 import Logger from '@/service/shared/logging/Logger/logger';
 import { store } from '@/store';
-import { showErrorSnackbar } from '@/store/slices/snackbarSlice';
+import { showErrorSnackbar } from '@/store/slices/ui';
 
 // Zentrale Konfiguration für Snackbar-Anzeige bei verschiedenen Operationen
 const SNACKBAR_CONFIG: Record<string, boolean> = {

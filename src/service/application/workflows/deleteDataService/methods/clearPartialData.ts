@@ -1,8 +1,8 @@
 import { store } from '@/store';
-import { clearAllTransactions } from '@/store/slices/transactionsSlice';
-import { clearAllLiabilities } from '@/store/slices/liabilitiesSlice';
-import { clearAllExpenses } from '@/store/slices/expensesSlice';
-import { clearAllIncome } from '@/store/slices/incomeSlice';
+import { clearAllTransactions } from '@/store/slices/domain';
+import { clearAllLiabilities } from '@/store/slices/domain';
+import { clearAllExpenses } from '@/store/slices/domain';
+import { clearAllIncome } from '@/store/slices/domain';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { StoreNames } from '@/types/domains/database';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';

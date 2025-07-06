@@ -1,6 +1,6 @@
 import { Asset } from "@/types/domains/assets/entities";
 import { calculateAssetMonthlyIncomeWithCache } from "@/service/shared/calculations/assetIncomeCalculations";
-import { updateAssetCache } from "@/store/slices/transactionsSlice";
+import { updateAssetCache } from "@/store/slices/domain";
 import { createCachedDividends } from "@/utils/dividendCacheUtils";
 import Logger from "@/service/shared/logging/Logger/logger";
 import type { AppDispatch } from "@/store";

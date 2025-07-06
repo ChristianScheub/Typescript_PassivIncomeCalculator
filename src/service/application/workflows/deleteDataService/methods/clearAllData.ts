@@ -1,10 +1,10 @@
 import { store } from '@/store';
-import { clearAllTransactions } from '@/store/slices/transactionsSlice';
-import { clearAllLiabilities } from '@/store/slices/liabilitiesSlice';
-import { clearAllExpenses } from '@/store/slices/expensesSlice';
-import { clearAllIncome } from '@/store/slices/incomeSlice';
-import { clearAllAssetCategories } from '@/store/slices/assetCategoriesSlice';
-import { setApiKey, setApiEnabled } from '@/store/slices/apiConfigSlice';
+import { clearAllTransactions } from '@/store/slices/domain';
+import { clearAllLiabilities } from '@/store/slices/domain';
+import { clearAllExpenses } from '@/store/slices/domain';
+import { clearAllIncome } from '@/store/slices/domain';
+import { clearAllAssetCategories } from '@/store/slices/domain';
+import { setStockApiKey, setStockApiEnabled } from '@/store/slices/configSlice';
 import { StockAPIProvider } from '@/types/shared/base/enums';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { clearSQLiteStores } from './utils';
@@ -49,9 +49,9 @@ export async function clearAllData(): Promise<void> {
         StockAPIProvider.ALPHA_VANTAGE
     ];
     providers.forEach((provider) => {
-        store.dispatch(setApiKey({ provider, apiKey: null }));
+        store.dispatch(setStockApiKey({ provider, key: '' }));
     });
-    store.dispatch(setApiEnabled(false));
+    store.dispatch(setStockApiEnabled(false));
 
     Logger.infoService("All data cleared successfully");
 

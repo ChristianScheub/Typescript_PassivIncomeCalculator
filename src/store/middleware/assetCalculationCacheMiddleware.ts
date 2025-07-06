@@ -1,5 +1,5 @@
 import { Middleware, AnyAction } from '@reduxjs/toolkit';
-import { updateAssetCache } from '../slices/transactionsSlice';
+import { updateAssetCache } from '../slices/domain';
 import { calculateAssetMonthlyIncomeWithCache } from '@/service/shared/calculations/assetIncomeCalculations';
 import { createCachedDividends } from '@/utils/dividendCacheUtils';
 import Logger from '@/service/shared/logging/Logger/logger';

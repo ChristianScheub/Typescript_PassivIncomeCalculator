@@ -7,7 +7,7 @@ import { ButtonGroup } from '@ui/shared';
 import { IconButton } from '@ui/shared';
 import { History } from 'lucide-react';
 import { AssetPositionsList, AssetWithValue } from '@ui/portfolioHub';
-import { AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
+import { AssetFocusTimeRange } from '@/types/shared/analytics';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
 import PortfolioHistoryCard from './PortfolioHistoryCard';

@@ -7,14 +7,14 @@ import {
   updateAssetDefinition,
   deleteAssetDefinition,
   fetchAndUpdateDividends,
-} from "@/store/slices/assetDefinitionsSlice";
+} from "@/store/slices/domain";
 import {
   fetchAssetCategories,
   fetchAssetCategoryOptions,
   fetchAssetCategoryAssignments,
   addAssetCategoryAssignment,
   deleteAssetCategoryAssignmentsByAssetId,
-} from "@/store/slices/assetCategoriesSlice";
+} from "@/store/slices/domain";
 import { AssetDefinitionsView } from "@/view/portfolio-hub/assets/AssetDefinitionsView";
 import {
   AssetDefinition,
@@ -28,13 +28,13 @@ import { StockPriceUpdater } from "@/service/shared/utilities/helper/stockPriceU
 import { TimeRangePeriod } from "@/types/shared/time";
 import { deepCleanObject } from "@/utils/deepCleanObject";
 import { executeAsyncOperation } from "@/utils/containerUtils";
-import { showSuccessSnackbar } from "@/store/slices/snackbarSlice";
+import { showSuccessSnackbar } from "@/store/slices/ui";
 
 // Type for the asset definition data when creating
 // type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
 import { PriceEntry } from "@/ui/dialog/AddPriceEntryDialog";
 import { addPriceToHistory } from "@/utils/priceHistoryUtils";
-import { calculatePortfolioIntradayDataDirect } from "@/store/slices/portfolioIntradaySlice";
+import { calculatePortfolioIntradayDataDirect } from "@/store/slices/cache";
 import { DividendFrequency } from "@/types/shared";
 
 interface AssetDefinitionsContainerProps {

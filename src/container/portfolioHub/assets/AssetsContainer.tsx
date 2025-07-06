@@ -10,7 +10,7 @@ import {
   selectPortfolioCacheValid,
   selectPortfolioTotals,
   selectSortedTransactions
-} from '@/store/slices/transactionsSlice';
+} from '@/store/slices/domain';
 import { AssetsView } from '@/view/portfolio-hub/assets/AssetsView';
 import { Asset } from '@/types/domains/assets';
 import { useTranslation } from 'react-i18next';

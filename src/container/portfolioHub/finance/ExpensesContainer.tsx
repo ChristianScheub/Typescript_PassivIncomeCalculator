@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { addExpense, updateExpense, deleteExpense } from '@/store/slices/expensesSlice';
+import { addExpense, updateExpense, deleteExpense } from '@/store/slices/domain';
 import { Expense } from '@/types/domains/financial';
 import { ExpenseFormData } from '@/types/domains/forms/form-data';
 import { useTranslation } from 'react-i18next';

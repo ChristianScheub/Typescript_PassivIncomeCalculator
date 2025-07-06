@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
-import { setApiEnabled, setDividendApiEnabled, setApiKey, setSelectedProvider, setSelectedDiviProvider, setDividendApiKey } from "@/store/slices/apiConfigSlice";
-import { setDashboardMode, loadDashboardSettingsFromStorage } from "@/store/slices/dashboardSettingsSlice";
-import { clearAllTransactions } from "@/store/slices/transactionsSlice";
-import { clearAllExpenses } from "@/store/slices/expensesSlice";
-import { clearAllIncome } from "@/store/slices/incomeSlice";
-import { clearAllAssetCategories } from "@/store/slices/assetCategoriesSlice";
+import { 
+  setStockApiEnabled, 
+  setDividendApiEnabled, 
+  setStockApiKey, 
+  setStockApiProvider, 
+  setDividendApiProvider, 
+  setDividendApiKey,
+  selectStockApiConfig,
+  selectDividendApiConfig,
+  selectDashboardConfig
+} from "@/store/slices/configSlice";
+import { clearAllTransactions } from "@/store/slices/domain/transactionsSlice";
+import { clearAllExpenses } from "@/store/slices/domain/expensesSlice";
+import { clearAllIncome } from "@/store/slices/domain/incomeSlice";
+import { clearAllAssetCategories } from "@/store/slices/domain/assetCategoriesSlice";
 import sqliteService from "@/service/infrastructure/sqlLiteService";
 import { StoreNames } from "@/service/infrastructure/sqlLiteService/interfaces/ISQLiteService";
 import Logger from "@/service/shared/logging/Logger/logger";
@@ -18,9 +27,9 @@ import {
 import deleteDataService from '@/service/application/workflows/deleteDataService';
 import { t } from "i18next";
 import { ConfirmationDialogState } from "@/ui/dialog/types";
-import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/snackbarSlice';
+import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/ui';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
-import { clearAllLiabilities } from "@/store/slices/liabilitiesSlice";
+import { clearAllLiabilities } from "@/store/slices/domain";
 import { StockAPIProvider } from "@/types/shared";
 import { DashboardMode } from "@/types/shared/analytics";
 // Type aliases for operation statuses

@@ -1,5 +1,5 @@
 import { Middleware, MiddlewareAPI, AnyAction } from '@reduxjs/toolkit';
-import { updateForecastValues, updateMonthlyAssetIncomeCache } from '../slices/forecastSlice';
+import { updateForecastValues, updateMonthlyAssetIncomeCache } from '../slices/cache';
 import { StoreState } from '../index';
 import { appInitializationService } from '@/service/application/orchestration/initService/appInitialization';
 import Logger from '@service/shared/logging/Logger/logger';

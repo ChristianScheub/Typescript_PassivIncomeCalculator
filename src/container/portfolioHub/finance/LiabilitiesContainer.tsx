@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { addLiability, updateLiability, deleteLiability } from '@/store/slices/liabilitiesSlice';
+import { addLiability, updateLiability, deleteLiability } from '@/store/slices/domain';
 import { Liability } from '@/types/domains/financial';
 import { useTranslation } from 'react-i18next';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';

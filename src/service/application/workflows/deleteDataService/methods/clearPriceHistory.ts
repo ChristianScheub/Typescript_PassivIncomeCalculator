@@ -1,5 +1,5 @@
 import { store } from '@/store';
-import { invalidatePortfolioCache } from '@/store/slices/transactionsSlice';
+import { invalidatePortfolioCache } from '@/store/slices/domain';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { clearPortfolioHistory } from './clearPortfolioHistory';
 import sqliteService from '@/service/infrastructure/sqlLiteService';

@@ -5,7 +5,7 @@ import {
   setPortfolioIntradayData,
   setPortfolioIntradayStatus,
   setPortfolioIntradayError
-} from '@/store/slices/portfolioIntradaySlice';
+} from '@/store/slices/cache';
 import Logger from '@/service/shared/logging/Logger/logger';
 import PortfolioHistoryWorker from '../workers/portfolioHistoryWorker.ts?worker';
 
@@ -62,7 +62,7 @@ export async function recalculatePortfolioHistoryAndIntraday({ assetDefinitions,
  */
 export function usePortfolioIntradayView(): Array<{ date: string; value: number; timestamp: string }> {
   const dispatch = useAppDispatch();
-  const { portfolioCache } = useAppSelector(state => state.transactions);
+  const { cache: portfolioCache, cacheValid } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const { isHydrated } = useAppSelector(state => state.calculatedData);
 
@@ -174,7 +174,7 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
     };
     const timeoutId = setTimeout(resetAttempt, 200);
     return () => clearTimeout(timeoutId);
-  }, [portfolioCache?.portfolioCacheValid, assetDefinitions.length]);
+  }, [cacheValid, assetDefinitions.length]);
 
   return portfolioIntradayData;
 }
@@ -188,7 +188,7 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
  * Now uses the worker for calculation and bulk DB persistence if data is missing.
  */
 export function usePortfolioHistoryView(timeRange?: string): Array<{ date: string; value: number; transactions: Array<any> }> {
-  const { portfolioCache } = useAppSelector(state => state.transactions);
+  const { cache: portfolioCache } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
   const { isHydrated } = useAppSelector(state => state.calculatedData);
   const dispatch = useAppDispatch();
@@ -221,6 +221,11 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         }));
       } else {
         Logger.infoService(`⚠️ No portfolio history data in IndexedDB for ${timeRange}, triggering worker calculation...`);
+        // Check if portfolioCache exists before using it
+        if (!portfolioCache?.positions) {
+          Logger.infoService('❌ Cannot trigger worker calculation - missing portfolio positions');
+          return [];
+        }
         // Nutze die generische Utility
         const { intraday, history } = await recalculatePortfolioHistoryAndIntraday({ assetDefinitions, portfolioPositions: portfolioCache.positions });
         // Redux-Update für Intraday
@@ -336,7 +341,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
  * (Simplified version without Redux dependencies)
  */
 export function usePortfolioHistoryRecalculation() {
-  const { portfolioCache } = useAppSelector(state => state.transactions);
+  const { cache: portfolioCache } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
 
   const triggerRecalculation = async () => {

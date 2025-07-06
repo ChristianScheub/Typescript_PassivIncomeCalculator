@@ -46,9 +46,9 @@ export interface TransactionsState {
   items: Asset[];
   status: StoreStatus;
   error: string | null;
-  portfolioCache?: PortfolioCache;
-  portfolioCacheValid: boolean;
-  lastPortfolioCalculation?: string;
+  cache?: PortfolioCache;
+  cacheValid: boolean;
+  lastCalculated?: string;
   calculationMetadata: {
     lastCalculated: string;
     totalValue: number;

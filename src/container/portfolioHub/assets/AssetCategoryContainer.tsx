@@ -14,7 +14,7 @@ import {
   addAssetCategoryOption,
   updateAssetCategoryOption,
   deleteAssetCategoryOption
-} from '@/store/slices/assetCategoriesSlice';
+} from '@/store/slices/domain';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { useAsyncOperation } from '@/utils/containerUtils';
 import { AssetCategory, AssetCategoryOption, NewAssetCategory, NewAssetCategoryOption, NewAssetCategoryOptionWithCategory, CategoryFormData, CategoryOptionFormData } from '@/types/domains/assets';

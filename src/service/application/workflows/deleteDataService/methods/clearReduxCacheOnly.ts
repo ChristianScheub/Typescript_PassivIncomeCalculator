@@ -1,10 +1,10 @@
 import { Dispatch } from 'redux';
-import { clearAllCharts } from '@/store/slices/customAnalyticsSlice';
-import { clearAllCache } from '@/store/slices/calculatedDataSlice';
-import { clearAllTransactions } from '@/store/slices/transactionsSlice';
-import { clearAllForecast } from '@/store/slices/forecastSlice';
-import { clearAllExpenses } from '@/store/slices/expensesSlice';
-import { clearAllAssetCategories } from '@/store/slices/assetCategoriesSlice';
+import { clearAllCharts } from '@/store/slices/ui';
+import { clearAllCache } from '@/store/slices/cache';
+import { clearAllTransactions } from '@/store/slices/domain';
+import { clearAllForecast } from '@/store/slices/cache';
+import { clearAllExpenses } from '@/store/slices/domain';
+import { clearAllAssetCategories } from '@/store/slices/domain';
 
 /**
  * Löscht NUR den Redux-Cache (calculatedData, customAnalytics) und den LocalStorage-Key 'passiveIncomeCalculator'.

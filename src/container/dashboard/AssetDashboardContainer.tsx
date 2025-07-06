@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import { setAssetFocusTimeRange, AssetFocusTimeRange } from '@/store/slices/dashboardSettingsSlice';
-import { updateAssetDefinition } from '@/store/slices/assetDefinitionsSlice';
+import { AssetFocusTimeRange } from '@/types/shared/analytics';
+import { updateAssetDefinition } from '@/store/slices/domain';
 import { usePortfolioHistory, useAssetFocusData, useFinancialSummary } from '../../hooks/useCalculatedDataCache';
 import { usePortfolioIntradayView, usePortfolioHistoryView } from '../../hooks/usePortfolioHistoryView';
 import AssetDashboardView from '@/view/finance-hub/overview/AssetDashboardView';

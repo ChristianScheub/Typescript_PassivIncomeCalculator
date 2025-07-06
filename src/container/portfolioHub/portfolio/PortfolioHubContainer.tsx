@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/redux';
-import { selectPortfolioCache } from '@/store/slices/transactionsSlice';
+import { selectPortfolioCache } from '@/store/slices/domain';
 import AssetsContainer from '../assets/AssetsContainer';
 import LiabilitiesContainer from '../finance/LiabilitiesContainer';
 import IncomeContainer from '../finance/IncomeContainer';

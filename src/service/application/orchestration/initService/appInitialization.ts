@@ -1,12 +1,12 @@
 import { AppDispatch, RootState } from "@/store/index";
-import { calculateFinancialSummary } from "@/store/slices/calculatedDataSlice";
+import { calculateFinancialSummary } from "@/store/slices/cache";
 import Logger from "@/service/shared/logging/Logger/logger";
 import { isFinancialSummaryAllZero } from "@/utils/isFinancialSummaryValid";
-import { fetchAssetDefinitions } from '@/store/slices/assetDefinitionsSlice';
-import { fetchTransactions,calculatePortfolioData } from '@/store/slices/transactionsSlice';
-import { fetchLiabilities } from '@/store/slices/liabilitiesSlice';
-import { fetchExpenses } from '@/store/slices/expensesSlice';
-import { fetchIncome } from '@/store/slices/incomeSlice';
+import { fetchAssetDefinitions } from '@/store/slices/domain';
+import { fetchTransactions,calculatePortfolioData } from '@/store/slices/domain';
+import { fetchLiabilities } from '@/store/slices/domain';
+import { fetchExpenses } from '@/store/slices/domain';
+import { fetchIncome } from '@/store/slices/domain';
 
 /**
  * Central initialization logic for the application
@@ -137,7 +137,7 @@ export class AppInitializationService {
     // If we have transactions but no valid portfolio cache, compute it
     const needsPortfolioCalculation =
       hasTransactions &&
-      (!transactions.portfolioCacheValid || !transactions.portfolioCache);
+      (!transactions.cacheValid || !transactions.cache);
 
     if (needsPortfolioCalculation && hasAssetDefinitions) {
       Logger.info(
@@ -169,7 +169,7 @@ export class AppInitializationService {
       Logger.warn(
         "AppInitialization: Transactions exist but no asset definitions found"
       );
-    } else if (transactions.portfolioCacheValid) {
+    } else if (transactions.cacheValid) {
       Logger.info(
         "AppInitialization: Portfolio cache is valid, skipping calculation"
       );

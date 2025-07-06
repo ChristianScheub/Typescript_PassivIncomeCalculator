@@ -4,7 +4,7 @@ import {
   calculatePortfolioIntradayDataDirect,
   loadPortfolioIntradayFromDB,
   savePortfolioIntradayToDB
-} from '@/store/slices/portfolioIntradaySlice';
+} from '@/store/slices/cache';
 
 /**
  * Simplified hook that only manages portfolio intraday data

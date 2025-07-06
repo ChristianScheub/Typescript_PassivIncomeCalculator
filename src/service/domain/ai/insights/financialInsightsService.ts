@@ -53,15 +53,15 @@ class FinancialInsightsService implements IFinancialInsightsService {
     const { transactions, income, expenses, liabilities } = state;
     
     return {
-      totalAssets: transactions.portfolioCache?.totals?.totalValue || 0,
-      monthlyIncome: transactions.portfolioCache?.totals?.monthlyIncome || 0,
+      totalAssets: transactions.cache?.totals?.totalValue || 0,
+      monthlyIncome: transactions.cache?.totals?.monthlyIncome || 0,
       totalExpenses: expenses.items.reduce((sum: number, exp: any) => sum + (exp.paymentSchedule?.amount || 0), 0),
       totalLiabilities: liabilities.items.reduce((sum: number, lib: any) => sum + (lib.currentBalance || 0), 0),
       assetsCount: transactions.items.length,
       incomeCount: income.items.length,
       expensesCount: expenses.items.length,
       liabilitiesCount: liabilities.items.length,
-      netWorth: (transactions.portfolioCache?.totals?.totalValue || 0) - 
+      netWorth: (transactions.cache?.totals?.totalValue || 0) - 
                 liabilities.items.reduce((sum: number, lib: any) => sum + (lib.currentBalance || 0), 0)
     };
   }

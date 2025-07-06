@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
-import { addIncome, updateIncome, deleteIncome } from '@/store/slices/incomeSlice';
+import { addIncome, updateIncome, deleteIncome } from '@/store/slices/domain';
 import { Income } from '@/types/domains/financial';
 import { useTranslation } from 'react-i18next';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';

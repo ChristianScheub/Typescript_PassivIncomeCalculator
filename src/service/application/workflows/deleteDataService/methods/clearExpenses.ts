@@ -1,5 +1,5 @@
 import { store } from '@/store';
-import { clearAllExpenses } from '@/store/slices/expensesSlice';
+import { clearAllExpenses } from '@/store/slices/domain';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { StoreNames } from '@/types/domains/database';
 import { clearSQLiteStores, clearLocalStorageData } from './utils';

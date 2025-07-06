@@ -10,7 +10,7 @@ import {
   removeChart, 
   openConfigPanel, 
   closeConfigPanel
-} from '@/store/slices/customAnalyticsSlice';
+} from '@/store/slices/ui';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { 
   AllocationData, 

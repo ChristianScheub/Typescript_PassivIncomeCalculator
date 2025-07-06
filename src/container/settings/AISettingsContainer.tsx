@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAppSelector, useAppDispatch } from '@/hooks/redux';
 import { AISettingsSection } from '@/view/settings/general/AISettingsSection';
-import { setAIEnabled } from '@/store/slices/aiConfigSlice';
+import { setAIEnabled } from '@/store/slices/configSlice';
 
 /**
  * AI Settings Container
@@ -9,7 +9,7 @@ import { setAIEnabled } from '@/store/slices/aiConfigSlice';
  */
 export const AISettingsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
-  const aiConfig = useAppSelector(state => state.aiConfig);
+  const aiConfig = useAppSelector(state => state.config.ai);
 
   const handleAIToggle = (enabled: boolean) => {
     dispatch(setAIEnabled(enabled));

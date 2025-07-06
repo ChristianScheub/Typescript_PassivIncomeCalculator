@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useAppSelector } from '../../../hooks/redux';
 import { calculatorService } from '@/service/';
 import { AssetType } from '@/types/shared/base/enums';
-import { selectPortfolioCache } from '@/store/slices/transactionsSlice';
+import { selectPortfolioCache } from '@/store/slices/domain';
 import PortfolioAnalyticsView from '@/view/analytics-hub/distributions/assets/PortfolioAnalyticsView';
 
 type AnalyticsTab = 'asset_distribution' | 'income_distribution' | 'custom';
