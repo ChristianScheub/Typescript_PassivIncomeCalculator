@@ -1,14 +1,12 @@
-import { 
+import type { 
   FinancialMetrics, 
   UIAlert, 
-  FinancialAlert, 
-  AlertGenerationOptions 
+  FinancialAlert
 } from '@/types/domains/analytics/reporting';
 
 export interface IBaseAlertsService {
   generateFinancialAlerts: (
-    metrics: FinancialMetrics, 
-    options?: AlertGenerationOptions
+    metrics: FinancialMetrics
   ) => FinancialAlert[];
   
   calculateAlertPriority: (alert: FinancialAlert, metrics: FinancialMetrics) => number;

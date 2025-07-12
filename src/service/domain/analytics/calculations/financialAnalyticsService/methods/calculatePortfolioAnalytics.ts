@@ -63,10 +63,12 @@ export const calculatePortfolioAnalytics = (
         sectorMap.set(sectorName, currentValue + proportionalValue);
       });
     } else {
-      // Single sector asset
-      const sector = position.sector || (assetDef && 'sector' in assetDef ? (assetDef as any).sector : undefined) || 'Unknown';
-      const currentValue = sectorMap.get(sector) || 0;
-      sectorMap.set(sector, currentValue + position.currentValue);
+      // Single sector asset (Legacy: position.sector → position.sectors)
+      const sectorArr = Array.isArray(position.sectors) && position.sectors.length > 0 ? position.sectors : ['Unknown'];
+      sectorArr.forEach(sector => {
+        const currentValue = sectorMap.get(sector) || 0;
+        sectorMap.set(sector, currentValue + position.currentValue);
+      });
     }
   });
   const sectorAllocation = Array.from([...sectorMap.entries()])
@@ -260,10 +262,12 @@ export const calculateIncomeAnalytics = (
           sectorIncomeMap.set(sectorName, currentIncome + proportionalIncome);
         });
       } else {
-        // Single sector asset
-        const sector = position.sector || (assetDef && 'sector' in assetDef ? (assetDef as any).sector : undefined) || 'Unknown';
-        const currentIncome = sectorIncomeMap.get(sector) || 0;
-        sectorIncomeMap.set(sector, currentIncome + position.monthlyIncome);
+        // Single sector asset (Legacy: position.sector → position.sectors)
+        const sectorArr = Array.isArray(position.sectors) && position.sectors.length > 0 ? position.sectors : ['Unknown'];
+        sectorArr.forEach(sector => {
+          const currentIncome = sectorIncomeMap.get(sector) || 0;
+          sectorIncomeMap.set(sector, currentIncome + position.monthlyIncome);
+        });
       }
     }
   });

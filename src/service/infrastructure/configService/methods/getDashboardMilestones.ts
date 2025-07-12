@@ -1,5 +1,5 @@
 import { TrendingUp, Target, CheckCircle } from 'lucide-react';
-import { FinancialRatios } from '../../analyticsService/interfaces/IAnalyticsService';
+import { FinancialRatios } from '@/types/domains/analytics/reporting';
 import { Milestone, NavigationHandlers } from '../interfaces/IConfigService';
 
 export const getDashboardMilestones = (

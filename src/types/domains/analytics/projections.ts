@@ -27,6 +27,7 @@ export interface MonthlyProjection {
     [key: string]: number;
   };
   date: string; // ISO date string for the first day of the month
+  passiveIncomeCoverage?: number; // Added for expense coverage chart compatibility
 }
 
 export interface ProjectionConfig {

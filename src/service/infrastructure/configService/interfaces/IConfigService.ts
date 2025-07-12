@@ -1,4 +1,4 @@
-import { FinancialRatios } from '../../analyticsService/interfaces/IAnalyticsService';
+import { FinancialRatios } from '@/types/domains/analytics/reporting';
 
 export interface QuickAction {
   id: string;

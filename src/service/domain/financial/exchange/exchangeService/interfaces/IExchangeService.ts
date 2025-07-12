@@ -1,4 +1,4 @@
-import { ExchangeRate } from '@/types/domains/financial/calculations';
+import type { ExchangeRate } from '@/types/domains/financial/calculations';
 
 export interface IExchangeService {
   /**

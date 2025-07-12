@@ -1,9 +1,9 @@
-import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
-import { 
+import type { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
+import type { 
   PortfolioHistoryPoint,
   PerformanceMetrics,
   ChartDataPoint 
-} from '@/types/domains/portfolio/history';
+} from '@/types/domains/portfolio/performance';
 
 
 

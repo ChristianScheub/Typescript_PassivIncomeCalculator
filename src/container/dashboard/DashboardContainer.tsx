@@ -1,38 +1,82 @@
 import React, { useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '../../hooks/redux';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { 
-  selectFinancialSummary
-} from '@/store/slices/cache/calculatedDataSlice';
+  selectFinancialSummary,
+  calculateFinancialSummary
+} from '@/store/slices/domain/transactionsSlice'; // MIGRATED: Now using consolidated cache
 import DashboardView from '@/view/finance-hub/overview/DashboardView';
+import AssetFocusDashboardContainer from './AssetDashboardContainer';
 import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
 import alertsService from '@/service/application/notifications/alertsService';
 import { useDashboardConfig } from '../../hooks/useDashboardConfig';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { useAsyncOperation } from '../../utils/containerUtils';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { RootState } from '@/store';
 
 const DashboardContainer: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch() as ThunkDispatch<RootState, unknown, AnyAction>;
   const { executeAsyncOperation } = useAsyncOperation();
 
-  // Redux state - dashboard is now always in 'smartSummary' mode  
-  const dashboardMode = 'smartSummary';
+  // Redux state - get dashboard mode from Redux config
+  const dashboardMode = useAppSelector((state) => state.config.dashboard.assetFocus.mode);
   
-  // Cached financial summary from Redux (should be available after initialization)
+  // Cached financial summary from Redux (consolidated cache)
   const financialSummaryCache = useAppSelector(selectFinancialSummary);
+  
+  // Additional data for financial summary calculation
+  const liabilities = useAppSelector((state) => state.liabilities.items);
+  const expenses = useAppSelector((state) => state.expenses.items);
+  const income = useAppSelector((state) => state.income.items);
 
-  // Get financial summary from cache or provide fallback
-  const financialSummary = useMemo(() => financialSummaryCache || {
-    netWorth: 0,
-    totalAssets: 0,
-    totalLiabilities: 0,
-    monthlyIncome: 0,
-    monthlyExpenses: 0,
-    monthlyCashFlow: 0
+  // Extract core financial data (remove cache metadata)
+  const financialSummary = useMemo(() => {
+    // Always ensure complete FinancialSummary structure
+    const defaultSummary = {
+      netWorth: 0,
+      totalAssets: 0,
+      totalLiabilities: 0,
+      monthlyIncome: 0,
+      monthlyExpenses: 0,
+      monthlyCashFlow: 0,
+      monthlyLiabilityPayments: 0,
+      monthlyAssetIncome: 0,
+      passiveIncome: 0,
+      totalMonthlyIncome: 0,
+      totalPassiveIncome: 0,
+      totalMonthlyExpenses: 0,
+      savingsRate: 0,
+      emergencyFundMonths: 0
+    };
+    
+    if (financialSummaryCache) {
+      // Extract only the financial data, excluding cache metadata
+      const { lastCalculated, inputHash, ...coreData } = financialSummaryCache;
+      return { ...defaultSummary, ...coreData };
+    }
+    
+    return defaultSummary;
   }, [financialSummaryCache]);
+
+  // Automatically calculate financial summary if missing or all zero
+  useEffect(() => {
+    const hasData = liabilities.length > 0 || expenses.length > 0 || income.length > 0;
+    const hasValidFinancialSummary = financialSummaryCache && 
+      (financialSummaryCache.totalAssets > 0 || 
+       financialSummaryCache.monthlyIncome > 0 || 
+       financialSummaryCache.monthlyExpenses > 0 ||
+       financialSummaryCache.totalLiabilities > 0);
+
+    if (hasData && !hasValidFinancialSummary) {
+      Logger.info('DashboardContainer: Financial summary missing or all zero, triggering calculation');
+      dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
+    }
+  }, [dispatch, financialSummaryCache, liabilities, expenses, income]);
 
   const ratios = useMemo(() => 
     analyticsService.calculateRatios(financialSummary),
@@ -63,17 +107,40 @@ const DashboardContainer: React.FC = () => {
 
   // Alerts configuration
   const alerts = useMemo(() => {
-    const financialAlerts = alertsService.generateFinancialAlerts(financialSummary, {
-      maxAlerts: 3,
-      includeSuccess: true,
-      priorityThreshold: 1
-    });
-
+    // Extract only FinancialMetrics properties for alert generation
+    const metrics = {
+      netWorth: financialSummary.netWorth,
+      totalAssets: financialSummary.totalAssets,
+      totalLiabilities: financialSummary.totalLiabilities,
+      monthlyIncome: financialSummary.monthlyIncome,
+      monthlyExpenses: financialSummary.monthlyExpenses,
+      monthlyLiabilityPayments: financialSummary.monthlyLiabilityPayments,
+      monthlyAssetIncome: financialSummary.monthlyAssetIncome,
+      passiveIncome: financialSummary.passiveIncome,
+      monthlyCashFlow: financialSummary.monthlyCashFlow
+    };
+    const financialAlerts = alertsService.generateFinancialAlerts(metrics);
     return alertsService.transformToUIAlerts(financialAlerts, t, navigate);
   }, [financialSummary, navigate, t]);
 
   // Effects
   // Dashboard settings are now auto-loaded via configSlice
+  
+  // Automatically calculate financial summary if missing or all zero
+  useEffect(() => {
+    const hasData = income.length > 0 || expenses.length > 0 || liabilities.length > 0;
+    const hasValidFinancialSummary = financialSummaryCache && 
+      (financialSummaryCache.totalAssets > 0 || 
+       financialSummaryCache.monthlyIncome > 0 || 
+       financialSummaryCache.monthlyExpenses > 0 ||
+       financialSummaryCache.totalLiabilities > 0);
+
+    if (hasData && !hasValidFinancialSummary) {
+      Logger.info('DashboardContainer: Financial summary missing or all zero, triggering calculation');
+      Logger.info(`DashboardContainer: Data available - income: ${income.length}, expenses: ${expenses.length}, liabilities: ${liabilities.length}`);
+      dispatch(calculateFinancialSummary({ liabilities, expenses, income }) as any);
+    }
+  }, [dispatch, financialSummaryCache, income, expenses, liabilities]);
   
   // Debug: Log dashboard mode changes
   useEffect(() => {
@@ -102,7 +169,13 @@ const DashboardContainer: React.FC = () => {
     }
   }, [executeAsyncOperation]);
 
-  // Default: Smart Summary Dashboard (assetFocus mode removed)
+  // Render based on dashboard mode
+  if (dashboardMode === 'assetFocus') {
+    Logger.infoService("DashboardContainer: Rendering AssetFocusDashboardContainer");
+    return <AssetFocusDashboardContainer />;
+  }
+
+  // Default: Smart Summary Dashboard
   Logger.infoService("DashboardContainer: Rendering DashboardView (Smart Summary)");
   return (
     <DashboardView

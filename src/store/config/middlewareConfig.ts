@@ -3,6 +3,7 @@ import portfolioCacheMiddleware from '../middleware/portfolioCacheMiddleware';
 import calculatedDataCacheMiddleware from '../middleware/calculatedDataCacheMiddleware';
 import assetCalculationCacheMiddleware from '../middleware/assetCalculationCacheMiddleware';
 import storageValidationMiddleware from '../middleware/storageValidationMiddleware';
+import financialSummaryMiddleware from '../middleware/financialSummaryListener';
 import Logger from '@service/shared/logging/Logger/logger';
 
 /**
@@ -26,6 +27,7 @@ export const middlewareConfig = (getDefaultMiddleware: any) => {
     portfolioCacheMiddleware as any,           // Portfolio cache invalidation
     calculatedDataCacheMiddleware as any,     // Calculated data cache management  
     assetCalculationCacheMiddleware as any,   // Asset calculation cache
+    financialSummaryMiddleware as any,        // Financial summary auto-calculation
     storageValidationMiddleware as any,       // Storage health monitoring
     dataChangeMiddleware as any,              // Data mutation handling (should be last)
   );

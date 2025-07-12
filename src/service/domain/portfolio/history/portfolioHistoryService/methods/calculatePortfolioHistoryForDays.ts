@@ -1,8 +1,5 @@
+import type { PortfolioHistoryPoint, AssetPosition } from '@/types/domains/portfolio/performance';
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
-import { 
-  PortfolioHistoryPoint, 
-  AssetPosition 
-} from '../interfaces/IPortfolioHistoryService';
 import { PortfolioHistoryHelper } from './portfolioHistoryHelper';
 import Logger from "@/service/shared/logging/Logger/logger";
 
@@ -21,7 +18,7 @@ function calculatePortfolioHistoryForDays(
   );
 
   // Prepare assets and get asset definition map
-  const { validAssets, assetDefMap } = PortfolioHistoryHelper.prepareAssets(assets, assetDefinitions);
+  const { validAssets } = PortfolioHistoryHelper.prepareAssets(assets, assetDefinitions);
   if (validAssets.length === 0) return [];
 
   // Calculate date range
@@ -45,7 +42,7 @@ function calculatePortfolioHistoryForDays(
   // Process each date to calculate portfolio value
   for (const date of relevantDates) {
     historyPoints.push(
-      PortfolioHistoryHelper.createHistoryPoint(validAssets, assetDefMap, date, positions)
+      PortfolioHistoryHelper.createHistoryPoint(positions, date)
     );
   }
 

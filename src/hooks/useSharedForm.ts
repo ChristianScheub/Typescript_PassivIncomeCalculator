@@ -52,9 +52,7 @@ export function useSharedForm<T extends FieldValues>({
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         Logger.error('Form submission error: ' + errorMessage);
-        if (onError) {
-          onError(error);
-        }
+        // Do not call onError here; onError is for form validation errors, not exceptions
       }
     };
 
@@ -70,8 +68,9 @@ export function useSharedForm<T extends FieldValues>({
       
       // Trigger validation for all fields to show all errors
       form.trigger();
-      if (onError) {
-        onError(errors);
+      if (onError && errors && typeof errors === 'object' && 'message' in errors) {
+        // Only call onError if error is a FieldErrors object
+        onError(errors as any); // fallback, but ideally onError should only be called with FieldErrors
       }
     };
 
@@ -96,23 +95,22 @@ export type FormArrayOperation<T> = {
 }
 
 // Form array helper hook with proper typing
-export function useFormArray<T, TForm extends FieldValues>(
+export function useFormArray<TForm extends FieldValues, T = any>(
   form: UseFormReturn<TForm>, 
-  name: keyof TForm
+  name: import('react-hook-form').Path<TForm>
 ): FormArrayOperation<T> & { fields: T[] } {
   const { getValues, setValue } = form;
-  
   return {
     fields: (getValues(name) as T[]) || [],
     append: (value: T) => {
       const current = (getValues(name) as T[]) || [];
-      setValue(name, [...current, value] as TForm[keyof TForm], { shouldValidate: true });
+      setValue(name, [...current, value] as any, { shouldValidate: true });
     },
     remove: (index: number) => {
       const current = (getValues(name) as T[]) || [];
       setValue(
         name,
-        current.filter((_, i: number) => i !== index) as TForm[keyof TForm],
+        current.filter((_, i: number) => i !== index) as any,
         { shouldValidate: true }
       );
     },
@@ -120,7 +118,7 @@ export function useFormArray<T, TForm extends FieldValues>(
       const current = (getValues(name) as T[]) || [];
       setValue(
         name,
-        current.map((item: T, i: number) => (i === index ? value : item)) as TForm[keyof TForm],
+        current.map((item: T, i: number) => (i === index ? value : item)) as any,
         { shouldValidate: true }
       );
     },

@@ -9,7 +9,7 @@ import { setAIEnabled } from '@/store/slices/configSlice';
  */
 export const AISettingsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
-  const aiConfig = useAppSelector(state => state.config.ai);
+  const aiConfig = useAppSelector(state => state.config.apis.ai);
 
   const handleAIToggle = (enabled: boolean) => {
     dispatch(setAIEnabled(enabled));
@@ -23,7 +23,7 @@ export const AISettingsContainer: React.FC = () => {
 
   return (
     <AISettingsSection
-      isAIEnabled={aiConfig.isAIEnabled}
+      isAIEnabled={aiConfig.enabled}
       onAIToggle={handleAIToggle}
     />
   );

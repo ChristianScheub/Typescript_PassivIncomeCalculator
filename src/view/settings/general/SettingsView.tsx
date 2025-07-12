@@ -56,7 +56,7 @@ interface SettingsViewProps {
     onConfirm: () => void;
   };
   onCloseConfirmDialog: () => void;
-  onApiToggle: (enabled: boolean) => void;
+  onApiToggle?: (enabled: boolean) => void;
   onDividendApiToggle: (enabled: boolean) => void;
   onExportData: (storeNames: string[]) => void;
   onImportData: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -290,7 +290,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
             <Toggle
               checked={isApiEnabled}
-              onChange={onApiToggle}
+              onChange={onApiToggle ? onApiToggle : () => {}}
               id="api-toggle"
               label={t('settings.enableStockApi')}
             />

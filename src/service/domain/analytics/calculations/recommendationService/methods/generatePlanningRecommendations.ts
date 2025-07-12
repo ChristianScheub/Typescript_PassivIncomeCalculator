@@ -1,13 +1,12 @@
 import { Transaction as Asset } from '@/types/domains/assets/';
-import { Income, Expense, Liability } from '@/types/domains/financial/';
+import { Income, Expense } from '@/types/domains/financial/';
 import { PortfolioRecommendation } from '@/types/domains/analytics';
 import { calculatorService } from '@/service';
 
 export const generatePlanningRecommendations = (
   assets: Asset[],
   income: Income[],
-  expenses: Expense[],
-  liabilities: Liability[]
+  expenses: Expense[]
 ): PortfolioRecommendation[] => {
   const recommendations: PortfolioRecommendation[] = [];
 

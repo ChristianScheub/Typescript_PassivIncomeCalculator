@@ -6,6 +6,7 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { StockAPIProvider, DividendApiProvider } from '@/types/shared/base/enums';
+import { AssetFocusTimeRange } from '@/types/shared/analytics';
 import { StateHydrationService } from '../services/stateHydrationService';
 
 // Unified Configuration Interface
@@ -50,6 +51,10 @@ interface ConfigState {
         visible: boolean;
         size: 'small' | 'medium' | 'large';
       };
+    };
+    assetFocus: {
+      timeRange: AssetFocusTimeRange;
+      mode: 'smartSummary' | 'assetFocus';
     };
   };
   
@@ -108,6 +113,10 @@ const initialState: ConfigState = {
     autoRefreshInterval: 300, // 5 minutes
     hiddenSections: [],
     customLayout: {},
+    assetFocus: {
+      timeRange: '1M',
+      mode: 'smartSummary',
+    },
   },
   general: {
     theme: 'auto',
@@ -187,6 +196,14 @@ const configSlice = createSlice({
       state.dashboard.customLayout = action.payload;
     },
     
+    // Asset Focus Configuration
+    setAssetFocusTimeRange: (state, action: PayloadAction<AssetFocusTimeRange>) => {
+      state.dashboard.assetFocus.timeRange = action.payload;
+    },
+    setAssetFocusMode: (state, action: PayloadAction<'smartSummary' | 'assetFocus'>) => {
+      state.dashboard.assetFocus.mode = action.payload;
+    },
+    
     // General Settings
     setTheme: (state, action: PayloadAction<'light' | 'dark' | 'auto'>) => {
       state.general.theme = action.payload;
@@ -234,6 +251,10 @@ export const {
   toggleDashboardSection,
   updateDashboardLayout,
   
+  // Asset Focus
+  setAssetFocusTimeRange,
+  setAssetFocusMode,
+  
   // General
   setTheme,
   setLanguage,
@@ -250,6 +271,7 @@ export const selectStockApiConfig = (state: { config: ConfigState }) => state.co
 export const selectDividendApiConfig = (state: { config: ConfigState }) => state.config.apis.dividend;
 export const selectAIConfig = (state: { config: ConfigState }) => state.config.apis.ai;
 export const selectDashboardConfig = (state: { config: ConfigState }) => state.config.dashboard;
+export const selectAssetFocusConfig = (state: { config: ConfigState }) => state.config.dashboard.assetFocus;
 export const selectGeneralConfig = (state: { config: ConfigState }) => state.config.general;
 
 // Derived selectors

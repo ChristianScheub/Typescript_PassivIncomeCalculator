@@ -1,6 +1,6 @@
 import sqliteService from "@/service/infrastructure/sqlLiteService";
 import Logger from "@/service/shared/logging/Logger/logger";
-import { ExchangeRate } from '../interfaces/IExchangeService';
+import type { ExchangeRate } from '@/types/domains/financial/calculations';
 
 /**
  * Refresh exchange rate for today from ECB XML

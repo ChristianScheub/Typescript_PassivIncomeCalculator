@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Filter, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { AssetType } from '@/types/shared/base';
+import { AssetType } from '@/types/shared/base/enums';
 
 interface AssetTypeOption {
   value: AssetType | 'all';

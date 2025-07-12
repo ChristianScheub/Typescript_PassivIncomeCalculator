@@ -15,9 +15,9 @@ import Logger from '@/service/shared/logging/Logger/logger';
  * - Returns cached data when fresh calculation is not needed
  */
 export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: number; timestamp: string }> {
-  const { portfolioCache } = useAppSelector(state => state.transactions);
+  const { cache: portfolioCache } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
-  const { isHydrated } = useAppSelector(state => state.calculatedData);
+  const isHydrated = useAppSelector(state => !!state.transactions.cache);
   
   const [cachedData, setCachedData] = useState<Array<{ date: string; value: number; timestamp: string }>>([]);
   const [lastCalculationHash, setLastCalculationHash] = useState<string>('');
@@ -189,9 +189,9 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
       const debugInfo: string[] = [];
 
       portfolioCache.positions.forEach((position: any) => {
-        const definition = position.assetDefinition;
+        const definition = assetDefinitions.find((def: any) => def.id === position.assetDefinitionId);
         if (!definition) {
-          debugInfo.push(`No definition for position`);
+          debugInfo.push(`No definition for position with ID: ${position.assetDefinitionId}`);
           return;
         }
 
@@ -287,15 +287,24 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
       
       // Create simplified positions array (this could be enhanced with actual position data)
       const positions = portfolioCache?.positions?.map((pos: any) => ({
-        assetDefinitionId: pos.assetDefinition?.id || 'unknown',
-        quantity: pos.quantity || 0,
-        value: (pos.quantity || 0) * (dailyValue / (portfolioCache.positions?.length || 1)), // Rough estimate
-        price: dailyValue / (portfolioCache.positions?.length || 1) // Rough estimate
+        assetDefinitionId: pos.assetDefinition?.id || pos.assetDefinitionId || 'unknown',
+        assetName: pos.assetDefinition?.name || pos.name || 'Unknown',
+        assetType: pos.assetDefinition?.type || pos.type || 'Unknown',
+        ticker: pos.assetDefinition?.ticker || pos.ticker || '',
+        quantity: pos.quantity || pos.totalQuantity || 0,
+        averagePrice: pos.averagePrice || pos.averagePurchasePrice || 0,
+        currentPrice: dailyValue / (portfolioCache.positions?.length || 1),
+        currentValue: (pos.quantity || pos.totalQuantity || 0) * (dailyValue / (portfolioCache.positions?.length || 1)),
+        totalInvested: estimatedInvested / (portfolioCache.positions?.length || 1),
+        totalReturn: totalReturn / (portfolioCache.positions?.length || 1),
+        totalReturnPercentage: totalReturnPercentage,
+        weight: 100 / (portfolioCache.positions?.length || 1),
       })) || [];
       
       return {
         date: dayData.date,
         value: dailyValue,
+        totalValue: dailyValue, // Added to satisfy PortfolioHistoryPoint
         totalInvested: estimatedInvested,
         totalReturn,
         totalReturnPercentage,

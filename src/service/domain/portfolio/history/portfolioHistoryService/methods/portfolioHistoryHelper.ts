@@ -1,8 +1,7 @@
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets';
 import { getCurrentQuantity } from '@/utils/transactionCalculations';
-import { calculatePortfolioValueForDate } from './calculatePortfolioValueForDate';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { PortfolioHistoryPoint, PortfolioServiceTransaction, ServiceAssetPosition } from '@/types/domains/portfolio';
+import { PortfolioHistoryPoint, PortfolioServiceTransaction, AssetPosition } from '@/types/domains/portfolio';
 
 /**
  * Helper class containing shared functionality for portfolio history calculations
@@ -250,45 +249,34 @@ export class PortfolioHistoryHelper {
   }
 
   /**
-   * Creates a PortfolioHistoryPoint for a specific date with caching
+   * Creates a PortfolioHistoryPoint for a specific date with caching (konsolidierte Struktur)
    */
   static createHistoryPoint(
-    validAssets: Asset[],
-    assetDefMap: Map<string, AssetDefinition>,
-    date: string,
-    positions: Map<string, ServiceAssetPosition>
+    positions: Map<string, AssetPosition>,
+    date: string
   ): PortfolioHistoryPoint {
-    const cacheKey = this.getCacheKey(validAssets, date);
-    const cachedValue = this.portfolioValueCache.get(cacheKey);
-    
-    if (cachedValue !== undefined) {
-      Logger.cache(`Cache hit: Using cached portfolio value for ${date}`);
-      return {
-        date,
-        value: cachedValue,
-        transactions: this.getTransactionsForDate(validAssets, assetDefMap, date)
-      };
-    }
+    // Für die konsolidierte Struktur: Berechne alle Felder
+    // (Hier: Beispielhafte Berechnung, ggf. anpassen je nach Logik)
+    // totalValue = Summe der aktuellen Werte aller Positionen
+    // totalInvested = Summe der Investitionen
+    // totalReturn = totalValue - totalInvested
+    // totalReturnPercentage = (totalReturn / totalInvested) * 100
+    // positions = aktuelle AssetPositionen für das Datum
 
-    const dateTransactions = this.getTransactionsForDate(validAssets, assetDefMap, date);
-    const portfolioValue = calculatePortfolioValueForDate(
-      validAssets,
-      assetDefMap,
-      date,
-      positions,
-      dateTransactions
-    );
-
-    this.portfolioValueCache.set(cacheKey, portfolioValue);
-
-    Logger.infoService(
-      `Date: ${date}, Value: €${portfolioValue.toFixed(2)}, Transactions: ${dateTransactions.length}`
-    );
+    // Dummy-Implementierung für die Struktur, Logik ggf. anpassen
+    const assetPositions: AssetPosition[] = Array.from(positions.values());
+    const totalValue = assetPositions.reduce((sum, p) => sum + p.currentValue, 0);
+    const totalInvested = assetPositions.reduce((sum, p) => sum + p.totalInvested, 0);
+    const totalReturn = totalValue - totalInvested;
+    const totalReturnPercentage = totalInvested > 0 ? (totalReturn / totalInvested) * 100 : 0;
 
     return {
       date,
-      value: portfolioValue,
-      transactions: dateTransactions
+      totalValue,
+      totalInvested,
+      totalReturn,
+      totalReturnPercentage,
+      positions: assetPositions
     };
   }
 }

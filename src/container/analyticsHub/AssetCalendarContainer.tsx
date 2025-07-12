@@ -9,7 +9,7 @@ import Logger from '@/service/shared/logging/Logger/logger';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { calculatorService } from '../../service';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux';
-import { selectPortfolioCache, selectPortfolioCacheValid, calculatePortfolioData } from '@/store/slices/domain';
+import { calculatePortfolioData } from '@/store/slices/domain';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { AssetDefinition } from '@/types/domains/assets/entities';
 import { DividendHistoryEntry } from '@/types/domains/assets/dividends';
@@ -52,8 +52,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   
   // Use Redux cache instead of recalculating
   const dispatch = useAppDispatch();
-  const portfolioCache = useAppSelector(selectPortfolioCache);
-  const portfolioCacheValid = useAppSelector(selectPortfolioCacheValid);
+  const portfolioCache = useAppSelector(state => state.transactions.cache);
   
   const { t } = useTranslation();
   
@@ -72,21 +71,24 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
 
   // Ensure portfolio cache is available
   useEffect(() => {
-    if (!portfolioCacheValid && assets.length > 0 && assetDefinitions.length > 0) {
+    if ((!portfolioCache || !portfolioCache.positions || portfolioCache.positions.length === 0) && assets.length > 0 && assetDefinitions.length > 0) {
       Logger.info('Portfolio cache invalid, recalculating for asset calendar');
-      // Korrektur des TypeScript-Fehlers durch explizite Typzuweisung des Dispatch
       (dispatch as ThunkDispatch<StoreState, unknown, AnyAction>)(calculatePortfolioData({ 
         assetDefinitions, 
         categoryData: { categories: assetCategories, categoryOptions, categoryAssignments } 
       }));
     }
-  }, [assets.length, assetDefinitions.length, portfolioCacheValid, dispatch, assetCategories, categoryOptions, categoryAssignments]);
+  }, [assets.length, assetDefinitions.length, portfolioCache, dispatch, assetCategories, categoryOptions, categoryAssignments]);
 
   // Get portfolio data from cache or provide empty fallback
   const portfolioData = useMemo(() => {
     if (portfolioCache) {
-      Logger.info(`Using cached portfolio data for asset calendar: ${portfolioCache.positions.length} positions`);
-      return portfolioCache;
+      const safePositions = Array.isArray(portfolioCache.positions) ? portfolioCache.positions : [];
+      Logger.info(`Using cached portfolio data for asset calendar: ${safePositions.length} positions`);
+      return {
+        ...portfolioCache,
+        positions: safePositions
+      };
     } else {
       Logger.info('No portfolio cache available, using empty data');
       return {
@@ -147,7 +149,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
 
   // Helper functions for income calculation by asset type
   const calculateStockIncome = useCallback((position: PortfolioPosition, month: number): number => {
-    const assetDefinition = position.assetDefinition;
+    const assetDefinition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
     if (!assetDefinition) return 0;
     const totalQuantity = position.totalQuantity;
     if (totalQuantity <= 0) return 0;
@@ -178,10 +180,10 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
       Logger.cache(`Error calculating dividend for ${position.name}: ${error}`);
       return 0;
     }
-  }, [selectedYear]);
+  }, [selectedYear, assetDefinitions]);
   
   const calculateInterestIncome = useCallback((position: PortfolioPosition): number => {
-    const assetDefinition = position.assetDefinition;
+    const assetDefinition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
     if (!assetDefinition?.bondInfo?.interestRate) return 0;
     
     const interestRate = assetDefinition.bondInfo.interestRate;
@@ -190,18 +192,20 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
     const monthlyInterest = annualInterest / 12;
     
     return isFinite(monthlyInterest) ? monthlyInterest : 0;
-  }, []);
+  }, [assetDefinitions]);
   
   const calculateRentalIncome = useCallback((position: PortfolioPosition): number => {
-    const baseRent = position.assetDefinition?.rentalInfo?.baseRent;
+    const assetDefinition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
+    const baseRent = assetDefinition?.rentalInfo?.baseRent;
     if (baseRent === undefined) return 0;
     
     return isFinite(baseRent) ? baseRent : 0;
-  }, []);
+  }, [assetDefinitions]);
 
   // Main position income calculator
   const calculatePositionIncomeForMonth = useCallback((position: PortfolioPosition, month: number): number => {
-    if (!position.assetDefinition) {
+    const assetDefinition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
+    if (!assetDefinition) {
       return 0;
     }
 
@@ -219,7 +223,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
       default:
         return 0;
     }
-  }, [calculateStockIncome, calculateInterestIncome, calculateRentalIncome]);
+  }, [calculateStockIncome, calculateInterestIncome, calculateRentalIncome, assetDefinitions]);
 
   // Log positions details for debugging
   useEffect(() => {
@@ -231,20 +235,24 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
     filteredPositions.forEach((position: PortfolioPosition) => {
       Logger.info(`Position: ${position.name} (${position.type}) - Value: ${position.currentValue}`);
       
+      // Get asset definition for this position
+      const assetDefinition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
+      if (!assetDefinition) return;
+      
       // Check dividend info from AssetDefinition
-      const dividendInfo = position.assetDefinition?.dividendInfo;
+      const dividendInfo = assetDefinition.dividendInfo;
       if (position.type === 'stock' && dividendInfo) {
         Logger.info(`  Dividend Info: frequency=${dividendInfo.frequency}, amount=${dividendInfo.amount}`);
       }
       
       // Check interest rate from AssetDefinition
-      const interestRate = position.assetDefinition?.bondInfo?.interestRate;
+      const interestRate = assetDefinition.bondInfo?.interestRate;
       if (position.type === 'bond' && interestRate) {
         Logger.info(`  Interest Rate: ${interestRate}%`);
       }
       
       // Check rental info from AssetDefinition
-      const rentalInfo = position.assetDefinition?.rentalInfo;
+      const rentalInfo = assetDefinition.rentalInfo;
       if (position.type === 'real_estate' && rentalInfo) {
         const amount = rentalInfo.baseRent;
         Logger.info(`  Rental Income: ${amount}`);
@@ -286,16 +294,20 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
         let income = calculatePositionIncomeForMonth(positionWithQuantity, month);
         let isForecast = false;
         let forecastShare = 0;
+        
+        // Get asset definition for forecast calculations
+        const assetDefinition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
+        
         // --- Forecast-Integration: Nur für Aktien mit dividendHistory & Forecast ---
         if (
-          positionWithQuantity.assetDefinition?.type === 'stock' &&
-          Array.isArray(positionWithQuantity.assetDefinition.dividendHistory) &&
-          positionWithQuantity.assetDefinition.dividendHistory.length > 0 &&
-          Array.isArray(positionWithQuantity.assetDefinition.dividendForecast3Y)
+          assetDefinition?.type === 'stock' &&
+          Array.isArray(assetDefinition.dividendHistory) &&
+          assetDefinition.dividendHistory.length > 0 &&
+          Array.isArray(assetDefinition.dividendForecast3Y)
         ) {
-          const forecastEntries = getForecastForMonth(positionWithQuantity.assetDefinition, month, selectedYear);
+          const forecastEntries = getForecastForMonth(assetDefinition, month, selectedYear);
           if (forecastEntries.length > 0 && quantity > 0) {
-            const hasRealDividend = positionWithQuantity.assetDefinition.dividendHistory.some(entry => {
+            const hasRealDividend = assetDefinition.dividendHistory.some((entry: DividendHistoryEntry) => {
               const d = new Date(entry.date);
               return d.getMonth() + 1 === month && d.getFullYear() === selectedYear && (entry.amount ?? 0) > 0;
             });
@@ -329,7 +341,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
       Logger.info(`  ${m.name}: ${m.totalIncome} from ${m.positions.length} positions`);
     });
     return data;
-  }, [filteredPositions, monthNames, calculatePositionIncomeForMonth, selectedYear]);
+  }, [filteredPositions, monthNames, calculatePositionIncomeForMonth, selectedYear, assetDefinitions]);
 
   // Memoize selected month data
   const selectedMonthData = useMemo(() => {

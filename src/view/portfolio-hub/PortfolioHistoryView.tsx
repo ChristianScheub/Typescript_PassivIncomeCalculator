@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign } from 'lucide-react';
-import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
+import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import { formatService } from '@/service';
 import { ChartEmptyState } from '@/ui/shared';
 import { TabButton, TabGroup } from '@/ui/portfolioHub/TabButton';
@@ -56,9 +56,9 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
   const chartData = useMemo(() => {
     return historyData.map(point => ({
       date: point.date,
-      value: point.value,
+      value: point.totalValue,
       formattedDate: new Date(point.date).toLocaleDateString('de-DE'),
-      hasTransactions: point.transactions.length > 0
+      // hasTransactions und transactions entfallen, da nicht mehr Teil der Struktur
     }));
   }, [historyData]);
 
@@ -72,7 +72,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
       };
     }
 
-    const values = historyData.map(p => p.value).filter(v => isFinite(v) && v >= 0);
+    const values = historyData.map(p => p.totalValue).filter(v => isFinite(v) && v >= 0);
     
     if (values.length === 0) {
       return {

@@ -18,7 +18,9 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const { theme } = useAppContext();
   const isDarkMode = theme === 'dark';
 
-  const muiTheme = useMemo(() => createMuiTheme(theme), [theme]);
+  // Map 'auto' to 'light' (or use system preference if desired)
+  const muiThemeMode: 'light' | 'dark' = theme === 'dark' ? 'dark' : 'light';
+  const muiTheme = useMemo(() => createMuiTheme(muiThemeMode), [muiThemeMode]);
 
   const contextValue = useMemo(() => ({
     isDarkMode,

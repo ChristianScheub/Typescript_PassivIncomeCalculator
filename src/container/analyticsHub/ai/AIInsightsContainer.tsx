@@ -17,7 +17,7 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
   const reduxState = useAppSelector((state) => state);
   
   // Redux state - Basic financial data for display
-  const { items: assets, portfolioCache } = reduxState.transactions;
+  const { items: assets, cache: portfolioCache } = reduxState.transactions;
   const { items: income } = reduxState.income;
   const { items: expenses } = reduxState.expenses;
   const { items: liabilities } = reduxState.liabilities;

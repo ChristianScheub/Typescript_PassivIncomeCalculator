@@ -1,216 +1,146 @@
-import React, { useCallback } from 'react';
+import { useCallback } from 'react';
 import { useAppSelector, useAppDispatch } from './redux';
+import type { ThunkDispatch, AnyAction } from '@reduxjs/toolkit';
+import type { RootState } from '@/store';
 import { 
   calculateAssetFocusData,
   calculateFinancialSummary,
+  calculatePortfolioHistory,
   selectPortfolioHistory,
   selectAssetFocusData,
   selectFinancialSummary,
-  selectIsStoreHydrated,
-  clearAllCache,
-  invalidateAllCache
-} from '@/store/slices/cache';
+  invalidateAllCaches
+} from '@/store/slices/domain/transactionsSlice';
 import { AssetFocusTimeRange } from '@/types/shared/analytics';
 import Logger from '@/service/shared/logging/Logger/logger';
 
 /**
- * Custom hook for managing calculated data cache
- * Provides easy access to cached calculations and cache management functions
+ * Custom hook for managing calculated data cache (MIGRATED VERSION)
+ * Now uses consolidated cache in transactionsSlice
  */
 export const useCalculatedDataCache = () => {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch() as ThunkDispatch<RootState, unknown, AnyAction>;
+  const getState = () => {
+    // useAppSelector gibt keinen direkten Zugriff auf den State, daher ggf. workaround nötig
+    // In Hooks: useSelector kann als Ersatz dienen, aber für Callbacks ggf. als Parameter übergeben
+    // Hier: Wir holen die Werte direkt in jedem Callback
+    return {
+      liabilities: useAppSelector((state) => state.liabilities.items),
+      expenses: useAppSelector((state) => state.expenses.items),
+      income: useAppSelector((state) => state.income.items),
+    };
+  };
 
-  // Cache management functions
+  // Cache invalidation functions
   const clearCache = useCallback(() => {
-    Logger.cache('Clearing all calculated data cache via hook');
-    dispatch(clearAllCache());
+    Logger.cache('useCalculatedDataCache: Clearing all cache');
+    dispatch(invalidateAllCaches());
   }, [dispatch]);
 
   const invalidateCache = useCallback(() => {
-    Logger.cache('Invalidating all calculated data cache via hook');
-    dispatch(invalidateAllCache());
+    Logger.cache('useCalculatedDataCache: Invalidating all cache');
+    dispatch(invalidateAllCaches());
   }, [dispatch]);
 
-  const refreshPortfolioHistory = useCallback((timeRange: AssetFocusTimeRange) => {
-    Logger.cache(`Portfolio history refresh requested for timeRange: ${timeRange} - using new system`);
-    // The new portfolio history system handles refresh automatically
-  }, []);
-
+  // Refresh functions that get required data from Redux store
   const refreshAssetFocusData = useCallback(() => {
-    Logger.cache('Refreshing asset focus data');
-    dispatch(calculateAssetFocusData());
+    Logger.cache('useCalculatedDataCache: Refreshing asset focus data');
+    dispatch(calculateAssetFocusData() as any);
   }, [dispatch]);
 
   const refreshFinancialSummary = useCallback(() => {
-    Logger.cache('Refreshing financial summary');
-    dispatch(calculateFinancialSummary());
+    Logger.cache('useCalculatedDataCache: Refreshing financial summary');
+    const { liabilities, expenses, income } = getState();
+    dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
+  }, [dispatch]);
+
+  const refreshPortfolioHistory = useCallback((timeRange: AssetFocusTimeRange) => {
+    Logger.cache(`useCalculatedDataCache: Refreshing portfolio history for ${timeRange}`);
+    dispatch(calculatePortfolioHistory({ timeRange }) as any);
   }, [dispatch]);
 
   const refreshAllData = useCallback((timeRange?: AssetFocusTimeRange) => {
-    Logger.cache('Refreshing all calculated data');
-    dispatch(calculateFinancialSummary());
-    dispatch(calculateAssetFocusData());
+    Logger.cache('useCalculatedDataCache: Refreshing all data');
+    refreshAssetFocusData();
+    refreshFinancialSummary();
     if (timeRange) {
-      Logger.cache(`Portfolio history refresh for timeRange ${timeRange} - delegated to new system`);
+      refreshPortfolioHistory(timeRange);
     }
-  }, [dispatch]);
+  }, [refreshAssetFocusData, refreshFinancialSummary, refreshPortfolioHistory]);
 
   return {
     // Cache management
     clearCache,
     invalidateCache,
     
-    // Data refresh functions
-    refreshPortfolioHistory,
+    // Refresh functions
     refreshAssetFocusData,
     refreshFinancialSummary,
+    refreshPortfolioHistory,
     refreshAllData,
     
-    // Selector helpers
+    // Hook functions for components
     usePortfolioHistory: (timeRange: AssetFocusTimeRange) => 
       useAppSelector(selectPortfolioHistory(timeRange)),
+    
     useAssetFocusData: () => 
       useAppSelector(selectAssetFocusData),
+    
     useFinancialSummary: () => 
-      useAppSelector(selectFinancialSummary)
+      useAppSelector(selectFinancialSummary),
   };
 };
 
-/**
- * Hook specifically for portfolio history with automatic calculation
- */
+// Individual hooks for backwards compatibility
 export const usePortfolioHistory = (timeRange: AssetFocusTimeRange) => {
+  const portfolioHistory = useAppSelector(selectPortfolioHistory(timeRange));
   const dispatch = useAppDispatch();
-  const portfolioHistoryCache = useAppSelector(selectPortfolioHistory(timeRange));
-  const isStoreHydrated = useAppSelector(selectIsStoreHydrated);
-  const { items: assets } = useAppSelector(state => state.transactions);
-  const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
 
-  // Auto-calculate only if store is hydrated, cache is empty, und wir haben Daten
-  React.useEffect(() => {
-    if (!isStoreHydrated) {
-      Logger.cache(`Portfolio history hook waiting for store hydration (timeRange: ${timeRange})`);
-      return;
-    }
-    const shouldCalculate = !portfolioHistoryCache && assets.length > 0 && assetDefinitions.length > 0;
-    if (shouldCalculate) {
-      Logger.cache(`Auto-calculating portfolio history (no valid cache found, store hydrated, timeRange: ${timeRange})`);
-      dispatch({ type: 'portfolioHistory/triggerCalculation', payload: { timeRange } });
-    } else if (portfolioHistoryCache) {
-      Logger.cache(`Using cached portfolio history for timeRange: ${timeRange} (${portfolioHistoryCache.data.length} entries, calculated: ${portfolioHistoryCache.lastCalculated})`);
-    } else {
-      Logger.cache(`No auto-calculation for portfolio history timeRange: ${timeRange} - using new PortfolioHistoryCalculationService`);
-    }
-  }, [isStoreHydrated, portfolioHistoryCache, assets.length, assetDefinitions.length, timeRange, dispatch]);
+  const refresh = useCallback(() => {
+    dispatch(calculatePortfolioHistory({ timeRange }) as any);
+  }, [dispatch, timeRange]);
 
   return {
-    data: portfolioHistoryCache?.data || [],
-    lastCalculated: portfolioHistoryCache?.lastCalculated,
-    isLoading: isStoreHydrated && !portfolioHistoryCache && assets.length > 0,
-    refresh: () => {
-      Logger.cache(`Manual refresh requested for portfolio history timeRange: ${timeRange}`);
-      // The new portfolio history system will handle refresh automatically
-      // when data is invalidated or dependencies change
-    }
+    data: portfolioHistory?.data || [],
+    loading: false, // TODO: Add proper loading state tracking
+    error: null,
+    lastCalculated: portfolioHistory?.lastCalculated,
+    refresh
   };
 };
 
-/**
- * Hook specifically for asset focus data with automatic calculation
- */
 export const useAssetFocusData = () => {
+  const assetFocusData = useAppSelector(selectAssetFocusData);
   const dispatch = useAppDispatch();
-  const assetFocusDataCache = useAppSelector(selectAssetFocusData);
-  const isStoreHydrated = useAppSelector(selectIsStoreHydrated);
-  const { items: assets } = useAppSelector(state => state.transactions);
-  const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
 
-  // Auto-calculate only if store is hydrated, cache is empty, and we have data
-  React.useEffect(() => {
-    if (!isStoreHydrated) {
-      Logger.cache('Asset focus hook waiting for store hydration');
-      return;
-    }
-    
-    const shouldCalculate = !assetFocusDataCache && 
-                           assets.length > 0 && 
-                           assetDefinitions.length > 0;
-    
-    if (shouldCalculate) {
-      Logger.cache('Auto-calculating asset focus data (no valid cache found, store hydrated)');
-      dispatch(calculateAssetFocusData());
-    } else if (assetFocusDataCache) {
-      Logger.cache(`Using cached asset focus data (calculated: ${assetFocusDataCache.lastCalculated})`);
-    } else {
-      Logger.cache('No calculation needed for asset focus data (store hydrated, no data or cache exists)');
-    }
-  }, [isStoreHydrated, assetFocusDataCache, assets.length, assetDefinitions.length, dispatch]);
+  const refresh = useCallback(() => {
+    dispatch(calculateAssetFocusData() as any);
+  }, [dispatch]);
 
   return {
-    assetsWithValues: assetFocusDataCache?.assetsWithValues || [],
-    portfolioSummary: assetFocusDataCache?.portfolioSummary || {},
-    lastCalculated: assetFocusDataCache?.lastCalculated,
-    isLoading: isStoreHydrated && !assetFocusDataCache && assets.length > 0,
-    refresh: () => dispatch(calculateAssetFocusData())
+    data: assetFocusData,
+    loading: false, // TODO: Add proper loading state tracking
+    error: null,
+    refresh
   };
 };
 
-/**
- * Hook specifically for financial summary with automatic calculation
- */
 export const useFinancialSummary = () => {
-  const dispatch = useAppDispatch();
-  const financialSummaryCache = useAppSelector(selectFinancialSummary);
-  const isStoreHydrated = useAppSelector(selectIsStoreHydrated);
-  const { items: assets } = useAppSelector(state => state.transactions);
-  const { items: liabilities } = useAppSelector(state => state.liabilities);
-  const { items: expenses } = useAppSelector(state => state.expenses);
-  const { items: income } = useAppSelector(state => state.income);
-
-  // Auto-calculate only if store is hydrated, cache is empty, and we have financial data
-  React.useEffect(() => {
-    if (!isStoreHydrated) {
-      Logger.cache('Financial summary hook waiting for store hydration');
-      return;
-    }
-    
-    const hasData = assets.length > 0 || liabilities.length > 0 || 
-                    expenses.length > 0 || income.length > 0;
-    
-    const shouldCalculate = !financialSummaryCache && hasData;
-    
-    if (shouldCalculate) {
-      Logger.cache('Auto-calculating financial summary (no valid cache found, store hydrated)');
-      dispatch(calculateFinancialSummary());
-    } else if (financialSummaryCache) {
-      Logger.cache(`Using cached financial summary (calculated: ${financialSummaryCache.lastCalculated})`);
-    } else {
-      Logger.cache('No calculation needed for financial summary (store hydrated, no data or cache exists)');
-    }
-  }, [
-    isStoreHydrated,
-    financialSummaryCache, 
-    assets.length, 
-    liabilities.length, 
-    expenses.length, 
-    income.length, 
-    dispatch
-  ]);
-
+  const financialSummary = useAppSelector(selectFinancialSummary);
+  const dispatch = useAppDispatch() as ThunkDispatch<RootState, unknown, AnyAction>;
+  const liabilities = useAppSelector((state) => state.liabilities.items);
+  const expenses = useAppSelector((state) => state.expenses.items);
+  const income = useAppSelector((state) => state.income.items);
+  const refresh = useCallback(() => {
+    dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
+  }, [dispatch, liabilities, expenses, income]);
   return {
-    ...(financialSummaryCache || {
-      netWorth: 0,
-      totalAssets: 0,
-      totalLiabilities: 0,
-      monthlyIncome: 0,
-      monthlyExpenses: 0,
-      monthlyCashFlow: 0
-    }),
-    lastCalculated: financialSummaryCache?.lastCalculated,
-    isLoading: isStoreHydrated && !financialSummaryCache && (
-      assets.length > 0 || liabilities.length > 0 || 
-      expenses.length > 0 || income.length > 0
-    ),
-    refresh: () => dispatch(calculateFinancialSummary())
+    data: financialSummary,
+    loading: false,
+    error: null,
+    refresh
   };
 };
+
+// Keep the original export for backward compatibility
+export default useCalculatedDataCache;

@@ -19,16 +19,28 @@ export const AssetSelectionDropdown: React.FC<AssetSelectionDropdownProps> = ({
         required
       >
         <option value="">{t('assets.selectAssetOption')}</option>
-        {filteredDefinitions.map((definition) => (
-          <option key={definition.id} value={definition.id}>
-            {definition.fullName} {definition.ticker && `(${definition.ticker})`}
-            {definition.sector && ` - ${definition.sector}`}
-          </option>
-        ))}
+        {filteredDefinitions.map((definition) => {
+          // Zeige Sektoren als Komma-separierte Liste, falls vorhanden
+          const sectorString =
+            definition.sectors && definition.sectors.length > 0
+              ? ` - ${definition.sectors
+                  .map((s) => s.sector)
+                  .filter(Boolean)
+                  .join(', ')}`
+              : '';
+          return (
+            <option key={definition.id} value={definition.id}>
+              {definition.fullName} {definition.ticker && `(${definition.ticker})`}
+              {sectorString}
+            </option>
+          );
+        })}
       </select>
       {errors.assetDefinitionId && (
         <p className="mt-1 text-sm text-red-600">
-          {typeof errors.assetDefinitionId.message === 'string' ? errors.assetDefinitionId.message : 'Invalid selection'}
+          {typeof errors.assetDefinitionId.message === 'string'
+            ? errors.assetDefinitionId.message
+            : 'Invalid selection'}
         </p>
       )}
     </div>

@@ -15,7 +15,6 @@ interface MobileAssetSummaryCardProps {
   monthlyAssetIncome: number;
   annualAssetIncome: number;
   onNavigateToCalendar: () => void;
-  onNavigateToAnalytics?: () => void;
   onNavigateToPortfolioHistory?: () => void;
 }
 
@@ -24,7 +23,6 @@ export const MobileAssetSummaryCard: React.FC<MobileAssetSummaryCardProps> = ({
   monthlyAssetIncome,
   annualAssetIncome,
   onNavigateToCalendar,
-  onNavigateToAnalytics,
   onNavigateToPortfolioHistory
 }) => {
   const { t } = useTranslation();

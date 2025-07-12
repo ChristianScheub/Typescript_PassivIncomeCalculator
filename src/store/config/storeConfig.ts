@@ -13,8 +13,8 @@ import {
 
 import {
   forecastReducer,
-  calculatedDataReducer,
-  portfolioIntradayReducer,
+  // calculatedDataReducer, // REMOVED - consolidated into transactionsSlice
+  // portfolioIntradayReducer, // REMOVED - consolidated into transactionsSlice
 } from '../slices/cache';
 
 import {
@@ -26,20 +26,29 @@ import {
 import configReducer from '../slices/configSlice';
 import { middlewareConfig } from './middlewareConfig';
 
-// Define the root reducer map
+// Define the consolidated root reducer map
 const rootReducer = combineReducers({
-  transactions: transactionsReducer,
+  // Domain slices - core entities
+  transactions: transactionsReducer, // NOW INCLUDES: portfolio cache, history, asset focus, financial summary, intraday data
   assetDefinitions: assetDefinitionsReducer,
   assetCategories: assetCategoriesReducer,
   liabilities: liabilitiesReducer,
   expenses: expensesReducer,
   income: incomeReducer,
-  forecast: forecastReducer,
+  
+  // Cache slices - simplified
+  forecast: forecastReducer, // Still separate, but will use consolidated portfolio cache
+  
+  // Config slice - unified
   config: configReducer, // Unified configuration slice
+  
+  // UI slices
   customAnalytics: customAnalyticsReducer,
   snackbar: snackbarReducer,
-  calculatedData: calculatedDataReducer,
-  portfolioIntraday: portfolioIntradayReducer,
+  
+  // REMOVED REDUNDANT SLICES:
+  // calculatedData: calculatedDataReducer, // Moved to transactions.cache.history/.assetFocusData/.financialSummary
+  // portfolioIntraday: portfolioIntradayReducer, // Moved to transactions.cache.intradayData
 });
 
 // First, define the root state type
@@ -75,10 +84,13 @@ export const createStoreConfig = (preloadedState?: Partial<RootState>) => {
       const state = store.getState();
       // Check for common state issues in development
       if (state.transactions.error) {
-        console.warn('Store Error - Transactions:', state.transactions.error);
+        console.warn('Store Error - Transactions (Consolidated Cache):', state.transactions.error);
       }
-      if (state.calculatedData.error) {
-        console.warn('Store Error - CalculatedData:', state.calculatedData.error);
+      if (state.config.error) {
+        console.warn('Store Error - Config:', state.config.error);
+      }
+      if (state.assetDefinitions.error) {
+        console.warn('Store Error - Asset Definitions:', state.assetDefinitions.error);
       }
     });
   }

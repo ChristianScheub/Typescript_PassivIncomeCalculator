@@ -1,7 +1,7 @@
 import { fetchAssetDefinitions } from '../slices/domain';
-import { markStoreHydrated, validateCacheOnStartup } from '../slices/cache';
 import Logger from '@service/shared/logging/Logger/logger';
 import type { AppStore, RootState } from '../config/storeConfig';
+import { markStoreHydrated } from '../slices/cache';
 
 /**
  * Store Initialization Service
@@ -21,9 +21,6 @@ export class StoreInitializationService {
     
     // Schedule cache validation and asset definitions loading
     setTimeout(() => {
-      // Validate cache startup
-      store.dispatch(validateCacheOnStartup());
-      
       // Load AssetDefinitions from DB after store hydration
       (store.dispatch as any)(fetchAssetDefinitions());
       

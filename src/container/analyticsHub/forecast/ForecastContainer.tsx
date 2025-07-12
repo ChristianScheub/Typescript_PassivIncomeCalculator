@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import { updateForecastValues } from '@/store/slices/cache';
 import Logger from '@/service/shared/logging/Logger/logger';
 import ForecastView from '@/view/analytics-hub/ForecastView';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { updateForecastValues } from '@/store/slices/cache/forecastSlice';
+import { useAsyncOperation } from '@/utils/containerUtils';
 
 interface ForecastContainerProps {
   onBack?: () => void;
@@ -10,37 +11,52 @@ interface ForecastContainerProps {
 
 const ForecastContainer: React.FC<ForecastContainerProps> = ({ onBack }) => {
   const dispatch = useAppDispatch();
-  const { status: assetsStatus } = useAppSelector(state => state.transactions);
-  const { status: incomeStatus } = useAppSelector(state => state.income);
-  const { status: expensesStatus } = useAppSelector(state => state.expenses);
-  const { status: liabilitiesStatus } = useAppSelector(state => state.liabilities);
+  const { executeAsyncOperation } = useAsyncOperation();
+  // Status-Strings werden nicht mehr als Trigger verwendet
   const forecast = useAppSelector(state => state.forecast);
+  const isDataLoading = [
+    useAppSelector(state => state.transactions.status),
+    useAppSelector(state => state.income.status),
+    useAppSelector(state => state.expenses.status),
+    useAppSelector(state => state.liabilities.status)
+  ].includes('loading');
+  // Portfolio-Input-Hash als Trigger für Forecast-Update
+  const portfolioInputHash = useAppSelector(state => state.transactions.cache?.inputHash);
 
-  // Check if any of the underlying data is loading
-  const isDataLoading = [assetsStatus, incomeStatus, expensesStatus, liabilitiesStatus].includes('loading');
-  
   // Scroll to top when component mounts
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
-  
-  // Trigger forecast update when underlying data changes
-  useEffect(() => {
-    if (!isDataLoading && 
-        (assetsStatus === 'succeeded' || incomeStatus === 'succeeded' || 
-         expensesStatus === 'succeeded' || liabilitiesStatus === 'succeeded')) {
-      Logger.info('Underlying data changed, updating forecast values');
-      dispatch(updateForecastValues());
-    }
-  }, [dispatch, isDataLoading, assetsStatus, incomeStatus, expensesStatus, liabilitiesStatus]);
 
-  // Initial load
+  // Forecast nur neu berechnen, wenn sich der Portfolio-Input-Hash ändert
   useEffect(() => {
-    if (!forecast.lastUpdated && !isDataLoading) {
-      Logger.info('Initial forecast load');
-      dispatch(updateForecastValues());
+    if (!isDataLoading && portfolioInputHash) {
+      Logger.info('[ForecastContainer] Portfolio inputHash changed, updating forecast values');
+      executeAsyncOperation(
+        'update forecast values',
+        async () => {
+          const action = updateForecastValues();
+          await (dispatch as any)(action);
+        },
+        () => {}
+      );
     }
-  }, [dispatch, forecast.lastUpdated, isDataLoading]);
+  }, [dispatch, executeAsyncOperation, isDataLoading, portfolioInputHash]);
+
+  // Initial load (nur wenn noch nie geladen und nicht loading)
+  useEffect(() => {
+    if (!forecast.lastUpdated && !isDataLoading && portfolioInputHash) {
+      Logger.info('[ForecastContainer] Initial forecast load');
+      executeAsyncOperation(
+        'initial forecast load',
+        async () => {
+          const action = updateForecastValues();
+          await (dispatch as any)(action);
+        },
+        () => {}
+      );
+    }
+  }, [dispatch, executeAsyncOperation, forecast.lastUpdated, isDataLoading, portfolioInputHash]);
 
   const isLoading = isDataLoading || forecast.isLoading;
 
@@ -48,7 +64,7 @@ const ForecastContainer: React.FC<ForecastContainerProps> = ({ onBack }) => {
 
   return (
     <ForecastView
-          isLoading={isLoading}
+      isLoading={isLoading}
       projections={forecast.projections}
       onBack={onBack}
     />

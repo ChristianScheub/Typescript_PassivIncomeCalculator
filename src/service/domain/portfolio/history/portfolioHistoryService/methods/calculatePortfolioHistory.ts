@@ -1,7 +1,7 @@
 import { Asset, AssetDefinition } from '@/types/domains/assets';
 import { PortfolioHistoryHelper } from './portfolioHistoryHelper';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { ServiceAssetPosition, PortfolioHistoryPoint } from '@/types/domains/portfolio';
+import { AssetPosition, PortfolioHistoryPoint } from '@/types/domains/portfolio';
 
 function calculatePortfolioHistory(
   assets: Asset[], 
@@ -12,7 +12,7 @@ function calculatePortfolioHistory(
   );
 
   // Prepare assets and get asset definition map
-  const { validAssets, assetDefMap } = PortfolioHistoryHelper.prepareAssets(assets, assetDefinitions);
+  const { validAssets } = PortfolioHistoryHelper.prepareAssets(assets, assetDefinitions);
   if (validAssets.length === 0) return [];
 
   // Get all unique dates
@@ -20,12 +20,13 @@ function calculatePortfolioHistory(
   Logger.infoService(`Processing ${allDates.length} unique dates`);
 
   const historyPoints: PortfolioHistoryPoint[] = [];
-  const positions: Map<string, ServiceAssetPosition> = new Map();
+  // Use AssetPosition instead of ServiceAssetPosition
+  const positions: Map<string, AssetPosition> = new Map();
 
   // Process each date to calculate portfolio value
   for (const date of allDates) {
     historyPoints.push(
-      PortfolioHistoryHelper.createHistoryPoint(validAssets, assetDefMap, date, positions)
+      PortfolioHistoryHelper.createHistoryPoint(positions, date)
     );
   }
 

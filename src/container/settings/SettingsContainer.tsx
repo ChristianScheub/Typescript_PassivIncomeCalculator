@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { 
   setStockApiEnabled, 
@@ -7,9 +7,7 @@ import {
   setStockApiProvider, 
   setDividendApiProvider, 
   setDividendApiKey,
-  selectStockApiConfig,
-  selectDividendApiConfig,
-  selectDashboardConfig
+  setAssetFocusMode
 } from "@/store/slices/configSlice";
 import { clearAllTransactions } from "@/store/slices/domain/transactionsSlice";
 import { clearAllExpenses } from "@/store/slices/domain/expensesSlice";
@@ -26,12 +24,11 @@ import {
 } from "@/service/domain/assets/market-data/stockAPIService/utils/fetch";
 import deleteDataService from '@/service/application/workflows/deleteDataService';
 import { t } from "i18next";
-import { ConfirmationDialogState } from "@/ui/dialog/types";
+import { ConfirmationDialogState } from '@/ui/portfolioHub/dialog/types';
 import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/ui';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 import { clearAllLiabilities } from "@/store/slices/domain";
-import { StockAPIProvider } from "@/types/shared";
-import { DashboardMode } from "@/types/shared/analytics";
+import { StockAPIProvider, DividendApiProvider } from "@/types/shared/base/enums";
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";
 type AsyncOperationStatus = "idle" | "loading" | "success" | "error";
@@ -39,8 +36,23 @@ type ApiKeyStatus = "idle" | "saving" | "success" | "error";
 
 const SettingsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
-  const apiConfig = useAppSelector((state) => state.apiConfig);
-  const dashboardSettings = useAppSelector((state) => state.dashboardSettings);
+  const stockApiConfig = useAppSelector((state) => state.config.apis.stock);
+  const dividendApiConfig = useAppSelector((state) => state.config.apis.dividend);
+  const dashboardSettings = useAppSelector((state) => state.config.dashboard);
+  const currentDashboardMode = useAppSelector((state) => state.config.dashboard.assetFocus.mode);
+
+  // Memoized dashboard mode to ensure re-rendering
+  const dashboardMode = useMemo(() => currentDashboardMode, [currentDashboardMode]);
+
+  // Debug: Log dashboard settings changes
+  useEffect(() => {
+    Logger.info(`[Settings] Dashboard assetFocus state changed: ${JSON.stringify(dashboardSettings.assetFocus)}`);
+  }, [dashboardSettings.assetFocus]);
+
+  // Debug: Log specific mode changes
+  useEffect(() => {
+    Logger.info(`[Settings] Current dashboard mode: ${dashboardMode}`);
+  }, [dashboardMode]);
 
   const [exportStatus, setExportStatus] = useState<AsyncOperationStatus>("idle");
   const [importStatus, setImportStatus] = useState<AsyncOperationStatus>("idle");
@@ -93,7 +105,7 @@ const SettingsContainer: React.FC = () => {
     setCurrency(storedCurrency);
     
     // Load dashboard settings from localStorage
-    dispatch(loadDashboardSettingsFromStorage());
+    // dispatch(loadDashboardSettingsFromStorage());
   }, [dispatch]);
 
   const loadLogs = () => {
@@ -259,36 +271,33 @@ const SettingsContainer: React.FC = () => {
   const handleApiKeyChange = async (provider: StockAPIProvider, newApiKey: string) => {
     setApiKeyStatus("saving");
     setApiKeyError(null);
-
     try {
-      dispatch(setApiKey({ provider, apiKey: newApiKey }));
-      dispatch(setApiEnabled(true));
+      dispatch(setStockApiKey({ provider, key: newApiKey }));
+      dispatch(setStockApiEnabled(true));
       setApiKeyStatus("success");
       dispatch(showSuccessSnackbar(t("settings.snackbar.apiKeySaved") || "API-Schlüssel gespeichert."));
-
     } catch (error) {
       setApiKeyError("Failed to save API key");
       setApiKeyStatus("error");
       dispatch(showErrorSnackbar(t("settings.snackbar.apiKeySaveError") || "Fehler beim Speichern des API-Schlüssels."));
-
       Logger.error("Failed to save API key" + JSON.stringify(error));
     }
   };
 
   const handleApiKeyRemove = (provider: StockAPIProvider) => {
-    dispatch(setApiKey({ provider, apiKey: null }));
-    if (provider === apiConfig.selectedProvider) {
-      const hasOtherConfiguredProvider = Object.entries(apiConfig.apiKeys)
+    dispatch(setStockApiKey({ provider, key: "" }));
+    if (provider === stockApiConfig.selectedProvider) {
+      const hasOtherConfiguredProvider = Object.entries(stockApiConfig.apiKeys)
         .some(([key, value]) => key !== provider && value);
       if (!hasOtherConfiguredProvider) {
-        dispatch(setApiEnabled(false));
+        dispatch(setStockApiEnabled(false));
       }
     }
     dispatch(showSuccessSnackbar(t("settings.snackbar.apiKeyRemoved") || "API-Schlüssel entfernt."));
   };
 
   const handleProviderChange = (provider: StockAPIProvider) => {
-    dispatch(setSelectedProvider(provider));
+    dispatch(setStockApiProvider(provider));
     dispatch(showSuccessSnackbar(t("settings.snackbar.providerChanged") || "API-Provider geändert."));
   };
 
@@ -301,9 +310,27 @@ const SettingsContainer: React.FC = () => {
     }
   };
 
-  const handleDashboardModeChange = (mode: DashboardMode) => {
-    dispatch(setDashboardMode(mode));
+  const [, forceUpdate] = useState({});
+
+  const handleDashboardModeChange = (mode: string) => {
     Logger.info(`Dashboard mode changed to ${mode}`);
+    
+    // Log current state before dispatch
+    Logger.info(`[Settings] Current mode before dispatch: ${dashboardMode}`);
+    
+    // Dispatch the Redux action to update the store
+    if (mode === 'assetFocus' || mode === 'smartSummary') {
+      dispatch(setAssetFocusMode(mode as 'assetFocus' | 'smartSummary'));
+      Logger.info(`Redux action dispatched: setAssetFocusMode(${mode})`);
+      
+      // Force component re-render
+      setTimeout(() => {
+        forceUpdate({});
+        Logger.info(`[Settings] Mode after dispatch (next tick): ${dashboardMode}`);
+      }, 0);
+    } else {
+      Logger.warn(`Invalid dashboard mode: ${mode}`);
+    }
   };
 
   // Handle clearing all data
@@ -356,9 +383,9 @@ const SettingsContainer: React.FC = () => {
         StockAPIProvider.ALPHA_VANTAGE
       ];
       providers.forEach((provider) => {
-        dispatch(setApiKey({ provider, apiKey: null }));
+        dispatch(setStockApiKey({ provider, key: "" }));
       });
-      dispatch(setApiEnabled(false));
+      dispatch(setStockApiEnabled(false));
 
       setClearAllDataStatus("success");
       Logger.infoService("All data cleared successfully");
@@ -553,39 +580,31 @@ const SettingsContainer: React.FC = () => {
   };
 
   // --- Dividend API Provider/Key Handling ---
-  const handleDiviApiKeyChange = async (provider: string, newApiKey: string) => {
-    setApiKeyStatus("saving");
-    setApiKeyError(null);
-    try {
-      dispatch(setDividendApiKey({ provider, apiKey: newApiKey }));
-      setApiKeyStatus("success");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.diviApiKeySaved") || "Dividend-API-Schlüssel gespeichert."));
-
-    } catch (error) {
-      setApiKeyError("Failed to save Dividend API key");
-      setApiKeyStatus("error");
-      dispatch(showErrorSnackbar(t("settings.snackbar.diviApiKeySaveError") || "Fehler beim Speichern des Dividend-API-Schlüssels."));
-
-      Logger.errorStack("Failed to save Dividend API key", error instanceof Error ? error : new Error(String(error)));
-    }
+  // Accept string, cast to DividendApiProvider for Redux action
+  const handleDiviApiKeyChange = (provider: string, newApiKey: string) => {
+    dispatch(setDividendApiKey({ provider: provider as DividendApiProvider, key: newApiKey }));
+    setApiKeyStatus("success");
+    dispatch(showSuccessSnackbar(t("settings.snackbar.diviApiKeySaved") || "Dividend-API-Schlüssel gespeichert."));
   };
 
   const handleDiviApiKeyRemove = (provider: string) => {
-    dispatch(setDividendApiKey({ provider, apiKey: "" }));
+    dispatch(setDividendApiKey({ provider: provider as DividendApiProvider, key: "" }));
     dispatch(showSuccessSnackbar(t("settings.snackbar.diviApiKeyRemoved") || "Dividend-API-Schlüssel entfernt."));
   };
 
   const handleDiviProviderChange = (provider: string) => {
-    dispatch(setSelectedDiviProvider(provider));
+    dispatch(setDividendApiProvider(provider as DividendApiProvider));
     dispatch(showSuccessSnackbar(t("settings.snackbar.diviProviderChanged") || "Dividend-Provider geändert."));
   };
 
-  const handleApiToggle = (enabled: boolean) => {
-    dispatch(setApiEnabled(enabled));
+  // Handle stock API toggle
+  const handleStockApiToggle = (enabled: boolean) => {
+    Logger.info(`[Settings] Stock API toggle changed to: ${enabled}`);
+    dispatch(setStockApiEnabled(enabled));
     if (enabled) {
-      dispatch(showSuccessSnackbar(t("settings.snackbar.apiEnabled") || "API aktiviert."));
+      dispatch(showSuccessSnackbar(t("settings.snackbar.stockApiEnabled") || "Stock-API aktiviert."));
     } else {
-      dispatch(showSuccessSnackbar(t("settings.snackbar.apiDisabled") || "API deaktiviert."));
+      dispatch(showSuccessSnackbar(t("settings.snackbar.stockApiDisabled") || "Stock-API deaktiviert."));
     }
   };
 
@@ -651,8 +670,8 @@ const SettingsContainer: React.FC = () => {
       logs={logs}
       showLogs={showLogs}
       autoRefresh={autoRefresh}
-      selectedProvider={apiConfig.selectedProvider}
-      apiKeys={apiConfig.apiKeys}
+      selectedProvider={stockApiConfig.selectedProvider}
+      apiKeys={stockApiConfig.apiKeys}
       apiKeyStatus={apiKeyStatus}
       apiKeyError={apiKeyError}
       currency={currency}
@@ -665,12 +684,12 @@ const SettingsContainer: React.FC = () => {
       clearAllDataStatus={clearAllDataStatus}
       clearReduxCacheStatus={clearReduxCacheStatus}
       clearDividendHistoryStatus={clearDividendHistoryStatus}
-      isApiEnabled={apiConfig.isEnabled}
-      isDividendApiEnabled={apiConfig.isDividendApiEnabled}
-      dashboardMode={dashboardSettings.mode}
-      selectedDiviProvider={apiConfig.selectedDiviProvider}
-      dividendApiKey={apiConfig.dividendApiKey}
-      onApiToggle={handleApiToggle}
+      isApiEnabled={stockApiConfig.enabled}
+      isDividendApiEnabled={dividendApiConfig.enabled}
+      dashboardMode={dashboardMode}
+      selectedDiviProvider={dividendApiConfig.selectedProvider}
+      dividendApiKey={dividendApiConfig.apiKeys}
+      onApiToggle={handleStockApiToggle}
       onDividendApiToggle={handleDividendApiToggle}
       onExportData={handleExportData}
       onImportData={handleImportData}

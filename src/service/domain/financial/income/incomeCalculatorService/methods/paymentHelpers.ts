@@ -1,4 +1,4 @@
-import { DividendSchedule, PaymentSchedule } from '@/types/shared/base';
+import { PaymentSchedule } from '@/types/shared/base/payments';
 
 export const calculateMonthlyAmountFromFrequency = (
   amount: number,
@@ -46,7 +46,7 @@ export const isPaymentMonthForFrequency = (
 };
 
 export const calculateAmountForPaymentMonth = (
-  schedule: PaymentSchedule | DividendSchedule,
+  schedule: PaymentSchedule,
   monthNumber: number,
   quantity = 1
 ): number => {

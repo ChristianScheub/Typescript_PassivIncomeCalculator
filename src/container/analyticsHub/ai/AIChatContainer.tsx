@@ -20,12 +20,14 @@ export const AIChatContainer: React.FC<AIChatContainerProps> = ({ onBack }) => {
   const { sendMessage: sendLLMMessage, modelStatus } = useLLMService();
   
   // Redux state - Complete financial data
-  const { items: assets, portfolioCache } = useAppSelector(state => state.transactions);
+  const { items: assets, cache } = useAppSelector(state => state.transactions);
+  const portfolioCache = cache;
   const { items: income } = useAppSelector(state => state.income);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
-  const { assetFocusData, financialSummary } = useAppSelector(state => state.calculatedData);
+  const assetFocusData = useAppSelector(state => state.transactions.cache?.assetFocusData);
+  const financialSummary = useAppSelector(state => state.transactions.cache?.financialSummary);
 
   // Local state
   const [messages, setMessages] = useState<AIChatMessage[]>([]);
@@ -95,10 +97,11 @@ export const AIChatContainer: React.FC<AIChatContainerProps> = ({ onBack }) => {
         income,
         expenses,
         liabilities,
-        assetFocusData: {
+        assetFocusData: assetFocusData ? {
           ...assetFocusData,
-          assetDefinitions // Add assetDefinitions from Redux to the data structure
-        },
+          assetDefinitions,
+          assetsWithValues: assetFocusData.assetsWithValues?.map(mapAssetWithValueForAI)
+        } : { assetDefinitions },
         financialSummary
       };
 
@@ -167,6 +170,15 @@ export const AIChatContainer: React.FC<AIChatContainerProps> = ({ onBack }) => {
     t('ai.chat.suggestions.risk_assessment'),
     t('ai.chat.suggestions.investment_strategy')
   ];
+
+  // Hilfsfunktion: Mapping AssetWithValue (Store) → AssetWithValue (zentraler Typ)
+  function mapAssetWithValueForAI(assetWithValue: any): import('@/types/domains/portfolio/assetWithValue').AssetWithValue {
+    return {
+      assetDefinition: assetWithValue.assetDefinition,
+      value: assetWithValue.value,
+      quantity: assetWithValue.quantity
+    };
+  }
 
   // Props for the view component - using the updated AIChatViewProps with viewMode
   const viewProps: AIChatViewProps = {

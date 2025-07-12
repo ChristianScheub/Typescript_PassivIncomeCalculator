@@ -1,4 +1,4 @@
-import { FinancialSummary, FinancialRatios } from '../interfaces/IAnalyticsService';
+import { FinancialSummary, FinancialRatios } from '@/types/domains/analytics/reporting';
 
 export const calculateRatios = (summary: FinancialSummary): FinancialRatios => {
   const {

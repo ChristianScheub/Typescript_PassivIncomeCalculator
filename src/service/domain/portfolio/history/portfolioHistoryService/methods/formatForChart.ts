@@ -1,4 +1,4 @@
-import { ChartDataPoint, PortfolioHistoryPoint } from '../interfaces/IPortfolioHistoryService';
+import type { ChartDataPoint, PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import Logger from "@/service/shared/logging/Logger/logger";
 
 /**
@@ -22,15 +22,13 @@ export function formatForChart(historyPoints: PortfolioHistoryPoint[]): ChartDat
 
     return {
       date: point.date,
-      value: point.value,
+      value: point.totalValue,
       formattedDate,
-      hasTransactions: point.transactions.length > 0,
-      transactions: point.transactions
     };
   });
 
   Logger.infoService(
-    `Formatted chart data: ${chartData.length} points, ${chartData.filter(p => p.hasTransactions).length} with transactions`
+    `Formatted chart data: ${chartData.length} points.`
   );
 
   return chartData;

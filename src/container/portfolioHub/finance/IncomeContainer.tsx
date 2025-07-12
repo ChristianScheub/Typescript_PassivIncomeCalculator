@@ -7,10 +7,12 @@ import calculatorService from '@/service/domain/financial/calculations/composite
 import IncomeView from '@/view/portfolio-hub/income/IncomeView';
 import { sortIncome, SortOrder } from '@/utils/sortingUtils';
 import { useAsyncOperation } from '@/utils/containerUtils';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { RootState } from '@/store';
 
 const IncomeContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
+  const dispatch: ThunkDispatch<RootState, unknown, AnyAction> = useAppDispatch();
   const { executeAsyncOperation } = useAsyncOperation();
   const { items: incomeItems, status } = useAppSelector(state => state.income);
   const [isAddingIncome, setIsAddingIncome] = useState(false);

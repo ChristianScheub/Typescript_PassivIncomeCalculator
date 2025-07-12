@@ -97,13 +97,3 @@ export interface ExpenseBreakdown {
   amount: number;
   percentage: number;
 }
-
-/**
- * Exchange Rate - currency exchange data
- */
-export interface ExchangeRate {
-  id?: number;
-  date: string; // YYYY-MM-DD format
-  usdToEur: number;
-  createdAt?: string;
-}

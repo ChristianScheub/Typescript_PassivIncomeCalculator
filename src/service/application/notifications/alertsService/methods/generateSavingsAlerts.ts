@@ -1,4 +1,4 @@
-import { FinancialMetrics, FinancialAlert } from '../interfaces/IAlertsService';
+import type { FinancialMetrics, FinancialAlert } from '@/types/domains/analytics/reporting';
 import { v4 as uuidv4 } from '@/utils/uuid';
 
 export const generateSavingsAlerts = (metrics: FinancialMetrics): FinancialAlert[] => {

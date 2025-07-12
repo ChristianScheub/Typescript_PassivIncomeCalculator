@@ -62,20 +62,23 @@ export class StatePersistenceService {
    * They are loaded from DB on app start
    */
   private static prepareStateForSaving(state: any) {
-    // Validate and fix lastCalculated if missing
-    let assetFocusDataToSave = state.calculatedData?.assetFocusData;
+    // Validate and fix lastCalculated if missing from transactions cache
+    let assetFocusDataToSave = state.transactions?.cache?.assetFocusData;
     if (assetFocusDataToSave && !assetFocusDataToSave.lastCalculated) {
       Logger.warn('Persist: assetFocusData.lastCalculated fehlt, setze auf jetzt!');
       assetFocusDataToSave = { ...assetFocusDataToSave, lastCalculated: new Date().toISOString() };
     }
     
-    let financialSummaryToSave = state.calculatedData?.financialSummary;
+    let financialSummaryToSave = state.transactions?.cache?.financialSummary;
     if (financialSummaryToSave && !financialSummaryToSave.lastCalculated) {
       Logger.warn('Persist: financialSummary.lastCalculated fehlt, setze auf jetzt!');
       financialSummaryToSave = { ...financialSummaryToSave, lastCalculated: new Date().toISOString() };
     }
 
-    Logger.infoRedux(`Persist: Speichere calculatedData | assetFocusDataLastCalculated=${assetFocusDataToSave?.lastCalculated} | financialSummaryLastCalculated=${financialSummaryToSave?.lastCalculated}`);
+    Logger.infoRedux(`Persist: Speichere consolidated cache | assetFocusDataLastCalculated=${assetFocusDataToSave?.lastCalculated} | financialSummaryLastCalculated=${financialSummaryToSave?.lastCalculated}`);
+    
+    // DEBUG: Log den zu speichernden State (inkl. config)
+    Logger.infoRedux(`[Persist] config zu speichern: ${JSON.stringify(state.config)}`);
     
     // IMPORTANT: Only persist summary data and cache, NOT raw transactions or assetDefinitions
     return {
@@ -93,25 +96,18 @@ export class StatePersistenceService {
       income: { items: state.income?.items || [] },
       customAnalytics: { charts: state.customAnalytics?.charts || [] },
       forecast: state.forecast || {},
-      apiConfig: state.apiConfig || {},
-      dividendApiConfig: state.dividendApiConfig || {},
+      config: state.config || {}, // Unified config instead of separate API configs
       // snackbar wird NICHT persistiert (temporärer Zustand)
-      dashboardSettings: state.dashboardSettings || {},
-      calculatedData: {
-        assetFocusData: assetFocusDataToSave,
-        financialSummary: financialSummaryToSave,
-        portfolioHistory: state.calculatedData?.portfolioHistory || {},
-        status: 'idle',
-        error: null,
-        cacheValidityDuration: state.calculatedData?.cacheValidityDuration || 5 * 60 * 1000,
-        enableConditionalLogging: state.calculatedData?.enableConditionalLogging ?? true
-      },
-      portfolioIntraday: {
-        portfolioIntradayData: state.portfolioIntraday?.portfolioIntradayData || [],
-        portfolioIntradayCacheKey: state.portfolioIntraday?.portfolioIntradayCacheKey || null,
-        portfolioIntradayLastUpdated: state.portfolioIntraday?.portfolioIntradayLastUpdated || null
-      },
-      aiConfig: state.aiConfig || {}
+      // Persist only cache data from consolidated transactions slice
+      transactions: {
+        cache: {
+          assetFocusData: assetFocusDataToSave,
+          financialSummary: financialSummaryToSave,
+          history: state.transactions?.cache?.history || {},
+          intradayData: state.transactions?.cache?.intradayData || null,
+          metadata: state.transactions?.cache?.metadata || {}
+        }
+      }
     };
   }
 
@@ -124,7 +120,7 @@ export class StatePersistenceService {
     const hasExpenses = (state.expenses?.items?.length || 0) > 0;
     const hasIncome = (state.income?.items?.length || 0) > 0;
     const hasCategories = (state.assetCategories?.categories?.length || 0) > 0;
-    const hasCalculatedData = state.calculatedData?.assetFocusData || state.calculatedData?.financialSummary;
+    const hasCalculatedData = state.transactions?.cache?.assetFocusData || state.transactions?.cache?.financialSummary;
     
     return !hasLiabilities && !hasExpenses && !hasIncome && !hasCategories && !hasCalculatedData;
   }

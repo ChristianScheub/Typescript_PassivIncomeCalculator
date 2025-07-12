@@ -32,7 +32,7 @@ import { showSuccessSnackbar } from "@/store/slices/ui";
 
 // Type for the asset definition data when creating
 // type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
-import { PriceEntry } from "@/ui/dialog/AddPriceEntryDialog";
+import { PriceEntry } from "@/ui/portfolioHub/dialog/AddPriceEntryDialog";
 import { addPriceToHistory } from "@/utils/priceHistoryUtils";
 import { calculatePortfolioIntradayDataDirect } from "@/store/slices/cache";
 import { DividendFrequency } from "@/types/shared";
@@ -60,11 +60,11 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   const { items: assetDefinitions, status } = useAppSelector(
     (state) => state.assetDefinitions
   );
-  const { isEnabled: isApiEnabled } = useAppSelector(
-    (state) => state.apiConfig
+  const { enabled: isApiEnabled } = useAppSelector(
+    (state) => state.config.apis.stock
   );
   const isDividendApiEnabled = useAppSelector(
-    (state) => state.apiConfig.isDividendApiEnabled
+    (state) => state.config.apis.dividend.enabled
   ); // Added this selector
   const [isAddingDefinition, setIsAddingDefinition] = useState(false);
   const [editingDefinition, setEditingDefinition] =
@@ -261,63 +261,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
     );
   };
 
-  const handleFetchDividendsFromApi = async (definition: AssetDefinition) => {
-    await executeAsyncOperation(
-      "fetch dividends",
-      async () => {
-        Logger.info(
-          "Fetching dividends from API for asset: " + definition.fullName
-        );
-        const result = await (
-          dispatch as ThunkDispatch<RootState, unknown, AnyAction>
-        )(
-          // @ts-ignore
-          fetchAndUpdateDividends(definition)
-        ).unwrap();
-        if (result) {
-          Logger.info(
-            "Dividenden erfolgreich abgerufen und Asset aktualisiert: " +
-              JSON.stringify(result)
-          );
-          const resultToDispatch = { ...result };
-          if (resultToDispatch.dividendInfo) {
-            const { amount, lastDividendDate, paymentMonths } =
-              resultToDispatch.dividendInfo;
-            const allowedFrequencies = [
-              "monthly",
-              "quarterly",
-              "annually",
-              "custom",
-            ] as const;
-            const rawFrequency = resultToDispatch.dividendInfo.frequency;
-            const frequency: DividendFrequency =
-              allowedFrequencies.includes(rawFrequency as any)
-                ? (rawFrequency as DividendFrequency)
-                : "custom";
-            resultToDispatch.dividendInfo = {
-              amount,
-              frequency,
-              lastDividendDate,
-              paymentMonths,
-            };
-          }
-          await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
-            updateAssetDefinition(resultToDispatch as AssetDefinition)
-          );
-        }
-      },
-      () =>
-        dispatch(
-          showSuccessSnackbar(
-            t(
-              "assets.fetchDividendsSuccess",
-              "Dividenden-Daten erfolgreich geholt"
-            )
-          )
-        ),
-      JSON.stringify(definition)
-    );
-  };
+  const transactionsCache = useAppSelector((state: RootState) => state.transactions?.cache);
 
   const handleUpdateStockPrices = async () => {
     await executeAsyncOperation(
@@ -356,22 +300,13 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
           Logger.info(
             "Successfully updated stock prices for asset definitions"
           );
-          const state =
-            (
-              dispatch as ThunkDispatch<RootState, unknown, AnyAction> & {
-                getState?: () => RootState;
-              }
-            ).getState?.() ?? {};
-          const portfolioPositions =
-            state.transactions?.portfolioCache?.positions || [];
-          const portfolioCacheId =
-            state.transactions?.portfolioCache?.id || "default";
+          const portfolioPositions = transactionsCache?.positions || [];
+          const portfolioCacheId = transactionsCache?.id || "default";
           if (portfolioPositions.length > 0) {
             await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
               calculatePortfolioIntradayDataDirect({
-                portfolioPositions,
                 portfolioCacheId,
-                assetDefinitions: assetDefinitions,
+                // assetDefinitions: assetDefinitions, // Remove if not expected by thunk
               })
             );
             Logger.info(
@@ -579,7 +514,6 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
       onUpdateDefinitionWithCategories={updateDefinition}
       onDeleteDefinition={handleDeleteDefinition}
       onAddPriceEntry={handleAddPriceEntry}
-      onFetchDividendsForAsset={handleFetchDividendsFromApi}
       onFetchAllDividends={handleFetchAllDividends}
       onUpdateStockPrices={handleUpdateStockPrices}
       onUpdateHistoricalData={handleUpdateHistoricalData}

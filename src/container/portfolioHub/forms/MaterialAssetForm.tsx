@@ -1,22 +1,39 @@
 import React, { useEffect } from 'react';
 import { Asset } from '@/types/domains/assets/entities';
 import { AssetType } from '@/types/shared/base/enums';
-import { MaterialAssetFormData } from '@/types/domains/assets';
+import { AssetFormData } from '@/types/domains/forms/form-data';
 import { useSharedForm } from '@/hooks/useSharedForm';
 import { useTranslation } from 'react-i18next';
 import Logger from '@/service/shared/logging/Logger/logger';
-import { createMaterialAssetSchema } from '@/utils/validationSchemas';
+import { z } from 'zod';
 import { MaterialAssetFormView } from '@/view/portfolio-hub/forms/MaterialAssetFormView';
 import { getCurrentQuantity } from '@/utils/transactionCalculations';
 
-const assetSchema = createMaterialAssetSchema();
+const assetSchema = z.object({
+  name: z.string(),
+  type: z.enum(["stock", "bond", "real_estate", "crypto", "cash", "other"]),
+  value: z.number(),
+  purchaseDate: z.string(), // now required
+  ticker: z.string().optional(),
+  quantity: z.number().optional(),
+  purchasePrice: z.number(), // now required
+  currentPrice: z.number().optional(),
+  propertyValue: z.number().optional(),
+  symbol: z.string().optional(),
+  acquisitionCost: z.number().optional(),
+  notes: z.string().optional(),
+  id: z.string().optional(),
+  createdAt: z.string().optional(),
+  updatedAt: z.string().optional(),
+  transactionType: z.enum(["buy", "sell"]),
+});
 
 interface AssetFormProps {
   initialData?: Asset;
   onSubmit: (data: Asset) => void;
 }
 
-const getDefaultValues = (initialData?: Asset): Partial<MaterialAssetFormData> => {
+const getDefaultValues = (initialData?: Asset): Partial<AssetFormData> => {
   if (!initialData) {
     return {
       type: 'stock' as AssetType,
@@ -37,7 +54,7 @@ const getDefaultValues = (initialData?: Asset): Partial<MaterialAssetFormData> =
 };
 
 // Helper to calculate stock value, difference, and percentage
-function calculateStockValues(data: MaterialAssetFormData) {
+function calculateStockValues(data: AssetFormData) {
   let finalValue = data.value;
   let valueDifference;
   let percentageDifference;
@@ -60,7 +77,7 @@ function calculateStockValues(data: MaterialAssetFormData) {
 }
 
 // Helper to assign type-specific fields
-function assignTypeSpecificFields(transformedData: Asset, data: MaterialAssetFormData) {
+function assignTypeSpecificFields(transformedData: Asset, data: AssetFormData) {
   switch (data.type) {
     case 'stock':
       // Note: ticker and currentPrice are now stored in AssetDefinition, not directly on Asset
@@ -97,10 +114,10 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
     reset,
     formState: { errors },
     onFormSubmit
-  } = useSharedForm<MaterialAssetFormData>({
+  } = useSharedForm<AssetFormData>({
     validationSchema: assetSchema,
-    defaultValues: getDefaultValues(initialData) as MaterialAssetFormData,
-    onSubmit: async (data: MaterialAssetFormData) => {
+    defaultValues: getDefaultValues(initialData) as AssetFormData,
+    onSubmit: async (data: AssetFormData) => {
       try {
         Logger.info('Form submission started with data: ' + JSON.stringify(data));
         // Use helper for stock calculations
@@ -109,7 +126,7 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
         const transformedData: Asset = {
           id: initialData?.id || Date.now().toString(),
           name: data.name,
-          type: data.type,
+          type: data.type as AssetType,
           value: finalValue || data.value || 0,
           transactionType: 'buy', // Default transaction type for material asset form
           createdAt: initialData?.createdAt || new Date().toISOString(),
@@ -140,7 +157,7 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
     if (initialData) {
       Logger.info('Pre-populating form fields with initial data: ' + JSON.stringify(initialData));
       
-      const formData: Partial<MaterialAssetFormData> = {
+      const formData: Partial<AssetFormData> = {
         name: initialData.name || '',
         type: initialData.type,
         value: initialData.value || 0,
@@ -177,7 +194,7 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
 
   return (
     <MaterialAssetFormView 
-      assetType={assetType}
+      assetType={assetType as AssetType}
       quantity={quantity}
       currentPrice={currentPrice}
       errors={errors}

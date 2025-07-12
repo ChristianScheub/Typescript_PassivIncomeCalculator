@@ -6,12 +6,12 @@ import { Button } from '@ui/shared';
 import { ButtonGroup } from '@ui/shared';
 import { IconButton } from '@ui/shared';
 import { History } from 'lucide-react';
-import { AssetPositionsList, AssetWithValue } from '@ui/portfolioHub';
+import { AssetPositionsList } from '@ui/portfolioHub';
 import { AssetFocusTimeRange } from '@/types/shared/analytics';
-import { PortfolioHistoryPoint } from '@/types/domains/portfolio/history';
-import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
+import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
+import { AssetDefinition } from '@/types/domains/assets/entities';
 import PortfolioHistoryCard from './PortfolioHistoryCard';
-import { useSelector } from 'react-redux';
+import { AssetWithValue } from '@/types/domains/portfolio/assetWithValue';
 
 interface PortfolioSummary {
   totalValue: number;
@@ -29,7 +29,7 @@ interface AssetDashboardViewProps {
   isRefreshing: boolean;
   onNavigateToForecast: () => void;
   onNavigateToSettings: () => void;
-  onNavigateToAssetDetail: (asset: Asset, assetDefinition: AssetDefinition) => void;
+  onNavigateToAssetDetail: (assetDefinition: AssetDefinition) => void; // Updated prop type
   netWorth: number;
   totalAssets: number;
   totalLiabilities: number;
@@ -48,7 +48,7 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
   isRefreshing,
   onNavigateToForecast,
   onNavigateToSettings,
-  onNavigateToAssetDetail,
+  onNavigateToAssetDetail, // Destructure the updated prop
   netWorth,
   totalAssets,
   totalLiabilities,
@@ -57,7 +57,6 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
   isIntradayView
 }) => {
   const { t } = useTranslation();
-  const assetDefinitions = useSelector((state: any) => state.assetDefinitions.items);
 
   const timeRangeOptions: { value: AssetFocusTimeRange; label: string }[] = [
     { value: '1D', label: '1T' },
@@ -107,10 +106,10 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
             <PortfolioHistoryCard 
               history={portfolioHistory.map((point, index) => ({
                 date: point.date,
-                value: point.value,
-                change: index > 0 ? point.value - portfolioHistory[index - 1].value : 0,
-                changePercentage: index > 0 && portfolioHistory[index - 1].value > 0 
-                  ? ((point.value - portfolioHistory[index - 1].value) / portfolioHistory[index - 1].value) * 100 
+                value: point.totalValue,
+                change: index > 0 ? point.totalValue - portfolioHistory[index - 1].totalValue : 0,
+                changePercentage: index > 0 && portfolioHistory[index - 1].totalValue > 0 
+                  ? ((point.totalValue - portfolioHistory[index - 1].totalValue) / portfolioHistory[index - 1].totalValue) * 100 
                   : 0
               }))}
               isIntradayView={isIntradayView || false}
@@ -142,7 +141,6 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
         {/* Assets List */}
         <AssetPositionsList
           assetsWithValues={assetsWithValues}
-          assetDefinitions={assetDefinitions}
           onAssetClick={onNavigateToAssetDetail}
         />
       </div>

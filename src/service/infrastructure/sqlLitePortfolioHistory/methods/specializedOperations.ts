@@ -1,8 +1,8 @@
 import { dbOperations } from './dbOperations';
 import { 
-  PortfolioIntradayPoint, 
-  PortfolioHistoryPoint 
+  PortfolioIntradayPoint 
 } from '../interfaces/IPortfolioHistoryService';
+import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import Logger from '@/service/shared/logging/Logger/logger';
 
 const specializedOperations = {

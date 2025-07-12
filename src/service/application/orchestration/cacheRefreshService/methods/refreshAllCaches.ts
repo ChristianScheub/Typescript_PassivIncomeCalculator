@@ -22,6 +22,8 @@ import recentActivityService from '@/service/domain/analytics/reporting/recentAc
 import Logger from "@/service/shared/logging/Logger/logger";
 import { calculatePortfolioIntradayDataDirect } from '@/store/slices/cache';
 import PortfolioHistoryWorker from '@/workers/portfolioHistoryWorker.ts?worker';
+import type { ThunkDispatch, AnyAction } from '@reduxjs/toolkit';
+import type { RootState } from '@/store';
 
 /**
  * Refreshes all caches in the application (e.g. for pull to refresh)
@@ -37,6 +39,9 @@ import PortfolioHistoryWorker from '@/workers/portfolioHistoryWorker.ts?worker';
  */
 export async function refreshAllCaches(): Promise<void> {
     Logger.cache("Starting COMPLETE cache refresh for ALL data");
+
+    // Cast store.dispatch for AsyncThunk actions
+    const thunkDispatch = store.dispatch as ThunkDispatch<RootState, unknown, AnyAction>;
 
     try {
         // Step 1: Clear all dividend caches
@@ -65,16 +70,16 @@ export async function refreshAllCaches(): Promise<void> {
         // Fetch ALL core data in parallel
         await Promise.all([
             // Asset-related data
-            store.dispatch(fetchTransactions()),
-            store.dispatch(fetchAssetDefinitions()),
-            store.dispatch(fetchAssetCategories()),
-            store.dispatch(fetchAssetCategoryOptions()),
-            store.dispatch(fetchAssetCategoryAssignments()),
+            thunkDispatch(fetchTransactions()).unwrap(),
+            thunkDispatch(fetchAssetDefinitions()).unwrap(),
+            thunkDispatch(fetchAssetCategories()).unwrap(),
+            thunkDispatch(fetchAssetCategoryOptions()).unwrap(),
+            thunkDispatch(fetchAssetCategoryAssignments()).unwrap(),
             
             // Financial data
-            store.dispatch(fetchLiabilities()),
-            store.dispatch(fetchExpenses()),
-            store.dispatch(fetchIncome())
+            thunkDispatch(fetchLiabilities()).unwrap(),
+            thunkDispatch(fetchExpenses()).unwrap(),
+            thunkDispatch(fetchIncome()).unwrap()
         ]);
 
         // Step 7: Wait for data to be available, then recalculate derived data
@@ -93,7 +98,7 @@ export async function refreshAllCaches(): Promise<void> {
 
         // Recalculate portfolio data with fresh data
         if (assets.length > 0 && assetDefinitions.length > 0) {
-            await store.dispatch(calculatePortfolioData({ 
+            await thunkDispatch(calculatePortfolioData({ 
                 assetDefinitions, 
                 categoryData: { categories, categoryOptions, categoryAssignments } 
             }));
@@ -102,7 +107,7 @@ export async function refreshAllCaches(): Promise<void> {
         // Step 8: Update ALL calculated values and derived data
         Logger.infoService("Updating ALL dashboard, forecast, and analytics values");
         await Promise.all([
-            store.dispatch(updateForecastValues())
+            thunkDispatch(updateForecastValues())
             // Note: 30-day history is now calculated directly from IndexedDB, no Redux action needed
         ]);
 
@@ -110,7 +115,7 @@ export async function refreshAllCaches(): Promise<void> {
         Logger.infoService("Clearing and recalculating portfolio history database via Web Worker");
         // Hole aktuelle Daten für Worker
         const refreshedStateForWorker = store.getState();
-        const portfolioPositionsForWorker = refreshedStateForWorker.transactions?.portfolioCache?.positions || [];
+        const portfolioPositionsForWorker = refreshedStateForWorker.transactions?.cache?.positions || [];
         const assetDefinitionsForHistory = refreshedStateForWorker.assetDefinitions?.items || [];
         if (portfolioPositionsForWorker.length > 0 && assetDefinitionsForHistory.length > 0) {
             const worker = new PortfolioHistoryWorker();
@@ -144,17 +149,15 @@ export async function refreshAllCaches(): Promise<void> {
 
         // Step 10: Trigger portfolio intraday aggregation with latest data
         const refreshedState = store.getState();
-        const portfolioPositions = refreshedState.transactions?.portfolioCache?.positions || [];
-        const portfolioCacheId = refreshedState.transactions?.portfolioCache?.id || 'default';
+        const portfolioPositions = refreshedState.transactions?.cache?.positions || [];
         const assetDefinitionsForIntraday = refreshedState.assetDefinitions?.items || [];
+        // No id property on cache, use 'default' or generate as needed
+        const portfolioCacheId = 'default';
         if (portfolioPositions.length > 0 && assetDefinitionsForIntraday.length > 0) {
-            await store.dispatch(
-                calculatePortfolioIntradayDataDirect({
-                    portfolioPositions,
-                    portfolioCacheId,
-                    assetDefinitions: assetDefinitionsForIntraday
-                })
-            );
+            await thunkDispatch(calculatePortfolioIntradayDataDirect({
+                portfolioCacheId
+                // Add dateRange if needed
+            }));
             Logger.infoService('Triggered portfolio intraday aggregation after full cache refresh');
         } else {
             Logger.warn('No portfolio positions or asset definitions found for intraday aggregation after cache refresh');

@@ -10,7 +10,7 @@ interface MilestonesContainerProps {
 
 const MilestonesContainer: React.FC<MilestonesContainerProps> = ({ onBack }) => {
   // Get necessary data from the store
-  const { portfolioCache } = useAppSelector(state => state.transactions);
+  const { cache: portfolioCache } = useAppSelector(state => state.transactions);
   const { items: expenses } = useAppSelector(state => state.expenses);
   const { items: liabilities } = useAppSelector(state => state.liabilities);
   const { items: income } = useAppSelector(state => state.income);

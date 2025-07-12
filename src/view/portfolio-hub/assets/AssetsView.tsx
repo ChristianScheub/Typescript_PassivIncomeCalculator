@@ -201,7 +201,6 @@ const MobileSummary: React.FC<{
         monthlyAssetIncome={monthlyAssetIncome}
         annualAssetIncome={annualAssetIncome}
         onNavigateToCalendar={onNavigateToCalendar}
-        onNavigateToAnalytics={onNavigateToAnalytics}
         onNavigateToPortfolioHistory={onNavigateToPortfolioHistory}
       />
       <div className="mb-4">
@@ -286,7 +285,7 @@ export const AssetsView: React.FC<AssetsViewProps> = ({
 
   // Sort portfolio positions by current value (highest to lowest)
   const sortedPortfolioAssets = useMemo(() => {
-    const positionsCopy = [...portfolioData.positions];
+    const positionsCopy = Array.isArray(portfolioData.positions) ? [...portfolioData.positions] : [];
     return positionsCopy.sort((a, b) => b.currentValue - a.currentValue);
   }, [portfolioData.positions]);
 

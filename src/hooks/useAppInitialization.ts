@@ -20,7 +20,7 @@ export const useAppInitialization = (): UseAppInitializationResult => {
   const [initializationError, setInitializationError] = useState<string | null>(null);
   
   // Track if store is hydrated from localStorage
-  const isStoreHydrated = useAppSelector(state => state.calculatedData.isHydrated);
+  const isStoreHydrated = useAppSelector(state => !!state.transactions.cache);
   
   // Track initialization status
   const [isInitialized, setIsInitialized] = useState(

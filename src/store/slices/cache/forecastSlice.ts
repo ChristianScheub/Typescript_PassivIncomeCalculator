@@ -102,7 +102,7 @@ export const updateForecastValues = createAsyncThunk(
     // Cache Asset-Einkommen für jeden Monat (berücksichtigt Dividendentermine)
     const monthlyAssetIncomeCache: Record<number, number> = {};
     const portfolioCache = transactions.cache;
-    if (!portfolioCache || !transactions.cacheValid) {
+    if (!portfolioCache) {
       Logger.cache('Portfolio cache not available for forecast calculation');
       throw new Error('Portfolio cache required for forecast calculations');
     }
@@ -141,7 +141,7 @@ export const updateMonthlyAssetIncomeCache = createAsyncThunk<
     const { transactions, assetDefinitions } = state;
     const monthlyAssetIncomeCache: Record<number, number> = {};
     const portfolioCache = transactions.cache;
-    if (!portfolioCache || !transactions.cacheValid) {
+    if (!portfolioCache) {
       Logger.cache('Portfolio cache not available for cache update');
       throw new Error('Portfolio cache required for monthly asset income calculations');
     }

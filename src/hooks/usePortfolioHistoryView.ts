@@ -62,13 +62,14 @@ export async function recalculatePortfolioHistoryAndIntraday({ assetDefinitions,
  */
 export function usePortfolioIntradayView(): Array<{ date: string; value: number; timestamp: string }> {
   const dispatch = useAppDispatch();
-  const { cache: portfolioCache, cacheValid } = useAppSelector(state => state.transactions);
+  const { cache: portfolioCache } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
-  const { isHydrated } = useAppSelector(state => state.calculatedData);
+  const isHydrated = useAppSelector(state => !!state.transactions.cache);
 
-  // Get data from portfolioIntraday Redux slice
-  const portfolioIntradayData = useAppSelector(state => state.portfolioIntraday?.portfolioIntradayData || []);
-  const portfolioIntradayStatus = useAppSelector(state => state.portfolioIntraday?.portfolioIntradayStatus || 'idle');
+  // Korrigierte Selektoren für Intraday-Daten
+  const intradayDataObj = portfolioCache?.intradayData;
+  const portfolioIntradayData = intradayDataObj?.data || [];
+  const portfolioIntradayStatus = intradayDataObj ? 'succeeded' : 'idle';
 
   // Use ref to prevent infinite loops - tracks if we've already attempted to load
   const hasAttemptedLoad = useRef(false);
@@ -86,7 +87,7 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
       Logger.infoService('📂 Using portfolio intraday data from Redux cache');
       return;
     }
-    if (isLoadingRef.current || portfolioIntradayStatus === 'loading') {
+    if (isLoadingRef.current) {
       return;
     }
     if (hasAttemptedLoad.current) {
@@ -112,7 +113,7 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
           Logger.infoService(`📂 Loaded ${dbData.length} portfolio intraday points from IndexedDB`);
           const transformedData = dbData.map(point => ({
             date: point.date,
-            value: point.value,
+            value: point.value, // Use 'value' instead of 'totalValue' for PortfolioIntradayPoint
             timestamp: point.timestamp
           }));
           dispatch(setPortfolioIntradayData(transformedData));
@@ -174,7 +175,7 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
     };
     const timeoutId = setTimeout(resetAttempt, 200);
     return () => clearTimeout(timeoutId);
-  }, [cacheValid, assetDefinitions.length]);
+  }, [assetDefinitions.length]);
 
   return portfolioIntradayData;
 }
@@ -187,14 +188,14 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
  *
  * Now uses the worker for calculation and bulk DB persistence if data is missing.
  */
-export function usePortfolioHistoryView(timeRange?: string): Array<{ date: string; value: number; transactions: Array<any> }> {
+export function usePortfolioHistoryView(timeRange?: string): Array<{ date: string; totalValue: number; change: number; changePercentage: number }> {
   const { cache: portfolioCache } = useAppSelector(state => state.transactions);
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
-  const { isHydrated } = useAppSelector(state => state.calculatedData);
+  const isHydrated = useAppSelector(state => !!state.transactions.cache);
   const dispatch = useAppDispatch();
 
   // State for storing data directly (no Redux)
-  const [portfolioHistoryData, setPortfolioHistoryData] = useState<Array<{ date: string; value: number; change: number; changePercentage: number }>>([]);
+  const [portfolioHistoryData, setPortfolioHistoryData] = useState<Array<{ date: string; totalValue: number; change: number; changePercentage: number }>>([]);
   const isLoadingRef = useRef(false);
 
   useEffect(() => {
@@ -215,7 +216,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         Logger.infoService(`📂 Loaded ${dbData.length} portfolio history points from IndexedDB for ${timeRange}`);
         return dbData.map(point => ({
           date: point.date,
-          value: point.value,
+          totalValue: point.totalValue,
           change: point.totalReturn,
           changePercentage: point.totalReturnPercentage
         }));
@@ -234,7 +235,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         // Update local state für history
         return history.map((point: any) => ({
           date: point.date,
-          value: point.value,
+          totalValue: point.totalValue,
           change: point.totalReturn,
           changePercentage: point.totalReturnPercentage
         }));
@@ -271,7 +272,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
               Logger.infoService(`📂 Loaded ${dbData.length} ALL portfolio history points from DB (full range)`);
               setPortfolioHistoryData(dbData.map(point => ({
                 date: point.date,
-                value: point.value,
+                totalValue: point.totalValue,
                 change: point.totalReturn,
                 changePercentage: point.totalReturnPercentage
               })) as any);
@@ -302,34 +303,21 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
     if (!timeRange) {
       return [];
     }
-    // Für 1W: Kombinierte Daten mit Typ-Flag (intraday/daily)
     if (timeRange === '1W') {
       return (portfolioHistoryData as any[]).map((item: any) => ({
         date: item.date,
-        value: typeof item.value === 'number' && !isNaN(item.value) ? item.value : 0,
-        transactions: [],
+        totalValue: typeof item.totalValue === 'number' && !isNaN(item.totalValue) ? item.totalValue : 0,
+        change: typeof item.change === 'number' ? item.change : 0,
+        changePercentage: typeof item.changePercentage === 'number' ? item.changePercentage : 0,
         type: item.type || 'intraday'
       }));
     }
-
-    // Debug logging
-    Logger.info(`🔍 DEBUG portfolioHistoryView for ${timeRange}: portfolioHistoryDataLength=${portfolioHistoryData.length}`);
-    if (portfolioHistoryData.length > 0) {
-      Logger.info(`🔍 DEBUG first 3 items: ${JSON.stringify(portfolioHistoryData.slice(0, 3).map((item: any) => ({ date: item.date, value: item.value, type: typeof item.value })))}`);
-    }
-
-    // Transform portfolioHistoryData to the format expected by PortfolioHistoryView
     const transformed = portfolioHistoryData.map((item: any) => ({
       date: item.date,
-      value: typeof item.value === 'number' && !isNaN(item.value) ? item.value : 0,
-      transactions: [] // Empty array as no transaction-level data is stored in daily snapshots
+      totalValue: typeof item.totalValue === 'number' && !isNaN(item.totalValue) ? item.totalValue : 0,
+      change: typeof item.change === 'number' ? item.change : 0,
+      changePercentage: typeof item.changePercentage === 'number' ? item.changePercentage : 0
     }));
-
-    Logger.info(`🔍 DEBUG transformed data for ${timeRange}: transformedLength=${transformed.length}`);
-    if (transformed.length > 0) {
-      Logger.info(`🔍 DEBUG first 3 transformed: ${JSON.stringify(transformed.slice(0, 3))}`);
-    }
-
     return transformed;
   }, [timeRange, portfolioHistoryData]);
 

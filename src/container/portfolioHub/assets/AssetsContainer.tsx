@@ -6,8 +6,6 @@ import {
   calculatePortfolioData,
   selectTransactions,
   selectTransactionsStatus,
-  selectPortfolioCache,
-  selectPortfolioCacheValid,
   selectPortfolioTotals,
   selectSortedTransactions
 } from '@/store/slices/domain';
@@ -23,17 +21,18 @@ import { PortfolioHistoryContainer } from './PortfolioHistoryContainer';
 import PortfolioAnalyticsContainer from '@/container/analyticsHub/distribution/PortfolioAnalyticsContainer';
 import { useAsyncOperation } from '@/utils/containerUtils';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { RootState } from '@/store';
 
 const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
+  const dispatch: ThunkDispatch<RootState, unknown, AnyAction> = useAppDispatch();
   const { executeAsyncOperation } = useAsyncOperation();
   
   // Use new selectors for transactions
   const assets = useAppSelector(selectTransactions);
   const status = useAppSelector(selectTransactionsStatus);
-  const portfolioCache = useAppSelector(selectPortfolioCache);
-  const portfolioCacheValid = useAppSelector(selectPortfolioCacheValid);
+  const portfolioCache = useAppSelector(state => state.transactions.cache);
   const portfolioTotals = useAppSelector(selectPortfolioTotals);
   const sortedAssets = useAppSelector(selectSortedTransactions);
   
@@ -63,14 +62,14 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
 
   // Calculate portfolio data when needed (with caching)
   useEffect(() => {
-    if (assets.length > 0 && assetDefinitions.length > 0 && !portfolioCacheValid) {
+    if (assets.length > 0 && assetDefinitions.length > 0 && !portfolioCache) {
       Logger.info('Calculating portfolio data');
       dispatch(calculatePortfolioData({ 
         assetDefinitions, 
         categoryData: { categories, categoryOptions, categoryAssignments } 
       }));
     }
-  }, [assets.length, assetDefinitions.length, portfolioCacheValid, dispatch, categories, categoryOptions, categoryAssignments]);
+  }, [assets.length, assetDefinitions.length, portfolioCache, dispatch, categories, categoryOptions, categoryAssignments]);
 
   // Extract values from cached totals
   const { totalAssetValue, monthlyAssetIncome, annualAssetIncome } = useMemo(() => {
@@ -91,7 +90,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
           lastCalculated: portfolioCache.lastCalculated,
           assetCount: assets.length,
           definitionCount: assetDefinitions.length,
-          positionCount: portfolioCache.positions.length
+          positionCount: Array.isArray(portfolioCache.positions) ? portfolioCache.positions.length : 0
         }
       };
     }
@@ -188,7 +187,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   // Optimiert: Läuft nur wenn sich assets ändern oder Portfolio-Cache invalidiert wird
   useEffect(() => {
     if (!assets || assets.length === 0) return;
-    if (portfolioCacheValid) return; // Skip wenn Portfolio-Cache gültig ist
+    if (portfolioCache) return; // Skip wenn Portfolio-Cache gültig ist
     
     Logger.info('Checking and updating asset dividend caches');
     
@@ -218,7 +217,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
         }
       });
     }
-  }, [assets.length, portfolioCacheValid, dispatch]); // Dependency auf asset length und cache validity
+  }, [assets.length, portfolioCache, dispatch]); // Dependency auf asset length und cache validity
 
 
 

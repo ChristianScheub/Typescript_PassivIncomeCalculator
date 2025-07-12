@@ -99,8 +99,8 @@ export class StateHydrationService {
 
     // Basic validation - but no size limits as these can be legitimate
     // We just check for obvious corruption or invalid data
-    if (state.calculatedData && typeof state.calculatedData !== 'object') {
-      Logger.warn('State validation failed: invalid calculatedData structure');
+    if (state.transactions?.cache && typeof state.transactions.cache !== 'object') {
+      Logger.warn('State validation failed: invalid transactions.cache structure');
       return false;
     }
 
@@ -165,8 +165,7 @@ export class StateHydrationService {
         items: [],
         status: 'idle' as Status,
         error: null,
-        cache: undefined,
-        cacheValid: false,
+        cache: state.transactions?.cache || undefined,
         lastCalculated: undefined,
         calculationMetadata: {
           lastCalculated: '',
@@ -194,8 +193,6 @@ export class StateHydrationService {
       forecast: state.forecast || {},
       config: this.transformConfigState(state), // Unified config transformation
       snackbar: this.transformSnackbarState(state.snackbar),
-      calculatedData: this.transformCalculatedDataState(state.calculatedData),
-      portfolioIntraday: this.transformPortfolioIntradayState(state.portfolioIntraday),
     };
 
     Logger.infoRedux('State transformation completed');
@@ -286,15 +283,25 @@ export class StateHydrationService {
         autoRefreshInterval: dashboardData?.autoRefreshInterval ?? 300,
         hiddenSections: dashboardData?.hiddenSections ?? [],
         customLayout: dashboardData?.customLayout ?? {},
+        assetFocus: {
+          timeRange: dashboardData?.assetFocus?.timeRange ?? '1M',
+          mode: dashboardData?.assetFocus?.mode ?? 'smartSummary',
+        },
       },
       general: {
-        theme: 'auto',
+        theme: (['light', 'dark', 'auto'] as const).includes(dashboardData?.theme)
+          ? (dashboardData.theme as 'light' | 'dark' | 'auto')
+          : 'auto',
+        // Ensure MUI always gets a valid theme (never 'auto')
+        muiTheme: (['light', 'dark'] as const).includes(dashboardData?.theme)
+          ? (dashboardData.theme as 'light' | 'dark')
+          : 'light',
         language: 'en',
         currency: 'EUR',
         dateFormat: 'DD/MM/YYYY',
         numberFormat: 'de-DE',
       },
-      status: 'idle',
+      status: ['idle', 'loading', 'succeeded', 'failed'].includes(state?.config?.status) ? state.config.status : 'idle',
       error: null,
     };
   }
@@ -308,46 +315,6 @@ export class StateHydrationService {
       open: false
     };
   }
-
-  /**
-   * Transform calculated data state
-   */
-  private static transformCalculatedDataState(calculatedData: any) {
-    // Validate and fix lastCalculated if missing
-    let assetFocusDataToLoad = calculatedData?.assetFocusData;
-    if (assetFocusDataToLoad && !assetFocusDataToLoad.lastCalculated) {
-      Logger.warn('Load: assetFocusData.lastCalculated fehlt, setze auf jetzt!');
-      assetFocusDataToLoad = { ...assetFocusDataToLoad, lastCalculated: new Date().toISOString() };
-    }
-    
-    let financialSummaryToLoad = calculatedData?.financialSummary;
-    if (financialSummaryToLoad && !financialSummaryToLoad.lastCalculated) {
-      Logger.warn('Load: financialSummary.lastCalculated fehlt, setze auf jetzt!');
-      financialSummaryToLoad = { ...financialSummaryToLoad, lastCalculated: new Date().toISOString() };
-    }
-
-    return {
-      assetFocusData: assetFocusDataToLoad || null,
-      financialSummary: financialSummaryToLoad || null,
-      portfolioHistory: calculatedData?.portfolioHistory || {},
-      status: 'idle' as Status,
-      error: null,
-      cacheValidityDuration: calculatedData?.cacheValidityDuration || 5 * 60 * 1000,
-      enableConditionalLogging: calculatedData?.enableConditionalLogging ?? true,
-      isHydrated: false // Will be set to true after store creation
-    };
-  }
-
-  /**
-   * Transform portfolio intraday state
-   */
-  private static transformPortfolioIntradayState(portfolioIntradayData: any) {
-    return {
-      portfolioIntradayData: portfolioIntradayData?.portfolioIntradayData || [],
-      portfolioIntradayStatus: 'idle' as Status,
-      portfolioIntradayError: null,
-      portfolioIntradayCacheKey: portfolioIntradayData?.portfolioIntradayCacheKey || null,
-      portfolioIntradayLastUpdated: portfolioIntradayData?.portfolioIntradayLastUpdated || null
-    };
-  }
 }
+
+export default StateHydrationService;

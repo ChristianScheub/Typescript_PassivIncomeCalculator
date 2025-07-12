@@ -1,4 +1,4 @@
-import { FinancialAlert, UIAlert } from '../interfaces/IAlertsService';
+import type { FinancialAlert, UIAlert } from '@/types/domains/analytics/reporting';
 
 export const transformToUIAlerts = (
   financialAlerts: FinancialAlert[],

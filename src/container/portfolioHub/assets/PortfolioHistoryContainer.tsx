@@ -32,16 +32,19 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
     if (portfolioHistoryData.length > 0) {
       Logger.info(`🔍 DEBUG first 3 items: ${JSON.stringify(portfolioHistoryData.slice(0, 3).map(point => ({ 
         date: point.date, 
-        value: point.value, 
-        valueType: typeof point.value,
-        hasTransactions: !!point.transactions 
+        totalValue: point.totalValue, 
+        valueType: typeof point.totalValue,
       })))}"`);
     }
 
+    // Map to PortfolioHistoryPoint structure
     const transformed = portfolioHistoryData.map(point => ({
       date: point.date,
-      value: point.value,
-      transactions: point.transactions || [] // This field is required by PortfolioHistoryView
+      totalValue: point.totalValue,
+      totalInvested: 0,
+      totalReturn: point.change ?? 0,
+      totalReturnPercentage: point.changePercentage ?? 0,
+      positions: []
     }));
 
     Logger.info(`🔍 DEBUG PortfolioHistoryContainer transformed: length=${transformed.length}`);

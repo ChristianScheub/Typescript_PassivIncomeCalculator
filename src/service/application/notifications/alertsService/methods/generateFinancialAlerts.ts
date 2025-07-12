@@ -1,4 +1,4 @@
-import { FinancialMetrics, FinancialAlert, AlertGenerationOptions } from '../interfaces/IAlertsService';
+import type { FinancialMetrics, FinancialAlert } from '@/types/domains/analytics/reporting';
 import { generateCashflowAlerts } from './generateCashflowAlerts';
 import { generateDebtAlerts } from './generateDebtAlerts';
 import { generatePassiveIncomeAlerts } from './generatePassiveIncomeAlerts';
@@ -7,15 +7,13 @@ import { generateEmergencyFundAlerts } from './generateEmergencyFundAlerts';
 import { generateGeneralAlerts } from './generateGeneralAlerts';
 
 export const generateFinancialAlerts = (
-  metrics: FinancialMetrics,
-  options: AlertGenerationOptions = {}
+  metrics: FinancialMetrics
 ): FinancialAlert[] => {
-  const {
-    maxAlerts = 3,
-    includeSuccess = true,
-    priorityThreshold = 1,
-    excludeCategories = []
-  } = options;
+  // Use default options (could be made configurable elsewhere)
+  const maxAlerts = 3;
+  const includeSuccess = true;
+  const priorityThreshold = 1;
+  const excludeCategories: string[] = [];
 
   const alerts: FinancialAlert[] = [];
 

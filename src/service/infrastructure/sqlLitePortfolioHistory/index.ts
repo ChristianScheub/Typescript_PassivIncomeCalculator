@@ -80,7 +80,4 @@ const portfolioHistoryService: IPortfolioHistoryService = {
 
 export default portfolioHistoryService;
 export type { IPortfolioHistoryService } from './interfaces/IPortfolioHistoryService';
-export type { 
-  PortfolioIntradayPoint, 
-  PortfolioHistoryPoint 
-} from './interfaces/IPortfolioHistoryService';
+export type { PortfolioIntradayPoint } from './interfaces/IPortfolioHistoryService';

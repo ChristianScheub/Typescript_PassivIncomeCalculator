@@ -1,4 +1,5 @@
 import { DBSchema } from 'idb';
+import type { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 
 // Define the Portfolio History database schema
 export interface PortfolioHistoryDB extends DBSchema {
@@ -31,21 +32,6 @@ export interface PortfolioIntradayPoint {
   performance?: number;
   change?: number;
   changePercent?: number;
-}
-
-export interface PortfolioHistoryPoint {
-  date: string;
-  value: number;
-  totalInvested: number;
-  totalReturn: number;
-  totalReturnPercentage: number;
-  positions: Array<{
-    assetDefinitionId: string;
-    quantity: number;
-    value: number;
-    price: number;
-  }>;
-  timestamp: number;
 }
 
 // Store names type

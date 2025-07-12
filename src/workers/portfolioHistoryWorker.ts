@@ -1,6 +1,7 @@
 import { AssetDefinition, Transaction as Asset } from '@/types/domains/assets';
 import { PortfolioPosition } from '@/types/domains/portfolio';
-import { PortfolioIntradayPoint, PortfolioHistoryPoint } from '@/service/infrastructure/sqlLitePortfolioHistory';
+import { PortfolioIntradayPoint } from '@/service/infrastructure/sqlLitePortfolioHistory';
+import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import { calculatePortfolioHistory, calculatePortfolioIntraday } from '@/service/domain/portfolio/history/portfolioHistoryService';
 
 // Typen für Nachrichten

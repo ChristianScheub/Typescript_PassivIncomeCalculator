@@ -1,21 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import formatService from '@/service/infrastructure/formatService';
-import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
-
-export interface AssetWithValue {
-  asset: Asset;
-  currentValue: number;
-  totalInvestment: number;
-  dayChange: number;
-  dayChangePercent: number;
-  assetDefinitionId: string;
-}
+import { AssetDefinition } from '@/types/domains/assets/entities';
+import { AssetWithValue } from '@/types/domains/portfolio/assetWithValue';
 
 interface AssetPositionsListProps {
   assetsWithValues: AssetWithValue[];
-  assetDefinitions: AssetDefinition[];
-  onAssetClick?: (asset: Asset, assetDefinition: AssetDefinition) => void;
+  onAssetClick?: (assetDefinition: AssetDefinition) => void;
   title?: string;
   emptyMessage?: string;
   showQuantity?: boolean;
@@ -26,7 +17,6 @@ interface AssetPositionsListProps {
 
 export const AssetPositionsList: React.FC<AssetPositionsListProps> = ({
   assetsWithValues,
-  assetDefinitions = [],
   onAssetClick,
   title,
   emptyMessage,
@@ -44,11 +34,26 @@ export const AssetPositionsList: React.FC<AssetPositionsListProps> = ({
   const gridClass = "grid-cols-4";
 
   const handleAssetClick = (assetWithValue: AssetWithValue) => {
-    const assetDefinition = assetDefinitions.find(def => def.id === assetWithValue.assetDefinitionId);
-    if (onAssetClick && assetDefinition) {
-      onAssetClick(assetWithValue.asset, assetDefinition);
+    if (onAssetClick) {
+      onAssetClick(assetWithValue.assetDefinition);
     }
   };
+
+  // Hilfsfunktion: Berechne dayChange und dayChangePercent aus priceHistory
+  function getDayChange(assetDefinition: AssetDefinition, quantity: number) {
+    if (!assetDefinition.priceHistory || assetDefinition.priceHistory.length < 2) {
+      return { dayChange: 0, dayChangePercent: 0 };
+    }
+    const sortedHistory = [...assetDefinition.priceHistory].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    const todayPrice = sortedHistory[0]?.price || assetDefinition.currentPrice || 0;
+    const yesterdayPrice = sortedHistory[1]?.price || todayPrice;
+    const priceChange = todayPrice - yesterdayPrice;
+    const dayChange = quantity * priceChange;
+    const dayChangePercent = yesterdayPrice > 0 ? (priceChange / yesterdayPrice) * 100 : 0;
+    return { dayChange, dayChangePercent };
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
@@ -57,7 +62,6 @@ export const AssetPositionsList: React.FC<AssetPositionsListProps> = ({
           {defaultTitle}
         </h3>
       </div>
-      
       {assetsWithValues.length === 0 ? (
         <div className="p-8 text-center text-gray-500 dark:text-gray-400">
           <p>{defaultEmptyMessage}</p>
@@ -71,14 +75,11 @@ export const AssetPositionsList: React.FC<AssetPositionsListProps> = ({
             {showValue && <div className="text-right">{t('common.value') || 'Wert'}</div>}
             {showDayChange && <div className="text-right">{t('common.change') || 'Änderung'}</div>}
           </div>
-
           {/* Assets Rows */}
           {assetsWithValues.map((assetWithValue, index) => {
-            const { asset, assetDefinitionId, currentValue, dayChange, dayChangePercent } = assetWithValue;
-            const assetDefinition = assetDefinitions.find(def => def.id === assetDefinitionId);
+            const { assetDefinition, value, quantity } = assetWithValue;
             if (!assetDefinition) return null;
-            const quantity = asset.purchaseQuantity || 0;
-            
+            const { dayChange, dayChangePercent } = getDayChange(assetDefinition, quantity);
             return (
               <div 
                 key={`${assetDefinition.ticker || assetDefinition.id}-${index}`} 
@@ -98,7 +99,6 @@ export const AssetPositionsList: React.FC<AssetPositionsListProps> = ({
                     {assetDefinition.fullName || assetDefinition.name}
                   </span>
                 </div>
-
                 {/* Position */}
                 {showQuantity && (
                   <div className="text-right">
@@ -112,16 +112,14 @@ export const AssetPositionsList: React.FC<AssetPositionsListProps> = ({
                     )}
                   </div>
                 )}
-
                 {/* Value */}
                 {showValue && (
                   <div className="text-right">
                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {formatService.formatCurrency(currentValue)}
+                      {formatService.formatCurrency(value)}
                     </div>
                   </div>
                 )}
-
                 {/* Day Change */}
                 {showDayChange && (
                   <div className="text-right">

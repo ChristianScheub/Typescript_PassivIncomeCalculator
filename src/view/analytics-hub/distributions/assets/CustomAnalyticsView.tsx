@@ -206,15 +206,14 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
   const { charts, isConfigPanelOpen, editingChartId } = useAppSelector((state: { customAnalytics: any; }) => state.customAnalytics);
   
   // Get data needed for charts
-  const assetAllocation = useAppSelector((state: { dashboard: { assetAllocation: any; }; }) => state.dashboard?.assetAllocation);
-  const portfolioCache = useAppSelector((state: { transactions: { portfolioCache: any; }; }) => state.transactions.portfolioCache);
+  const cache = useAppSelector(state => state.transactions.cache);
 
   // Calculate portfolio analytics data from portfolio positions
   const portfolioAnalytics = useMemo((): ServicePortfolioAnalyticsData => {
-    // Use filteredPositions if provided, otherwise fall back to portfolioCache positions
+    // Use filteredPositions if provided, otherwise fall back to cache positions
     const positions = filteredPositions && filteredPositions.length > 0 
       ? filteredPositions 
-      : portfolioCache?.positions || [];
+      : cache?.positions || [];
       
     if (!positions.length) {
       return {
@@ -227,14 +226,14 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
     }
     
     return calculatorService.calculatePortfolioAnalytics(positions);
-  }, [filteredPositions, portfolioCache?.positions]);
+  }, [filteredPositions, cache?.positions]);
 
   // Calculate income analytics data from portfolio positions (like IncomeDistributionView)
   const incomeAnalytics = useMemo((): ServiceIncomeAnalyticsData => {
-    // Use filteredPositions if provided, otherwise fall back to portfolioCache positions
+    // Use filteredPositions if provided, otherwise fall back to cache positions
     const positions = filteredPositions && filteredPositions.length > 0 
       ? filteredPositions 
-      : portfolioCache?.positions || [];
+      : cache?.positions || [];
       
     if (!positions.length) {
       return {
@@ -247,7 +246,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
     }
     
     return calculatorService.calculateIncomeAnalytics(positions);
-  }, [filteredPositions, portfolioCache?.positions]);
+  }, [filteredPositions, cache?.positions]);
 
   const editingChart = editingChartId ? charts.find((chart: CustomAnalyticsConfig) => chart.id === editingChartId) || null : null;
 
@@ -298,7 +297,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
   const getPositionsData = (): PortfolioPosition[] => {
     return filteredPositions && filteredPositions.length > 0 
       ? filteredPositions 
-      : portfolioCache?.positions || [];
+      : cache?.positions || [];
   };
 
   // Helper function to map asset type data with translation
@@ -362,7 +361,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
           case 'assetDefinition':
             return getAssetDefinitionValueData();
           default:
-            return assetAllocation.map((item: AllocationData) => ({
+            return portfolioAnalytics.assetAllocation.map((item: AllocationData) => ({
               name: t(`assets.types.${item.name}`),
               value: item.value,
               percentage: item.percentage

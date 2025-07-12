@@ -31,7 +31,6 @@ export interface CacheableState<T extends BaseEntity, C = unknown> {
   
   // Cache-Management
   cache?: C;
-  cacheValid: boolean;
   lastCalculated?: string;
   
   // Cache-Metadaten (erweitert für komplexe Caches wie Portfolio)
@@ -101,21 +100,12 @@ export const standardReducerPatterns = {
   // Cache invalidation pattern for CacheableState
   invalidateCache: <T extends BaseEntity>(state: CacheableState<T>) => {
     state.cache = undefined;
-    state.cacheValid = false;
     state.lastCalculated = undefined;
   },
   
   // Cache invalidation pattern for PortfolioCacheableState
   invalidatePortfolioCache: <T extends BaseEntity>(state: PortfolioCacheableState<T>) => {
     state.cache = undefined;
-    state.cacheValid = false;
     state.lastCalculated = undefined;
   },
-  
-  // Legacy cache invalidation pattern (deprecated)
-  invalidatePortfolioCacheLegacy: (state: { portfolioCache?: unknown; portfolioCacheValid: boolean; lastPortfolioCalculation?: string }) => {
-    state.portfolioCache = undefined;
-    state.portfolioCacheValid = false;
-    state.lastPortfolioCalculation = undefined;
-  }
 };

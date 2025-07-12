@@ -40,9 +40,9 @@ export interface PortfolioHistoryCache {
 
 // Portfolio History Service Types
 /**
- * Portfolio History Point - represents portfolio value at a specific date (Service Layer)
+ * ServicePortfolioHistoryPoint - represents portfolio value at a specific date (Service Layer)
  */
-export interface PortfolioHistoryPoint {
+export interface ServicePortfolioHistoryPoint {
   date: string;
   value: number;
   transactions: PortfolioServiceTransaction[];

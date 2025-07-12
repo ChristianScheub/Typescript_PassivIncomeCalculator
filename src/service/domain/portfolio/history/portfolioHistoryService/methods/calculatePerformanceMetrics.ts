@@ -1,4 +1,4 @@
-import { PerformanceMetrics, PortfolioHistoryPoint } from '../interfaces/IPortfolioHistoryService';
+import type { PerformanceMetrics, PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import Logger from "@/service/shared/logging/Logger/logger";
 
 /**
@@ -14,23 +14,25 @@ export function calculatePerformanceMetrics(
     return {
       totalReturn: 0,
       totalReturnPercentage: 0,
-      startValue: 0,
-      endValue: 0,
-      peakValue: 0,
-      lowestValue: 0
+      annualizedReturn: 0,
+      volatility: 0,
+      sharpeRatio: 0,
+      maxDrawdown: 0,
+      winRate: 0,
+      averageGain: 0,
+      averageLoss: 0
     };
   }
 
   Logger.infoService(
-    `Calculating performance metrics from ${historyPoints.length} history points, total investment: €${totalInvestment.toFixed(2)}`
+    `Calculating performance metrics from ${historyPoints.length} history points, total investment: ${totalInvestment.toFixed(2)}`
   );
 
-  const startValue = historyPoints[0]?.value || 0;
-  const endValue = historyPoints[historyPoints.length - 1]?.value || 0;
+  const endValue = historyPoints[historyPoints.length - 1]?.totalValue || 0;
   
   // Filter out invalid values for peak/lowest calculations
   const values = historyPoints
-    .map(p => p.value)
+    .map(p => p.totalValue)
     .filter(v => isFinite(v) && v >= 0);
   
   if (values.length === 0) {
@@ -38,10 +40,13 @@ export function calculatePerformanceMetrics(
     return {
       totalReturn: 0,
       totalReturnPercentage: 0,
-      startValue: 0,
-      endValue: 0,
-      peakValue: 0,
-      lowestValue: 0
+      annualizedReturn: 0,
+      volatility: 0,
+      sharpeRatio: 0,
+      maxDrawdown: 0,
+      winRate: 0,
+      averageGain: 0,
+      averageLoss: 0
     };
   }
 
@@ -52,16 +57,19 @@ export function calculatePerformanceMetrics(
     ((endValue - totalInvestment) / totalInvestment) * 100 : 0;
   
   Logger.infoService(
-    `Performance metrics: Total Return: €${totalReturn.toFixed(2)} (${totalReturnPercentage.toFixed(2)}%), Peak: €${peakValue.toFixed(2)}, Lowest: €${lowestValue.toFixed(2)}`
+    `Performance metrics: Total Return: ${totalReturn.toFixed(2)} (${totalReturnPercentage.toFixed(2)}%), Peak: ${peakValue.toFixed(2)}, Lowest: ${lowestValue.toFixed(2)}`
   );
   
   const metrics: PerformanceMetrics = {
     totalReturn,
     totalReturnPercentage,
-    startValue,
-    endValue,
-    peakValue: isFinite(peakValue) ? peakValue : 0,
-    lowestValue: isFinite(lowestValue) ? lowestValue : 0
+    annualizedReturn: 0, // TODO: implement
+    volatility: 0, // TODO: implement
+    sharpeRatio: 0, // TODO: implement
+    maxDrawdown: 0, // TODO: implement
+    winRate: 0, // TODO: implement
+    averageGain: 0, // TODO: implement
+    averageLoss: 0 // TODO: implement
   };
 
   return metrics;

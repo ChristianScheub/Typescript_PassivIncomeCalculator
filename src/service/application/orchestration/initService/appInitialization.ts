@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from "@/store/index";
-import { calculateFinancialSummary } from "@/store/slices/cache";
+import { calculateFinancialSummary, calculateAssetFocusData } from "@/store/slices/domain/transactionsSlice"; // MIGRATED: Now in consolidated cache
 import Logger from "@/service/shared/logging/Logger/logger";
 import { isFinancialSummaryAllZero } from "@/utils/isFinancialSummaryValid";
 import { fetchAssetDefinitions } from '@/store/slices/domain';
@@ -7,6 +7,7 @@ import { fetchTransactions,calculatePortfolioData } from '@/store/slices/domain'
 import { fetchLiabilities } from '@/store/slices/domain';
 import { fetchExpenses } from '@/store/slices/domain';
 import { fetchIncome } from '@/store/slices/domain';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 
 /**
  * Central initialization logic for the application
@@ -70,6 +71,8 @@ export class AppInitializationService {
     dispatch: AppDispatch,
     getState: () => RootState
   ): Promise<void> {
+    // Cast dispatch to ThunkDispatch for AsyncThunk actions
+    const thunkDispatch = dispatch as ThunkDispatch<RootState, unknown, AnyAction>;
     let state = getState();
 
     // Step 0: Ensure all master data is loaded
@@ -81,75 +84,76 @@ export class AppInitializationService {
 
     if (needsTransactions) {
       Logger.info('AppInitialization: Transactions missing, loading from DB...');
-      await dispatch(fetchTransactions()).unwrap();
+      await thunkDispatch(fetchTransactions()).unwrap();
       state = getState();
       Logger.info(`AppInitialization: Transactions loaded: ${state.transactions.items.length}`);
     }
     if (needsAssetDefinitions) {
       Logger.info('AppInitialization: Asset definitions missing, loading from DB...');
-      await dispatch(fetchAssetDefinitions()).unwrap();
+      await thunkDispatch(fetchAssetDefinitions()).unwrap();
       state = getState();
       Logger.info(`AppInitialization: Asset definitions loaded: ${state.assetDefinitions.items.length}`);
     }
     if (needsLiabilities) {
       Logger.info('AppInitialization: Liabilities missing, loading from DB...');
-      await dispatch(fetchLiabilities()).unwrap();
+      await thunkDispatch(fetchLiabilities()).unwrap();
       state = getState();
       Logger.info(`AppInitialization: Liabilities loaded: ${state.liabilities.items.length}`);
     }
     if (needsExpenses) {
       Logger.info('AppInitialization: Expenses missing, loading from DB...');
-      await dispatch(fetchExpenses()).unwrap();
+      await thunkDispatch(fetchExpenses()).unwrap();
       state = getState();
       Logger.info(`AppInitialization: Expenses loaded: ${state.expenses.items.length}`);
     }
     if (needsIncome) {
       Logger.info('AppInitialization: Income missing, loading from DB...');
-      await dispatch(fetchIncome()).unwrap();
+      await thunkDispatch(fetchIncome()).unwrap();
       state = getState();
       Logger.info(`AppInitialization: Income loaded: ${state.income.items.length}`);
     }
 
     // Step 1: Check if portfolio cache needs to be computed
-    await this._ensurePortfolioCache(dispatch, state);
+    await this._ensurePortfolioCache(thunkDispatch, getState);
 
     // Step 2: Ensure financial summary is computed
-    await this._ensureFinancialSummary(dispatch, state);
+    await this._ensureFinancialSummary(thunkDispatch, getState);
 
-    // Step 3: Initialize LLM model
+    // Step 3: Ensure asset focus data is computed
+    await this._ensureAssetFocusData(thunkDispatch, getState);
+
+    // Step 4: Initialize LLM model
     await this._initializeLLMModel();
 
-    // Step 4: Wait a tick to allow all state updates to propagate
+    // Step 5: Wait a tick to allow all state updates to propagate
     await new Promise((resolve) => setTimeout(resolve, 0));
   }
 
   private async _ensurePortfolioCache(
-    dispatch: AppDispatch,
-    state: RootState
+    dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
+    getState: () => RootState
   ): Promise<void> {
+    const state = getState();
     const { transactions, assetDefinitions, assetCategories } = state;
 
-    // Check if we have the necessary data to compute portfolio cache
+    // Check if wir die nötigen Daten haben
     const hasTransactions = transactions.items && transactions.items.length > 0;
     const hasAssetDefinitions =
       assetDefinitions.items && assetDefinitions.items.length > 0;
 
-    // If we have transactions but no valid portfolio cache, compute it
+    // Wenn wir Transaktionen haben, aber keinen gültigen Cache, berechnen
     const needsPortfolioCalculation =
-      hasTransactions &&
-      (!transactions.cacheValid || !transactions.cache);
+      hasTransactions && !transactions.cache;
 
     if (needsPortfolioCalculation && hasAssetDefinitions) {
       Logger.info(
         "AppInitialization: Portfolio cache invalid or missing, triggering calculation"
       );
-
       const categoryData = {
         categories: assetCategories.categories || [],
         categoryOptions: assetCategories.categoryOptions || [],
         categoryAssignments: assetCategories.categoryAssignments || [],
       };
-
       try {
         await dispatch(
           calculatePortfolioData({
@@ -169,7 +173,7 @@ export class AppInitializationService {
       Logger.warn(
         "AppInitialization: Transactions exist but no asset definitions found"
       );
-    } else if (transactions.cacheValid) {
+    } else if (transactions.cache) {
       Logger.info(
         "AppInitialization: Portfolio cache is valid, skipping calculation"
       );
@@ -181,14 +185,15 @@ export class AppInitializationService {
   }
 
   private async _ensureFinancialSummary(
-    dispatch: AppDispatch,
-    state: RootState
+    dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
+    getState: () => RootState
   ): Promise<void> {
-    const { calculatedData } = state;
+    const state = getState();
+    const { transactions } = state;
 
     const hasAllZeroFinancialSummary =
-      calculatedData.financialSummary &&
-      isFinancialSummaryAllZero(calculatedData.financialSummary);
+      transactions.cache?.financialSummary &&
+      isFinancialSummaryAllZero(transactions.cache.financialSummary);
 
     if (hasAllZeroFinancialSummary) {
       Logger.warn(
@@ -196,7 +201,13 @@ export class AppInitializationService {
       );
 
       try {
-        await dispatch(calculateFinancialSummary()).unwrap();
+        // Get the required data from state for the new consolidated calculateFinancialSummary
+        const currentState = getState();
+        const liabilities = currentState.liabilities?.items || [];
+        const expenses = currentState.expenses?.items || [];
+        const income = currentState.income?.items || [];
+        
+        await dispatch(calculateFinancialSummary({ liabilities, expenses, income })).unwrap();
         Logger.info(
           "AppInitialization: Financial summary calculation completed"
         );
@@ -207,11 +218,48 @@ export class AppInitializationService {
         );
         // Don't throw - app can still work without financial summary
       }
-    } else if (calculatedData.financialSummary) {
+    } else if (transactions.cache?.financialSummary) {
       Logger.info("AppInitialization: Financial summary already available");
     } else {
       Logger.info(
         "AppInitialization: No financial data found, skipping financial summary calculation"
+      );
+    }
+  }
+
+  private async _ensureAssetFocusData(
+    dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
+    getState: () => RootState
+  ): Promise<void> {
+    const state = getState();
+    const { transactions, assetDefinitions } = state;
+
+    // Check if we have assets or asset definitions
+    const hasAssets = transactions.items && transactions.items.length > 0;
+    const hasAssetDefinitions = assetDefinitions.items && assetDefinitions.items.length > 0;
+    
+    // Check if we already have valid asset focus data
+    const hasValidAssetFocusData = transactions.cache?.assetFocusData && 
+      transactions.cache.assetFocusData.assetsWithValues &&
+      transactions.cache.assetFocusData.assetsWithValues.length > 0;
+
+    if ((hasAssets || hasAssetDefinitions) && !hasValidAssetFocusData) {
+      Logger.info("AppInitialization: Asset focus data missing or empty, triggering calculation");
+      try {
+        await dispatch(calculateAssetFocusData()).unwrap();
+        Logger.info("AppInitialization: Asset focus data calculation completed");
+      } catch (error) {
+        Logger.error(
+          "AppInitialization: Asset focus data calculation failed: " +
+            JSON.stringify(error)
+        );
+        // Don't throw - app can still work without asset focus data
+      }
+    } else if (hasValidAssetFocusData) {
+      Logger.info("AppInitialization: Asset focus data already available");
+    } else {
+      Logger.info(
+        "AppInitialization: No assets or asset definitions found, skipping asset focus data calculation"
       );
     }
   }

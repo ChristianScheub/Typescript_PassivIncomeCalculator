@@ -20,7 +20,7 @@ export const generateRecommendations = (
   const incomeRecommendations = generateIncomeRecommendations(assets, income, assetDefinitions, portfolioCache);
   const expenseRecommendations = generateExpenseRecommendations(expenses, income);
   const liabilityRecommendations = generateLiabilityRecommendations(assets, liabilities);
-  const planningRecommendations = generatePlanningRecommendations(assets, income, expenses, liabilities);
+  const planningRecommendations = generatePlanningRecommendations(assets, income, expenses);
 
   // Combine all recommendations
   const allRecommendations = [

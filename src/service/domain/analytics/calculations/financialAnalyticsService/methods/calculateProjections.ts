@@ -38,6 +38,7 @@ function mapCalculatorToMonthlyProjection(
       expenseBreakdown: {},
       liabilityBreakdown: {},
       date: p.month ?? new Date().toISOString(),
+      passiveIncomeCoverage: p.passiveIncomeCoverage ?? 0, // Pass through from calculator
     };
   });
 }

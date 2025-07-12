@@ -1,18 +1,10 @@
 import Logger from '@service/shared/logging/Logger/logger';
 import type { AssetDefinition } from '@/types/domains/assets/entities';
+import type { AssetWithValue } from '@/types/domains/portfolio/assetWithValue';
 
 /**
  * Types for AI Context Service
  */
-export interface AssetWithValue {
-  assetDefinitionId: string;
-  asset?: {
-    name?: string;
-    type?: string;
-  };
-  currentValue?: number;
-}
-
 export interface FinancialSnapshot {
   totalAssets: number;
   monthlyIncome: number;
@@ -47,12 +39,12 @@ export class AIContextService {
 
     // Group assets by type and calculate totals
     const assetsByType = assetFocusData.assetsWithValues.reduce((acc: any, assetWithValue: AssetWithValue) => {
-      const type = assetWithValue.asset?.type || 'Unknown';
+      const type = assetWithValue.assetDefinition?.type || 'Unknown';
       if (!acc[type]) {
         acc[type] = { count: 0, totalValue: 0 };
       }
       acc[type].count += 1;
-      acc[type].totalValue += assetWithValue.currentValue || 0;
+      acc[type].totalValue += assetWithValue.value || 0;
       return acc;
     }, {});
 
@@ -76,9 +68,14 @@ export class AIContextService {
     }
     
     // Handle sectors - take the first one or 'Unknown'
-    const sector = assetDefinition?.sectors && assetDefinition.sectors.length > 0 
-      ? assetDefinition.sectors[0].sector || assetDefinition.sectors[0].sectorName || 'Unknown'
-      : 'Unknown';
+    // Sektor als String extrahieren (immer String, nie Objekt)
+    let sector = 'Unknown';
+    if (Array.isArray(assetDefinition?.sectors) && assetDefinition.sectors.length > 0) {
+      const first = assetDefinition.sectors[0];
+      sector = typeof first === 'string'
+        ? first
+        : (first.sectorName || first.sector || 'Unknown');
+    }
     
     // Handle countries - take the first one or use the single country field
     const country = assetDefinition?.countries && assetDefinition.countries.length > 0 
@@ -110,7 +107,7 @@ export class AIContextService {
 
     // Filter out assets with value €0 or undefined/null
     const assetsWithValue = assetFocusData.assetsWithValues.filter((assetWithValue: AssetWithValue) => {
-      const value = assetWithValue.currentValue || 0;
+      const value = assetWithValue.value || 0;
       return value > 0;
     });
 
@@ -124,13 +121,13 @@ export class AIContextService {
     return assetsWithValue
       .map((assetWithValue: AssetWithValue, index: number) => {
         const { sector, country } = AIContextService.fetchAssetDetails(
-          assetWithValue.assetDefinitionId, 
+          assetWithValue.assetDefinition.id, 
           assetFocusData.assetDefinitions
         );
         
-        Logger.info(`AIContextService: Asset ${index + 1}: ${assetWithValue.asset?.name} - Value: ${assetWithValue.currentValue}, Definition ID: ${assetWithValue.assetDefinitionId}`);
+        Logger.info(`AIContextService: Asset ${index + 1}: ${assetWithValue.assetDefinition?.name} - Value: ${assetWithValue.value}, Definition ID: ${assetWithValue.assetDefinition.id}`);
         
-        return `- Name: ${assetWithValue.asset?.name || 'Unnamed'}, Type: ${assetWithValue.asset?.type || 'Unknown'}, Value: €${(assetWithValue.currentValue || 0).toLocaleString()}, Sector: ${sector}, Country: ${country}`;
+        return `- Name: ${assetWithValue.assetDefinition?.name || 'Unnamed'}, Type: ${assetWithValue.assetDefinition?.type || 'Unknown'}, Value: €${(assetWithValue.value || 0).toLocaleString()}, Sector: ${sector}, Country: ${country}`;
       })
       .join('\n');
   }

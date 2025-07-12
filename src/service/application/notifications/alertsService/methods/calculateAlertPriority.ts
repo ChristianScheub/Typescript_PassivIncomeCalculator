@@ -1,4 +1,4 @@
-import { FinancialAlert, FinancialMetrics } from '../interfaces/IAlertsService';
+import type { FinancialAlert, FinancialMetrics } from '@/types/domains/analytics/reporting';
 
 interface PriorityAdjustmentConfig {
   criticalThreshold: number;

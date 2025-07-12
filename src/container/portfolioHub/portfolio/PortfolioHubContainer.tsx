@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppSelector } from '@/hooks/redux';
-import { selectPortfolioCache } from '@/store/slices/domain';
 import AssetsContainer from '../assets/AssetsContainer';
 import LiabilitiesContainer from '../finance/LiabilitiesContainer';
 import IncomeContainer from '../finance/IncomeContainer';
@@ -47,7 +46,7 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
   }, [location.search]);
 
   // Get portfolio data for context sharing
-  const portfolioCache = useAppSelector(selectPortfolioCache);
+  const portfolioCache = useAppSelector(state => state.transactions.cache);
   const assets = useAppSelector(state => state.transactions.items);
   const liabilities = useAppSelector(state => state.liabilities.items);
   const income = useAppSelector(state => state.income.items);

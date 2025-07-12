@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../shared/Card';
 import { recentActivityService } from '@/service';
-import type { PortfolioCategory, PortfolioSubCategory } from '@/service/domain/analytics/reporting/recentActivityService/types';
+import type { PortfolioCategory, PortfolioSubCategory } from '@/types/domains/analytics/reporting';
 
 interface PortfolioRecentActivitiesProps {
   portfolioData: {

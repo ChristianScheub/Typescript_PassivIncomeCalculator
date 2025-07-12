@@ -8,10 +8,12 @@ import calculatorService from '@/service/domain/financial/calculations/composite
 import ExpensesView from '@/view/portfolio-hub/expenses/ExpensesView';
 import { sortExpenses, SortOrder } from '@/utils/sortingUtils';
 import { useAsyncOperation } from '@/utils/containerUtils';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { RootState } from '@/store';
 
 const ExpensesContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
+  const dispatch: ThunkDispatch<RootState, unknown, AnyAction> = useAppDispatch();
   const { executeAsyncOperation } = useAsyncOperation();
   const { items: expenses, status } = useAppSelector(state => state.expenses);
   const [isAddingExpense, setIsAddingExpense] = useState(false);

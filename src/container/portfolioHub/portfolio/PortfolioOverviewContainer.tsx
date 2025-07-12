@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useAppSelector } from '@/hooks/redux';
-import { selectPortfolioCache } from '@/store/slices/domain';
 import PortfolioOverviewView from '@/view/portfolio-hub/PortfolioOverviewView';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import { getAssetAllocationFromCache } from '@/utils/portfolioCacheHelpers';
@@ -33,14 +32,14 @@ const PortfolioOverviewContainer: React.FC<PortfolioOverviewContainerProps> = ({
   onCategoryChange
 }) => {
   // Get detailed portfolio data for analytics
-  const portfolioCache = useAppSelector(selectPortfolioCache);
+  const portfolioCache = useAppSelector(state => state.transactions.cache);
   const income = useAppSelector(state => state.income.items);
   const expenses = useAppSelector(state => state.expenses.items);
   const liabilities = useAppSelector(state => state.liabilities.items);
 
   // Calculate portfolio analytics for overview charts - OPTIMIZED
   const portfolioAnalytics = useMemo(() => {
-    if (!portfolioCache?.positions.length) {
+    if (!portfolioCache || !Array.isArray(portfolioCache.positions) || portfolioCache.positions.length === 0) {
       Logger.cache('Portfolio Overview: No portfolio cache available, returning empty analytics [CACHE MISS]');
       return {
         assetAllocation: [],

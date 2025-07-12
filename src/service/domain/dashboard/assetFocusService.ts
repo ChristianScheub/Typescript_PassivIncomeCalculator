@@ -1,14 +1,6 @@
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
+import { AssetWithValue } from '@/types/domains/portfolio/assetWithValue';
 import Logger from '../../shared/logging/Logger/logger';
-
-export interface AssetWithValue {
-  asset: Asset;
-  currentValue: number;
-  totalInvestment: number;
-  dayChange: number;
-  dayChangePercent: number;
-  assetDefinitionId: string;
-}
 
 export interface AssetFocusData {
   assetsWithValues: AssetWithValue[];
@@ -24,17 +16,14 @@ export interface AssetFocusData {
  */
 class AssetFocusService {
   /**
-   * Calculate asset values with day changes for Asset Focus dashboard
+   * Calculate asset values for Asset Focus dashboard (zentraler Typ)
    */
   calculateAssetsWithValues(assets: Asset[], assetDefinitions: AssetDefinition[]): AssetWithValue[] {
     if (!assets || assets.length === 0 || !assetDefinitions || assetDefinitions.length === 0) {
       return [];
     }
-
-    const assetMap = new Map<string, AssetWithValue>();
-
+    const assetMap = new Map<string, { quantity: number; value: number; assetDefinition: AssetDefinition }>();
     try {
-      // Group assets by assetDefinitionId and calculate totals
       assets.forEach((asset: Asset) => {
         const assetDef = assetDefinitions.find((def: AssetDefinition) => def.id === asset.assetDefinitionId);
         if (!assetDef) {
@@ -42,68 +31,28 @@ class AssetFocusService {
           return;
         }
         const assetKey = assetDef.id;
-        const existing = assetMap.get(assetKey);
         const quantity = asset.transactionType === 'sell' ? -(asset.purchaseQuantity || 0) : (asset.purchaseQuantity || 0);
-        const investment = asset.transactionType === 'sell' ? -asset.value : asset.value;
+        const value = (asset.purchaseQuantity || 0) * (asset.purchasePrice || 0) * (asset.transactionType === 'sell' ? -1 : 1);
+        const existing = assetMap.get(assetKey);
         if (existing) {
-          existing.asset.purchaseQuantity = (existing.asset.purchaseQuantity || 0) + quantity;
-          existing.totalInvestment += investment;
+          existing.quantity += quantity;
+          existing.value += value;
         } else {
           assetMap.set(assetKey, {
-            asset: {
-              ...asset,
-              purchaseQuantity: quantity
-            },
-            currentValue: 0,
-            totalInvestment: investment,
-            dayChange: 0,
-            dayChangePercent: 0,
-            assetDefinitionId: assetDef.id
+            quantity,
+            value,
+            assetDefinition: assetDef
           });
         }
       });
-
-      // Calculate current values and day changes
-      const result: AssetWithValue[] = [];
-      assetMap.forEach((assetWithValue) => {
-        const { asset, assetDefinitionId } = assetWithValue;
-        const assetDefinition = assetDefinitions.find(def => def.id === assetDefinitionId);
-        if (!assetDefinition) return;
-
-        const quantity = asset.purchaseQuantity || 0;
-        if (quantity <= 0) return; // Skip sold assets
-
-        // Get current price (latest price from price history or stored current price)
-        const currentPrice = assetDefinition.currentPrice || 0;
-        const currentValue = quantity * currentPrice;
-
-        // Calculate day change from price history
-        let dayChange = 0;
-        let dayChangePercent = 0;
-
-        if (assetDefinition.priceHistory && assetDefinition.priceHistory.length >= 2) {
-          const sortedHistory = [...assetDefinition.priceHistory].sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-          );
-          
-          const todayPrice = sortedHistory[0]?.price || currentPrice;
-          const yesterdayPrice = sortedHistory[1]?.price || todayPrice;
-          
-          const priceChange = todayPrice - yesterdayPrice;
-          dayChange = quantity * priceChange;
-          dayChangePercent = yesterdayPrice > 0 ? (priceChange / yesterdayPrice) * 100 : 0;
-        }
-
-        result.push({
-          ...assetWithValue,
-          currentValue,
-          dayChange,
-          dayChangePercent
-        });
-      });
-
-      // Sort by current value (descending)
-      return result.sort((a, b) => b.currentValue - a.currentValue);
+      // Filter out sold assets (quantity <= 0)
+      return Array.from(assetMap.values())
+        .filter(entry => entry.quantity > 0)
+        .map(entry => ({
+          assetDefinition: entry.assetDefinition,
+          value: entry.quantity * (entry.assetDefinition.currentPrice || 0),
+          quantity: entry.quantity
+        }));
     } catch (error) {
       Logger.error('Error calculating assets with values: ' + JSON.stringify(error));
       return [];
@@ -114,10 +63,18 @@ class AssetFocusService {
    * Calculate portfolio summary from assets with values
    */
   calculatePortfolioSummary(assetsWithValues: AssetWithValue[]) {
-    const totalValue = assetsWithValues.reduce((sum, asset) => sum + asset.currentValue, 0);
-    const totalDayChange = assetsWithValues.reduce((sum, asset) => sum + asset.dayChange, 0);
+    const totalValue = assetsWithValues.reduce((sum, asset) => sum + asset.value, 0);
+    // dayChange und dayChangePercent werden nicht mehr als Property geführt, sondern können on-the-fly berechnet werden
+    const totalDayChange = assetsWithValues.reduce((sum, asset) => {
+      const priceHistory = asset.assetDefinition.priceHistory;
+      if (!priceHistory || priceHistory.length < 2) return sum;
+      const sortedHistory = [...priceHistory].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      const todayPrice = sortedHistory[0]?.price || asset.assetDefinition.currentPrice || 0;
+      const yesterdayPrice = sortedHistory[1]?.price || todayPrice;
+      const priceChange = todayPrice - yesterdayPrice;
+      return sum + asset.quantity * priceChange;
+    }, 0);
     const totalDayChangePercent = totalValue > 0 ? (totalDayChange / (totalValue - totalDayChange)) * 100 : 0;
-
     return {
       totalValue,
       totalDayChange,
@@ -131,7 +88,6 @@ class AssetFocusService {
   calculateAssetFocusData(assets: Asset[], assetDefinitions: AssetDefinition[]): AssetFocusData {
     const assetsWithValues = this.calculateAssetsWithValues(assets, assetDefinitions);
     const portfolioSummary = this.calculatePortfolioSummary(assetsWithValues);
-
     return {
       assetsWithValues,
       portfolioSummary

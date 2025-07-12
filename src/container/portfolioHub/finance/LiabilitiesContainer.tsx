@@ -7,10 +7,12 @@ import calculatorService from '@/service/domain/financial/calculations/composite
 import LiabilitiesView from '@/view/portfolio-hub/liabilities/LiabilitiesView';
 import { sortLiabilitiesByPayment, SortOrder } from '../../../utils/sortingUtils';
 import { useAsyncOperation } from '@/utils/containerUtils';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { RootState } from '@/store';
 
 const LiabilitiesContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
+  const dispatch: ThunkDispatch<RootState, unknown, AnyAction> = useAppDispatch();
   const { executeAsyncOperation } = useAsyncOperation();
   const { items: liabilities, status } = useAppSelector(state => state.liabilities);
   const [isAddingLiability, setIsAddingLiability] = useState(false);

@@ -8,6 +8,13 @@ import { AssetType } from '@/types/shared/base/enums';
 import { Button } from "../../../shared/Button";
 import { Toggle } from '@/ui/shared';
 
+export function getErrorMessage(error: any): string | undefined {
+  if (!error) return undefined;
+  if (typeof error === 'string') return error;
+  if (typeof error.message === 'string') return error.message;
+  return undefined;
+}
+
 export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
   watch,
   setValue,
@@ -72,7 +79,7 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
           label={t(isDefinition ? "assets.fullName" : "assets.name")}
           name={isDefinition ? "fullName" : "name"}
           required
-          error={errors[isDefinition ? "fullName" : "name"]?.message}
+          error={getErrorMessage(errors[isDefinition ? "fullName" : "name"])}
           value={watch(isDefinition ? "fullName" : "name")}
           onChange={(value) => setValue(isDefinition ? "fullName" : "name", value)}
           placeholder={t(isDefinition ? "assets.fullNamePlaceholder" : "assets.namePlaceholder")}
@@ -84,7 +91,7 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
           type="select"
           required
           options={getAssetTypeOptions(t)}
-          error={errors.type?.message}
+          error={getErrorMessage(errors.type)}
           value={watch("type")}
           onChange={(value) => setValue("type", value as AssetType)}
         />
@@ -121,7 +128,7 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
               value={countries[0]?.country || ''}
               onChange={v => handleCountryChange(countries[0].id, 'country', v as string)}
               placeholder={t("assets.countryPlaceholder")}
-              error={errors.country?.message}
+              error={getErrorMessage(errors.country)}
             />
             <div className="flex items-center mb-2 mt-2">
               <Toggle

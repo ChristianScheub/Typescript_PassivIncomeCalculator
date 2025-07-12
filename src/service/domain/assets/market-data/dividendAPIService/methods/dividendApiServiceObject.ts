@@ -8,8 +8,8 @@ export async function fetchDividends(
 ): Promise<{ dividends: DividendData[] }> {
   const state: RootState = store.getState();
   // Use apiConfig.selectedDiviProvider and apiConfig.dividendApiKey for dividend provider selection
-  const provider = (state.apiConfig?.selectedDiviProvider || 'yahoo') as DividendApiProvider;
-  const apiKey = state.apiConfig?.dividendApiKey?.[provider] || '';
+  const provider = (state.config?.apis?.dividend?.selectedProvider || 'yahoo') as DividendApiProvider;
+  const apiKey = state.config?.apis?.dividend?.apiKeys?.[provider] || '';
   const providerFn = dividendProviders[provider];
   if (!providerFn) throw new Error(`No provider implementation for ${provider}`);
   return providerFn(ticker, { ...opts, apiKey });

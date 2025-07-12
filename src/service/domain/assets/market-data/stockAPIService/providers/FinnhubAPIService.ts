@@ -218,7 +218,7 @@ export class FinnhubAPIService implements IStockAPIService {
    * Get intraday stock data (1-minute intervals for current day)
    * TODO: Implement intraday data fetching for Finnhub API
    */
-  async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
+  async getIntradayHistory(symbol: string): Promise<StockHistory> {
     Logger.warn(`Finnhub intraday history not implemented for ${symbol} - nothing happened, nothing implemented`);
     // TODO: Implement Finnhub intraday API call
     

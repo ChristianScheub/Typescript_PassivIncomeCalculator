@@ -1,7 +1,7 @@
 import React from 'react';
 import { AssetType } from '@/types/shared/base/enums';
-import { UseFormSetValue, FieldErrors } from 'react-hook-form';
-import { MaterialAssetFormData } from '@/types/domains/assets';
+import { UseFormSetValue, FieldErrors, useForm } from 'react-hook-form';
+import type { AssetFormData } from '@/types/domains/forms/form-data';
 import {
   StandardFormField,
   StandardFormWrapper,
@@ -17,9 +17,9 @@ interface MaterialAssetFormViewProps {
   assetType: AssetType;
   quantity?: number;
   currentPrice?: number;
-  errors: FieldErrors<MaterialAssetFormData>;
+  errors: FieldErrors<AssetFormData>;
   watch: (field: string) => unknown;
-  setValue: UseFormSetValue<MaterialAssetFormData>;
+  setValue: UseFormSetValue<AssetFormData>;
   onFormSubmit: () => void;
   title: string;
 }
@@ -36,6 +36,12 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
+
+  const {
+    // Remove unused destructured variables: handleSubmit, formWatch, formSetValue, formErrors, reset
+  } = useForm<AssetFormData>({
+    // ...existing code...
+  });
 
   return (
     <StandardFormWrapper

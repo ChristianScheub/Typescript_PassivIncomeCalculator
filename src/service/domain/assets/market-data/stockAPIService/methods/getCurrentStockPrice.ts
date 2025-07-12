@@ -6,7 +6,7 @@ import { YahooAPIService } from '../providers/YahooAPIService';
 import { AlphaVantageAPIService } from '../providers/AlphaVantageAPIService';
 
 export async function getCurrentStockPrice(symbol: string): Promise<StockPrice> {
-  const { selectedProvider, apiKeys } = store.getState().apiConfig;
+  const { selectedProvider, apiKeys } = store.getState().config.apis.stock;
 
   switch (selectedProvider) {
     case StockAPIProvider.FINNHUB: {

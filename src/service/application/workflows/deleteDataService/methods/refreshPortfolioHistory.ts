@@ -3,9 +3,11 @@ import {
     calculatePortfolioHistory,
     calculateAssetFocusData,
     calculateFinancialSummary
-} from '@/store/slices/cache';
+} from '@/store/slices/domain/transactionsSlice'; // MIGRATED: Now in consolidated cache
 import { AssetFocusTimeRange } from '@/types/shared/analytics';
 import Logger from "@/service/shared/logging/Logger/logger";
+import type { ThunkDispatch, AnyAction } from '@reduxjs/toolkit';
+import type { RootState } from '@/store';
 
 /**
  * Clears and recalculates all portfolio history data
@@ -18,6 +20,9 @@ import Logger from "@/service/shared/logging/Logger/logger";
  */
 export async function refreshPortfolioHistory(): Promise<void> {
     Logger.infoService("Starting to refresh portfolio history data");
+
+    // Cast store.dispatch for AsyncThunk actions
+    const thunkDispatch = store.dispatch as ThunkDispatch<RootState, unknown, AnyAction>;
 
     try {
         // Import here to avoid circular dependencies
@@ -34,14 +39,19 @@ export async function refreshPortfolioHistory(): Promise<void> {
         Logger.infoService("Recalculating portfolio history for all time ranges");
         for (const timeRange of timeRanges) {
             Logger.infoService(`Calculating portfolio history for timeRange: ${timeRange}`);
-            await store.dispatch(calculatePortfolioHistory({ timeRange }));
+            await thunkDispatch(calculatePortfolioHistory({ timeRange }));
         }
 
         // Step 4: Recalculate other calculated data
         Logger.infoService("Recalculating calculated data");
+        const state = store.getState();
         await Promise.all([
-            store.dispatch(calculateFinancialSummary()),
-            store.dispatch(calculateAssetFocusData())
+            thunkDispatch(calculateFinancialSummary({
+                liabilities: state.liabilities.items,
+                expenses: state.expenses.items,
+                income: state.income.items
+            })),
+            thunkDispatch(calculateAssetFocusData())
             // Note: 30-day history is now calculated directly from IndexedDB, no Redux action needed
         ]);
 

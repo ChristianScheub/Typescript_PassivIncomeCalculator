@@ -3,7 +3,7 @@
  */
 
 import { FieldErrors, UseFormSetValue } from 'react-hook-form';
-import { AssetFormData } from './asset-selection';
+import { AssetFormData } from '../../domains/forms/form-data';
 
 export interface BasicAssetInformationProps {
   watch: <K extends keyof AssetFormData>(field: K) => AssetFormData[K];

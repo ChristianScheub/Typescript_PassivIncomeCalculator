@@ -10,8 +10,8 @@ import Logger from '@/service/shared/logging/Logger/logger';
  */
 export function useAutoPortfolioHistoryUpdate() {
   const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
-  const { portfolioCache } = useAppSelector(state => state.transactions);
-  const { isHydrated } = useAppSelector(state => state.calculatedData);
+  const { cache: portfolioCache } = useAppSelector(state => state.transactions);
+  const isHydrated = useAppSelector(state => !!state.transactions.cache);
   
   const { triggerRecalculation } = usePortfolioHistoryRecalculation();
   

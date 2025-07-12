@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/shared/base';
+import { AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/domains/assets/categories';
 import { Plus, X, Tag } from 'lucide-react';
 
 interface AssetCategoryAssignmentSelectorProps {
@@ -28,14 +28,19 @@ export const AssetCategoryAssignmentSelector: React.FC<AssetCategoryAssignmentSe
     if (assetDefinitionId) {
       const assignments = currentAssignments
         .filter(assignment => assignment.assetDefinitionId === assetDefinitionId)
-        .map(assignment => ({
-          assetDefinitionId: assignment.assetDefinitionId,
-          categoryId: assignment.categoryId,
-          categoryOptionId: assignment.categoryOptionId
-        }));
+        .map(assignment => {
+          const category = categories.find(cat => cat.id === assignment.categoryId);
+          const option = categoryOptions.find(opt => opt.id === assignment.categoryOptionId);
+          return {
+            assetDefinitionId: assignment.assetDefinitionId,
+            categoryId: assignment.categoryId,
+            categoryOptionId: assignment.categoryOptionId,
+            name: option?.name || category?.name || '',
+          };
+        });
       setSelectedAssignments(assignments);
     }
-  }, [assetDefinitionId, currentAssignments]);
+  }, [assetDefinitionId, currentAssignments, categories, categoryOptions]);
 
   // Get options for selected category
   const getOptionsForCategory = (categoryId: string) => {
@@ -57,17 +62,19 @@ export const AssetCategoryAssignmentSelector: React.FC<AssetCategoryAssignmentSe
   // Add new assignment
   const handleAddAssignment = (categoryId: string, optionId: string) => {
     if (!assetDefinitionId) return;
+    const category = categories.find(cat => cat.id === categoryId);
+    const option = categoryOptions.find(opt => opt.id === optionId);
+    const newAssignment = {
+      assetDefinitionId,
+      categoryId,
+      categoryOptionId: optionId,
+      name: option?.name || category?.name || '',
+    };
 
     // Check if assignment already exists for this category
     const existingIndex = selectedAssignments.findIndex(
       assignment => assignment.categoryId === categoryId
     );
-
-    const newAssignment = {
-      assetDefinitionId,
-      categoryId,
-      categoryOptionId: optionId
-    };
 
     let updatedAssignments;
     if (existingIndex >= 0) {
@@ -135,10 +142,10 @@ export const AssetCategoryAssignmentSelector: React.FC<AssetCategoryAssignmentSe
                   {getCategoryName(assignment.categoryId)}:
                 </span>
                 <div className="flex items-center gap-1">
-                  {option?.color && (
+                  {('color' in (option || {})) && (option as any).color && (
                     <div 
                       className="w-3 h-3 rounded-full border border-gray-300"
-                      style={{ backgroundColor: option.color }}
+                      style={{ backgroundColor: (option as any).color }}
                     />
                   )}
                   <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -199,15 +206,15 @@ export const AssetCategoryAssignmentSelector: React.FC<AssetCategoryAssignmentSe
                       onClick={() => handleAddAssignment(selectedCategoryId, option.id)}
                       className="flex items-center gap-2 p-2 text-left text-sm border border-gray-200 dark:border-gray-600 rounded hover:bg-white dark:hover:bg-gray-600"
                     >
-                      {option.color && (
+                      {('color' in (option || {})) && (option as any).color && (
                         <div 
                           className="w-3 h-3 rounded-full border border-gray-300"
-                          style={{ backgroundColor: option.color }}
+                          style={{ backgroundColor: (option as any).color }}
                         />
                       )}
                       <span className="text-gray-900 dark:text-gray-100">{option.name}</span>
-                      {option.description && (
-                        <span className="text-xs text-gray-500">({option.description})</span>
+                      {('description' in (option || {})) && (option as any).description && (
+                        <span className="text-xs text-gray-500">({((option as any).description)})</span>
                       )}
                     </button>
                   ))}

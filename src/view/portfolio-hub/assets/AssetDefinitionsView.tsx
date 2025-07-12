@@ -9,7 +9,6 @@ import { ViewHeader } from "../../../ui/shared/ViewHeader";
 import { Plus, Wallet, RefreshCw, History, DollarSign } from "lucide-react";
 import { Tooltip } from "@mui/material";
 import { formatService } from "../../../service";
-import { TimeRangePeriod } from "../../../types/shared/time";
 import { SearchInput } from "@/ui/portfolioHub/inputs/SearchInput";
 import { IconButton } from "@/ui/shared";
 import { AddPriceEntryDialog, SwipeableCard, TimeRangeSelectionDialog } from "@/ui/portfolioHub";
@@ -37,7 +36,6 @@ interface AssetDefinitionsViewProps {
   onAddDefinitionWithCategories?: (definition: CreateAssetDefinitionData, categoryAssignments: AssetCategoryAssignment[]) => void;
   onUpdateDefinitionWithCategories?: (definition: CreateAssetDefinitionData, categoryAssignments: AssetCategoryAssignment[]) => void;
   onAddPriceEntry?: (assetDefinitionId: string, price: PriceEntry) => void;
-  onFetchDividendsForAsset?: (definition: AssetDefinition) => void;
   onFetchAllDividends?: () => void;
 }
 
@@ -62,7 +60,6 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   onAddDefinitionWithCategories,
   onUpdateDefinitionWithCategories,
   onAddPriceEntry,
-  onFetchDividendsForAsset,
   onFetchAllDividends,
 }) => {
   const { t } = useTranslation();
@@ -94,7 +91,7 @@ export const AssetDefinitionsView: React.FC<AssetDefinitionsViewProps> = ({
   };
 
   // Handle time range selection and close dialog
-  const handleTimeRangeConfirm = (period: TimeRangePeriod) => {
+  const handleTimeRangeConfirm = () => {
     setIsTimeRangeDialogOpen(false);
     onUpdateHistoricalData();
   };

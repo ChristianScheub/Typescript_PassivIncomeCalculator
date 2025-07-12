@@ -69,7 +69,7 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const getBarColorByMonth = (month: string, forecastShare?: number, isSelected?: boolean) => {
+  const getBarColorByMonth = (forecastShare?: number, isSelected?: boolean) => {
     if (forecastShare && forecastShare > 0.01) {
       // Zeige Forecast-Anteil als Verlauf (blau für real, orange für forecast)
       return isSelected
@@ -150,10 +150,10 @@ const AssetCalendarView: React.FC<AssetCalendarViewProps> = ({
                       tickFormatter={(value) => formatService.formatCurrency(value)}
                     />
                     <Bar dataKey="income" radius={[4, 4, 0, 0]}>
-                      {chartData.map((entry, idx) => (
+                      {chartData.map((entry) => (
                         <Cell 
                           key={`cell-${entry.month}`}
-                          fill={getBarColorByMonth(entry.month, entry.forecastShare, entry.isSelected)}
+                          fill={getBarColorByMonth(entry.forecastShare, entry.isSelected)}
                           style={{ cursor: 'pointer' }}
                         />
                       ))}

@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useForm, UseFormReturn } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
+import { RootState } from '@/store/index';
 import { AssetCategoryManagerView } from '@/view/portfolio-hub/assets/AssetCategoryManagerView';
 import {
   fetchAssetCategories,
@@ -49,7 +51,7 @@ interface AssetCategoryContainerProps {
 }
 
 export const AssetCategoryContainer: React.FC<AssetCategoryContainerProps> = ({ onBack }) => {
-  const dispatch = useAppDispatch();
+  const dispatch: ThunkDispatch<RootState, unknown, AnyAction> = useAppDispatch();
   const { executeAsyncOperation } = useAsyncOperation();
   const { categories, categoryOptions, status } = useAppSelector(
     state => state.assetCategories

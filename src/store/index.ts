@@ -16,6 +16,12 @@ if (persistedState) {
   StoreInitializationService.initializeWithoutPersistedState(store);
 }
 
+// Debug: Log config after hydration
+if (persistedState && persistedState.config && persistedState.config.dashboard) {
+  // eslint-disable-next-line no-console
+  console.info('[Hydration] Dashboard assetFocus nach Laden:', persistedState.config.dashboard.assetFocus);
+}
+
 // Setup state persistence with throttling
 StoreInitializationService.setupStorePersistence(store, (state) => {
   StatePersistenceService.saveState(state);

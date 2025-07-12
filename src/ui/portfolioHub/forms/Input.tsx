@@ -24,10 +24,13 @@ const inputVariants = cva(
   }
 );
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement>, VariantProps<typeof inputVariants> {}
+// Fix InputProps: Omit 'size' from InputHTMLAttributes to avoid conflict with VariantProps
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>, VariantProps<typeof inputVariants> {
+  size?: 'default' | 'sm' | 'lg';
+}
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, variant, size, type = "text", ...props }, ref) => {
+  ({ className, variant, size = 'default', type = "text", ...props }, ref) => {
     return (
       <input
         type={type}

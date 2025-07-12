@@ -46,20 +46,23 @@ export const getTotalValueFromCache = (portfolioCache: Partial<TypedPortfolioCac
   return totalValue;
 };
 
-export const isPortfolioCacheValid = (portfolioCache: Partial<TypedPortfolioCache> | null, portfolioCacheValid: boolean): boolean => {
-  const isValid = !!(portfolioCache && portfolioCacheValid);
-  Logger.cache(`Portfolio cache validity: ${isValid}`);
-  return isValid;
-};
-
 export const getSectorAllocationFromCache = (positions: PortfolioPosition[]): Array<{name: string; value: number; percentage: number}> => {
   if (!positions.length) return [];
 
   const sectorMap = new Map<string, number>();
   const totalValue = positions.reduce((sum, position) => {
-    const sector = position.sector || 'Unknown';
-    const currentValue = sectorMap.get(sector) || 0;
-    sectorMap.set(sector, currentValue + position.currentValue);
+    // Nutze alle Sektoren (Array), falls vorhanden, sonst 'Unknown'
+    if (Array.isArray(position.sectors) && position.sectors.length > 0) {
+      position.sectors.forEach(sectorName => {
+        const name = sectorName || 'Unknown';
+        const currentValue = sectorMap.get(name) || 0;
+        sectorMap.set(name, currentValue + position.currentValue);
+      });
+    } else {
+      const name = 'Unknown';
+      const currentValue = sectorMap.get(name) || 0;
+      sectorMap.set(name, currentValue + position.currentValue);
+    }
     return sum + position.currentValue;
   }, 0);
 

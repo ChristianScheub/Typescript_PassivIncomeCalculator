@@ -1,6 +1,7 @@
 import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
 import { calculatePortfolioHistoryForDays } from './calculatePortfolioHistoryForDays';
-import { PortfolioHistoryPoint, TimeRange } from '@/types/domains/portfolio/history';
+import { TimeRange } from '@/types/domains/portfolio/history';
+import { PortfolioHistoryPoint } from '@/types/domains/portfolio';
 import Logger from "@/service/shared/logging/Logger/logger";
 
 

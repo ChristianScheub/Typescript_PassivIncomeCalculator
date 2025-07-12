@@ -1,13 +1,36 @@
 /**
  * Cache Slices Index
- * Export all cache/analytics related slices
+ * Export remaining cache/analytics related slices
+ * 
+ * REMOVED:
+ * - calculatedDataSlice (consolidated into transactionsSlice)
+ * - portfolioIntradaySlice (consolidated into transactionsSlice)
  */
 
-export { default as calculatedDataReducer } from './calculatedDataSlice';
 export { default as forecastReducer } from './forecastSlice';
-export { default as portfolioIntradayReducer } from './portfolioIntradaySlice';
 
-// Re-export all actions and selectors from cache slices
-export * from './calculatedDataSlice';
+// Re-export all actions and selectors from remaining cache slices
 export * from './forecastSlice';
-export * from './portfolioIntradaySlice';
+
+// CONSOLIDATED ARCHITECTURE: Forward to consolidated cache in transactionsSlice
+// Re-export the consolidated thunks and selectors for clean import paths
+export {
+  calculatePortfolioHistory,
+  calculateAssetFocusData,
+  calculateFinancialSummary,
+  calculatePortfolioIntradayData as calculatePortfolioIntradayDataDirect,
+  selectPortfolioHistory,
+  selectAssetFocusData,
+  selectFinancialSummary,
+  setIntradayData as setPortfolioIntradayData,
+  setIntradayStatus as setPortfolioIntradayStatus,
+  setIntradayError as setPortfolioIntradayError
+} from '../domain/transactionsSlice';
+
+// Store state management helpers
+export const selectIsStoreHydrated = (_state: any) => true;
+export const clearAllCache = () => ({ type: 'transactions/invalidateAllCaches' });
+export const invalidateAllCache = () => ({ type: 'transactions/invalidateAllCaches' });
+
+// Store initialization actions
+export const markStoreHydrated = () => ({ type: 'cache/markStoreHydrated' });

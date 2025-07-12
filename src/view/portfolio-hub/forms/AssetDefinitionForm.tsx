@@ -27,6 +27,8 @@ import {
   OptionalSection,
   FormGrid,
 } from "@/ui/portfolioHub/forms";
+import { AssetFormData } from '@/types/domains/forms/form-data';
+import { getErrorMessage } from "@ui/portfolioHub/forms/sections/BasicAssetInformation";
 
 // Add useDividendApi to schema
 const assetDefinitionSchema = z.object({
@@ -130,8 +132,8 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
   } = useAppSelector((state) => state.assetCategories);
 
   // Get API configuration from Redux store
-  const { isEnabled: isApiEnabled } = useAppSelector(
-    (state) => state.apiConfig
+  const { enabled: isApiEnabled } = useAppSelector(
+    (state) => state.config.apis.stock
   );
 
   const {
@@ -140,7 +142,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     setValue,
     formState: { errors },
     reset,
-  } = useForm<AssetDefinitionFormData>({
+  } = useForm<AssetFormData>({
     resolver: zodResolver(assetDefinitionSchema),
     defaultValues: editingDefinition
       ? {
@@ -231,7 +233,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     if (checked) {
       newMonths = [...currentMonths, month].sort((a, b) => a - b);
     } else {
-      newMonths = currentMonths.filter((m) => m !== month);
+      newMonths = currentMonths.filter((m: number) => m !== month);
     }
 
     setValue("dividendPaymentMonths", newMonths);
@@ -253,7 +255,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     if (checked) {
       newMonths = [...currentMonths, month].sort((a, b) => a - b);
     } else {
-      newMonths = currentMonths.filter((m) => m !== month);
+      newMonths = currentMonths.filter((m: number) => m !== month);
     }
 
     setValue("rentalPaymentMonths", newMonths);
@@ -269,7 +271,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
 
   const updateSector = (
     index: number,
-    field: "sectorName" | "percentage",
+    field: "sector" | "percentage",
     value: string | number
   ) => {
     const newSectors = [...sectors];
@@ -525,25 +527,28 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
     };
   };
 
-  const handleFormSubmit = (data: AssetDefinitionFormData) => {
+  const handleFormSubmit = (data: AssetFormData) => {
+    const definitionData = { ...data, fullName: data.name, type: data.type as AssetType, useDividendApi: data.useDividendApi ?? false };
+
+    // If needed, transform AssetFormData to AssetDefinitionFormData shape here
     // Get existing definition if editing to preserve price history
     const existingDefinition = editingDefinition || null;
 
     // Build the definition data step by step to reduce complexity
     let finalDefinitionData = createBaseDefinitionData(
-      data,
+      definitionData,
       existingDefinition
     );
     finalDefinitionData = updatePriceHistoryIfNeeded(
       finalDefinitionData,
-      data,
+      definitionData,
       existingDefinition
     );
-    finalDefinitionData = addDividendInfoIfNeeded(finalDefinitionData, data);
-    finalDefinitionData = addRentalInfoIfNeeded(finalDefinitionData, data);
-    finalDefinitionData = addBondInfoIfNeeded(finalDefinitionData, data);
+    finalDefinitionData = addDividendInfoIfNeeded(finalDefinitionData, definitionData);
+    finalDefinitionData = addRentalInfoIfNeeded(finalDefinitionData, definitionData);
+    finalDefinitionData = addBondInfoIfNeeded(finalDefinitionData, definitionData);
     // Add useDividendApi at the root
-    finalDefinitionData.useDividendApi = data.useDividendApi ?? false;
+    finalDefinitionData.useDividendApi = definitionData.useDividendApi ?? false;
 
     // Submit the form and reset state
     onSubmit(finalDefinitionData, categoryAssignments);
@@ -588,7 +593,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
               }
               step={0.01}
               min={0}
-              error={errors.currentPrice?.message}
+              error={getErrorMessage(errors.currentPrice)}
             />
           </FormGrid>
         </OptionalSection>
@@ -643,20 +648,7 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
               percentage: sa.percentage,
             })));
           }}
-          updateSector={(index, field, value) => {
-            // Accepts 'sector' or 'percentage' as field
-            const newSectors = [...sectors];
-            if (field === 'sector') {
-              newSectors[index] = { ...newSectors[index], sectorName: value as string };
-            } else if (field === 'percentage') {
-              newSectors[index] = { ...newSectors[index], percentage: value as number };
-            }
-            setSectors(newSectors);
-            setValue('sectors', newSectors.map(s => ({
-              sectorName: s.sectorName,
-              percentage: s.percentage,
-            })));
-          }}
+          updateSector={updateSector} // Pass updateSector to SectorSection
         />
 
         {/* Dividend Section */}

@@ -18,9 +18,7 @@ interface TypedChartTooltipProps extends ChartTooltipPayload {
   valueKey?: string;
   
   // Special cases
-  useCustomFormatting?: boolean;
   showTransactions?: boolean;
-  firstBarColor?: string;
   
   // Custom translations
   t?: (key: string) => string;
@@ -61,9 +59,7 @@ export const TypedChartTooltip: React.FC<TypedChartTooltipProps> = ({
   translateItemKey = false,
   nameKey = 'name',
   valueKey = 'value',
-  useCustomFormatting = false,
   showTransactions = false,
-  firstBarColor = '#8884d8',
   t: customT,
   name
 }) => {
