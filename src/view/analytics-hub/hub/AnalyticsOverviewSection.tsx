@@ -51,7 +51,7 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({
   
   // Get AI configuration from Redux
   const aiConfig = useAppSelector(state => state.config.apis.ai);
-  const isAIEnabled = aiConfig.enabled && aiConfig.modelStatus === 'loaded';
+  const isAIEnabled = aiConfig.enabled;
   // Real recent analytics based on user data
   const recentAnalytics = useMemo(() => {
     const history = recentActivityService.getActivitiesByType("analytics", 3);

@@ -76,41 +76,67 @@ export class AppInitializationService {
     let state = getState();
 
     // Step 0: Ensure all master data is loaded
-    const needsTransactions = !state.transactions.items || state.transactions.items.length === 0;
-    const needsAssetDefinitions = !state.assetDefinitions.items || state.assetDefinitions.items.length === 0;
-    const needsLiabilities = !state.liabilities.items || state.liabilities.items.length === 0;
-    const needsExpenses = !state.expenses.items || state.expenses.items.length === 0;
-    const needsIncome = !state.income.items || state.income.items.length === 0;
+    // Check if data is missing or if we've never attempted to load it
+    const needsTransactions = (!state.transactions.items || state.transactions.items.length === 0) && state.transactions.status === 'idle';
+    const needsAssetDefinitions = (!state.assetDefinitions.items || state.assetDefinitions.items.length === 0) && state.assetDefinitions.status === 'idle';
+    const needsLiabilities = (!state.liabilities.items || state.liabilities.items.length === 0) && state.liabilities.status === 'idle';
+    const needsExpenses = (!state.expenses.items || state.expenses.items.length === 0) && state.expenses.status === 'idle';
+    const needsIncome = (!state.income.items || state.income.items.length === 0) && state.income.status === 'idle';
 
     if (needsTransactions) {
       Logger.info('AppInitialization: Transactions missing, loading from DB...');
-      await thunkDispatch(fetchTransactions()).unwrap();
-      state = getState();
-      Logger.info(`AppInitialization: Transactions loaded: ${state.transactions.items.length}`);
+      try {
+        await thunkDispatch(fetchTransactions()).unwrap();
+        state = getState();
+        Logger.info(`AppInitialization: Transactions loaded: ${state.transactions.items.length}`);
+      } catch (error) {
+        Logger.warn('AppInitialization: Failed to load transactions, continuing with empty state: ' + JSON.stringify(error));
+        state = getState();
+      }
     }
     if (needsAssetDefinitions) {
       Logger.info('AppInitialization: Asset definitions missing, loading from DB...');
-      await thunkDispatch(fetchAssetDefinitions()).unwrap();
-      state = getState();
-      Logger.info(`AppInitialization: Asset definitions loaded: ${state.assetDefinitions.items.length}`);
+      try {
+        await thunkDispatch(fetchAssetDefinitions()).unwrap();
+        state = getState();
+        Logger.info(`AppInitialization: Asset definitions loaded: ${state.assetDefinitions.items.length}`);
+      } catch (error) {
+        Logger.warn('AppInitialization: Failed to load asset definitions, continuing with empty state: ' + JSON.stringify(error));
+        state = getState();
+      }
     }
     if (needsLiabilities) {
       Logger.info('AppInitialization: Liabilities missing, loading from DB...');
-      await thunkDispatch(fetchLiabilities()).unwrap();
-      state = getState();
-      Logger.info(`AppInitialization: Liabilities loaded: ${state.liabilities.items.length}`);
+      try {
+        await thunkDispatch(fetchLiabilities()).unwrap();
+        state = getState();
+        Logger.info(`AppInitialization: Liabilities loaded: ${state.liabilities.items.length}`);
+      } catch (error) {
+        Logger.warn('AppInitialization: Failed to load liabilities, continuing with empty state: ' + JSON.stringify(error));
+        state = getState();
+      }
     }
     if (needsExpenses) {
       Logger.info('AppInitialization: Expenses missing, loading from DB...');
-      await thunkDispatch(fetchExpenses()).unwrap();
-      state = getState();
-      Logger.info(`AppInitialization: Expenses loaded: ${state.expenses.items.length}`);
+      try {
+        await thunkDispatch(fetchExpenses()).unwrap();
+        state = getState();
+        Logger.info(`AppInitialization: Expenses loaded: ${state.expenses.items.length}`);
+      } catch (error) {
+        Logger.warn('AppInitialization: Failed to load expenses, continuing with empty state: ' + JSON.stringify(error));
+        state = getState();
+      }
     }
     if (needsIncome) {
       Logger.info('AppInitialization: Income missing, loading from DB...');
-      await thunkDispatch(fetchIncome()).unwrap();
-      state = getState();
-      Logger.info(`AppInitialization: Income loaded: ${state.income.items.length}`);
+      try {
+        await thunkDispatch(fetchIncome()).unwrap();
+        state = getState();
+        Logger.info(`AppInitialization: Income loaded: ${state.income.items.length}`);
+      } catch (error) {
+        Logger.warn('AppInitialization: Failed to load income, continuing with empty state: ' + JSON.stringify(error));
+        state = getState();
+      }
     }
 
     // Step 1: Check if portfolio cache needs to be computed

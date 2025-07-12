@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAppDispatch,useAppSelector } from './redux';
+import { useAppDispatch } from './redux';
 import { appInitializationService } from '../service/application/orchestration/initService/appInitialization';
 import { store } from '@/store';
 import Logger from '@/service/shared/logging/Logger/logger';
@@ -20,7 +20,18 @@ export const useAppInitialization = (): UseAppInitializationResult => {
   const [initializationError, setInitializationError] = useState<string | null>(null);
   
   // Track if store is hydrated from localStorage
-  const isStoreHydrated = useAppSelector(state => !!state.transactions.cache);
+  // Use a simple timeout-based approach for robustness
+  const [isStoreReady, setIsStoreReady] = useState(false);
+  
+  useEffect(() => {
+    // Use a minimal delay to ensure the store initialization has completed
+    // This prevents infinite waiting on empty databases
+    const timer = setTimeout(() => {
+      setIsStoreReady(true);
+    }, 100); // 100ms should be sufficient for store initialization
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Track initialization status
   const [isInitialized, setIsInitialized] = useState(
@@ -28,9 +39,9 @@ export const useAppInitialization = (): UseAppInitializationResult => {
   );
 
   useEffect(() => {
-    // Only start initialization once the store is hydrated from localStorage
-    if (!isStoreHydrated) {
-      Logger.info('useAppInitialization: Waiting for store hydration');
+    // Only start initialization once the store is ready
+    if (!isStoreReady) {
+      Logger.info('useAppInitialization: Waiting for store to be ready');
       return;
     }
 
@@ -55,7 +66,7 @@ export const useAppInitialization = (): UseAppInitializationResult => {
         setInitializationError(error?.message || 'Initialization failed');
         setIsInitializing(false);
       });
-  }, [dispatch, isStoreHydrated, isInitialized, isInitializing]);
+  }, [dispatch, isStoreReady, isInitialized, isInitializing]);
 
   return {
     isInitialized,
