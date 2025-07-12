@@ -37,6 +37,10 @@ export const calculateFinancialSummary = (
     monthlyLiabilityPayments
   );
 
+  // Calculate additional metrics
+  const savingsRate = totalMonthlyIncome > 0 ? (monthlyCashFlow / totalMonthlyIncome) * 100 : 0;
+  const emergencyFundMonths = totalMonthlyExpenses > 0 ? totalAssets / totalMonthlyExpenses : 0;
+
   return {
     netWorth,
     totalAssets,
@@ -49,6 +53,8 @@ export const calculateFinancialSummary = (
     monthlyCashFlow,
     totalMonthlyIncome,
     totalPassiveIncome,
-    totalMonthlyExpenses
+    totalMonthlyExpenses,
+    savingsRate,
+    emergencyFundMonths
   };
 };

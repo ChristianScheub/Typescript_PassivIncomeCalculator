@@ -10,6 +10,8 @@ function isActionWithType(action: unknown): action is AnyAction {
 
 // Helper function to get required data for financial summary
 const getFinancialData = (state: RootState) => ({
+  assets: state.transactions?.items || [],
+  assetDefinitions: state.assetDefinitions?.items || [],
   liabilities: state.liabilities?.items || [],
   expenses: state.expenses?.items || [],
   income: state.income?.items || [],
@@ -17,10 +19,11 @@ const getFinancialData = (state: RootState) => ({
 
 // Helper function to check if financial summary should be recalculated
 const shouldRecalculateFinancialSummary = (state: RootState): boolean => {
-  const hasData = state.income?.items?.length > 0 || 
+  const hasData = state.transactions?.items?.length > 0 ||
+                  state.assetDefinitions?.items?.length > 0 ||
+                  state.income?.items?.length > 0 || 
                   state.expenses?.items?.length > 0 || 
-                  state.liabilities?.items?.length > 0 ||
-                  state.transactions?.items?.length > 0;
+                  state.liabilities?.items?.length > 0;
   
   const hasValidFinancialSummary = state.transactions?.cache?.financialSummary && 
     (state.transactions.cache.financialSummary.totalAssets > 0 || 

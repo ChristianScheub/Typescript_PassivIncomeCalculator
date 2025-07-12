@@ -31,18 +31,38 @@ export const fetchAssetDefinitions = createAsyncThunk(
       const definitions = await sqliteService.getAll('assetDefinitions');
       Logger.infoRedux(logger.completeOperation('fetch', `${definitions.length} asset definitions`));
       definitions.forEach(def => {
+        const defName = def.name || def.fullName || 'Unnamed Asset';
         if (def.dividendHistory) {
-          Logger.info(`[DEBUG] Asset ${def.name} hat dividendHistory mit ${def.dividendHistory.length} Einträgen`);
+          Logger.info(`[DEBUG] Asset ${defName} hat dividendHistory mit ${def.dividendHistory.length} Einträgen`);
         } else {
-          Logger.info(`[DEBUG] Asset ${def.name} hat KEINE dividendHistory`);
+          Logger.info(`[DEBUG] Asset ${defName} hat KEINE dividendHistory`);
         }
       });
       
-      // Migration: dividendHistory immer setzen
+      // Migration: dividendHistory immer setzen und name field sicherstellen
       for (const def of definitions) {
+        let needsUpdate = false;
+        
         if (def.dividendHistory === undefined) {
           def.dividendHistory = [];
-          Logger.info(`[MIGRATION] Setze dividendHistory für Asset ${def.name}`);
+          const defName = def.name || def.fullName || 'Unnamed Asset';
+          Logger.info(`[MIGRATION] Setze dividendHistory für Asset ${defName}`);
+          needsUpdate = true;
+        }
+        
+        // Ensure name field is always set
+        if (!def.name && def.fullName) {
+          def.name = def.fullName;
+          Logger.info(`[MIGRATION] Setze name field von fullName für Asset ${def.fullName}`);
+          needsUpdate = true;
+        } else if (!def.name && !def.fullName) {
+          def.name = 'Unnamed Asset';
+          def.fullName = 'Unnamed Asset';
+          Logger.info(`[MIGRATION] Setze Standard-Name für Asset ohne Namen`);
+          needsUpdate = true;
+        }
+        
+        if (needsUpdate) {
           await sqliteService.update('assetDefinitions', def);
         }
       }
@@ -58,11 +78,12 @@ export const fetchAssetDefinitions = createAsyncThunk(
 export const addAssetDefinition = createAsyncThunk(
   'assetDefinitions/addAssetDefinition',
   async (assetDefinitionData: Omit<AssetDefinition, 'id' | 'createdAt' | 'updatedAt'>) => {
-    Logger.infoRedux(logger.startOperation('add', `asset definition: ${assetDefinitionData.name}`));
+    Logger.infoRedux(logger.startOperation('add', `asset definition: ${assetDefinitionData.name || assetDefinitionData.fullName || 'Unnamed Asset'}`));
     try {
-      // Ensure sector and sectors are always set
+      // Ensure name field is always set
       const safeAssetDefinitionData = {
         ...assetDefinitionData,
+        name: assetDefinitionData.name || assetDefinitionData.fullName || 'Unnamed Asset',
         sectors: Array.isArray(assetDefinitionData.sectors) ? assetDefinitionData.sectors : [],
       };
       // Erstellen einer neuen Asset-Definition mit ID und Zeitstempeln
@@ -76,7 +97,7 @@ export const addAssetDefinition = createAsyncThunk(
       // Speichern in der Datenbank
       const savedId = await sqliteService.add('assetDefinitions', newAssetDefinition);
       const savedDefinition = { ...newAssetDefinition, id: savedId };
-      Logger.infoRedux(logger.completeOperation('add', `asset definition: ${savedDefinition.name}`));
+      Logger.infoRedux(logger.completeOperation('add', `asset definition: ${savedDefinition.name || savedDefinition.fullName || 'Unnamed Asset'}`));
       return savedDefinition;
     } catch (error) {
       Logger.error(`Error saving asset definition to database: ${error}`);
@@ -88,12 +109,13 @@ export const addAssetDefinition = createAsyncThunk(
 export const updateAssetDefinition = createAsyncThunk(
   'assetDefinitions/updateAssetDefinition',
   async (assetDefinition: AssetDefinition) => {
-    Logger.info(`Updating asset definition in database: ${assetDefinition.name}`);
+    Logger.info(`Updating asset definition in database: ${assetDefinition.name || assetDefinition.fullName || 'Unnamed Asset'}`);
     try {
       Logger.info('[DEBUG] Vor DeepClean: ' + JSON.stringify(assetDefinition));
-      // Ensure sector and sectors are always set
+      // Ensure name field and sectors are always set
       const safeAssetDefinition = {
         ...assetDefinition,
+        name: assetDefinition.name || assetDefinition.fullName || 'Unnamed Asset',
         sectors: Array.isArray(assetDefinition.sectors) ? assetDefinition.sectors : [],
       };
       // Aktualisierung des updatedAt-Feldes
@@ -107,13 +129,15 @@ export const updateAssetDefinition = createAsyncThunk(
       const cleanedDefinition = deepCleanObject(updatedDefinition);
       Logger.info('[DEBUG] Nach DeepClean: ' + JSON.stringify(cleanedDefinition));
       if (cleanedDefinition.dividendHistory) {
-        Logger.info(`[DEBUG] Update: Asset ${cleanedDefinition.name} hat dividendHistory mit ${cleanedDefinition.dividendHistory.length} Einträgen`);
+        const defName = cleanedDefinition.name || cleanedDefinition.fullName || 'Unnamed Asset';
+        Logger.info(`[DEBUG] Update: Asset ${defName} hat dividendHistory mit ${cleanedDefinition.dividendHistory.length} Einträgen`);
       } else {
-        Logger.info(`[DEBUG] Update: Asset ${cleanedDefinition.name} hat KEINE dividendHistory`);
+        const defName = cleanedDefinition.name || cleanedDefinition.fullName || 'Unnamed Asset';
+        Logger.info(`[DEBUG] Update: Asset ${defName} hat KEINE dividendHistory`);
       }
       // Speichern der Aktualisierung in der Datenbank
       await sqliteService.update('assetDefinitions', cleanedDefinition);
-      Logger.info(`Asset definition updated successfully: ${cleanedDefinition.name}`);
+      Logger.info(`Asset definition updated successfully: ${cleanedDefinition.name || cleanedDefinition.fullName || 'Unnamed Asset'}`);
       return cleanedDefinition;
     } catch (error) {
       Logger.error(`Error updating asset definition in database: ${JSON.stringify(error, Object.getOwnPropertyNames(error))}`);
@@ -227,7 +251,12 @@ const assetDefinitionsSlice = createSlice({
       .addCase(fetchAssetDefinitions.pending, standardReducerPatterns.pending)
       .addCase(fetchAssetDefinitions.fulfilled, (state, action) => {
         standardReducerPatterns.fulfilled(state);
-        state.items = action.payload.slice().sort((a, b) => a.name.localeCompare(b.name));
+        state.items = action.payload.slice().sort((a, b) => {
+          // Defensive sorting: Use fullName as fallback if name is undefined/null
+          const nameA = a.name || a.fullName || '';
+          const nameB = b.name || b.fullName || '';
+          return nameA.localeCompare(nameB);
+        });
       })
       .addCase(fetchAssetDefinitions.rejected, (state, action) => {
         const errorMsg = action.error.message || 'Failed to fetch asset definitions';
@@ -240,7 +269,7 @@ const assetDefinitionsSlice = createSlice({
       .addCase(addAssetDefinition.fulfilled, (state, action) => {
         standardReducerPatterns.fulfilled(state);
         state.items.push(action.payload);
-        Logger.cache(`Asset definition added: ${action.payload.name}, invalidating portfolio cache`);
+        Logger.cache(`Asset definition added: ${action.payload.name || action.payload.fullName || 'Unnamed Asset'}, invalidating portfolio cache`);
       })
       .addCase(addAssetDefinition.rejected, (state, action) => {
         const errorMsg = action.error.message || 'Failed to add asset definition';

@@ -20,6 +20,7 @@ export const useLLMService = () => {
   const [error, setError] = useState<string | null>(null);
   const [modelConfig, setModelConfig] = useState<LLMModelConfig | null>(null);
   const [modelMode, setModelMode] = useState<string>('unknown');
+  const [loadingProgress, setLoadingProgress] = useState<number>(0);
 
   /**
    * Load the LLM model using mlc-ai/web-llm
@@ -29,11 +30,20 @@ export const useLLMService = () => {
       setIsLoading(true);
       setError(null);
       setModelStatus('loading');
+      setLoadingProgress(0);
       
       Logger.info(`useLLMService: Loading model ${config.modelName}`);
       
+      // Progress callback to update loading progress
+      const progressCallback = (progress: number) => {
+        // Convert progress from decimal (0.47948723039556324) to percentage and round to nearest integer
+        const progressPercentage = Math.round(progress * 100);
+        setLoadingProgress(progressPercentage);
+        Logger.info(`useLLMService: Loading progress: ${progressPercentage}%`);
+      };
+      
       // Use modelPath as model ID for MLC WebLLM
-      await modelManager.loadModel(config.modelPath, config.modelName);
+      await modelManager.loadModel(config.modelPath, config.modelName, progressCallback);
       
       // Get model mode from ModelManager
       const managerStatus = modelManager.getStatus();
@@ -41,12 +51,14 @@ export const useLLMService = () => {
       
       setModelConfig(config);
       setModelStatus('loaded');
+      setLoadingProgress(100);
       
       Logger.info(`useLLMService: Model ${config.modelName} loaded successfully in ${managerStatus.mode} mode`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load model';
       setError(errorMessage);
       setModelStatus('error');
+      setLoadingProgress(0);
       Logger.error(`useLLMService: Failed to load model - ${errorMessage}`);
     } finally {
       setIsLoading(false);
@@ -159,6 +171,7 @@ export const useLLMService = () => {
     error,
     modelConfig,
     modelMode,
+    loadingProgress,
     isModelReady: modelStatus === 'loaded',
     
     // Actions

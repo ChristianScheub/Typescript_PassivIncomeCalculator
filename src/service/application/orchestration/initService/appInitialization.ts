@@ -56,9 +56,9 @@ export class AppInitializationService {
         "AppInitialization: Application initialization completed successfully"
       );
     } catch (error) {
-      Logger.error(
-        "AppInitialization: Failed to initialize application: " +
-          JSON.stringify(error)
+      Logger.errorStack(
+        "AppInitialization: Failed to initialize application: ",
+        error instanceof Error ? error : new Error(String(error))
       );
       this.initializationPromise = null; // Allow retry
       throw error;

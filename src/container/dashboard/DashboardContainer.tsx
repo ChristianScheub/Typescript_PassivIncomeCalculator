@@ -30,6 +30,8 @@ const DashboardContainer: React.FC = () => {
   const financialSummaryCache = useAppSelector(selectFinancialSummary);
   
   // Additional data for financial summary calculation
+  const assets = useAppSelector((state) => state.transactions.items);
+  const assetDefinitions = useAppSelector((state) => state.assetDefinitions.items);
   const liabilities = useAppSelector((state) => state.liabilities.items);
   const expenses = useAppSelector((state) => state.expenses.items);
   const income = useAppSelector((state) => state.income.items);
@@ -65,18 +67,23 @@ const DashboardContainer: React.FC = () => {
 
   // Automatically calculate financial summary if missing or all zero
   useEffect(() => {
-    const hasData = liabilities.length > 0 || expenses.length > 0 || income.length > 0;
+    const hasData = assets.length > 0 || liabilities.length > 0 || expenses.length > 0 || income.length > 0 || assetDefinitions.length > 0;
     const hasValidFinancialSummary = financialSummaryCache && 
       (financialSummaryCache.totalAssets > 0 || 
        financialSummaryCache.monthlyIncome > 0 || 
        financialSummaryCache.monthlyExpenses > 0 ||
        financialSummaryCache.totalLiabilities > 0);
 
+    Logger.info(`DashboardContainer Debug: hasData=${hasData}, hasValidFinancialSummary=${hasValidFinancialSummary}`);
+    Logger.info(`DashboardContainer Debug: assets=${assets.length}, assetDefinitions=${assetDefinitions.length}, income=${income.length}, expenses=${expenses.length}, liabilities=${liabilities.length}`);
+    Logger.info(`DashboardContainer Debug: financialSummaryCache=${JSON.stringify(financialSummaryCache)}`);
+
     if (hasData && !hasValidFinancialSummary) {
       Logger.info('DashboardContainer: Financial summary missing or all zero, triggering calculation');
-      dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
+      Logger.info(`DashboardContainer: Data available - assets: ${assets.length}, assetDefinitions: ${assetDefinitions.length}, income: ${income.length}, expenses: ${expenses.length}, liabilities: ${liabilities.length}`);
+      dispatch(calculateFinancialSummary({ liabilities, expenses, income }) as any);
     }
-  }, [dispatch, financialSummaryCache, liabilities, expenses, income]);
+  }, [dispatch, financialSummaryCache, assets, assetDefinitions, income, expenses, liabilities]);
 
   const ratios = useMemo(() => 
     analyticsService.calculateRatios(financialSummary),
@@ -128,19 +135,23 @@ const DashboardContainer: React.FC = () => {
   
   // Automatically calculate financial summary if missing or all zero
   useEffect(() => {
-    const hasData = income.length > 0 || expenses.length > 0 || liabilities.length > 0;
+    const hasData = assets.length > 0 || liabilities.length > 0 || expenses.length > 0 || income.length > 0 || assetDefinitions.length > 0;
     const hasValidFinancialSummary = financialSummaryCache && 
       (financialSummaryCache.totalAssets > 0 || 
        financialSummaryCache.monthlyIncome > 0 || 
        financialSummaryCache.monthlyExpenses > 0 ||
        financialSummaryCache.totalLiabilities > 0);
 
+    Logger.info(`DashboardContainer Debug: hasData=${hasData}, hasValidFinancialSummary=${hasValidFinancialSummary}`);
+    Logger.info(`DashboardContainer Debug: assets=${assets.length}, assetDefinitions=${assetDefinitions.length}, income=${income.length}, expenses=${expenses.length}, liabilities=${liabilities.length}`);
+    Logger.info(`DashboardContainer Debug: financialSummaryCache=${JSON.stringify(financialSummaryCache)}`);
+
     if (hasData && !hasValidFinancialSummary) {
       Logger.info('DashboardContainer: Financial summary missing or all zero, triggering calculation');
-      Logger.info(`DashboardContainer: Data available - income: ${income.length}, expenses: ${expenses.length}, liabilities: ${liabilities.length}`);
+      Logger.info(`DashboardContainer: Data available - assets: ${assets.length}, assetDefinitions: ${assetDefinitions.length}, income: ${income.length}, expenses: ${expenses.length}, liabilities: ${liabilities.length}`);
       dispatch(calculateFinancialSummary({ liabilities, expenses, income }) as any);
     }
-  }, [dispatch, financialSummaryCache, income, expenses, liabilities]);
+  }, [dispatch, financialSummaryCache, assets, assetDefinitions, income, expenses, liabilities]);
   
   // Debug: Log dashboard mode changes
   useEffect(() => {

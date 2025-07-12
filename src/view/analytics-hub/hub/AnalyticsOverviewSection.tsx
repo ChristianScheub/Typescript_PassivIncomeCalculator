@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useAppSelector } from "@/hooks/redux";
 import { recentActivityService } from "../../../service";
 import {
   TrendingUp,
@@ -47,6 +48,10 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({
   onAINavigation,
 }) => {
   const { t } = useTranslation();
+  
+  // Get AI configuration from Redux
+  const aiConfig = useAppSelector(state => state.config.apis.ai);
+  const isAIEnabled = aiConfig.enabled && aiConfig.modelStatus === 'loaded';
   // Real recent analytics based on user data
   const recentAnalytics = useMemo(() => {
     const history = recentActivityService.getActivitiesByType("analytics", 3);
@@ -103,18 +108,24 @@ const AnalyticsOverviewSection: React.FC<AnalyticsOverviewSectionProps> = ({
   }, [onCategoryChange, t]);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-      {/* AI Insights Card */}
-      <AIInsightsCard
-        onClick={() => onAINavigation?.("insights")}
-        className="p-3 rounded-lg"
-      />
+    <div className={`grid gap-6 mb-8 ${isAIEnabled ? 'grid-cols-1 lg:grid-cols-2' : 'grid-cols-1'}`}>
+      {/* AI Cards - only show if AI is enabled and model is loaded */}
+      {isAIEnabled && (
+        <>
+          {/* AI Insights Card */}
+          <AIInsightsCard
+            onClick={() => onAINavigation?.("insights")}
+            className="p-3 rounded-lg"
+          />
 
-      {/* AI Chat Card */}
-      <AIChatCard
-        onClick={() => onAINavigation?.("chat")}
-        className="p-3 rounded-lg"
-      />
+          {/* AI Chat Card */}
+          <AIChatCard
+            onClick={() => onAINavigation?.("chat")}
+            className="p-3 rounded-lg"
+          />
+        </>
+      )}
+      
       {/* Recent Analytics */}
       <CollapsibleSection
         title={t("analytics.hub.recentAnalytics")}

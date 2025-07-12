@@ -34,6 +34,7 @@ export const AISettingsSection: React.FC<AISettingsSectionProps> = ({
     loadModel,
     clearError,
     modelMode,
+    loadingProgress,
   } = useLLMService();
 
   const [selectedModelId, setSelectedModelId] = useState<string>("tinyllama");
@@ -113,7 +114,11 @@ export const AISettingsSection: React.FC<AISettingsSectionProps> = ({
                 className="flex items-center space-x-1"
               >
                 {getStatusIcon()}
-                <span>{t(`ai.model.states.${modelStatus}`)}</span>
+                <span>
+                  {modelStatus === "loading" || isLoading
+                    ? `${t(`ai.model.states.${modelStatus}`)} ${loadingProgress}%`
+                    : t(`ai.model.states.${modelStatus}`)}
+                </span>
               </Badge>
             </div>
 
@@ -203,8 +208,8 @@ export const AISettingsSection: React.FC<AISettingsSectionProps> = ({
                 <Download className="h-4 w-4" />
               )}
               <span>
-                {isLoading
-                  ? t("ai.settings.loading_model")
+                {isLoading || modelStatus === "loading"
+                  ? `${t("ai.settings.loading_model")} ${loadingProgress}%`
                   : t("ai.settings.load_model")}
               </span>
             </Button>

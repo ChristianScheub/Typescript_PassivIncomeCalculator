@@ -346,7 +346,8 @@ export const calculateFinancialSummary = createAsyncThunk(
       assets,
       payload.liabilities,
       payload.expenses,
-      payload.income
+      payload.income,
+      assetDefinitions  // Add missing assetDefinitions parameter
     );
     
     return {

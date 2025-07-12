@@ -14,7 +14,7 @@ export class ModelManager {
   /**
    * Lädt ein WebLLM Modell (z.B. TinyLlama)
    */
-  async loadModel(modelId: string, _modelName?: string): Promise<void> {
+  async loadModel(modelId: string, _modelName?: string, progressCallback?: (progress: number) => void): Promise<void> {
     try {
       // Verhindere parallele Ladevorgänge
       if (this.loadingPromise) {
@@ -22,7 +22,7 @@ export class ModelManager {
         return;
       }
 
-      this.loadingPromise = this._loadModelInternal(modelId);
+      this.loadingPromise = this._loadModelInternal(modelId, progressCallback);
       await this.loadingPromise;
       this.loadingPromise = null;
     } catch (error) {
@@ -31,7 +31,7 @@ export class ModelManager {
     }
   }
 
-  private async _loadModelInternal(modelId: string): Promise<void> {
+  private async _loadModelInternal(modelId: string, progressCallback?: (progress: number) => void): Promise<void> {
     Logger.infoService(`ModelManager: Loading model ${modelId}...`);
 
     try {
@@ -45,7 +45,14 @@ export class ModelManager {
       const engineConfig = {
         // Konfiguration für größeren Context Window
         initProgressCallback: (report: any) => {
-          Logger.infoService(`ModelManager: Loading progress: ${report.progress}%`);
+          // Convert progress from decimal to percentage and round
+          const progressPercentage = report.progress;
+          Logger.infoService(`ModelManager: Loading progress: ${progressPercentage * 100}%`);
+          
+          // Call the progress callback if provided
+          if (progressCallback) {
+            progressCallback(progressPercentage);
+          }
         }
       };
 
