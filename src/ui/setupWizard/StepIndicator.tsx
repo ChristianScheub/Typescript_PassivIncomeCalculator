@@ -22,7 +22,6 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' 
         {progress.stepsConfig.map((stepConfig, index) => {
           const isActive = index === progress.currentStepIndex;
           const isCompleted = index < progress.currentStepIndex;
-          const isUpcoming = index > progress.currentStepIndex;
           
           return (
             <div key={stepConfig.step} className="flex flex-col items-center flex-1">

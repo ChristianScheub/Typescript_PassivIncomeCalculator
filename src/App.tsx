@@ -9,6 +9,7 @@ import DesktopLayout from './layouts/DesktopLayout';
 // Pages
 import DashboardContainer from './container/dashboard/DashboardContainer';
 import SettingsContainer from './container/settings/SettingsContainer';
+import SetupWizardContainer from './container/setupWizard/SetupWizardContainer';
 
 // Context
 import { AppProvider } from './context/AppContext';
@@ -50,6 +51,7 @@ const AppContent = () => {
         <Route path="/portfolio" element={<PortfolioHubContainer />} />
         <Route path="/analytics" element={<AnalyticsHubContainer />} />
         <Route path="/settings" element={<SettingsContainer />} />
+        <Route path="/setup" element={<SetupWizardContainer />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

@@ -11,6 +11,8 @@ export default defineConfig({
       '@/types': path.resolve(__dirname, './src/types/index'),
       '@service': path.resolve(__dirname, './src/service'),
       '@ui': path.resolve(__dirname, './src/ui'),
+      '@view': path.resolve(__dirname, './src/view'),
+      '@container': path.resolve(__dirname, './src/container'),
     },
   },
   optimizeDeps: {
