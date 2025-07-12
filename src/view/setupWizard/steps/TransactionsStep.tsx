@@ -54,7 +54,17 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
 
   const getAssetName = (assetId: string) => {
     const asset = availableAssets.find(a => ('id' in a ? a.id : a.symbol) === assetId);
-    return asset ? `${'symbol' in asset ? asset.symbol : assetId} - ${'name' in asset ? asset.name : 'Custom Asset'}` : assetId;
+    if (!asset) return assetId;
+    
+    const symbol = 'symbol' in asset ? asset.symbol : assetId;
+    const name = 'name' in asset ? asset.name : 'Custom Asset';
+    return `${symbol} - ${name}`;
+  };
+
+  const getTransactionTypeColor = (type: string) => {
+    if (type === 'buy') return 'bg-green-100 text-green-800';
+    if (type === 'sell') return 'bg-red-100 text-red-800';
+    return 'bg-blue-100 text-blue-800';
   };
 
   const hasAssets = availableAssets.length > 0;
@@ -170,16 +180,12 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                 <div className="space-y-4">
                   <h5 className="font-medium text-gray-900">Your Transactions ({stepData.transactions.length})</h5>
                   <div className="space-y-3">
-                    {stepData.transactions.map((transaction, index) => (
-                      <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                    {stepData.transactions.map((transaction) => (
+                      <div key={`${transaction.assetId}-${transaction.date}-${transaction.amount}`} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                         <div className="flex-1">
                           <div className="flex items-center space-x-4">
                             <span className="font-medium text-gray-900">{getAssetName(transaction.assetId)}</span>
-                            <span className={`px-2 py-1 text-xs font-medium rounded ${
-                              transaction.type === 'buy' ? 'bg-green-100 text-green-800' :
-                              transaction.type === 'sell' ? 'bg-red-100 text-red-800' :
-                              'bg-blue-100 text-blue-800'
-                            }`}>
+                            <span className={`px-2 py-1 text-xs font-medium rounded ${getTransactionTypeColor(transaction.type)}`}>
                               {transaction.type.toUpperCase()}
                             </span>
                             <span className="text-gray-600">${transaction.amount.toFixed(2)}</span>
@@ -225,8 +231,9 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Asset</label>
+                      <label htmlFor="transaction-asset" className="block text-sm font-medium text-gray-700">Asset</label>
                       <select
+                        id="transaction-asset"
                         value={newTransaction.assetId}
                         onChange={(e) => setNewTransaction({ ...newTransaction, assetId: e.target.value })}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -243,8 +250,9 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Type</label>
+                      <label htmlFor="transaction-type" className="block text-sm font-medium text-gray-700">Type</label>
                       <select
+                        id="transaction-type"
                         value={newTransaction.type}
                         onChange={(e) => setNewTransaction({ ...newTransaction, type: e.target.value as 'buy' | 'sell' | 'dividend' })}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -256,8 +264,9 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Amount ($)</label>
+                      <label htmlFor="transaction-amount" className="block text-sm font-medium text-gray-700">Amount ($)</label>
                       <input
+                        id="transaction-amount"
                         type="number"
                         step="0.01"
                         value={newTransaction.amount || ''}
@@ -267,8 +276,9 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Quantity (Optional)</label>
+                      <label htmlFor="transaction-quantity" className="block text-sm font-medium text-gray-700">Quantity (Optional)</label>
                       <input
+                        id="transaction-quantity"
                         type="number"
                         step="0.01"
                         value={newTransaction.quantity || ''}
@@ -278,8 +288,9 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Date</label>
+                      <label htmlFor="transaction-date" className="block text-sm font-medium text-gray-700">Date</label>
                       <input
+                        id="transaction-date"
                         type="date"
                         value={newTransaction.date}
                         onChange={(e) => setNewTransaction({ ...newTransaction, date: e.target.value })}
@@ -289,8 +300,9 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                    <label htmlFor="transaction-notes" className="block text-sm font-medium text-gray-700">Notes (Optional)</label>
                     <textarea
+                      id="transaction-notes"
                       value={newTransaction.notes}
                       onChange={(e) => setNewTransaction({ ...newTransaction, notes: e.target.value })}
                       rows={2}

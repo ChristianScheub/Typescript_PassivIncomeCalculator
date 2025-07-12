@@ -197,8 +197,8 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
               {/* Custom Assets List */}
               {stepData.customAssets.length > 0 && (
                 <div className="space-y-3 mb-6">
-                  {stepData.customAssets.map((asset, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                  {stepData.customAssets.map((asset) => (
+                    <div key={`${asset.symbol}-${asset.name}`} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
                       <div>
                         <h5 className="font-medium text-gray-900">{asset.symbol} - {asset.name}</h5>
                         <div className="flex items-center space-x-2 mt-1">
@@ -239,8 +239,9 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Name</label>
+                      <label htmlFor="asset-name" className="block text-sm font-medium text-gray-700">Name</label>
                       <input
+                        id="asset-name"
                         type="text"
                         value={newCustomAsset.name}
                         onChange={(e) => setNewCustomAsset({ ...newCustomAsset, name: e.target.value })}
@@ -250,8 +251,9 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Symbol</label>
+                      <label htmlFor="asset-symbol" className="block text-sm font-medium text-gray-700">Symbol</label>
                       <input
+                        id="asset-symbol"
                         type="text"
                         value={newCustomAsset.symbol}
                         onChange={(e) => setNewCustomAsset({ ...newCustomAsset, symbol: e.target.value.toUpperCase() })}
@@ -261,8 +263,9 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Type</label>
+                      <label htmlFor="asset-type" className="block text-sm font-medium text-gray-700">Type</label>
                       <select
+                        id="asset-type"
                         value={newCustomAsset.type}
                         onChange={(e) => setNewCustomAsset({ ...newCustomAsset, type: e.target.value as 'stock' | 'etf' | 'bond' | 'crypto' | 'other' })}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -276,8 +279,9 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Category</label>
+                      <label htmlFor="asset-category" className="block text-sm font-medium text-gray-700">Category</label>
                       <input
+                        id="asset-category"
                         type="text"
                         value={newCustomAsset.category}
                         onChange={(e) => setNewCustomAsset({ ...newCustomAsset, category: e.target.value })}
@@ -288,8 +292,9 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Description (Optional)</label>
+                    <label htmlFor="asset-description" className="block text-sm font-medium text-gray-700">Description (Optional)</label>
                     <textarea
+                      id="asset-description"
                       value={newCustomAsset.description}
                       onChange={(e) => setNewCustomAsset({ ...newCustomAsset, description: e.target.value })}
                       rows={2}

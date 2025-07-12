@@ -149,8 +149,8 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
                   <div>
                     <p className="text-gray-600">Custom Assets:</p>
                     <ul className="list-disc list-inside text-gray-800">
-                      {stepData.assetDefinitions.customAssets.map((asset, index) => (
-                        <li key={index}>{asset.symbol} - {asset.name}</li>
+                      {stepData.assetDefinitions.customAssets.map((asset) => (
+                        <li key={`${asset.symbol}-${asset.name}`}>{asset.symbol} - {asset.name}</li>
                       ))}
                     </ul>
                   </div>

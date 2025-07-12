@@ -2,8 +2,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import SetupWizardView from '@view/setupWizard/SetupWizardView';
-import setupWizardService from '@service/application/setupWizard';
-import { stepValidationService } from '@service/application/setupWizard';
+import setupWizardService, { stepValidationService } from '@service/application/setupWizard';
 import {
   goToNextStep,
   goToPreviousStep,

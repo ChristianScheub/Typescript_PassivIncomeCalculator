@@ -84,8 +84,8 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
             <div className="space-y-4">
               <h5 className="font-medium text-gray-900">Your Liabilities ({stepData.liabilities.length})</h5>
               <div className="space-y-3">
-                {stepData.liabilities.map((liability, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+                {stepData.liabilities.map((liability) => (
+                  <div key={`${liability.name}-${liability.type}`} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h6 className="font-medium text-gray-900">{liability.name}</h6>
@@ -165,8 +165,9 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">Name *</label>
+                  <label htmlFor="liability-name" className="block text-sm font-medium text-gray-700">Name *</label>
                   <input
+                    id="liability-name"
                     type="text"
                     value={newLiability.name}
                     onChange={(e) => setNewLiability({ ...newLiability, name: e.target.value })}
@@ -176,8 +177,9 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Total Amount Owed ($) *</label>
+                  <label htmlFor="liability-amount" className="block text-sm font-medium text-gray-700">Total Amount Owed ($) *</label>
                   <input
+                    id="liability-amount"
                     type="number"
                     step="0.01"
                     value={newLiability.amount || ''}
@@ -187,8 +189,9 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Interest Rate (% per year)</label>
+                  <label htmlFor="liability-interest-rate" className="block text-sm font-medium text-gray-700">Interest Rate (% per year)</label>
                   <input
+                    id="liability-interest-rate"
                     type="number"
                     step="0.01"
                     value={newLiability.interestRate || ''}
@@ -199,8 +202,9 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Monthly Payment ($)</label>
+                  <label htmlFor="liability-monthly-payment" className="block text-sm font-medium text-gray-700">Monthly Payment ($)</label>
                   <input
+                    id="liability-monthly-payment"
                     type="number"
                     step="0.01"
                     value={newLiability.monthlyPayment || ''}
@@ -211,8 +215,9 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700">Description (Optional)</label>
+                <label htmlFor="liability-description" className="block text-sm font-medium text-gray-700">Description (Optional)</label>
                 <textarea
+                  id="liability-description"
                   value={newLiability.description}
                   onChange={(e) => setNewLiability({ ...newLiability, description: e.target.value })}
                   rows={2}

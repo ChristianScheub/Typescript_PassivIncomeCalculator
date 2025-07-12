@@ -95,7 +95,7 @@ export const getNavigationOptions = (
                      stepData.assetDefinitions.customAssets.length > 0;
     return {
       canGoBack,
-      canGoNext: hasAssets ? canGoNext : canGoNext,
+      canGoNext: hasAssets ? canGoNext : true,
       canSkip: !hasAssets || canSkip,
       isRequired: hasAssets && isRequired
     };

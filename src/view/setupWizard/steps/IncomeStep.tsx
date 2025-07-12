@@ -92,8 +92,8 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
             <div className="space-y-4">
               <h5 className="font-medium text-gray-900">Your Income Sources ({stepData.incomes.length})</h5>
               <div className="space-y-3">
-                {stepData.incomes.map((income, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+                {stepData.incomes.map((income) => (
+                  <div key={`${income.name}-${income.type}`} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center space-x-3 mb-2">
@@ -168,8 +168,9 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Source Name *</label>
+                  <label htmlFor="income-name" className="block text-sm font-medium text-gray-700">Source Name *</label>
                   <input
+                    id="income-name"
                     type="text"
                     value={newIncome.name}
                     onChange={(e) => setNewIncome({ ...newIncome, name: e.target.value })}
@@ -179,8 +180,9 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Income Type *</label>
+                  <label htmlFor="income-type" className="block text-sm font-medium text-gray-700">Income Type *</label>
                   <select
+                    id="income-type"
                     value={newIncome.type}
                     onChange={(e) => setNewIncome({ ...newIncome, type: e.target.value as 'salary' | 'freelance' | 'passive' | 'other' })}
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -193,8 +195,9 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Monthly Amount ($) *</label>
+                  <label htmlFor="income-monthly-amount" className="block text-sm font-medium text-gray-700">Monthly Amount ($) *</label>
                   <input
+                    id="income-monthly-amount"
                     type="number"
                     step="0.01"
                     value={newIncome.monthlyAmount || ''}
@@ -204,8 +207,9 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Annual Amount (calculated)</label>
+                  <label htmlFor="income-annual-amount" className="block text-sm font-medium text-gray-700">Annual Amount (calculated)</label>
                   <input
+                    id="income-annual-amount"
                     type="text"
                     value={`$${(newIncome.monthlyAmount * 12).toLocaleString()}`}
                     disabled
@@ -215,8 +219,9 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700">Description (Optional)</label>
+                <label htmlFor="income-description" className="block text-sm font-medium text-gray-700">Description (Optional)</label>
                 <textarea
+                  id="income-description"
                   value={newIncome.description}
                   onChange={(e) => setNewIncome({ ...newIncome, description: e.target.value })}
                   rows={2}

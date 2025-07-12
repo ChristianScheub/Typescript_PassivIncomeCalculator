@@ -7,6 +7,24 @@ interface StepIndicatorProps {
 }
 
 const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' }) => {
+  const getStepCircleClasses = (isCompleted: boolean, isActive: boolean) => {
+    if (isCompleted) return 'bg-green-500 text-white';
+    if (isActive) return 'bg-blue-600 text-white ring-4 ring-blue-200';
+    return 'bg-gray-300 text-gray-600';
+  };
+
+  const getStepLabelClasses = (isActive: boolean, isCompleted: boolean) => {
+    if (isActive) return 'text-blue-600';
+    if (isCompleted) return 'text-green-600';
+    return 'text-gray-500';
+  };
+
+  const getMobileStepClasses = (isCompleted: boolean, isActive: boolean) => {
+    if (isCompleted) return 'bg-green-500';
+    if (isActive) return 'bg-blue-600 scale-125';
+    return 'bg-gray-300';
+  };
+
   return (
     <div className={`w-full ${className}`}>
       {/* Progress Bar */}
@@ -30,12 +48,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' 
                 className={`
                   w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
                   transition-all duration-200
-                  ${isCompleted 
-                    ? 'bg-green-500 text-white' 
-                    : isActive 
-                    ? 'bg-blue-600 text-white ring-4 ring-blue-200' 
-                    : 'bg-gray-300 text-gray-600'
-                  }
+                  ${getStepCircleClasses(isCompleted, isActive)}
                 `}
               >
                 {isCompleted ? (
@@ -52,7 +65,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' 
                 <div 
                   className={`
                     text-xs font-medium
-                    ${isActive ? 'text-blue-600' : isCompleted ? 'text-green-600' : 'text-gray-500'}
+                    ${getStepLabelClasses(isActive, isCompleted)}
                   `}
                 >
                   {stepConfig.title}
@@ -91,12 +104,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' 
               key={stepConfig.step}
               className={`
                 w-3 h-3 rounded-full transition-all duration-200
-                ${isCompleted 
-                  ? 'bg-green-500' 
-                  : isActive 
-                  ? 'bg-blue-600 scale-125' 
-                  : 'bg-gray-300'
-                }
+                ${getMobileStepClasses(isCompleted, isActive)}
               `}
             />
           );
