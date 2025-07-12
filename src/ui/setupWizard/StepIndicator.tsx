@@ -17,8 +17,8 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' 
         ></div>
       </div>
       
-      {/* Step Indicators */}
-      <div className="flex justify-between items-center">
+      {/* Step Indicators - Mobile First Design */}
+      <div className="hidden sm:flex justify-between items-center">
         {progress.stepsConfig.map((stepConfig, index) => {
           const isActive = index === progress.currentStepIndex;
           const isCompleted = index < progress.currentStepIndex;
@@ -76,6 +76,29 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' 
                 />
               )}
             </div>
+          );
+        })}
+      </div>
+
+      {/* Mobile Step Indicator - Simpler Design */}
+      <div className="sm:hidden flex items-center justify-center space-x-2">
+        {progress.stepsConfig.map((stepConfig, index) => {
+          const isActive = index === progress.currentStepIndex;
+          const isCompleted = index < progress.currentStepIndex;
+          
+          return (
+            <div 
+              key={stepConfig.step}
+              className={`
+                w-3 h-3 rounded-full transition-all duration-200
+                ${isCompleted 
+                  ? 'bg-green-500' 
+                  : isActive 
+                  ? 'bg-blue-600 scale-125' 
+                  : 'bg-gray-300'
+                }
+              `}
+            />
           );
         })}
       </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import SetupWizardLayout from '@ui/setupWizard/SetupWizardLayout';
-import { WizardStep, WizardProgress, StepNavigationOptions, StepDataCollection, AssetTemplate, CustomAssetDefinition, SimplifiedTransaction, SimplifiedLiability, SimplifiedIncome, ImportValidationResult } from '@/types/domains/setupWizard';
+import { WizardProgress, StepNavigationOptions, StepDataCollection, AssetTemplate, CustomAssetDefinition, SimplifiedTransaction, SimplifiedLiability, SimplifiedIncome, ImportValidationResult } from '@/types/domains/setupWizard';
+import { WizardStep } from '@/types/shared/base/enums';
 
 // Step Components
 import WelcomeStep from './steps/WelcomeStep';

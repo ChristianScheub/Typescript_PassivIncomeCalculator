@@ -1,5 +1,4 @@
 import { 
-  WizardStep, 
   StepDataCollection, 
   StepNavigationOptions,
   WizardProgress,
@@ -7,6 +6,7 @@ import {
   ImportValidationResult,
   AssetTemplate
 } from '@/types/domains/setupWizard';
+import { WizardStep } from '@/types/shared/base/enums';
 
 export interface ISetupWizardService {
   /**

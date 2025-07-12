@@ -1,8 +1,8 @@
 import { 
-  WizardStep, 
   StepDataCollection, 
   WizardValidationResult 
 } from '@/types/domains/setupWizard';
+import { WizardStep } from '@/types/shared/base/enums';
 
 export interface IStepValidationService {
   /**

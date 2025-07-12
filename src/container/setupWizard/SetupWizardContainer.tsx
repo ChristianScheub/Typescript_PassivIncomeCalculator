@@ -27,7 +27,8 @@ import {
   removeIncome
 } from '@/store/slices/ui/setupWizardSlice';
 import { showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/ui/snackbarSlice';
-import { WizardStep, ImportValidationResult } from '@/types/domains/setupWizard';
+import { ImportValidationResult } from '@/types/domains/setupWizard';
+import { WizardStep } from '@/types/shared/base/enums';
 
 const SetupWizardContainer: React.FC = () => {
   const navigate = useNavigate();

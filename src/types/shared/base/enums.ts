@@ -49,3 +49,13 @@ export enum StockAPIProvider {
 }
 
 export type DividendApiProvider = 'yahoo' | 'finnhub';
+
+// Setup Wizard related enums
+export enum WizardStep {
+  WELCOME = 'welcome',
+  ASSET_DEFINITIONS = 'asset_definitions',
+  TRANSACTIONS = 'transactions',
+  LIABILITIES = 'liabilities',
+  INCOME = 'income',
+  COMPLETION = 'completion'
+}

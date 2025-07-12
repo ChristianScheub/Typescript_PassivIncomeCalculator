@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { 
   SetupWizardState, 
-  WizardStep, 
   StepDataCollection,
   WelcomeStepData,
   AssetDefinitionsStepData,
@@ -14,6 +13,7 @@ import {
   SimplifiedLiability,
   SimplifiedIncome
 } from '@/types/domains/setupWizard';
+import { WizardStep } from '@/types/shared/base/enums';
 
 const initialStepData: StepDataCollection = {
   welcome: {

@@ -1,3 +1,9 @@
+/**
+ * Setup Wizard types and interfaces
+ */
+
+import { WizardStep } from '@/types/shared/base/enums';
+
 export interface SetupWizardState {
   currentStep: WizardStep;
   completedSteps: WizardStep[];
@@ -5,15 +11,6 @@ export interface SetupWizardState {
   isCompleted: boolean;
   hasUnsavedChanges: boolean;
   stepData: StepDataCollection;
-}
-
-export enum WizardStep {
-  WELCOME = 'welcome',
-  ASSET_DEFINITIONS = 'asset_definitions',
-  TRANSACTIONS = 'transactions',
-  LIABILITIES = 'liabilities',
-  INCOME = 'income',
-  COMPLETION = 'completion'
 }
 
 export interface StepDataCollection {
