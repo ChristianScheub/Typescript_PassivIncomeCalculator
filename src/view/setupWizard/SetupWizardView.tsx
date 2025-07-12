@@ -1,6 +1,6 @@
 import React from 'react';
 import SetupWizardLayout from '@ui/setupWizard/SetupWizardLayout';
-import { WizardProgress, StepNavigationOptions, StepDataCollection, AssetTemplate, CustomAssetDefinition, SimplifiedTransaction, SimplifiedLiability, SimplifiedIncome, ImportValidationResult } from '@/types/domains/setupWizard';
+import { WizardProgress, StepNavigationOptions, StepDataCollection, AssetTemplate, CustomAssetDefinition, SimplifiedTransaction, SimplifiedLiability, SimplifiedIncome, ImportValidationResult, WelcomeStepData, AssetDefinitionsStepData, TransactionsStepData, LiabilitiesStepData, IncomeStepData } from '@/types/domains/setupWizard';
 import { WizardStep } from '@/types/shared/base/enums';
 
 // Step Components
@@ -24,14 +24,14 @@ interface SetupWizardViewProps {
   stepData: StepDataCollection;
   
   // Welcome step props
-  onUpdateWelcomeStepData?: (data: Partial<any>) => void;
+  onUpdateWelcomeStepData?: (data: Partial<WelcomeStepData>) => void;
   onFileSelect?: (file: File, type: 'csv' | 'json') => void;
   onValidationResult?: (result: ImportValidationResult) => void;
   
   // Asset definitions step props
   availableTemplates?: AssetTemplate[];
   popularTemplates?: AssetTemplate[];
-  onUpdateAssetDefinitionsStepData?: (data: Partial<any>) => void;
+  onUpdateAssetDefinitionsStepData?: (data: Partial<AssetDefinitionsStepData>) => void;
   onAddTemplate?: (template: AssetTemplate) => void;
   onRemoveTemplate?: (templateId: string) => void;
   onAddCustomAsset?: (asset: CustomAssetDefinition) => void;
@@ -39,17 +39,17 @@ interface SetupWizardViewProps {
   
   // Transactions step props
   availableAssets?: (AssetTemplate | CustomAssetDefinition)[];
-  onUpdateTransactionsStepData?: (data: Partial<any>) => void;
+  onUpdateTransactionsStepData?: (data: Partial<TransactionsStepData>) => void;
   onAddTransaction?: (transaction: SimplifiedTransaction) => void;
   onRemoveTransaction?: (index: number) => void;
   
   // Liabilities step props
-  onUpdateLiabilitiesStepData?: (data: Partial<any>) => void;
+  onUpdateLiabilitiesStepData?: (data: Partial<LiabilitiesStepData>) => void;
   onAddLiability?: (liability: SimplifiedLiability) => void;
   onRemoveLiability?: (index: number) => void;
   
   // Income step props
-  onUpdateIncomeStepData?: (data: Partial<any>) => void;
+  onUpdateIncomeStepData?: (data: Partial<IncomeStepData>) => void;
   onAddIncome?: (income: SimplifiedIncome) => void;
   onRemoveIncome?: (index: number) => void;
   

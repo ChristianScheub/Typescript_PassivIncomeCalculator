@@ -246,7 +246,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                       <label className="block text-sm font-medium text-gray-700">Type</label>
                       <select
                         value={newTransaction.type}
-                        onChange={(e) => setNewTransaction({ ...newTransaction, type: e.target.value as any })}
+                        onChange={(e) => setNewTransaction({ ...newTransaction, type: e.target.value as 'buy' | 'sell' | 'dividend' })}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       >
                         <option value="buy">Buy</option>

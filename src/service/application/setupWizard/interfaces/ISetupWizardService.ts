@@ -42,7 +42,7 @@ export interface ISetupWizardService {
   /**
    * Validate imported data
    */
-  validateImportedData(data: any): ImportValidationResult;
+  validateImportedData(data: ImportDataResult['data']): ImportValidationResult;
   
   /**
    * Save wizard data to the main application state

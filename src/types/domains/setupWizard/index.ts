@@ -126,10 +126,10 @@ export interface StepConfig {
 export interface ImportDataResult {
   success: boolean;
   data?: {
-    assets?: any[];
-    transactions?: any[];
-    liabilities?: any[];
-    income?: any[];
+    assets?: (AssetTemplate | Record<string, unknown>)[];
+    transactions?: (SimplifiedTransaction | Record<string, unknown>)[];
+    liabilities?: (SimplifiedLiability | Record<string, unknown>)[];
+    income?: (SimplifiedIncome | Record<string, unknown>)[];
   };
   errors?: string[];
 }

@@ -290,7 +290,7 @@ export const importDataFromFile = async (file: File, type: 'csv' | 'json'): Prom
   }
 };
 
-export const validateImportedData = (data: any): ImportValidationResult => {
+export const validateImportedData = (data: ImportDataResult['data']): ImportValidationResult => {
   const warnings: string[] = [];
   const errors: string[] = [];
   
