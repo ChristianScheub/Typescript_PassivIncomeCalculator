@@ -30,8 +30,7 @@ export const getStepsConfiguration = (): StepConfig[] => {
       title: 'Transactions',
       description: 'Add your asset transactions.',
       isOptional: true,
-      isConditional: true,
-      conditionKey: 'assetDefinitions'
+      isConditional: false
     },
     {
       step: WizardStep.LIABILITIES,
@@ -88,18 +87,6 @@ export const getNavigationOptions = (
   const canGoNext = stepIndex < stepsConfig.length - 1;
   const canSkip = stepConfig?.isOptional ?? false;
   const isRequired = !stepConfig?.isOptional;
-  
-  // Special logic for conditional steps
-  if (step === WizardStep.TRANSACTIONS) {
-    const hasAssets = stepData.assetDefinitions.selectedTemplates.length > 0 || 
-                     stepData.assetDefinitions.customAssets.length > 0;
-    return {
-      canGoBack,
-      canGoNext: hasAssets ? canGoNext : true,
-      canSkip: !hasAssets || canSkip,
-      isRequired: hasAssets && isRequired
-    };
-  }
   
   return {
     canGoBack,

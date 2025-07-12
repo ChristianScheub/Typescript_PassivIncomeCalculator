@@ -54,7 +54,10 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
 
   const getAssetName = (assetId: string) => {
     const asset = availableAssets.find(a => ('id' in a ? a.id : a.symbol) === assetId);
-    if (!asset) return assetId;
+    if (!asset) {
+      // If no asset definition found, this might be a manually entered asset
+      return assetId;
+    }
     
     const symbol = 'symbol' in asset ? asset.symbol : assetId;
     const name = 'name' in asset ? asset.name : 'Custom Asset';
@@ -73,19 +76,20 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
     <div className="space-y-8">
       {/* No Assets Warning */}
       {!hasAssets && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
           <div className="flex">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              <svg className="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-yellow-800">
-                No Assets Defined
+              <h3 className="text-sm font-medium text-blue-800">
+                No Assets Defined Yet
               </h3>
-              <div className="mt-2 text-sm text-yellow-700">
-                <p>You need to define assets before adding transactions. Go back to the previous step to add some assets first.</p>
+              <div className="mt-2 text-sm text-blue-700">
+                <p>You can add transactions later once you've defined some assets, or you can add transactions now if you already know your asset symbols/names.</p>
+                <p className="mt-2"><strong>Tip:</strong> You can go back to the previous step to add assets first, or skip this step and return to it later.</p>
               </div>
             </div>
           </div>
@@ -232,21 +236,37 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="transaction-asset" className="block text-sm font-medium text-gray-700">Asset</label>
-                      <select
-                        id="transaction-asset"
-                        value={newTransaction.assetId}
-                        onChange={(e) => setNewTransaction({ ...newTransaction, assetId: e.target.value })}
-                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                      >
-                        <option value="">Select an asset</option>
-                        {availableAssets.map((asset) => {
-                          const id = 'id' in asset ? asset.id : asset.symbol;
-                          const display = `${asset.symbol} - ${asset.name}`;
-                          return (
-                            <option key={id} value={id}>{display}</option>
-                          );
-                        })}
-                      </select>
+                      {hasAssets ? (
+                        <select
+                          id="transaction-asset"
+                          value={newTransaction.assetId}
+                          onChange={(e) => setNewTransaction({ ...newTransaction, assetId: e.target.value })}
+                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        >
+                          <option value="">Select an asset</option>
+                          {availableAssets.map((asset) => {
+                            const id = 'id' in asset ? asset.id : asset.symbol;
+                            const display = `${asset.symbol} - ${asset.name}`;
+                            return (
+                              <option key={id} value={id}>{display}</option>
+                            );
+                          })}
+                        </select>
+                      ) : (
+                        <input
+                          id="transaction-asset"
+                          type="text"
+                          placeholder="Enter asset symbol (e.g., AAPL, MSFT)"
+                          value={newTransaction.assetId}
+                          onChange={(e) => setNewTransaction({ ...newTransaction, assetId: e.target.value })}
+                          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        />
+                      )}
+                      {!hasAssets && (
+                        <p className="mt-1 text-xs text-gray-500">
+                          Enter the asset symbol or identifier for your transaction
+                        </p>
+                      )}
                     </div>
                     
                     <div>

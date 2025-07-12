@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import SetupWizardView from '@view/setupWizard/SetupWizardView';
 import setupWizardService, { stepValidationService } from '@service/application/setupWizard';
+import SetupWizardStateService from '@service/shared/utilities/setupWizardService';
 import {
   goToNextStep,
   goToPreviousStep,
@@ -140,6 +141,10 @@ const SetupWizardContainer: React.FC = () => {
         
         if (saveResult) {
           dispatch(completeWizard());
+          
+          // Mark setup as completed in localStorage
+          SetupWizardStateService.markSetupCompleted();
+          
           dispatch(showSuccessSnackbar('Setup completed successfully!'));
           navigate('/'); // Navigate to dashboard
         } else {
