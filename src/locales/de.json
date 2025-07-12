@@ -1639,5 +1639,261 @@
         "error": "Fehler"
       }
     }
+  },
+  "setupWizard": {
+    "general": {
+      "title": "Setup-Assistent",
+      "subtitle": "Lass uns deinen Passiveinkommen-Rechner einrichten",
+      "unknownStep": "Unbekannter Schritt",
+      "navigation": {
+        "back": "Zurück",
+        "next": "Weiter",
+        "skip": "Überspringen",
+        "complete": "Setup abschließen"
+      },
+      "steps": {
+        "welcome": "Willkommen",
+        "assetDefinitions": "Asset-Definitionen",
+        "transactions": "Transaktionen",
+        "liabilities": "Verbindlichkeiten",
+        "income": "Einkommensquellen",
+        "completion": "Setup abschließen"
+      },
+      "stepStatus": {
+        "current": "Aktuell",
+        "completed": "Abgeschlossen",
+        "pending": "Ausstehend",
+        "optional": "Optional"
+      }
+    },
+    "welcome": {
+      "title": "Willkommen zu Ihrem Passiveinkommen-Rechner!",
+      "description": "Dieser Setup-Assistent hilft Ihnen bei der Konfiguration Ihres Passiveinkommen-Rechners. Wir führen Sie durch das Hinzufügen Ihrer Assets, Transaktionen und Finanzinformationen, um Ihnen den Einstieg in die Verfolgung Ihres Investmentportfolios und Ihrer passiven Einkommensströme zu erleichtern.",
+      "skip": {
+        "title": "Den gesamten Assistenten überspringen",
+        "description": "Sie können später alles manuell auf der Einstellungsseite konfigurieren."
+      },
+      "import": {
+        "question": "Haben Sie vorhandene Daten zum Importieren?",
+        "no": "Nein, ich fange neu an",
+        "yes": "Ja, ich habe Daten zum Importieren",
+        "guidelines": {
+          "title": "Import-Format-Richtlinien",
+          "csvFormat": "CSV-Format:",
+          "csvDescription": "Erste Zeile sollte Spaltenüberschriften enthalten",
+          "jsonFormat": "JSON-Format:",
+          "jsonDescription": "Sollte Arrays für Assets, Transaktionen, Verbindlichkeiten und Einkommen enthalten",
+          "fileSize": "Dateigröße:",
+          "fileSizeDescription": "Maximal 10MB pro Datei"
+        }
+      },
+      "nextSteps": {
+        "title": "Was kommt als Nächstes?",
+        "description": "Der Assistent führt Sie durch:",
+        "step1": "Einrichten Ihrer Asset-Definitionen (Aktien, ETFs, usw.)",
+        "step2": "Hinzufügen Ihrer Transaktionshistorie",
+        "step3": "Konfigurieren von Verbindlichkeiten und Schulden (optional)",
+        "step4": "Einrichten von Einkommensquellen (optional)",
+        "note": "Alle Schritte außer der Begrüßung sind optional und können übersprungen werden."
+      }
+    },
+    "assets": {
+      "title": "Asset-Definitionen",
+      "subtitle": "Definieren Sie Ihre Investitions-Assets und Vorlagen",
+      "popularAssets": {
+        "title": "Aus beliebten Assets wählen",
+        "subtitle": "Wählen Sie aus unseren vorkonfigurierten Asset-Vorlagen, um schnell zu beginnen.",
+        "selected": "Ausgewählte Assets",
+        "count": "{{count}} Asset(s) ausgewählt"
+      },
+      "customAssets": {
+        "title": "Benutzerdefiniertes Asset erstellen",
+        "subtitle": "Fügen Sie Ihre eigenen benutzerdefinierten Assets hinzu, die nicht in unseren Vorlagen enthalten sind.",
+        "form": {
+          "symbol": "Symbol",
+          "symbolPlaceholder": "z.B. AAPL",
+          "name": "Asset-Name",
+          "namePlaceholder": "z.B. Apple Inc.",
+          "type": "Asset-Typ",
+          "typePlaceholder": "Asset-Typ auswählen",
+          "sector": "Sektor",
+          "sectorPlaceholder": "z.B. Technologie",
+          "country": "Land",
+          "countryPlaceholder": "z.B. Vereinigte Staaten",
+          "description": "Beschreibung",
+          "descriptionPlaceholder": "Optionale Beschreibung..."
+        },
+        "addAsset": "Benutzerdefiniertes Asset hinzufügen"
+      },
+      "selectedAssets": {
+        "title": "Ihre ausgewählten Assets",
+        "count": "{{count}} Assets ausgewählt",
+        "noAssets": "Noch keine Assets ausgewählt",
+        "addMore": "Fügen Sie weitere Assets hinzu, um mit Ihrem Portfolio zu beginnen."
+      }
+    },
+    "transactions": {
+      "title": "Transaktionshistorie",
+      "subtitle": "Fügen Sie Ihre Investitionstransaktionen und Handelshistorie hinzu",
+      "noAssets": {
+        "title": "Keine Assets verfügbar",
+        "description": "Sie haben noch keine Assets ausgewählt. Sie können:",
+        "option1": "Zurückgehen und zuerst Assets auswählen",
+        "option2": "Ein benutzerdefiniertes Asset unten hinzufügen",
+        "option3": "Diesen Schritt überspringen und später Transaktionen hinzufügen"
+      },
+      "form": {
+        "asset": "Asset",
+        "assetPlaceholder": "Asset auswählen",
+        "customAsset": "Oder neues Asset erstellen:",
+        "customAssetPlaceholder": "Asset-Symbol eingeben (z.B. AAPL)",
+        "type": "Transaktionstyp",
+        "date": "Datum",
+        "quantity": "Menge",
+        "quantityPlaceholder": "Anzahl der Aktien/Einheiten",
+        "price": "Preis pro Aktie",
+        "pricePlaceholder": "Bezahlter Preis pro Einheit",
+        "fees": "Gebühren",
+        "feesPlaceholder": "Transaktionsgebühren (optional)",
+        "description": "Beschreibung",
+        "descriptionPlaceholder": "Optionale Transaktionsnotizen..."
+      },
+      "types": {
+        "BUY": "Kauf",
+        "SELL": "Verkauf"
+      },
+      "addTransaction": "Transaktion hinzufügen",
+      "list": {
+        "title": "Ihre Transaktionen",
+        "count": "{{count}} Transaktionen",
+        "noTransactions": "Noch keine Transaktionen hinzugefügt",
+        "headers": {
+          "date": "Datum",
+          "asset": "Asset", 
+          "type": "Typ",
+          "quantity": "Menge",
+          "price": "Preis",
+          "total": "Gesamt"
+        }
+      }
+    },
+    "liabilities": {
+      "title": "Verbindlichkeiten & Schulden",
+      "subtitle": "Verfolgen Sie Ihre Schulden und finanziellen Verpflichtungen",
+      "optional": "Dieser Schritt ist optional - Sie können Schulden später konfigurieren, falls erforderlich.",
+      "form": {
+        "name": "Name der Verbindlichkeit",
+        "namePlaceholder": "z.B. Hypothek, Autokredit",
+        "type": "Verbindlichkeitstyp",
+        "amount": "Gesamtbetrag",
+        "amountPlaceholder": "Gesamtschuldenbetrag",
+        "interestRate": "Zinssatz (%)",
+        "interestRatePlaceholder": "Jährlicher Zinssatz",
+        "monthlyPayment": "Monatliche Zahlung",
+        "monthlyPaymentPlaceholder": "Erforderliche monatliche Zahlung",
+        "description": "Beschreibung",
+        "descriptionPlaceholder": "Zusätzliche Details..."
+      },
+      "types": {
+        "MORTGAGE": "Hypothek",
+        "CAR_LOAN": "Autokredit",
+        "PERSONAL_LOAN": "Privatkredit",
+        "CREDIT_CARD": "Kreditkarte",
+        "STUDENT_LOAN": "Studienkredit",
+        "OTHER": "Andere"
+      },
+      "addLiability": "Verbindlichkeit hinzufügen",
+      "list": {
+        "title": "Ihre Verbindlichkeiten",
+        "count": "{{count}} Verbindlichkeiten",
+        "noLiabilities": "Noch keine Verbindlichkeiten hinzugefügt",
+        "totalDebt": "Gesamtschuld",
+        "monthlyPayments": "Monatliche Zahlungen"
+      }
+    },
+    "income": {
+      "title": "Einkommensquellen",
+      "subtitle": "Konfigurieren Sie Ihre Einkommensströme und Verdienstquellen",
+      "optional": "Dieser Schritt ist optional - Sie können später Einkommensquellen hinzufügen, falls erforderlich.",
+      "form": {
+        "name": "Name der Einkommensquelle",
+        "namePlaceholder": "z.B. Gehalt, Freelancing",
+        "type": "Einkommenstyp",
+        "monthlyAmount": "Monatlicher Betrag",
+        "monthlyAmountPlaceholder": "Durchschnittliches monatliches Einkommen",
+        "isPassive": "Ist das passives Einkommen?",
+        "isRecurring": "Ist das wiederkehrendes Einkommen?",
+        "description": "Beschreibung",
+        "descriptionPlaceholder": "Zusätzliche Details..."
+      },
+      "types": {
+        "SALARY": "Gehalt",
+        "FREELANCE": "Freelancing",
+        "BUSINESS": "Geschäft",
+        "INVESTMENT": "Investition",
+        "RENTAL": "Miete",
+        "PENSION": "Rente",
+        "OTHER": "Andere"
+      },
+      "addIncome": "Einkommensquelle hinzufügen",
+      "list": {
+        "title": "Ihre Einkommensquellen",
+        "count": "{{count}} Einkommensquellen",
+        "noIncome": "Noch keine Einkommensquellen hinzugefügt",
+        "monthlyAmount": "Monatlicher Betrag",
+        "annualAmount": "Jährlicher Betrag",
+        "totalMonthly": "Gesamtes monatliches Einkommen"
+      }
+    },
+    "completion": {
+      "title": "Setup abgeschlossen!",
+      "subtitle": "Ihr Passiveinkommen-Rechner ist jetzt konfiguriert und einsatzbereit.",
+      "summary": {
+        "title": "Setup-Zusammenfassung",
+        "assets": "Assets konfiguriert",
+        "transactions": "Transaktionen hinzugefügt", 
+        "liabilities": "Verbindlichkeiten verfolgt",
+        "income": "Einkommensquellen",
+        "totalPortfolioValue": "Gesamtportfoliowert",
+        "monthlyIncome": "Monatliches Einkommen",
+        "monthlyExpenses": "Monatliche Schuldenzahlungen"
+      },
+      "nextSteps": {
+        "title": "Was kommt als Nächstes?",
+        "step1": "Erkunden Sie Ihr Dashboard für einen Überblick über Ihre Finanzen",
+        "step2": "Fügen Sie weitere Transaktionen hinzu, wenn Sie Investitionen tätigen",
+        "step3": "Nutzen Sie den Analytics-Bereich, um Ihren Fortschritt zu verfolgen",
+        "step4": "Richten Sie finanzielle Ziele und Meilensteine ein"
+      },
+      "actions": {
+        "goToDashboard": "Zum Dashboard gehen",
+        "exploreFeatures": "Funktionen erkunden"
+      },
+      "motivation": "Herzlichen Glückwunsch! Sie haben einen wichtigen Schritt in Richtung finanzieller Unabhängigkeit gemacht. Ihr Passiveinkommen-Rechner ist jetzt bereit, Ihnen beim Verfolgen und Wachsen Ihres Vermögens zu helfen."
+    },
+    "fileImport": {
+      "title": "Daten importieren",
+      "dragDrop": "Dateien hier hinziehen und ablegen",
+      "or": "oder",
+      "clickToSelect": "klicken, um Dateien auszuwählen",
+      "supportedFormats": "Unterstützte Formate",
+      "maxFileSize": "Maximale Dateigröße",
+      "validating": "Datei wird validiert...",
+      "processing": "Daten werden verarbeitet...",
+      "success": "Datei erfolgreich verarbeitet!",
+      "error": "Fehler beim Verarbeiten der Datei",
+      "validation": {
+        "invalidFormat": "Ungültiges Dateiformat",
+        "fileTooLarge": "Dateigröße überschreitet Limit",
+        "invalidData": "Ungültige Datenstruktur",
+        "missingColumns": "Fehlende erforderliche Spalten"
+      }
+    },
+    "progress": {
+      "saving": "Speichern...",
+      "saved": "Gespeichert!",
+      "step": "Schritt {{current}} von {{total}}",
+      "completion": "{{percent}}% abgeschlossen"
+    }
   }
 }

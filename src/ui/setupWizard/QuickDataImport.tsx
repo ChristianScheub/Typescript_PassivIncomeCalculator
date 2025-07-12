@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ImportValidationResult } from '@/types/domains/setupWizard';
 
 interface QuickDataImportProps {
@@ -16,6 +17,7 @@ const QuickDataImport: React.FC<QuickDataImportProps> = ({
   maxFileSize = 10,
   className = ''
 }) => {
+  const { t } = useTranslation();
   const [isDragOver, setIsDragOver] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [importType, setImportType] = useState<'csv' | 'json'>('csv');
@@ -26,7 +28,7 @@ const QuickDataImport: React.FC<QuickDataImportProps> = ({
       const validationResult: ImportValidationResult = {
         isValid: false,
         warnings: [],
-        errors: [`File size exceeds ${maxFileSize}MB limit`]
+        errors: [t('setupWizard.fileImport.validation.fileTooLarge')]
       };
       onValidationResult?.(validationResult);
       return;
@@ -179,10 +181,10 @@ const QuickDataImport: React.FC<QuickDataImportProps> = ({
             
             <div>
               <p className="text-base sm:text-lg font-medium text-gray-900 mb-2">
-                Import Your Data
+                {t('setupWizard.fileImport.title')}
               </p>
               <p className="text-sm text-gray-600 mb-4">
-                Drag and drop your file here, or click to browse
+                {t('setupWizard.fileImport.dragDrop')} {t('setupWizard.fileImport.or')} {t('setupWizard.fileImport.clickToSelect')}
               </p>
             </div>
 

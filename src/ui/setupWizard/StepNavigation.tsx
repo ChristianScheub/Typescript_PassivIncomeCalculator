@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StepNavigationOptions } from '@/types/domains/setupWizard';
 
 interface StepNavigationProps {
@@ -19,11 +20,16 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
   onBack,
   onSkip,
   isLoading = false,
-  nextButtonText = 'Next',
-  backButtonText = 'Back',
-  skipButtonText = 'Skip',
+  nextButtonText,
+  backButtonText,
+  skipButtonText,
   className = ''
 }) => {
+  const { t } = useTranslation();
+  
+  const defaultNextText = nextButtonText || t('setupWizard.general.navigation.next');
+  const defaultBackText = backButtonText || t('setupWizard.general.navigation.back');
+  const defaultSkipText = skipButtonText || t('setupWizard.general.navigation.skip');
   return (
     <div className={`pt-6 border-t border-gray-200 ${className}`}>
       {/* Mobile First Layout */}
@@ -41,7 +47,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
               <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              {backButtonText}
+              {defaultBackText}
             </button>
           ) : (
             <div className="hidden sm:block"></div>
@@ -57,7 +63,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
               disabled={isLoading}
               className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-center"
             >
-              {skipButtonText}
+              {defaultSkipText}
             </button>
           )}
         </div>
@@ -81,7 +87,7 @@ const StepNavigation: React.FC<StepNavigationProps> = ({
                 </>
               ) : (
                 <>
-                  {nextButtonText}
+                  {defaultNextText}
                   <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>

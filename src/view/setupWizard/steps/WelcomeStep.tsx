@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import QuickDataImport from '@ui/setupWizard/QuickDataImport';
 import { WelcomeStepData, ImportValidationResult } from '@/types/domains/setupWizard';
 
@@ -15,6 +16,8 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({
   onFileSelect,
   onValidationResult
 }) => {
+  const { t } = useTranslation();
+  
   const handleSkipWizardChange = (skipWizard: boolean) => {
     onUpdateStepData({ skipWizard });
   };
@@ -37,13 +40,11 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({
         </div>
         
         <h3 className="text-lg font-medium text-gray-900 mb-4">
-          Welcome to Your Passive Income Calculator!
+          {t('setupWizard.welcome.title')}
         </h3>
         
         <p className="text-gray-600 max-w-2xl mx-auto">
-          This setup wizard will help you configure your passive income calculator. 
-          We'll guide you through adding your assets, transactions, and financial information 
-          to get you started with tracking your investment portfolio and passive income streams.
+          {t('setupWizard.welcome.description')}
         </p>
       </div>
 
@@ -61,10 +62,10 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({
           </div>
           <div className="ml-3 text-sm">
             <label htmlFor="skip-wizard" className="font-medium text-gray-700">
-              Skip the entire wizard
+              {t('setupWizard.welcome.skip.title')}
             </label>
             <p className="text-gray-500">
-              You can configure everything manually later from the settings page.
+              {t('setupWizard.welcome.skip.description')}
             </p>
           </div>
         </div>
@@ -75,7 +76,7 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({
           {/* Data Import Option */}
           <div className="space-y-4">
             <h4 className="text-lg font-medium text-gray-900">
-              Do you have existing data to import?
+              {t('setupWizard.welcome.import.question')}
             </h4>
             
             <div className="space-y-3">
@@ -89,7 +90,7 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({
                   className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
                 />
                 <label htmlFor="import-no" className="ml-3 block text-sm font-medium text-gray-700">
-                  No, I'll start fresh
+                  {t('setupWizard.welcome.import.no')}
                 </label>
               </div>
               
@@ -103,7 +104,7 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({
                   className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
                 />
                 <label htmlFor="import-yes" className="ml-3 block text-sm font-medium text-gray-700">
-                  Yes, I have data to import
+                  {t('setupWizard.welcome.import.yes')}
                 </label>
               </div>
             </div>
@@ -120,11 +121,11 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({
               />
               
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h5 className="font-medium text-blue-900 mb-2">Import Format Guidelines</h5>
+                <h5 className="font-medium text-blue-900 mb-2">{t('setupWizard.welcome.import.guidelines.title')}</h5>
                 <div className="text-sm text-blue-800 space-y-1">
-                  <p><strong>CSV Format:</strong> First row should contain column headers</p>
-                  <p><strong>JSON Format:</strong> Should contain arrays for assets, transactions, liabilities, and income</p>
-                  <p><strong>File Size:</strong> Maximum 10MB per file</p>
+                  <p><strong>{t('setupWizard.welcome.import.guidelines.csvFormat')}</strong> {t('setupWizard.welcome.import.guidelines.csvDescription')}</p>
+                  <p><strong>{t('setupWizard.welcome.import.guidelines.jsonFormat')}</strong> {t('setupWizard.welcome.import.guidelines.jsonDescription')}</p>
+                  <p><strong>{t('setupWizard.welcome.import.guidelines.fileSize')}</strong> {t('setupWizard.welcome.import.guidelines.fileSizeDescription')}</p>
                 </div>
               </div>
             </div>
@@ -140,17 +141,17 @@ const WelcomeStep: React.FC<WelcomeStepProps> = ({
               </div>
               <div className="ml-3">
                 <h5 className="text-sm font-medium text-green-800">
-                  What's Next?
+                  {t('setupWizard.welcome.nextSteps.title')}
                 </h5>
                 <div className="mt-2 text-sm text-green-700">
-                  <p>The wizard will guide you through:</p>
+                  <p>{t('setupWizard.welcome.nextSteps.description')}</p>
                   <ul className="list-disc ml-5 mt-2 space-y-1">
-                    <li>Setting up your asset definitions (stocks, ETFs, etc.)</li>
-                    <li>Adding your transaction history</li>
-                    <li>Configuring liabilities and debts (optional)</li>
-                    <li>Setting up income sources (optional)</li>
+                    <li>{t('setupWizard.welcome.nextSteps.step1')}</li>
+                    <li>{t('setupWizard.welcome.nextSteps.step2')}</li>
+                    <li>{t('setupWizard.welcome.nextSteps.step3')}</li>
+                    <li>{t('setupWizard.welcome.nextSteps.step4')}</li>
                   </ul>
-                  <p className="mt-3">All steps except the welcome are optional and can be skipped.</p>
+                  <p className="mt-3">{t('setupWizard.welcome.nextSteps.note')}</p>
                 </div>
               </div>
             </div>

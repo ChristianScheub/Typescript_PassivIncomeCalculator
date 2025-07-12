@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import StepIndicator from './StepIndicator';
 import StepNavigation from './StepNavigation';
 import { WizardProgress, StepNavigationOptions } from '@/types/domains/setupWizard';
@@ -30,6 +31,7 @@ const SetupWizardLayout: React.FC<SetupWizardLayoutProps> = ({
   showProgressIndicator = true,
   className = ''
 }) => {
+  const { t } = useTranslation();
   const currentStepConfig = progress.stepsConfig[progress.currentStepIndex];
   const displayTitle = title || currentStepConfig?.title;
   const displayDescription = description || currentStepConfig?.description;
@@ -41,10 +43,10 @@ const SetupWizardLayout: React.FC<SetupWizardLayoutProps> = ({
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <div className="text-center">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-              Setup Wizard
+              {t('setupWizard.general.title')}
             </h1>
             <p className="text-gray-600 text-sm sm:text-base">
-              Let's get your passive income calculator set up
+              {t('setupWizard.general.subtitle')}
             </p>
           </div>
           

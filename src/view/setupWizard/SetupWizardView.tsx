@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import SetupWizardLayout from '@ui/setupWizard/SetupWizardLayout';
 import { WizardProgress, StepNavigationOptions, StepDataCollection, AssetTemplate, CustomAssetDefinition, SimplifiedTransaction, SimplifiedLiability, SimplifiedIncome, ImportValidationResult, WelcomeStepData, AssetDefinitionsStepData, TransactionsStepData, LiabilitiesStepData, IncomeStepData } from '@/types/domains/setupWizard';
 import { WizardStep } from '@/types/shared/base/enums';
@@ -94,6 +95,7 @@ const SetupWizardView: React.FC<SetupWizardViewProps> = ({
   // Completion step props
   onComplete = () => {}
 }) => {
+  const { t } = useTranslation();
   const renderCurrentStep = () => {
     switch (currentStep) {
       case WizardStep.WELCOME:
@@ -156,7 +158,7 @@ const SetupWizardView: React.FC<SetupWizardViewProps> = ({
           />
         );
       default:
-        return <div>Unknown step</div>;
+        return <div>{t('setupWizard.general.unknownStep')}</div>;
     }
   };
 
