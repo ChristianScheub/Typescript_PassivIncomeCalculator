@@ -22,7 +22,7 @@ export interface ISetupWizardService {
   /**
    * Get navigation options for a specific step
    */
-  getNavigationOptions(step: WizardStep, stepData: StepDataCollection): StepNavigationOptions;
+  getNavigationOptions(step: WizardStep, stepData?: StepDataCollection): StepNavigationOptions;
   
   /**
    * Get predefined asset templates

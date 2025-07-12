@@ -76,7 +76,8 @@ export const calculateProgress = (
 };
 
 export const getNavigationOptions = (
-  step: WizardStep
+  step: WizardStep,
+  stepData?: StepDataCollection
 ): StepNavigationOptions => {
   const stepsConfig = getStepsConfiguration();
   const stepConfig = stepsConfig.find(config => config.step === step);

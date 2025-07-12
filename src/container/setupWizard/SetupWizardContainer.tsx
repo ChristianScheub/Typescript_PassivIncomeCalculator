@@ -1,9 +1,9 @@
 import React, { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
+import { useSetupStatus } from '../../hooks/useSetupStatus';
 import SetupWizardView from '@view/setupWizard/SetupWizardView';
 import setupWizardService, { stepValidationService } from '@service/application/setupWizard';
-import SetupWizardStateService from '@service/shared/utilities/setupWizardService';
 import {
   goToNextStep,
   goToPreviousStep,
@@ -33,6 +33,7 @@ import { WizardStep } from '@/types/shared/base/enums';
 const SetupWizardContainer: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { markSetupCompleted } = useSetupStatus();
   
   // Redux state
   const {
@@ -46,7 +47,7 @@ const SetupWizardContainer: React.FC = () => {
 
   // Service data
   const progress = setupWizardService.calculateProgress(currentStep, completedSteps, skippedSteps);
-  const navigationOptions = setupWizardService.getNavigationOptions(currentStep);
+  const navigationOptions = setupWizardService.getNavigationOptions(currentStep, stepData);
   const availableTemplates = setupWizardService.getAssetTemplates();
   const popularTemplates = setupWizardService.getPopularAssetTemplates();
   
@@ -140,13 +141,16 @@ const SetupWizardContainer: React.FC = () => {
         const saveResult = await setupWizardService.saveWizardData(stepData);
         
         if (saveResult) {
+          // Mark setup as completed in localStorage using the hook FIRST
+          markSetupCompleted();
+          
           dispatch(completeWizard());
-          
-          // Mark setup as completed in localStorage
-          SetupWizardStateService.markSetupCompleted();
-          
           dispatch(showSuccessSnackbar('Setup completed successfully!'));
-          navigate('/'); // Navigate to dashboard
+          
+          // Navigate to dashboard with replace after a short delay to allow state updates
+          setTimeout(() => {
+            navigate('/', { replace: true });
+          }, 100);
         } else {
           dispatch(showErrorSnackbar('Failed to save configuration. Please try again.'));
         }
@@ -158,12 +162,12 @@ const SetupWizardContainer: React.FC = () => {
     } catch (error) {
       dispatch(showErrorSnackbar(`Failed to complete setup: ${error}`));
     }
-  }, [stepData, dispatch, navigate]);
+  }, [stepData, dispatch, navigate, markSetupCompleted]);
 
   // Redirect if wizard is already completed
   useEffect(() => {
     if (isCompleted) {
-      navigate('/');
+      navigate('/', { replace: true });
     }
   }, [isCompleted, navigate]);
 
