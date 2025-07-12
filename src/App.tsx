@@ -9,6 +9,7 @@ import DesktopLayout from './layouts/DesktopLayout';
 // Pages
 import DashboardContainer from './container/dashboard/DashboardContainer';
 import SettingsContainer from './container/settings/SettingsContainer';
+import SetupWizardContainer from './container/setupWizard/SetupWizardContainer';
 
 // Context
 import { AppProvider } from './context/AppContext';
@@ -23,6 +24,7 @@ import GlobalSnackbar from '@/ui/shared/GlobalSnackbar';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 import PortfolioHubContainer from './container/portfolioHub/portfolio/PortfolioHubContainer';
 import AnalyticsHubContainer from './container/analyticsHub/AnalyticsHubContainer';
+import SetupWizardStateService from '@/service/shared/utilities/setupWizardService';
 
 // Main App Content with initialization check
 const AppContent = () => {
@@ -40,16 +42,20 @@ const AppContent = () => {
     return <LoadingScreenAppStart />;
   }
 
+  // Check if this is a first-time user and redirect to setup
+  const isFirstTimeUser = SetupWizardStateService.isFirstTimeUser();
+  
   // Render the appropriate layout
   const Layout = isDesktop ? DesktopLayout : MobileLayout;
 
   return (
     <Layout>
       <Routes>
-        <Route path="/" element={<DashboardContainer />} />
+        <Route path="/" element={isFirstTimeUser ? <Navigate to="/setup" replace /> : <DashboardContainer />} />
         <Route path="/portfolio" element={<PortfolioHubContainer />} />
         <Route path="/analytics" element={<AnalyticsHubContainer />} />
         <Route path="/settings" element={<SettingsContainer />} />
+        <Route path="/setup" element={<SetupWizardContainer />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Layout>

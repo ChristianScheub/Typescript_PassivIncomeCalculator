@@ -1403,5 +1403,261 @@
       "how_it_works_3": "First load may take a few minutes",
       "how_it_works_4": "Model stays loaded until you refresh the page"
     }
+  },
+  "setupWizard": {
+    "general": {
+      "title": "Setup Wizard",
+      "subtitle": "Let's get your passive income calculator set up",
+      "unknownStep": "Unknown step",
+      "navigation": {
+        "back": "Back",
+        "next": "Next",
+        "skip": "Skip",
+        "complete": "Complete Setup"
+      },
+      "steps": {
+        "welcome": "Welcome",
+        "assetDefinitions": "Asset Definitions",
+        "transactions": "Transactions",
+        "liabilities": "Liabilities",
+        "income": "Income Sources",
+        "completion": "Complete Setup"
+      },
+      "stepStatus": {
+        "current": "Current",
+        "completed": "Completed",
+        "pending": "Pending",
+        "optional": "Optional"
+      }
+    },
+    "welcome": {
+      "title": "Welcome to Your Passive Income Calculator!",
+      "description": "This setup wizard will help you configure your passive income calculator. We'll guide you through adding your assets, transactions, and financial information to get you started with tracking your investment portfolio and passive income streams.",
+      "skip": {
+        "title": "Skip the entire wizard",
+        "description": "You can configure everything manually later from the settings page."
+      },
+      "import": {
+        "question": "Do you have existing data to import?",
+        "no": "No, I'll start fresh",
+        "yes": "Yes, I have data to import",
+        "guidelines": {
+          "title": "Import Format Guidelines",
+          "csvFormat": "CSV Format:",
+          "csvDescription": "First row should contain column headers",
+          "jsonFormat": "JSON Format:",
+          "jsonDescription": "Should contain arrays for assets, transactions, liabilities, and income",
+          "fileSize": "File Size:",
+          "fileSizeDescription": "Maximum 10MB per file"
+        }
+      },
+      "nextSteps": {
+        "title": "What's Next?",
+        "description": "The wizard will guide you through:",
+        "step1": "Setting up your asset definitions (stocks, ETFs, etc.)",
+        "step2": "Adding your transaction history",
+        "step3": "Configuring liabilities and debts (optional)",
+        "step4": "Setting up income sources (optional)",
+        "note": "All steps except the welcome are optional and can be skipped."
+      }
+    },
+    "assets": {
+      "title": "Asset Definitions",
+      "subtitle": "Define your investment assets and templates",
+      "popularAssets": {
+        "title": "Choose from Popular Assets",
+        "subtitle": "Select from our pre-configured asset templates to get started quickly.",
+        "selected": "Selected Assets",
+        "count": "{{count}} asset(s) selected"
+      },
+      "customAssets": {
+        "title": "Create Custom Asset",
+        "subtitle": "Add your own custom assets that aren't in our templates.",
+        "form": {
+          "symbol": "Symbol",
+          "symbolPlaceholder": "e.g., AAPL",
+          "name": "Asset Name",
+          "namePlaceholder": "e.g., Apple Inc.",
+          "type": "Asset Type",
+          "typePlaceholder": "Select asset type",
+          "sector": "Sector",
+          "sectorPlaceholder": "e.g., Technology",
+          "country": "Country",
+          "countryPlaceholder": "e.g., United States",
+          "description": "Description",
+          "descriptionPlaceholder": "Optional description..."
+        },
+        "addAsset": "Add Custom Asset"
+      },
+      "selectedAssets": {
+        "title": "Your Selected Assets",
+        "count": "{{count}} assets selected",
+        "noAssets": "No assets selected yet",
+        "addMore": "Add more assets to get started with your portfolio."
+      }
+    },
+    "transactions": {
+      "title": "Transaction History",
+      "subtitle": "Add your investment transactions and trading history",
+      "noAssets": {
+        "title": "No Assets Available",
+        "description": "You haven't selected any assets yet. You can:",
+        "option1": "Go back and select assets first",
+        "option2": "Add a custom asset below",
+        "option3": "Skip this step and add transactions later"
+      },
+      "form": {
+        "asset": "Asset",
+        "assetPlaceholder": "Select an asset",
+        "customAsset": "Or create new asset:",
+        "customAssetPlaceholder": "Enter asset symbol (e.g., AAPL)",
+        "type": "Transaction Type",
+        "date": "Date",
+        "quantity": "Quantity",
+        "quantityPlaceholder": "Number of shares/units",
+        "price": "Price per Share",
+        "pricePlaceholder": "Price paid per unit",
+        "fees": "Fees",
+        "feesPlaceholder": "Transaction fees (optional)",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional transaction notes..."
+      },
+      "types": {
+        "BUY": "Buy",
+        "SELL": "Sell"
+      },
+      "addTransaction": "Add Transaction",
+      "list": {
+        "title": "Your Transactions",
+        "count": "{{count}} transactions",
+        "noTransactions": "No transactions added yet",
+        "headers": {
+          "date": "Date",
+          "asset": "Asset", 
+          "type": "Type",
+          "quantity": "Quantity",
+          "price": "Price",
+          "total": "Total"
+        }
+      }
+    },
+    "liabilities": {
+      "title": "Liabilities & Debts",
+      "subtitle": "Track your debts and financial obligations",
+      "optional": "This step is optional - you can configure debts later if needed.",
+      "form": {
+        "name": "Liability Name",
+        "namePlaceholder": "e.g., Mortgage, Car Loan",
+        "type": "Liability Type",
+        "amount": "Total Amount",
+        "amountPlaceholder": "Total debt amount",
+        "interestRate": "Interest Rate (%)",
+        "interestRatePlaceholder": "Annual interest rate",
+        "monthlyPayment": "Monthly Payment",
+        "monthlyPaymentPlaceholder": "Required monthly payment",
+        "description": "Description",
+        "descriptionPlaceholder": "Additional details..."
+      },
+      "types": {
+        "MORTGAGE": "Mortgage",
+        "CAR_LOAN": "Car Loan",
+        "PERSONAL_LOAN": "Personal Loan",
+        "CREDIT_CARD": "Credit Card",
+        "STUDENT_LOAN": "Student Loan",
+        "OTHER": "Other"
+      },
+      "addLiability": "Add Liability",
+      "list": {
+        "title": "Your Liabilities",
+        "count": "{{count}} liabilities",
+        "noLiabilities": "No liabilities added yet",
+        "totalDebt": "Total Debt",
+        "monthlyPayments": "Monthly Payments"
+      }
+    },
+    "income": {
+      "title": "Income Sources",
+      "subtitle": "Configure your income streams and earning sources",
+      "optional": "This step is optional - you can add income sources later if needed.",
+      "form": {
+        "name": "Income Source Name",
+        "namePlaceholder": "e.g., Salary, Freelancing",
+        "type": "Income Type",
+        "monthlyAmount": "Monthly Amount",
+        "monthlyAmountPlaceholder": "Average monthly income",
+        "isPassive": "Is this passive income?",
+        "isRecurring": "Is this recurring income?",
+        "description": "Description",
+        "descriptionPlaceholder": "Additional details..."
+      },
+      "types": {
+        "SALARY": "Salary",
+        "FREELANCE": "Freelancing",
+        "BUSINESS": "Business",
+        "INVESTMENT": "Investment",
+        "RENTAL": "Rental",
+        "PENSION": "Pension",
+        "OTHER": "Other"
+      },
+      "addIncome": "Add Income Source",
+      "list": {
+        "title": "Your Income Sources",
+        "count": "{{count}} income sources",
+        "noIncome": "No income sources added yet",
+        "monthlyAmount": "Monthly Amount",
+        "annualAmount": "Annual Amount",
+        "totalMonthly": "Total Monthly Income"
+      }
+    },
+    "completion": {
+      "title": "Setup Complete!",
+      "subtitle": "Your passive income calculator is now configured and ready to use.",
+      "summary": {
+        "title": "Setup Summary",
+        "assets": "Assets Configured",
+        "transactions": "Transactions Added", 
+        "liabilities": "Liabilities Tracked",
+        "income": "Income Sources",
+        "totalPortfolioValue": "Total Portfolio Value",
+        "monthlyIncome": "Monthly Income",
+        "monthlyExpenses": "Monthly Debt Payments"
+      },
+      "nextSteps": {
+        "title": "What's Next?",
+        "step1": "Explore your dashboard for an overview of your finances",
+        "step2": "Add more transactions as you make investments",
+        "step3": "Use the analytics section to track your progress",
+        "step4": "Set up financial goals and milestones"
+      },
+      "actions": {
+        "goToDashboard": "Go to Dashboard",
+        "exploreFeatures": "Explore Features"
+      },
+      "motivation": "Congratulations! You've taken an important step towards financial independence. Your passive income calculator is now ready to help you track and grow your wealth."
+    },
+    "fileImport": {
+      "title": "Import Data",
+      "dragDrop": "Drag and drop files here",
+      "or": "or",
+      "clickToSelect": "click to select files",
+      "supportedFormats": "Supported formats",
+      "maxFileSize": "Maximum file size",
+      "validating": "Validating file...",
+      "processing": "Processing data...",
+      "success": "File processed successfully!",
+      "error": "Error processing file",
+      "validation": {
+        "invalidFormat": "Invalid file format",
+        "fileTooLarge": "File size exceeds limit",
+        "invalidData": "Invalid data structure",
+        "missingColumns": "Missing required columns"
+      }
+    },
+    "progress": {
+      "saving": "Saving...",
+      "saved": "Saved!",
+      "step": "Step {{current}} of {{total}}",
+      "completion": "{{percent}}% Complete"
+    }
   }
 }

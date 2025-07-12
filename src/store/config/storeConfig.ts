@@ -20,6 +20,7 @@ import {
 import {
   customAnalyticsReducer,
   snackbarReducer,
+  setupWizardReducer,
 } from '../slices/ui';
 
 // Unified config slice
@@ -45,6 +46,7 @@ const rootReducer = combineReducers({
   // UI slices
   customAnalytics: customAnalyticsReducer,
   snackbar: snackbarReducer,
+  setupWizard: setupWizardReducer,
   
   // REMOVED REDUNDANT SLICES:
   // calculatedData: calculatedDataReducer, // Moved to transactions.cache.history/.assetFocusData/.financialSummary

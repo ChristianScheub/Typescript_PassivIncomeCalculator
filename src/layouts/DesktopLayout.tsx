@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { NavLinkItem } from '@/ui/shared/navigation/NavLinkItem';
 import { Home, Briefcase, BarChart3, Settings, Sun, Moon } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
@@ -12,6 +12,21 @@ interface DesktopLayoutProps {
 const DesktopLayout: React.FC<DesktopLayoutProps> = ({ children }) => {
   const { theme, toggleTheme } = useAppContext();
   const { t } = useTranslation();
+  const location = useLocation();
+  
+  // Hide sidebar during setup wizard
+  const isSetupWizard = location.pathname === '/setup';
+
+  if (isSetupWizard) {
+    // Full-screen layout for setup wizard
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
+        <main className="container mx-auto px-6 py-8 overflow-x-hidden max-w-full">
+          {children}
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 overflow-x-hidden">
