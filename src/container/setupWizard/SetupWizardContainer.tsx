@@ -46,7 +46,7 @@ const SetupWizardContainer: React.FC = () => {
 
   // Service data
   const progress = setupWizardService.calculateProgress(currentStep, completedSteps, skippedSteps);
-  const navigationOptions = setupWizardService.getNavigationOptions(currentStep, stepData);
+  const navigationOptions = setupWizardService.getNavigationOptions(currentStep);
   const availableTemplates = setupWizardService.getAssetTemplates();
   const popularTemplates = setupWizardService.getPopularAssetTemplates();
   
