@@ -41,9 +41,7 @@ try {
       process.exit(0);
     }
   } else {
-    // If we can't parse the output, assume there are issues and fail
     console.log('\n❌ Could not parse lint output, assuming issues exist');
-    console.log('   Please ensure ESLint is properly configured');
     process.exit(1);
   }
 }
