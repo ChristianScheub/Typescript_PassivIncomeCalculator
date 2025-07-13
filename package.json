@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "npm run prebuild && tsc && vite build",
+    "prebuild": "npm run check-lint && npm run test",
     "lint": "eslint .",
+    "check-lint": "node scripts/check-lint.js",
+    "test": "node scripts/run-tests.js",
     "preview": "vite preview",
     "migrate": "node migrate-transaction-type.js",
     "type-check": "tsc --build --noEmit",
