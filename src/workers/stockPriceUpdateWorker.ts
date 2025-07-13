@@ -50,11 +50,11 @@ async function updateSingleStockPrice(definition: AssetDefinition): Promise<Stoc
         error: 'No price data received from API'
       };
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       symbol: definition.ticker || definition.name || 'unknown',
       success: false,
-      error: error?.message || String(error)
+      error: error instanceof Error ? error.message : String(error)
     };
   }
 }
@@ -83,24 +83,24 @@ self.onmessage = function (e: MessageEvent<WorkerRequest>) {
     if (e.data.type === 'updateBatch') {
       updateBatchStockPrices(e.data.definitions).then(results => {
         const response: WorkerResponse = { type: 'batchResult', results };
-        // @ts-ignore
+        // @ts-expect-error postMessage is available in worker context
         self.postMessage(response);
       }).catch(error => {
-        // @ts-ignore
-        self.postMessage({ type: 'error', error: error?.message || String(error) });
+        // @ts-expect-error postMessage is available in worker context
+        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
       });
     } else if (e.data.type === 'updateSingle') {
       updateSingleStockPrice(e.data.definition).then(result => {
         const response: WorkerResponse = { type: 'singleResult', result };
-        // @ts-ignore
+        // @ts-expect-error postMessage is available in worker context
         self.postMessage(response);
       }).catch(error => {
-        // @ts-ignore
-        self.postMessage({ type: 'error', error: error?.message || String(error) });
+        // @ts-expect-error postMessage is available in worker context
+        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
       });
     }
-  } catch (err: any) {
-    // @ts-ignore
-    self.postMessage({ type: 'error', error: err?.message || String(err) });
+  } catch (err: unknown) {
+    // @ts-expect-error postMessage is available in worker context
+    self.postMessage({ type: 'error', error: err instanceof Error ? err.message : String(err) });
   }
 };

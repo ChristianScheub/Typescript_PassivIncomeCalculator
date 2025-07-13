@@ -55,17 +55,27 @@ async function updateSingleDividendData(
     // Follow the same parsing logic as the Redux slice
     if (Array.isArray(result?.dividends)) {
       dividendHistory = result.dividends
-        .filter((div: any) => div.amount != null && (div.date || div.lastDividendDate))
-        .map((div: any) => ({
-          date: div.lastDividendDate
-            ? new Date(div.lastDividendDate).toISOString()
-            : div.date
-            ? new Date(div.date * 1000).toISOString()
-            : '',
-          amount: div.amount,
-          source: 'api' as const,
-          currency,
-        }))
+        .filter((div: unknown) => {
+          const dividend = div as { amount?: number; date?: unknown; lastDividendDate?: unknown };
+          return dividend.amount != null && (dividend.date || dividend.lastDividendDate);
+        })
+        .map((div: unknown) => {
+          const dividend = div as { 
+            amount: number; 
+            lastDividendDate?: string; 
+            date?: number 
+          };
+          return {
+            date: dividend.lastDividendDate
+              ? new Date(dividend.lastDividendDate).toISOString()
+              : dividend.date
+              ? new Date(dividend.date * 1000).toISOString()
+              : '',
+            amount: dividend.amount,
+            source: 'api' as const,
+            currency,
+          };
+        })
         .filter((entry: DividendHistoryEntry) => !!entry.date && entry.amount != null);
     } else {
       dividendHistory = parseDividendHistoryFromApiResult(result, currency);
@@ -88,7 +98,7 @@ async function updateSingleDividendData(
 
     // Calculate dividend growth and forecast (simplified for worker context)
     let dividendGrowthPast3Y = 0;
-    let dividendForecast3Y: any[] = [];
+    const dividendForecast3Y: DividendHistoryEntry[] = [];
     
     // Simplified growth calculation (3-year CAGR)
     if (dividendHistory.length >= 2) {
@@ -130,11 +140,11 @@ async function updateSingleDividendData(
       updatedDefinition,
       dividendCount: dividendHistory.length
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       symbol: definition.ticker || definition.name || 'unknown',
       success: false,
-      error: error?.message || String(error)
+      error: error instanceof Error ? error.message : String(error)
     };
   }
 }
@@ -164,24 +174,24 @@ self.onmessage = function (e: MessageEvent<WorkerRequest>) {
     if (e.data.type === 'updateBatch') {
       updateBatchDividendData(e.data.definitions, e.data.options).then(results => {
         const response: WorkerResponse = { type: 'batchResult', results };
-        // @ts-ignore
+        // @ts-expect-error postMessage is available in worker context
         self.postMessage(response);
       }).catch(error => {
-        // @ts-ignore
-        self.postMessage({ type: 'error', error: error?.message || String(error) });
+        // @ts-expect-error postMessage is available in worker context
+        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
       });
     } else if (e.data.type === 'updateSingle') {
       updateSingleDividendData(e.data.definition, e.data.options).then(result => {
         const response: WorkerResponse = { type: 'singleResult', result };
-        // @ts-ignore
+        // @ts-expect-error postMessage is available in worker context
         self.postMessage(response);
       }).catch(error => {
-        // @ts-ignore
-        self.postMessage({ type: 'error', error: error?.message || String(error) });
+        // @ts-expect-error postMessage is available in worker context
+        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
       });
     }
-  } catch (err: any) {
-    // @ts-ignore
-    self.postMessage({ type: 'error', error: err?.message || String(err) });
+  } catch (err: unknown) {
+    // @ts-expect-error postMessage is available in worker context
+    self.postMessage({ type: 'error', error: err instanceof Error ? err.message : String(err) });
   }
 };

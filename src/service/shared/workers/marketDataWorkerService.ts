@@ -112,10 +112,11 @@ export class StockPriceWorkerService {
 
 // Stock History Update Worker Service
 interface StockHistoryUpdateRequest {
-  type: 'updateBatch' | 'updateSingle' | 'updateBatchDefault' | 'updateSingleDefault';
+  type: 'updateBatch' | 'updateSingle' | 'updateBatchDefault' | 'updateSingleDefault' | 'updateBatchIntraday' | 'updateSingleIntraday';
   definitions?: AssetDefinition[];
   definition?: AssetDefinition;
   period?: TimeRangePeriod;
+  days?: number;
 }
 
 interface StockHistoryUpdateResponse {
@@ -159,6 +160,22 @@ export class StockHistoryWorkerService {
       type: period ? 'updateSingle' : 'updateSingleDefault',
       definition,
       period
+    });
+  }
+
+  async updateBatchIntraday(definitions: AssetDefinition[], days?: number): Promise<StockHistoryUpdateResponse> {
+    return this.workerService.sendMessage({
+      type: 'updateBatchIntraday',
+      definitions,
+      days
+    });
+  }
+
+  async updateSingleIntraday(definition: AssetDefinition, days?: number): Promise<StockHistoryUpdateResponse> {
+    return this.workerService.sendMessage({
+      type: 'updateSingleIntraday',
+      definition,
+      days
     });
   }
 
