@@ -1,4 +1,4 @@
-import { Middleware, MiddlewareAPI, AnyAction } from '@reduxjs/toolkit';
+import { Middleware, MiddlewareAPI, AnyAction, Dispatch } from '@reduxjs/toolkit';
 import { updateForecastValues, updateMonthlyAssetIncomeCache } from '../slices/cache';
 import { StoreState } from '../index';
 import { appInitializationService } from '@/service/application/orchestration/initService/appInitialization';
@@ -10,7 +10,7 @@ function isActionWithType(action: unknown): action is AnyAction {
 }
 
 // Middleware um automatisch Forecast und Dashboard zu aktualisieren wenn sich relevante Daten ändern
-export const dataChangeMiddleware: Middleware<object, StoreState> = (store: MiddlewareAPI<any, StoreState>) => (next) => (action: unknown) => {
+export const dataChangeMiddleware: Middleware<object, StoreState> = (store: MiddlewareAPI<Dispatch, StoreState>) => (next) => (action: unknown) => {
   const result = next(action);
   
   // Listen for successful data changes (but not fetch operations)

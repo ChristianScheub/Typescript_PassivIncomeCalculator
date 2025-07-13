@@ -1,5 +1,6 @@
 import Logger from '@service/shared/logging/Logger/logger';
 import { StateHydrationService } from './stateHydrationService';
+import type { RootState } from '@/store';
 
 /**
  * State Persistence Service
@@ -16,7 +17,7 @@ export class StatePersistenceService {
   /**
    * Save state to localStorage with throttling and size validation
    */
-  static saveState(state: any): void {
+  static saveState(state: RootState): void {
     // Clear existing timeout
     if (this.saveTimeout) {
       clearTimeout(this.saveTimeout);
@@ -61,7 +62,7 @@ export class StatePersistenceService {
    * CRITICAL: Transactions and AssetDefinitions are NOT persisted to prevent localStorage overflow
    * They are loaded from DB on app start
    */
-  private static prepareStateForSaving(state: any) {
+  private static prepareStateForSaving(state: RootState) {
     // Validate and fix lastCalculated if missing from transactions cache
     let assetFocusDataToSave = state.transactions?.cache?.assetFocusData;
     if (assetFocusDataToSave && !assetFocusDataToSave.lastCalculated) {
@@ -115,7 +116,7 @@ export class StatePersistenceService {
    * Check if state is empty and should be removed from localStorage
    * Since transactions are not persisted, we check other meaningful data
    */
-  private static isStateEmpty(state: any): boolean {
+  private static isStateEmpty(state: Record<string, unknown>): boolean {
     const hasLiabilities = (state.liabilities?.items?.length || 0) > 0;
     const hasExpenses = (state.expenses?.items?.length || 0) > 0;
     const hasIncome = (state.income?.items?.length || 0) > 0;

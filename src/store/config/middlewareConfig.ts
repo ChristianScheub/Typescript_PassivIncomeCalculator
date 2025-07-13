@@ -1,3 +1,4 @@
+import { configureStore } from '@reduxjs/toolkit';
 import dataChangeMiddleware from '../middleware/dataChangeMiddleware';
 import portfolioCacheMiddleware from '../middleware/portfolioCacheMiddleware';
 import calculatedDataCacheMiddleware from '../middleware/calculatedDataCacheMiddleware';
@@ -11,7 +12,7 @@ import Logger from '@service/shared/logging/Logger/logger';
  * Handles the middleware chain setup for the store
  * Order matters: middleware is executed from first to last
  */
-export const middlewareConfig = (getDefaultMiddleware: any) => {
+export const middlewareConfig = (getDefaultMiddleware: Parameters<typeof configureStore>[0]['middleware']) => {
   const middleware = getDefaultMiddleware({
     serializableCheck: {
       // Ignore specific action types and state paths that contain non-serializable values

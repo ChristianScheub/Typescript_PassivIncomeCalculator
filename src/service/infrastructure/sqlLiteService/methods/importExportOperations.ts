@@ -41,7 +41,7 @@ const importAnyStores = async (data: ExportData): Promise<void> => {
     if (storeData && Array.isArray(storeData)) {
       Logger.infoService(`Importing ${storeData.length} ${storeName}`);
       for (const item of storeData) {
-        await dbOperations.update(storeName, item as any);
+        await dbOperations.update(storeName, item as Record<string, unknown>);
       }
       Logger.infoService(`${storeName} import completed successfully`);
     }

@@ -4,6 +4,7 @@ import { calculateAssetMonthlyIncomeWithCache } from '@/service/shared/calculati
 import { createCachedDividends } from '@/utils/dividendCacheUtils';
 import Logger from '@/service/shared/logging/Logger/logger';
 import type { Asset } from '@/types/domains/assets/entities';
+import type { RootState } from '@/store';
 
 /**
  * Middleware to automatically cache asset calculation results
@@ -19,7 +20,7 @@ export const assetCalculationCacheMiddleware: Middleware = (store) => (next) => 
       typedAction.type === 'forecast/calculateForecastData/fulfilled' ||
       typedAction.type.includes('analytics')) {
     
-    const state = store.getState() as any; // Keep as any to avoid complex store typing
+    const state = store.getState() as RootState;
     const assets = state.transactions?.items || [];
     
     // Check if there are assets that need cache updates

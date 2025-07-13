@@ -22,7 +22,7 @@ export class StoreInitializationService {
     // Schedule cache validation and asset definitions loading
     setTimeout(() => {
       // Load AssetDefinitions from DB after store hydration
-      (store.dispatch as any)(fetchAssetDefinitions());
+      store.dispatch(fetchAssetDefinitions());
       
       Logger.cache('Store initialization with persisted state completed');
     }, 0);
@@ -38,7 +38,7 @@ export class StoreInitializationService {
     store.dispatch(markStoreHydrated());
     
     // Load AssetDefinitions from DB
-    (store.dispatch as any)(fetchAssetDefinitions());
+    store.dispatch(fetchAssetDefinitions());
     
     Logger.cache('Store initialization without persisted state completed');
   }
@@ -69,7 +69,7 @@ export class StoreInitializationService {
    */
   static setupDevelopmentTools(store: AppStore): void {
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'development') {
-      (window as any).__REDUX_STORE__ = store;
+      (window as { __REDUX_STORE__?: AppStore }).__REDUX_STORE__ = store;
       Logger.infoRedux('Development tools configured');
     }
   }

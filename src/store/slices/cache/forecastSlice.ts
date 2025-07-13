@@ -27,7 +27,7 @@ const calculateStockDividendIncome = (position: PortfolioPosition, month: number
   }
 };
 
-const calculateBondInterestIncome = (position: PortfolioPosition, assetDefinitions: any[]): number => {
+const calculateBondInterestIncome = (position: PortfolioPosition, assetDefinitions: AssetDefinition[]): number => {
   const assetDefinition = getAssetDefinition(position, assetDefinitions);
   if (assetDefinition?.bondInfo?.interestRate === undefined) {
     return 0;
@@ -38,7 +38,7 @@ const calculateBondInterestIncome = (position: PortfolioPosition, assetDefinitio
   return isFinite(monthlyInterest) ? monthlyInterest : 0;
 };
 
-const calculateRealEstateIncome = (position: PortfolioPosition, assetDefinitions: any[]): number => {
+const calculateRealEstateIncome = (position: PortfolioPosition, assetDefinitions: AssetDefinition[]): number => {
   const assetDefinition = getAssetDefinition(position, assetDefinitions);
   if (assetDefinition?.rentalInfo?.baseRent === undefined) {
     return 0;
@@ -48,7 +48,7 @@ const calculateRealEstateIncome = (position: PortfolioPosition, assetDefinitions
 };
 
 // Helper function to calculate monthly income from portfolio positions for a specific month
-const calculatePortfolioMonthlyIncome = (positions: PortfolioPosition[], month: number, assetDefinitions: any[]): number => {
+const calculatePortfolioMonthlyIncome = (positions: PortfolioPosition[], month: number, assetDefinitions: AssetDefinition[]): number => {
   let totalIncome = 0;
   positions.forEach(position => {
     const assetDefinition = getAssetDefinition(position, assetDefinitions);
