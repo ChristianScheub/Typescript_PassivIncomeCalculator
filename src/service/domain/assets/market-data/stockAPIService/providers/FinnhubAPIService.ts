@@ -1,11 +1,10 @@
-import { IStockAPIService } from '../interfaces/IStockAPIService';
+import { BaseStockAPIService } from './BaseStockAPIService';
 import { 
   StockPrice,
   StockHistory,
   StockHistoryEntry
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { CapacitorHttp } from '@capacitor/core';
 import exchangeService from '@service/domain/financial/exchange/exchangeService';
 
 const BASE_URL = 'https://finnhub.io/api/v1';
@@ -36,19 +35,15 @@ interface FinnhubCandle {
  * Finnhub API Service Provider
  * Implements the simplified IStockAPIService interface using Finnhub API
  */
-export class FinnhubAPIService implements IStockAPIService {
-  private readonly apiKey: string;
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    Logger.info('Initialized FinnhubAPIService with simplified interface');
-  }
+export class FinnhubAPIService extends BaseStockAPIService {
+  protected readonly baseUrl = BASE_URL;
+  protected readonly providerName = 'Finnhub';
 
   /**
    * Fetch data from Finnhub API
    */
   private async fetchFromAPI<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
-    const url = new URL(`${BASE_URL}${endpoint}`);
+    const url = new URL(`${this.baseUrl}${endpoint}`);
     
     // Add API key
     url.searchParams.append('token', this.apiKey);
@@ -59,16 +54,7 @@ export class FinnhubAPIService implements IStockAPIService {
     });
 
     try {
-      const response = await CapacitorHttp.get({
-        url: url.toString(),
-        headers: {},
-      });
-
-      if (response.status !== 200) {
-        throw new Error(`API request failed with status ${response.status}: ${response.data}`);
-      }
-
-      return response.data;
+      return await this.makeRequest(url.toString());
     } catch (error) {
       Logger.error(`Finnhub API request failed: ${error}`);
       throw error;
@@ -105,11 +91,10 @@ export class FinnhubAPIService implements IStockAPIService {
   }
 
   /**
-   * Calculate midday price from high and low
+   * Calculate midday price from high and low (override base method for clarity)
    */
   private calculateMiddayPrice(high: number, low: number): number {
-    // Use average of high and low as midday approximation
-    return (high + low) / 2;
+    return this.calculateMidday(high, low);
   }
 
   /**
@@ -208,27 +193,74 @@ export class FinnhubAPIService implements IStockAPIService {
   }
 
   /**
-   * Get 30 days of historical stock data
+   * Get 30 days of historical stock data (use base implementation)
    */
-  async getHistory30Days(symbol: string): Promise<StockHistory> {
-    return this.getHistory(symbol, 30);
-  }
+  // async getHistory30Days(symbol: string): Promise<StockHistory> {
+  //   return this.getHistory(symbol, 30);
+  // }
 
   /**
-   * Get intraday stock data (1-minute intervals for current day)
-   * TODO: Implement intraday data fetching for Finnhub API
+   * Get intraday stock data (5-minute intervals for specified days)
    */
-  async getIntradayHistory(symbol: string): Promise<StockHistory> {
-    Logger.warn(`Finnhub intraday history not implemented for ${symbol} - nothing happened, nothing implemented`);
-    // TODO: Implement Finnhub intraday API call
-    
-    // Return empty history for now
-    return {
-      symbol,
-      entries: [],
-      data: [],
-      currency: 'USD',
-    };
+  async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
+    try {
+      Logger.info(`Getting ${days} days of intraday history for: ${symbol}`);
+      
+      // Validate days parameter - limit to reasonable range for intraday data
+      if (days < 1 || days > 30) {
+        throw new Error('Days parameter for intraday data must be between 1 and 30');
+      }
+
+      const toTimestamp = Math.floor(Date.now() / 1000);
+      const fromTimestamp = toTimestamp - (days * 24 * 60 * 60);
+
+      // Use 5-minute resolution for intraday data (good balance of detail vs data volume)
+      const candles = await this.fetchFromAPI<FinnhubCandle>('/stock/candle', {
+        symbol: symbol,
+        resolution: '5',
+        from: fromTimestamp.toString(),
+        to: toTimestamp.toString()
+      });
+
+      if (candles.s !== 'ok' || !candles.t || candles.t.length === 0) {
+        throw new Error(`No intraday data available for ${symbol}`);
+      }
+
+      const historyData: StockHistoryEntry[] = [];
+      
+      for (let i = 0; i < candles.t.length; i++) {
+        const timestamp = candles.t[i] * 1000; // Convert to milliseconds
+        const date = new Date(timestamp).toISOString().split('T')[0];
+        
+        const open = await this.convertPrice(candles.o[i]);
+        const close = await this.convertPrice(candles.c[i]);
+        const high = await this.convertPrice(candles.h[i]);
+        const low = await this.convertPrice(candles.l[i]);
+        const midday = this.calculateMiddayPrice(high, low);
+        const convertedMidday = await this.convertPrice(midday);
+
+        historyData.push({
+          date: date,
+          timestamp: timestamp,
+          open: open,
+          high: high,
+          low: low,
+          close: close,
+          midday: convertedMidday,
+          volume: candles.v[i]
+        });
+      }
+
+      return {
+        symbol: symbol,
+        entries: historyData,
+        data: historyData, // For API compatibility
+        currency: this.getCurrency()
+      };
+    } catch (error) {
+      Logger.error(`Failed to get intraday history for ${symbol}: ${error}`);
+      throw error;
+    }
   }
 
 }

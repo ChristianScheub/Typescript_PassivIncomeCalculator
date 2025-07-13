@@ -159,6 +159,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({
     [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? '',
     [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] ?? '',
     [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] ?? '',
+    [StockAPIProvider.IEX_CLOUD]: apiKeys?.[StockAPIProvider.IEX_CLOUD] ?? '',
+    [StockAPIProvider.TWELVE_DATA]: apiKeys?.[StockAPIProvider.TWELVE_DATA] ?? '',
+    [StockAPIProvider.QUANDL]: apiKeys?.[StockAPIProvider.QUANDL] ?? '',
+    [StockAPIProvider.EOD_HISTORICAL_DATA]: apiKeys?.[StockAPIProvider.EOD_HISTORICAL_DATA] ?? '',
+    [StockAPIProvider.POLYGON_IO]: apiKeys?.[StockAPIProvider.POLYGON_IO] ?? '',
   });
 
   // Update tempApiKeys when apiKeys prop changes
@@ -167,6 +172,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({
       [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? '',
       [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] ?? '',
       [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] ?? '',
+      [StockAPIProvider.IEX_CLOUD]: apiKeys?.[StockAPIProvider.IEX_CLOUD] ?? '',
+      [StockAPIProvider.TWELVE_DATA]: apiKeys?.[StockAPIProvider.TWELVE_DATA] ?? '',
+      [StockAPIProvider.QUANDL]: apiKeys?.[StockAPIProvider.QUANDL] ?? '',
+      [StockAPIProvider.EOD_HISTORICAL_DATA]: apiKeys?.[StockAPIProvider.EOD_HISTORICAL_DATA] ?? '',
+      [StockAPIProvider.POLYGON_IO]: apiKeys?.[StockAPIProvider.POLYGON_IO] ?? '',
     });
   }, [apiKeys]);
 
@@ -191,6 +201,41 @@ const SettingsView: React.FC<SettingsViewProps> = ({
       description: t('settings.alphaVantageDescription'),
       keyPlaceholder: t('settings.enterAlphaVantageApiKey'),
       website: 'https://www.alphavantage.co',
+      requiresApiKey: true
+    },
+    [StockAPIProvider.IEX_CLOUD]: {
+      name: 'IEX Cloud',
+      description: 'Real-time and historical financial data from IEX Cloud',
+      keyPlaceholder: 'Enter your IEX Cloud API key',
+      website: 'https://iexcloud.io',
+      requiresApiKey: true
+    },
+    [StockAPIProvider.TWELVE_DATA]: {
+      name: 'Twelve Data',
+      description: 'Real-time and historical financial data from Twelve Data API',
+      keyPlaceholder: 'Enter your Twelve Data API key',
+      website: 'https://twelvedata.com',
+      requiresApiKey: true
+    },
+    [StockAPIProvider.QUANDL]: {
+      name: 'Quandl (Nasdaq Data Link)',
+      description: 'Financial and economic data from Quandl/Nasdaq Data Link',
+      keyPlaceholder: 'Enter your Quandl API key',
+      website: 'https://data.nasdaq.com',
+      requiresApiKey: true
+    },
+    [StockAPIProvider.EOD_HISTORICAL_DATA]: {
+      name: 'EOD Historical Data',
+      description: 'End-of-day and real-time financial data',
+      keyPlaceholder: 'Enter your EOD Historical Data API key',
+      website: 'https://eodhistoricaldata.com',
+      requiresApiKey: true
+    },
+    [StockAPIProvider.POLYGON_IO]: {
+      name: 'Polygon.io',
+      description: 'Real-time and historical stock market data from Polygon.io',
+      keyPlaceholder: 'Enter your Polygon.io API key',
+      website: 'https://polygon.io',
       requiresApiKey: true
     }
   };
@@ -358,6 +403,11 @@ const SettingsView: React.FC<SettingsViewProps> = ({
                   [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? '',
                   [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] ?? '',
                   [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] ?? '',
+                  [StockAPIProvider.IEX_CLOUD]: apiKeys?.[StockAPIProvider.IEX_CLOUD] ?? '',
+                  [StockAPIProvider.TWELVE_DATA]: apiKeys?.[StockAPIProvider.TWELVE_DATA] ?? '',
+                  [StockAPIProvider.QUANDL]: apiKeys?.[StockAPIProvider.QUANDL] ?? '',
+                  [StockAPIProvider.EOD_HISTORICAL_DATA]: apiKeys?.[StockAPIProvider.EOD_HISTORICAL_DATA] ?? '',
+                  [StockAPIProvider.POLYGON_IO]: apiKeys?.[StockAPIProvider.POLYGON_IO] ?? '',
                 }}
                 apiKeyStatus={apiKeyStatus}
                 apiKeyError={apiKeyError}

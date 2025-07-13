@@ -1,19 +1,23 @@
-import { IStockAPIService } from '../interfaces/IStockAPIService';
+import { BaseStockAPIService } from './BaseStockAPIService';
 import {
   StockPrice,
   StockHistory,
   StockHistoryEntry
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { CapacitorHttp } from '@capacitor/core';
 
 /**
  * Yahoo Finance API Service Provider (Capacitor + Typescript)
  * Implementiert das IStockAPIService Interface mit echten API-Aufrufen (ohne API-Key)
  */
-export class YahooAPIService implements IStockAPIService {
-  // Basis-URL für Chart-Daten
-  private static readonly baseUrl = 'https://query2.finance.yahoo.com/v8/finance/chart';
+export class YahooAPIService extends BaseStockAPIService {
+  protected readonly baseUrl = 'https://query2.finance.yahoo.com/v8/finance/chart';
+  protected readonly providerName = 'Yahoo Finance';
+
+  constructor() {
+    // Yahoo Finance doesn't require an API key
+    super('');
+  }
 
 
   private async fetchChart(symbol: string, interval: string, range: string): Promise<any> {
@@ -22,35 +26,28 @@ export class YahooAPIService implements IStockAPIService {
     }
 
     const encodedSymbol = encodeURIComponent(symbol.trim().toUpperCase());
-    const url = `${YahooAPIService.baseUrl}/${encodedSymbol}?interval=${interval}&range=${range}`;
+    const url = `${this.baseUrl}/${encodedSymbol}?interval=${interval}&range=${range}`;
     
     Logger.infoAPI(`Fetching chart data from Yahoo Finance API`, 
       { url, symbol: encodedSymbol, interval, range }
     );
 
     try {
-      const res = await CapacitorHttp.get({
-        url,
-        headers: {
-          'User-Agent': 'Mozilla/5.0',
-          'Accept': 'application/json',
-        },
-      });
+      const response = await this.makeRequest(url);
 
       Logger.infoAPI(`Received chart data response for ${symbol}`, null, { 
-        status: res.status, 
-        hasData: !!res.data,
-        hasChart: !!res.data?.chart,
-        hasResult: !!res.data?.chart?.result,
-        resultLength: res.data?.chart?.result?.length || 0
+        hasData: !!response,
+        hasChart: !!response?.chart,
+        hasResult: !!response?.chart?.result,
+        resultLength: response?.chart?.result?.length || 0
       });
 
-      if (res.status !== 200 || !res.data.chart?.result?.[0]) {
-        Logger.error(`No chart data available for ${symbol} - Status: ${res.status}, Data: ${JSON.stringify(res.data)}`);
+      if (!response.chart?.result?.[0]) {
+        Logger.error(`No chart data available for ${symbol} - Data: ${JSON.stringify(response)}`);
         throw new Error(`No chart data available for ${symbol}`);
       }
 
-      return res.data.chart.result[0];
+      return response.chart.result[0];
     } catch (error) {
       Logger.error(`Fehler beim Abrufen der Chart-Daten für ${symbol}: ${JSON.stringify(error)}`);
       throw error;
@@ -110,7 +107,7 @@ export class YahooAPIService implements IStockAPIService {
       const data: StockHistoryEntry[] = timestamps.map((t, i) => {
         const open = quote.open[i];
         const close = quote.close[i];
-        const midday = (open + close) / 2;
+        const midday = this.calculateMidday(open, close);
         return {
           date: new Date(t * 1000).toISOString().split('T')[0],
           timestamp: t * 1000,
@@ -143,9 +140,10 @@ export class YahooAPIService implements IStockAPIService {
     }
   }
 
-  async getHistory30Days(symbol: string): Promise<StockHistory> {
-    return this.getHistory(symbol, 30);
-  }
+  // Use the default implementation from BaseStockAPIService
+  // async getHistory30Days(symbol: string): Promise<StockHistory> {
+  //   return this.getHistory(symbol, 30);
+  // }
 
   async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
     // Clamp days to valid range (1-5)
@@ -183,7 +181,7 @@ export class YahooAPIService implements IStockAPIService {
       const data: StockHistoryEntry[] = timestamps.map((t, i) => {
         const open = quote.open[i];
         const close = quote.close[i];
-        const midday = (open + close) / 2;
+        const midday = this.calculateMidday(open, close);
         return {
           date: new Date(t * 1000).toISOString(), // Keep full timestamp for intraday data
           timestamp: t * 1000,
