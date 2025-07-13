@@ -11,6 +11,7 @@ import {
 } from '@/store/slices/domain';
 import { AssetsView } from '@/view/portfolio-hub/assets/AssetsView';
 import { Asset } from '@/types/domains/assets';
+import { Asset as TransactionAsset } from '@/types/domains/financial/entities';
 import { useTranslation } from 'react-i18next';
 import Logger from '@/service/shared/logging/Logger/logger';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
@@ -118,7 +119,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     };
   }, [portfolioCache, portfolioTotals, assets.length, assetDefinitions.length]);
 
-  const handleAddAsset = (data: any) => {
+  const handleAddAsset = (data: Omit<TransactionAsset, 'id' | 'createdAt' | 'updatedAt'>) => {
     console.log('AssetsContainer: handleAddAsset called with data:', data);
     Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
     
@@ -138,7 +139,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   };
 
   // Helper: Calculate stock value and differences
-  function updateStockValueFields(data: any) {
+  function updateStockValueFields(data: Partial<TransactionAsset>) {
     if (data.type === 'stock' && data.purchaseQuantity && data.purchasePrice) {
       // Note: currentPrice is now stored in AssetDefinition, not in transaction
       // This function only calculates purchase-related values for transactions
@@ -150,7 +151,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     }
   }
 
-  const handleUpdateAsset = (data: any) => {
+  const handleUpdateAsset = (data: Partial<TransactionAsset>) => {
     if (!editingAsset) return;
     
     Logger.info('Updating asset transaction' + " - " + JSON.stringify({ id: editingAsset.id, data }));

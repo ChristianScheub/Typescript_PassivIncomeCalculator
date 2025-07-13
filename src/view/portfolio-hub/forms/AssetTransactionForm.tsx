@@ -91,6 +91,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
       }
 
       // Remove assetDefinition if present (to avoid type error)
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { assetDefinition: _assetDefinition, ...cleanedData } = data as Record<string, unknown>;
 
       // Determine transaction date based on type

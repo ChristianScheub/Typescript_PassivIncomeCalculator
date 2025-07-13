@@ -86,16 +86,26 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   
   // Stacked bar special case
   if (chartType === 'stacked' && data) {
-    const stackedData = data as any; // Type assertion for stacked data
+    // Define interface for stacked chart data
+    interface StackedChartData {
+      amount: number;
+      percentage: number;
+      firstBar?: { name: string; value: number | string };
+      secondBar?: { name: string; value: number | string };
+    }
+    
+    const stackedData = data as StackedChartData;
     const { amount, percentage, firstBar, secondBar } = stackedData;
     
     // Helper function to check if an object has the required properties
-    const hasBarData = (bar: any): bar is { name: string; value: number } => {
-      return bar && 
+    const hasBarData = (bar: unknown): bar is { name: string; value: number } => {
+      return bar !== null &&
              typeof bar === 'object' && 
-             typeof bar.name === 'string' && 
-             (typeof bar.value === 'number' || typeof bar.value === 'string') && 
-             bar.value != null;
+             'name' in bar &&
+             'value' in bar &&
+             typeof (bar as { name: unknown }).name === 'string' && 
+             (typeof (bar as { value: unknown }).value === 'number' || typeof (bar as { value: unknown }).value === 'string') && 
+             (bar as { value: unknown }).value != null;
     };
     
     return (
