@@ -11,7 +11,7 @@ const MAX_LINT_ISSUES = 300;
 
 try {
   // Run ESLint and capture output
-  const result = execSync('npm run lint', { encoding: 'utf8', stdio: 'pipe' });
+  execSync('npm run lint', { encoding: 'utf8', stdio: 'pipe' });
   console.log('✅ No lint issues found!');
   process.exit(0);
 } catch (error) {
