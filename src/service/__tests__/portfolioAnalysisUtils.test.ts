@@ -75,15 +75,15 @@ describe('PortfolioAnalysisUtils', () => {
     });
 
     test('should calculate portfolio dividend yield correctly', () => {
-      const yield = portfolioAnalysisUtils.calculatePortfolioDividendYield(mockAssets);
+      const dividendYield = portfolioAnalysisUtils.calculatePortfolioDividendYield(mockAssets);
       const expectedYield = (1192 / 278500) * 100;
-      expect(yield).toBeCloseTo(expectedYield, 2);
+      expect(dividendYield).toBeCloseTo(expectedYield, 2);
     });
 
     test('should handle zero portfolio value for dividend yield', () => {
       const emptyAssets: PortfolioAsset[] = [];
-      const yield = portfolioAnalysisUtils.calculatePortfolioDividendYield(emptyAssets);
-      expect(yield).toBe(0);
+      const dividendYield = portfolioAnalysisUtils.calculatePortfolioDividendYield(emptyAssets);
+      expect(dividendYield).toBe(0);
     });
   });
 

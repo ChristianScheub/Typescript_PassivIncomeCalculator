@@ -9,7 +9,7 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/src/test/setup.ts"],
   collectCoverage: true,
   collectCoverageFrom: [
-    "src/service/shared/utilities/*.ts",
+    "src/service/**/*.ts",
     "!src/service/**/*.d.ts",
     "!src/service/**/__tests__/**",
     "!src/service/**/*.test.{ts,tsx}",
