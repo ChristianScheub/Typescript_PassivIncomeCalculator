@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import SetupWizardLayout from '@ui/setupWizard/SetupWizardLayout';
 import { WizardProgress, StepNavigationOptions, StepDataCollection, AssetTemplate, CustomAssetDefinition, SimplifiedTransaction, SimplifiedLiability, SimplifiedIncome, ImportValidationResult, WelcomeStepData, AssetDefinitionsStepData, TransactionsStepData, LiabilitiesStepData, IncomeStepData } from '@/types/domains/setupWizard';
 import { WizardStep } from '@/types/shared/base/enums';
+import type { AssetDefinition } from '@/types/domains/assets';
 
 // Step Components
 import WelcomeStep from './steps/WelcomeStep';
@@ -39,7 +40,7 @@ interface SetupWizardViewProps {
   onRemoveCustomAsset?: (index: number) => void;
   
   // Transactions step props
-  availableAssets?: (AssetTemplate | CustomAssetDefinition)[];
+  availableAssets?: (AssetTemplate | CustomAssetDefinition | AssetDefinition)[];
   onUpdateTransactionsStepData?: (data: Partial<TransactionsStepData>) => void;
   onAddTransaction?: (transaction: SimplifiedTransaction) => void;
   onRemoveTransaction?: (index: number) => void;

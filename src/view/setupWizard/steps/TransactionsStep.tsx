@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TransactionsStepData, SimplifiedTransaction, AssetTemplate, CustomAssetDefinition } from '@/types/domains/setupWizard';
+import type { AssetDefinition } from '@/types/domains/assets';
 import QuickDataImport from '@ui/setupWizard/QuickDataImport';
 
 interface TransactionsStepProps {
   stepData: TransactionsStepData;
-  availableAssets: (AssetTemplate | CustomAssetDefinition)[];
+  availableAssets: (AssetTemplate | CustomAssetDefinition | AssetDefinition)[];
   onUpdateStepData: (data: Partial<TransactionsStepData>) => void;
   onAddTransaction: (transaction: SimplifiedTransaction) => void;
   onRemoveTransaction: (index: number) => void;
@@ -55,15 +56,23 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
   };
 
   const getAssetName = (assetId: string) => {
-    const asset = availableAssets.find(a => ('id' in a ? a.id : a.symbol) === assetId);
+    const asset = availableAssets.find(a => {
+      if ('id' in a && a.id === assetId) return true;
+      if ('symbol' in a && a.symbol === assetId) return true;
+      return false;
+    });
     if (!asset) {
-      // If no asset definition found, this might be a manually entered asset
       return assetId;
     }
-    
-    const symbol = 'symbol' in asset ? asset.symbol : assetId;
-    const name = 'name' in asset ? asset.name : 'Custom Asset';
-    return `${symbol} - ${name}`;
+    if ('ticker' in asset) {
+      // AssetDefinition
+      return `${asset.ticker ?? asset.id ?? ''} - ${asset.name ?? asset.fullName ?? ''}`;
+    }
+    if ('symbol' in asset) {
+      // AssetTemplate/CustomAssetDefinition
+      return `${asset.symbol} - ${asset.name}`;
+    }
+    return assetId;
   };
 
   const getTransactionTypeColor = (type: string) => {
@@ -247,8 +256,21 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                         >
                           <option value="">{t('setupWizard.steps.transactions.form.assetPlaceholder')}</option>
                           {availableAssets.map((asset) => {
-                            const id = 'id' in asset ? asset.id : asset.symbol;
-                            const display = `${asset.symbol} - ${asset.name}`;
+                            let id: string;
+                            let display: string;
+                            if (isAssetDefinition(asset)) {
+                              id = asset.id ?? asset.ticker ?? '';
+                              display = `${asset.ticker ?? asset.id ?? ''} - ${asset.name ?? asset.fullName ?? ''}`;
+                            } else if (isAssetTemplate(asset)) {
+                              id = asset.symbol;
+                              display = `${asset.symbol} - ${asset.name}`;
+                            } else if (isCustomAsset(asset)) {
+                              id = asset.symbol;
+                              display = `${asset.symbol} - ${asset.name}`;
+                            } else {
+                              id = '';
+                              display = '';
+                            }
                             return (
                               <option key={id} value={id}>{display}</option>
                             );
@@ -358,5 +380,26 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
     </div>
   );
 };
+
+// Hilfsfunktionen für Typ-Guards
+function isAssetDefinition(asset: AssetTemplate | CustomAssetDefinition | import('@/types/domains/assets').AssetDefinition): asset is import('@/types/domains/assets').AssetDefinition {
+  return (
+    typeof asset === 'object' &&
+    'id' in asset &&
+    ('ticker' in asset || 'fullName' in asset)
+  );
+}
+function isAssetTemplate(asset: AssetTemplate | CustomAssetDefinition | import('@/types/domains/assets').AssetDefinition): asset is AssetTemplate {
+  return (
+    typeof asset === 'object' &&
+    'symbol' in asset && 'isPopular' in asset
+  );
+}
+function isCustomAsset(asset: AssetTemplate | CustomAssetDefinition | import('@/types/domains/assets').AssetDefinition): asset is CustomAssetDefinition {
+  return (
+    typeof asset === 'object' &&
+    'symbol' in asset && !('isPopular' in asset)
+  );
+}
 
 export default TransactionsStep;
