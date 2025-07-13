@@ -6,10 +6,13 @@
 import { AssetDefinition } from '@/types/domains/assets';
 import { TimeRangePeriod } from '@/types/shared/time';
 
+// Union type alias for worker response types
+type WorkerResponseType = 'batchResult' | 'singleResult' | 'error';
+
 // Worker wrapper class for type-safe communication
 export class WorkerService<RequestType, ResponseType> {
   private worker: Worker | null = null;
-  private workerUrl: string;
+  private readonly workerUrl: string;
 
   constructor(workerUrl: string) {
     this.workerUrl = workerUrl;
@@ -23,7 +26,7 @@ export class WorkerService<RequestType, ResponseType> {
         }
         resolve(this.worker);
       } catch (error) {
-        reject(error);
+        reject(error instanceof Error ? error : new Error(String(error)));
       }
     });
   }
@@ -66,7 +69,7 @@ interface StockPriceUpdateRequest {
 }
 
 interface StockPriceUpdateResponse {
-  type: 'batchResult' | 'singleResult' | 'error';
+  type: WorkerResponseType;
   results?: Array<{
     symbol: string;
     success: boolean;
@@ -83,7 +86,7 @@ interface StockPriceUpdateResponse {
 }
 
 export class StockPriceWorkerService {
-  private workerService: WorkerService<StockPriceUpdateRequest, StockPriceUpdateResponse>;
+  private readonly workerService: WorkerService<StockPriceUpdateRequest, StockPriceUpdateResponse>;
 
   constructor() {
     this.workerService = new WorkerService<StockPriceUpdateRequest, StockPriceUpdateResponse>(
@@ -120,7 +123,7 @@ interface StockHistoryUpdateRequest {
 }
 
 interface StockHistoryUpdateResponse {
-  type: 'batchResult' | 'singleResult' | 'error';
+  type: WorkerResponseType;
   results?: Array<{
     symbol: string;
     success: boolean;
@@ -139,7 +142,7 @@ interface StockHistoryUpdateResponse {
 }
 
 export class StockHistoryWorkerService {
-  private workerService: WorkerService<StockHistoryUpdateRequest, StockHistoryUpdateResponse>;
+  private readonly workerService: WorkerService<StockHistoryUpdateRequest, StockHistoryUpdateResponse>;
 
   constructor() {
     this.workerService = new WorkerService<StockHistoryUpdateRequest, StockHistoryUpdateResponse>(
@@ -196,7 +199,7 @@ interface DividendUpdateRequest {
 }
 
 interface DividendUpdateResponse {
-  type: 'batchResult' | 'singleResult' | 'error';
+  type: WorkerResponseType;
   results?: Array<{
     symbol: string;
     success: boolean;
@@ -215,7 +218,7 @@ interface DividendUpdateResponse {
 }
 
 export class DividendWorkerService {
-  private workerService: WorkerService<DividendUpdateRequest, DividendUpdateResponse>;
+  private readonly workerService: WorkerService<DividendUpdateRequest, DividendUpdateResponse>;
 
   constructor() {
     this.workerService = new WorkerService<DividendUpdateRequest, DividendUpdateResponse>(

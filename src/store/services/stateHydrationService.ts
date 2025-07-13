@@ -77,7 +77,7 @@ export class StateHydrationService {
     try {
       let total = 0;
       for (const key in localStorage) {
-        if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
+        if (Object.hasOwn(localStorage, key)) {
           total += localStorage[key].length + key.length;
         }
       }

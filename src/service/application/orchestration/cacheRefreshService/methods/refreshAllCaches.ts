@@ -2,25 +2,23 @@ import { store } from '@/store';
 import { 
     invalidatePortfolioCache, 
     calculatePortfolioData,
-    fetchTransactions 
-} from '@/store/slices/domain';
-import { fetchAssetDefinitions } from '@/store/slices/domain';
-import { 
+    fetchTransactions,
+    fetchAssetDefinitions,
     fetchAssetCategories,
     fetchAssetCategoryOptions,
-    fetchAssetCategoryAssignments 
+    fetchAssetCategoryAssignments,
+    fetchLiabilities,
+    fetchExpenses,
+    fetchIncome
 } from '@/store/slices/domain';
-import { fetchLiabilities } from '@/store/slices/domain';
-import { fetchExpenses } from '@/store/slices/domain';
-import { fetchIncome } from '@/store/slices/domain';
-import { updateForecastValues } from '@/store/slices/cache';
 import { 
-    clearAllCache as clearCalculatedDataCache
+    updateForecastValues,
+    clearAllCache as clearCalculatedDataCache,
+    calculatePortfolioIntradayDataDirect
 } from '@/store/slices/cache';
 import { PortfolioHistoryHelper } from '@/service/domain/portfolio/history/portfolioHistoryService/methods/portfolioHistoryHelper';
 import recentActivityService from '@/service/domain/analytics/reporting/recentActivityService';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { calculatePortfolioIntradayDataDirect } from '@/store/slices/cache';
 import PortfolioHistoryWorker from '@/workers/portfolioHistoryWorker.ts?worker';
 import type { ThunkDispatch, AnyAction } from '@reduxjs/toolkit';
 import type { RootState } from '@/store';

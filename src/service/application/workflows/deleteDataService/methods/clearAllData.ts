@@ -1,9 +1,11 @@
 import { store } from '@/store';
-import { clearAllTransactions } from '@/store/slices/domain';
-import { clearAllLiabilities } from '@/store/slices/domain';
-import { clearAllExpenses } from '@/store/slices/domain';
-import { clearAllIncome } from '@/store/slices/domain';
-import { clearAllAssetCategories } from '@/store/slices/domain';
+import { 
+  clearAllTransactions,
+  clearAllLiabilities,
+  clearAllExpenses,
+  clearAllIncome,
+  clearAllAssetCategories
+} from '@/store/slices/domain';
 import { setStockApiKey, setStockApiEnabled } from '@/store/slices/configSlice';
 import { StockAPIProvider } from '@/types/shared/base/enums';
 import Logger from "@/service/shared/logging/Logger/logger";

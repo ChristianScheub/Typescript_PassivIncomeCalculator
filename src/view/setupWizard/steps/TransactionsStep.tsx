@@ -4,9 +4,12 @@ import { TransactionsStepData, SimplifiedTransaction, AssetTemplate, CustomAsset
 import type { AssetDefinition } from '@/types/domains/assets';
 import QuickDataImport from '@ui/setupWizard/QuickDataImport';
 
+// Type alias for asset union type
+type AssetUnion = AssetTemplate | CustomAssetDefinition | AssetDefinition;
+
 interface TransactionsStepProps {
   stepData: TransactionsStepData;
-  availableAssets: (AssetTemplate | CustomAssetDefinition | AssetDefinition)[];
+  availableAssets: AssetUnion[];
   onUpdateStepData: (data: Partial<TransactionsStepData>) => void;
   onAddTransaction: (transaction: SimplifiedTransaction) => void;
   onRemoveTransaction: (index: number) => void;
@@ -382,20 +385,20 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
 };
 
 // Hilfsfunktionen für Typ-Guards
-function isAssetDefinition(asset: AssetTemplate | CustomAssetDefinition | import('@/types/domains/assets').AssetDefinition): asset is import('@/types/domains/assets').AssetDefinition {
+function isAssetDefinition(asset: AssetUnion): asset is import('@/types/domains/assets').AssetDefinition {
   return (
     typeof asset === 'object' &&
     'id' in asset &&
     ('ticker' in asset || 'fullName' in asset)
   );
 }
-function isAssetTemplate(asset: AssetTemplate | CustomAssetDefinition | import('@/types/domains/assets').AssetDefinition): asset is AssetTemplate {
+function isAssetTemplate(asset: AssetUnion): asset is AssetTemplate {
   return (
     typeof asset === 'object' &&
     'symbol' in asset && 'isPopular' in asset
   );
 }
-function isCustomAsset(asset: AssetTemplate | CustomAssetDefinition | import('@/types/domains/assets').AssetDefinition): asset is CustomAssetDefinition {
+function isCustomAsset(asset: AssetUnion): asset is CustomAssetDefinition {
   return (
     typeof asset === 'object' &&
     'symbol' in asset && !('isPopular' in asset)
