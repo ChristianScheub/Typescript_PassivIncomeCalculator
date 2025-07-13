@@ -7,7 +7,7 @@ jest.mock('@capacitor/core', () => ({
   }
 }));
 
-jest.mock('../../../../config/featureFlags', () => ({
+jest.mock('../../config/featureFlags', () => ({
   featureFlag_Debug_AllLogs: false,
   featureFlag_Debug_Log_Cache: false,
   featureFlag_Debug_Log_Error: true,
@@ -19,7 +19,7 @@ jest.mock('../../../../config/featureFlags', () => ({
   featureFlag_Debug_Log_API: true
 }));
 
-jest.mock('../../utilities/helper/downloadFile', () => ({
+jest.mock('../shared/utilities/helper/downloadFile', () => ({
   handleFileDownload: jest.fn()
 }));
 

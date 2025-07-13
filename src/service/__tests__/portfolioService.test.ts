@@ -19,7 +19,7 @@ jest.mock('../domain/portfolio/management/portfolioService/portfolioCalculations
   }))
 }));
 
-jest.mock('@/utils/transactionCalculations', () => ({
+jest.mock('../../utils/transactionCalculations', () => ({
   getCurrentQuantity: jest.fn((transaction) => transaction.quantity || 100)
 }));
 

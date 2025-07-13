@@ -31,12 +31,12 @@ export const calculateIncomeAllocation = (
 
   // Asset-Einkommen hinzufügen, wenn es nicht bereits als Income erfasst wurde
   assets.forEach(asset => {
-    const monthlyAmount = calculateAssetMonthlyIncome(asset);
-    if (monthlyAmount <= 0) return;
-
     // Prüfen ob dieses Asset-Einkommen bereits als reguläres Einkommen erfasst wurde
     const hasIncomeEntry = income.some(inc => inc.sourceId === asset.id);
     if (hasIncomeEntry) return;
+
+    const monthlyAmount = calculateAssetMonthlyIncome(asset);
+    if (monthlyAmount <= 0) return;
 
     let incomeType: IncomeType;
     switch(asset.type) {

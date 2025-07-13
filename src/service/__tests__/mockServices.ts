@@ -1,6 +1,18 @@
 // Mock implementation for testing services that may not have complete implementations
 export const mockIncomeCalculatorService = {
-  calculatePaymentSchedule: (schedule: any) => ({ monthlyAmount: schedule.amount || 0, annualAmount: (schedule.amount || 0) * 12 }),
+  calculatePaymentSchedule: (schedule: any) => {
+    let monthlyAmount = 0;
+    switch (schedule.frequency) {
+      case 'monthly': monthlyAmount = schedule.amount; break;
+      case 'quarterly': monthlyAmount = schedule.amount * 4 / 12; break;
+      case 'annually': monthlyAmount = schedule.amount / 12; break;
+      default: monthlyAmount = schedule.amount;
+    }
+    return { 
+      monthlyAmount, 
+      annualAmount: monthlyAmount * 12 
+    };
+  },
   calculateDividendSchedule: (schedule: any, quantity: number) => ({ monthlyAmount: (schedule.amount || 0) * quantity / 3, annualAmount: (schedule.amount || 0) * quantity * 4 }),
   calculateDividendForMonth: (schedule: any, quantity: number, monthNumber: number) => {
     if (schedule.months && schedule.months.includes(monthNumber)) {
@@ -133,8 +145,13 @@ export const mockFinancialCalculatorService = {
 };
 
 export const mockFormatService = {
-  formatCurrency: (amount: number) => `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-  formatPercentage: (value: number, options?: any) => `${(value).toLocaleString('de-DE', { minimumFractionDigits: options?.minimumFractionDigits ?? 2, maximumFractionDigits: options?.maximumFractionDigits ?? 2 })} %`,
+  formatCurrency: (amount: number) => {
+    const isNegative = amount < 0;
+    const absAmount = Math.abs(amount);
+    const formatted = `$${absAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    return isNegative ? `-${formatted}` : formatted;
+  },
+  formatPercentage: (value: number, options?: any) => `${(value).toLocaleString('en-US', { minimumFractionDigits: options?.minimumFractionDigits ?? 2, maximumFractionDigits: options?.maximumFractionDigits ?? 2 })} %`,
 };
 
 export const mockStockAPIService = {
