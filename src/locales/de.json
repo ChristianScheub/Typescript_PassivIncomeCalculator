@@ -13,31 +13,13 @@
       "october": "Oktober",
       "november": "November",
       "december": "Dezember"
-    },
-    "shortMonths": {
-      "january": "Jan",
-      "february": "Feb",
-      "march": "Mär",
-      "april": "Apr",
-      "may": "Mai",
-      "june": "Jun",
-      "july": "Jul",
-      "august": "Aug",
-      "september": "Sep",
-      "october": "Okt",
-      "november": "Nov",
-      "december": "Dez"
     }
   },
   "dashboard": {
-    "monthlyBreakdown": "Monatliche Übersicht",
     "monthlyOverview": "Monatliche Übersicht",
-    "title": "Dashboard",
-    "settings": "Einstellungen",
     "income": "Einkommen",
     "passive": "passiv",
     "assetIncome": "Vermögenseinkommen",
-    "fromDividends": "Aus Dividenden",
     "fromDividendsAndRental": "Aus Dividenden und Mieteinnahmen",
     "expenses": "Ausgaben",
     "liabilities": "Verbindlichkeitszahlungen",
@@ -46,11 +28,9 @@
     "netWorth": "Nettovermögen",
     "totalAssets": "Gesamtvermögen",
     "totalLiabilities": "Gesamtverbindlichkeiten",
-    "assetCalendar": "Assetkalender",
     "symbol": "Symbol",
     "currentPrice": "Aktueller Preis",
     "change": "Veränderung",
-    "changePercent": "Veränderung %",
     "assets": "Vermögenswerte",
     "portfolioHistory": "Vermögens Historie",
     "quickActions": "Schnellaktionen",
@@ -72,9 +52,6 @@
       "expenseCoverage": "Ausgabendeckung durch passives Einkommen",
       "passiveIncome": "Anteil passives Einkommen",
       "debtFreedom": "Schuldenfreiheit"
-    },
-    "recommendations": {
-      "increasePassive": "Passives Einkommen erhöhen"
     }
   },
   "alerts": {
@@ -191,9 +168,7 @@
     "smartSummary": "Smart Summary",
     "assetFocus": "Asset Focus",
     "currentDashboardMode": "Aktueller Modus: {{mode}}",
-    "appearance": "Erscheinungsbild",
     "theme": "Farbschema",
-    "language": "Sprache",
     "dataManagement": "Datenverwaltung",
     "exportData": "Daten exportieren",
     "exportDescription": "Laden Sie ein Backup Ihrer Finanzdaten herunter",
@@ -206,18 +181,9 @@
     "importData": "Daten importieren",
     "importDescription": "Stellen Sie Ihre Daten aus einer Backup-Datei wieder her",
     "about": "Über",
-    "entries": "Einträge",
-    "show": "Anzeigen",
-    "hide": "Ausblenden",
-    "logs": "Protokolle",
-    "refresh": "Aktualisieren",
-    "clear": "Löschen",
-    "autoRefresh": "Automatische Aktualisierung",
-    "totalEvents": "Gesamtevents",
     "appDescription": "Verfolgen Sie Ihre Vermögenswerte, Verbindlichkeiten, Einkommen und Ausgaben, um finanzielle Unabhängigkeit zu erreichen.",
     "debugModeActive": "Debug-Modus aktiv",
     "debugModeDescription": "Zusätzliche Debug-Funktionen sind aktiviert. In der Produktion deaktivieren.",
-    "seconds": "s",
     "dividendApiConfig": "Dividenden-API-Konfiguration",
     "enableDividendApi": "Dividenden-API aktivieren",
     "enableDividendApiDescription": "Aktivieren oder deaktivieren Sie die Integration der Dividenden-API",
@@ -225,7 +191,6 @@
     "recalculateDividendForecasts": "Dividendenprognosen neu berechnen",
     "clearData": "Daten löschen",
     "clearAllDataDesc": "Dies löscht alle Finanzdaten, einschließlich Vermögenswerte, Ausgaben, Verbindlichkeiten und Einstellungen wie API-Schlüssel und Wechselkurse.",
-    "clearPartialData": "Finanzdaten löschen",
     "clearAllData": "Alle Daten löschen",
     "clearAllDataTitle": "Alle Daten löschen",
     "clearPriceHistoryTitle": "Preisverlauf löschen",
@@ -290,21 +255,7 @@
     "clearReduxCacheDesc": "Alle zwischengespeicherten Berechnungen und temporären Daten im Arbeitsspeicher zurücksetzen",
     "ai": {
       "title": "KI-Assistent",
-      "enable_ai": "KI-Assistent aktivieren",
-      "enable_ai_description": "KI-gestützte Finanzeinblicke und Chat-Funktionen aktivieren",
-      "model_status": "Modell-Status",
-      "loaded_model": "Geladenes Modell",
-      "mode": "Modus",
-      "size": "Größe",
-      "select_model": "KI-Modell auswählen",
-      "load_model": "Modell laden",
-      "loading_model": "Modell wird geladen...",
-      "recommended": "Empfohlen",
-      "how_it_works": "So funktioniert es",
-      "how_it_works_1": "Modelle laufen vollständig in Ihrem Browser - keine Daten verlassen Ihr Gerät",
-      "how_it_works_2": "TinyLlama ist für lokale Inferenz und schnelle Antworten optimiert",
-      "how_it_works_3": "Ihre Finanzdaten werden lokal für personalisierte Einblicke analysiert",
-      "how_it_works_4": "Modelle werden einmal heruntergeladen und für Offline-Nutzung zwischengespeichert"
+      "size": "Größe"
     },
     "clearAllDataConfirm": "Sind Sie sicher, dass Sie ALLE Daten löschen möchten? Dies wird sämtliche Einstellungen und Daten unwiderruflich entfernen.",
     "clearDividendHistory": "Dividendenverlauf löschen",
@@ -354,10 +305,7 @@
     "selectDataSetsHint": "Wählen Sie die zu exportierenden Datenbereiche aus."
   },
   "pages": {
-    "addNewIncome": "Neues Einkommen hinzufügen",
-    "addNewLiability": "Neue Verbindlichkeit hinzufügen",
     "totalValue": "Gesamtwert",
-    "monthlyPassiveIncome": "Monatliches passives Einkommen",
     "totalMonthlyIncome": "Gesamtes monatliches Einkommen",
     "totalAnnualIncome": "Gesamtes jährliches Einkommen",
     "netWorth": "Nettovermögen",
@@ -366,14 +314,11 @@
   },
   "forecast": {
     "title": "Finanzprognose",
-    "projections": "Projektionen",
     "allocations": "Zuordnungen",
     "fire": "Meilensteine",
     "cashFlowProjection": "Monatliche Cashflow-Prognose",
     "passiveIncomeCoverage": "Deckung aller Ausgaben durch passives Einkommen",
     "assetAllocation": "Vermögensaufteilung",
-    "expenseBreakdown": "Monatliche Ausgabenaufschlüsselung",
-    "incomeAllocation": "Einkommensverteilung",
     "noAssetData": "Keine Vermögensdaten verfügbar",
     "month": "Monat",
     "coverage": "Deckungsgrad",
@@ -415,7 +360,6 @@
         "categories": "• Monatliche wiederkehrende Ausgaben: Wohnen, Transport, Nebenkosten, Versicherung und Gesundheit",
         "debtPayments": "• Alle monatlichen Schuldenrückzahlungen (Hypotheken, Kredite, Kreditkarten, etc.)",
         "exclusionNote": "💡 Hinweis: Freizeitausgaben und variable Kosten sind nicht in den Fixkosten enthalten.",
-        "breakdown": "Aufschlüsselung:\n• Monatliche wiederkehrende Ausgaben: {{expenses}}/Monat\n• Monatliche Schuldenrückzahlungen: {{debts}}/Monat",
         "percentCovered": "{{percent}}% durch passives Einkommen gedeckt",
         "noFixedCosts": "Noch keine Fixkosten erfasst. Füge deine wiederkehrenden Ausgaben und Schuldenrückzahlungen hinzu, um mit der Verfolgung zu beginnen."
       },
@@ -434,19 +378,16 @@
         "noDebt": "Noch keine Schulden erfasst. Füge deine Verbindlichkeiten hinzu, um deine Schuldenabdeckung zu überwachen.",
         "totalCoverage": "{{percent}}% Gesamtabdeckung",
         "monthlyCost": "Monatliche Kosten: {{amount}}",
-        "perDebt": "{{name}}: {{percent}}% Abdeckung",
-        "percentCovered": "{{percent}}% der Schulden durch passives Einkommen gedeckt"
+        "perDebt": "{{name}}: {{percent}}% Abdeckung"
       }
     }
   },
   "assetDefinitions": {
     "title": "Asset-Definitionen",
-    "subtitle": "Verwalten Sie Ihre Asset-Stammdaten und Definitionen",
     "addDefinition": "Definition hinzufügen",
     "editDefinition": "Definition bearbeiten",
     "noDefinitions": "Keine Asset-Definitionen",
-    "noDefinitionsDesc": "Erstellen Sie Asset-Definitionen, um Transaktionen zu vereinfachen",
-    "createDefinitionsFirst": "Erstellen Sie zuerst Asset-Definitionen, bevor Sie Transaktionen hinzufügen können"
+    "noDefinitionsDesc": "Erstellen Sie Asset-Definitionen, um Transaktionen zu vereinfachen"
   },
   "assetCategories": {
     "management": "Asset-Kategorien"
@@ -465,13 +406,11 @@
     "optionName": "Optionsname",
     "optionNamePlaceholder": "z.B. Dividendenaktie",
     "description": "Beschreibung",
-    "descriptionPlaceholder": "Zusätzliche Informationen...",
     "color": "Farbe",
     "isActive": "Aktiv",
     "options": "Optionen",
     "noCategories": "Keine Kategorien vorhanden",
     "noOptions": "Keine Optionen vorhanden",
-    "optionsFor": "Optionen für {{categoryName}}",
     "assetCategories": "Asset-Kategorien",
     "management": "Asset-Kategorien",
     "addAssignment": "Zuordnung hinzufügen",
@@ -557,7 +496,6 @@
     "totalReturn": "Gesamtrendite",
     "currentPrice": "Aktueller Kurs",
     "currentPricePlaceholder": "z.B. 150.00",
-    "purchaseDates": "Kaufdaten",
     "currentValue": "Aktueller Wert",
     "quantity": "Anzahl",
     "purchasePrice": "Kaufpreis",
@@ -569,14 +507,12 @@
     "sale": "Verkauf",
     "notes": "Notizen",
     "notesPlaceholder": "Zusätzliche Notizen zu dieser Transaktion...",
-    "noAssets": "Keine Assets vorhanden",
     "fullName": "Vollständiger Name",
     "fullNamePlaceholder": "z.B. Apple Inc.",
     "ticker": "Tickersymbol",
     "tickerPlaceholder": "z.B. AAPL",
     "riskLevel": "Risikostufe",
     "countryPlaceholder": "z.B. USA",
-    "continent": "Kontinent",
     "sectorPlaceholder": "z.B. Technologie",
     "exchange": "Börse",
     "exchangePlaceholder": "z.B. NASDAQ",
@@ -601,18 +537,13 @@
       "entries": "Preishistorie-Einträge",
       "title": "Preishistorie",
       "noHistory": "Keine Preishistorie verfügbar",
-      "latestPrice": "Letzter Preis",
-      "priceChange": "Preisänderung",
-      "since": "seit",
       "manual": "Manuell",
       "api": "API",
       "import": "Import"
     },
     "priceChart": {
       "title": "Kursverlauf",
-      "min": "Min",
-      "max": "Max",
-      "latestPrice": "Aktueller Kurs"
+      "max": "Max"
     },
     "selectDividendMonths": "Dividendenzahlungsmonate auswählen",
     "selectRentalMonths": "Mietzahlungsmonate auswählen",
@@ -675,8 +606,6 @@
     "save": "Speichern",
     "loading": "Wird geladen...",
     "deleteConfirm": "Sind Sie sicher, dass Sie diesen Eintrag löschen möchten?",
-    "required": "Pflichtfeld",
-    "priceRequired": "Preis muss größer als 0 sein",
     "customAmounts": "Individuelle Beträge",
     "totalAnnualAmount": "Jährlicher Gesamtbetrag",
     "requiredFields": "Pflichtfelder",
@@ -690,7 +619,6 @@
     "optionalFields": "Optionale Felder",
     "notes": "Notizen",
     "notesPlaceholder": "Zusätzliche Informationen oder Notizen...",
-    "noData": "Keine Daten verfügbar",
     "all": "Alle",
     "income": "Einkommen",
     "expenses": "Ausgaben",
@@ -703,15 +631,12 @@
     "title": "Ausgaben",
     "summary": "Monatliche Ausgaben",
     "addExpense": "Ausgabe hinzufügen",
-    "noExpenses": "Noch keine Ausgaben",
     "form": {
       "category": "Kategorie",
       "paymentFrequency": "Zahlungshäufigkeit",
-      "paymentAmount": "Zahlungsbetrag",
       "dayOfMonth": "Tag des Monats",
       "dayOfMonthPlaceholder": "z.B. 15 (für den 15. des Monats)",
       "paymentMonths": "Zahlungsmonate",
-      "required": "erforderlich",
       "enterExpenseName": "Ausgabenname eingeben",
       "selectCategory": "Kategorie auswählen",
       "selectFrequency": "Häufigkeit auswählen",
@@ -742,15 +667,11 @@
     "form": {
       "currentBalance": "Aktueller Saldo",
       "interestRate": "Zinssatz",
-      "paymentSchedule": "Zahlungsplan",
       "months": "Monate",
-      "years": "Jahre",
       "paymentAmount": "Zahlungsbetrag",
       "paymentFrequency": "Zahlungshäufigkeit",
       "paymentMonths": "Zahlungsmonate",
       "initialBalance": "Anfangssaldo",
-      "addLiability": "Verbindlichkeit hinzufügen",
-      "updateLiability": "Verbindlichkeit aktualisieren",
       "type": "Art der Verbindlichkeit"
     },
     "types": {
@@ -767,19 +688,14 @@
     "addIncome": "Einkommen hinzufügen",
     "editIncome": "Einkommen bearbeiten",
     "summary": "Einkommensübersicht",
-    "totalMonthly": "Monatliches Gesamteinkommen",
     "passiveIncome": "Passives Einkommen",
-    "noIncome": "Noch keine Einkommensquellen",
     "form": {
       "type": "Typ",
       "amount": "Betrag",
       "paymentFrequency": "Zahlungshäufigkeit",
-      "paymentAmount": "Zahlungsbetrag",
-      "paymentDay": "Zahltag",
       "dayOfMonth": "Tag des Monats",
       "dayOfMonthPlaceholder": "z.B. 15 (für den 15. des Monats)",
       "passiveIncome": "Passives Einkommen",
-      "selectAsset": "Vermögenswert auswählen",
       "paymentMonths": "Zahlungsmonate",
       "income": "Einkommen",
       "enterIncomeName": "Einkommensname eingeben",
@@ -800,7 +716,6 @@
       "title": "Analytics Hub",
       "subtitle": "Zentrale Übersicht aller Analysen und Einblicke",
       "recentAnalytics": "Zuletzt angesehen",
-      "recommendations": "Empfehlungen",
       "analyticsCategories": "Analytics-Kategorien",
       "availableAnalytics": "Verfügbare Analysen",
       "moreOptions": "weitere Optionen",
@@ -808,11 +723,7 @@
         "netWorth": "Nettovermögen",
         "monthlyCashFlow": "Monatlicher Cashflow",
         "totalAssets": "Gesamtvermögen",
-        "monthlyIncome": "Monatliches Einkommen",
-        "assetsCount": "Assets Anzahl",
-        "incomeSourcesCount": "Einkommensquellen",
-        "expenseCategories": "Ausgabenkategorien",
-        "liabilitiesCount": "Verbindlichkeiten"
+        "monthlyIncome": "Monatliches Einkommen"
       },
       "activities": {
         "overview": "Analytics-Übersicht angesehen",
@@ -843,9 +754,7 @@
       },
       "recent": {
         "portfolioDistribution": "Portfolio-Verteilung",
-        "viewedRecently": "Kürzlich angesehen",
-        "fireProgress": "FIRE-Fortschritt",
-        "monthlyBreakdown": "Monatliche Aufschlüsselung"
+        "viewedRecently": "Kürzlich angesehen"
       },
       "recommendationItems": {
         "diversification": "Portfolio diversifizieren"
@@ -857,7 +766,6 @@
       },
       "categories": {
         "overview": {
-          "title": "Übersicht",
           "description": "Allgemeine Finanz-Übersicht und Zusammenfassungen",
           "dashboard": "Dashboard",
           "summary": "Zusammenfassung"
@@ -896,47 +804,17 @@
         },
         "performance": {
           "title": "Performance-Analysen",
-          "subtitle": "Verfolgen Sie Ihre Portfolio-Performance und Renditen",
           "description": "Performance-Tracking und historische Analysen",
           "portfolio": "Portfolio-Performance",
           "portfolioDesc": "Portfolio-Wertentwicklung verfolgen",
           "returns": "Rendite-Analysen",
           "returnsDesc": "Rendite-Berechnungen und Vergleiche",
           "historical": "Historische Analysen",
-          "historicalDesc": "Langzeit-Trends und Entwicklungen",
-          "currentValue": "Aktueller Wert",
-          "totalReturn": "Gesamtrendite",
-          "peakValue": "Höchstwert",
-          "lowestValue": "Tiefstwert",
-          "volatility": "Volatilität",
-          "topPerformers": "Top-Performer",
-          "dailyReturn": "Tagesrendite",
-          "monthlyReturn": "Monatsrendite",
-          "annualizedReturn": "Jahresrendite",
-          "sharpeRatio": "Sharpe-Ratio",
-          "assetReturns": "Rendite nach Asset",
-          "riskMetrics": "Risikokennzahlen",
-          "invested": "Investiert",
-          "return": "Rendite",
-          "performanceTimeline": "Performance-Verlauf",
-          "bestDay": "Bester Tag",
-          "highestGain": "Höchster Tagesgewinn",
-          "bestMonth": "Bester Monat",
-          "highestMonthlyGain": "Höchster Monatsgewinn",
-          "annualizedPerformance": "Annualisierte Performance",
-          "yearOverYearReturn": "Jahr-zu-Jahr-Rendite",
-          "assetHistoricalPerformance": "Historische Asset-Performance",
-          "noHistoricalDataTitle": "Keine historischen Daten verfügbar",
-          "historicalAnalysis": "Historische Analyse",
-          "noData": "Keine Performance-Daten verfügbar",
-          "noHistoricalData": "Fügen Sie Assets mit Preishistorie hinzu, um die Performance über Zeit zu sehen. Historische Analysen helfen dabei, langfristige Performance-Trends Ihres Portfolios zu verfolgen."
+          "historicalDesc": "Langzeit-Trends und Entwicklungen"
         },
         "custom": {
-          "title": "Asset-Kalender",
           "description": "Verwalten und verfolgen Sie Ihre Asset-Ereignisse",
-          "builder": "Chart-Builder",
-          "saved": "Gespeicherte Analysen",
-          "templates": "Analyse-Vorlagen"
+          "saved": "Gespeicherte Analysen"
         },
         "assetCalendar": {
           "title": "Asset-Kalender",
@@ -952,8 +830,6 @@
     },
     "overview": {
       "net_worth": "Nettovermögen",
-      "title": "Finanz-Übersicht",
-      "subtitle": "Vollständige Übersicht Ihrer finanziellen Situation",
       "netWorth": "Nettovermögen",
       "monthlyCashFlow": "Monatlicher Cashflow",
       "totalAssets": "Gesamtvermögen",
@@ -961,19 +837,11 @@
       "monthlyIncome": "Monatliches Einkommen",
       "monthlyExpenses": "Monatliche Ausgaben",
       "assetsCount": "Assets",
-      "incomeSourcesCount": "Einkommensquellen",
-      "expenseCategories": "Ausgabenkategorien",
-      "liabilitiesCount": "Verbindlichkeiten",
-      "financialHealth": "Finanzgesundheit Zusammenfassung",
       "savingsRate": "Sparquote",
-      "expenseRatio": "Ausgabenrate",
       "tabs": {
         "summary": "Zusammenfassung",
-        "insights": "Einblicke",
-        "trends": "Trends"
-      },
-      "financialInsights": "Finanzielle Einblicke",
-      "negativeNetWorth": "Ihr Nettovermögen ist negativ. Erwägen Sie, Verbindlichkeiten zu reduzieren oder Vermögen zu erhöhen."
+        "insights": "Einblicke"
+      }
     },
     "portfolioAnalytics": "Portfolio-Analysen",
     "assetDistribution": "Vermögen",
@@ -1023,9 +891,7 @@
       "monthlyPayments": "Monatliche Zahlungen",
       "debtBalanceByType": "Schuldenstände nach Typ",
       "annualInterestByType": "Jährliche Zinsen nach Typ",
-      "interestRateComparison": "Zinssatz-Vergleich",
       "interestRate": "Zinssatz",
-      "debtProjection": "Schulden-Prognose (5 Jahre)",
       "debtProjection5Years": "Schulden-Prognose (5 Jahre)",
       "debtProjection10Years": "Schulden-Prognose (10 Jahre)",
       "debtProjection30Years": "Schulden-Prognose (30 Jahre)",
@@ -1042,12 +908,9 @@
       "chartTitle": "Diagramm-Titel",
       "editChart": "Diagramm bearbeiten",
       "enterTitle": "Titel eingeben",
-      "removeChart": "Diagramm entfernen",
       "groupBy": "Gruppieren nach",
       "dataSource": "Datenquelle",
-      "selectCategory": "Kategorie wählen",
       "chartType": "Diagramm-Typ",
-      "newChart": "Neues Diagramm",
       "assetValue": "Asset-Wert",
       "income": "Einkommen",
       "assets": "Vermögenswerte",
@@ -1077,8 +940,7 @@
     "quickActions": {
       "addTransaction": "Transaktion hinzufügen",
       "addIncome": "Einkommen hinzufügen",
-      "addExpense": "Ausgabe hinzufügen",
-      "addLiability": "Schuld hinzufügen"
+      "addExpense": "Ausgabe hinzufügen"
     },
     "track": "Verfolgen",
     "manage": "Verwalten",
@@ -1097,8 +959,6 @@
     "valueHistory": "Wertverlauf",
     "portfolioValue": "Portfolio-Wert",
     "transactionDays": "Transaktionstage",
-    "available": "Verfügbar",
-    "unified": "Vereint",
     "totalValue": "Gesamtwert",
     "positions": "Positionen",
     "view": "Ansicht",
@@ -1115,14 +975,11 @@
     },
     "debtRatio": "Schuldenquote",
     "analyze": "Analysieren",
-    "recentActivity": "Letzte Aktivitäten",
     "totalAssets": "Gesamtvermögen",
-    "lastUpdated": "Zuletzt aktualisiert",
     "hub": {
       "title": "Portfolio Hub",
       "subtitle": "Verwalten Sie Ihr komplettes finanzielles Portfolio",
       "recentActivities": "Letzte Portfolio-Aktivitäten",
-      "recommendations": "Empfehlungen",
       "recent": {
         "assetManagement": "Asset-Management",
         "incomeManagement": "Einkommensverwaltung",
@@ -1149,7 +1006,6 @@
         "assets.history": "Asset-Historie angesehen",
         "liabilities.debts": "Schulden angesehen",
         "liabilities.payments": "Zahlungen angesehen",
-        "liabilities.projections": "Projektionen angesehen",
         "income.sources": "Einkommensquellen angesehen",
         "income.streams": "Einkommensströme angesehen",
         "expenses.budgets": "Budgets angesehen",
@@ -1159,14 +1015,10 @@
         "transactions.import": "Transaktionen importiert",
         "transactions.export": "Transaktionen exportiert"
       },
-      "hubRecommendations": {
-        "diversifyIncome": "Einkommensströme diversifizieren"
-      },
       "quickActions": {
         "addTransaction": "Transaktion hinzufügen",
         "addIncome": "Einkommen hinzufügen",
-        "addExpense": "Ausgabe hinzufügen",
-        "addLiability": "Schuld hinzufügen"
+        "addExpense": "Ausgabe hinzufügen"
       }
     }
   },
@@ -1197,7 +1049,6 @@
       "description": "Einkommen ist der Motor Ihres Vermögensaufbaus. Dokumentieren Sie alle Einkommensquellen, um Ihren finanziellen Überblick zu verbessern.",
       "motivationalText": "Mehrere Einkommensquellen schaffen finanzielle Sicherheit!",
       "primaryAction": "Einkommen hinzufügen",
-      "secondaryAction": "Kategorien verstehen",
       "tips": [
         "Erfassen Sie auch passive Einkommensquellen",
         "Unterscheiden Sie zwischen aktivem und passivem Einkommen",
@@ -1209,7 +1060,6 @@
       "description": "Ausgaben zu kontrollieren ist der erste Schritt zu finanzieller Freiheit. Erfassen Sie Ihre wiederkehrenden Kosten für eine bessere Budgetplanung.",
       "motivationalText": "Wer seine Ausgaben kennt, kann sie optimieren!",
       "primaryAction": "Ausgabe hinzufügen",
-      "secondaryAction": "Budget planen",
       "tips": [
         "Beginnen Sie mit Ihren größten Ausgabenposten",
         "Unterscheiden Sie zwischen Bedürfnissen und Wünschen",
@@ -1221,7 +1071,6 @@
       "description": "Der Abbau von Verbindlichkeiten ist ein wichtiger Schritt zur finanziellen Unabhängigkeit. Dokumentieren Sie Ihre Schulden, um sie systematisch zu reduzieren.",
       "motivationalText": "Jede getilgte Schuld bringt Sie der Freiheit näher!",
       "primaryAction": "Verbindlichkeit hinzufügen",
-      "secondaryAction": "Tilgungsplan erstellen",
       "tips": [
         "Priorisieren Sie Schulden mit hohen Zinsen",
         "Kleine Zusatzzahlungen verkürzen die Laufzeit erheblich",
@@ -1229,22 +1078,14 @@
       ]
     },
     "portfolio": {
-      "title": "Ihr Portfolio wartet auf Sie!",
-      "description": "Ein diversifiziertes Portfolio ist der Schlüssel zu langfristigem Erfolg. Fügen Sie Assets hinzu, um Ihr Portfolio zu verfolgen.",
-      "motivationalText": "Diversifikation ist der einzige kostenlose Gewinn in der Finanzwelt!",
-      "actionLabel": "Portfolio aufbauen"
-    },
-    "analytics": {
-      "noData": "Noch keine Daten für die Analyse verfügbar"
+      "description": "Ein diversifiziertes Portfolio ist der Schlüssel zu langfristigem Erfolg. Fügen Sie Assets hinzu, um Ihr Portfolio zu verfolgen."
     },
     "charts": {
       "noData": "Keine Daten für die Darstellung verfügbar"
     },
     "forecast": {
       "title": "Planen Sie Ihre finanzielle Zukunft!",
-      "description": "Prognosen helfen Ihnen, fundierte finanzielle Entscheidungen zu treffen. Fügen Sie Assets und Einkommen hinzu, um Ihre Zukunft zu projizieren.",
-      "motivationalText": "Die beste Zeit zu investieren war vor 20 Jahren. Die zweitbeste Zeit ist jetzt!",
-      "actionLabel": "Daten für Prognose hinzufügen"
+      "description": "Prognosen helfen Ihnen, fundierte finanzielle Entscheidungen zu treffen. Fügen Sie Assets und Einkommen hinzu, um Ihre Zukunft zu projizieren."
     }
   },
   "recommendations": {
@@ -1369,7 +1210,6 @@
     "totalRecommendations": "{{count}} Empfehlungen werden angezeigt"
   },
   "assetFocus": {
-    "portfolioValue": "Portfolio Wert",
     "portfolioHistory": "Portfolio Verlauf",
     "updateIntradayHistory": "Intraday Verlauf aktualisieren",
     "positions": "Positionen",
@@ -1399,18 +1239,13 @@
     "max": "Maximum",
     "max.description": "Alle verfügbaren historischen Daten"
   },
-  "useMultipleCountries": "Mehrere Länder verwenden",
-  "totalPercentage": "Summe",
-  "percentageMustBe100": "Summe muss 100% sein",
   "ai": {
     "insights": {
       "title": "KI-Einblicke",
       "subtitle": "Finanzempfehlungen powered by KI",
       "generate": "Einblicke generieren",
       "generating": "Generiere Einblicke...",
-      "error": "Fehler beim Generieren der Einblicke",
-      "retry": "Wiederholen",
-      "clearError": "Fehler löschen"
+      "error": "Fehler beim Generieren der Einblicke"
     },
     "chat": {
       "title": "KI-Chat",
@@ -1446,10 +1281,6 @@
       }
     },
     "responses": {
-      "recommendations": "Empfehlungen",
-      "confidence": "Zuverlässigkeit",
-      "dataUsed": "Verwendete Daten",
-      "generatedAt": "Erstellt",
       "requestTypes": {
         "general": "Allgemeine Analyse",
         "portfolio": "Portfolio-Analyse",
@@ -1476,12 +1307,10 @@
       "navigation": {
         "back": "Zurück",
         "next": "Weiter",
-        "skip": "Überspringen",
-        "complete": "Setup abschließen"
+        "skip": "Überspringen"
       },
       "steps": {
         "welcome": {
-          "title": "Willkommen",
           "description": "Willkommen beim Einrichtungsassistenten. Beginnen Sie mit StrictFinance."
         },
         "assetDefinitions": {
@@ -1489,7 +1318,6 @@
           "description": "Definieren Sie Ihre Assets aus Vorlagen oder erstellen Sie benutzerdefinierte Assets."
         },
         "transactions": {
-          "title": "Transaktionen",
           "description": "Fügen Sie Ihre Asset-Transaktionen hinzu."
         },
         "liabilities": {
@@ -1501,7 +1329,6 @@
           "description": "Definieren Sie Ihre Einkommensquellen."
         },
         "completion": {
-          "title": "Einrichtung abschließen",
           "description": "Überprüfen und schließen Sie Ihre Einrichtung ab."
         }
       }
@@ -1539,60 +1366,32 @@
     },
     "assets": {
       "title": "Asset-Definitionen",
-      "subtitle": "Definieren Sie Ihre Investitions-Assets und Vorlagen",
-      "popularAssets": {
-        "title": "Aus beliebten Assets wählen",
-        "subtitle": "Wählen Sie aus unseren vorkonfigurierten Asset-Vorlagen, um schnell zu beginnen.",
-        "selected": "Ausgewählte Assets",
-        "count": "{{count}} Asset(s) ausgewählt"
-      },
       "customAssets": {
-        "title": "Benutzerdefiniertes Asset erstellen",
-        "subtitle": "Fügen Sie Ihre eigenen benutzerdefinierten Assets hinzu, die nicht in unseren Vorlagen enthalten sind.",
         "form": {
           "symbol": "Symbol",
-          "symbolPlaceholder": "z.B. AAPL",
           "name": "Asset-Name",
-          "namePlaceholder": "z.B. Apple Inc.",
           "type": "Asset-Typ",
           "sector": "Sektor",
-          "sectorPlaceholder": "z.B. Technologie",
           "country": "Land",
-          "countryPlaceholder": "z.B. Vereinigte Staaten",
-          "description": "Beschreibung",
-          "descriptionPlaceholder": "Optionale Beschreibung..."
-        },
-        "addAsset": "Benutzerdefiniertes Asset hinzufügen"
-      },
-      "selectedAssets": {
-        "title": "Ihre ausgewählten Assets",
-        "count": "{{count}} Assets ausgewählt",
-        "noAssets": "Noch keine Assets ausgewählt"
+          "description": "Beschreibung"
+        }
       }
     },
     "transactions": {
       "title": "Transaktionshistorie",
-      "subtitle": "Fügen Sie Ihre Investitionstransaktionen und Handelshistorie hinzu",
       "noAssets": {
-        "title": "Keine Assets verfügbar",
         "description": "Sie haben noch keine Assets ausgewählt. Sie können:"
       },
       "form": {
         "asset": "Asset",
-        "assetPlaceholder": "Asset auswählen",
-        "customAsset": "Oder neues Asset erstellen:",
         "type": "Transaktionstyp",
         "date": "Datum",
         "quantity": "Menge",
         "price": "Preis pro Aktie",
-        "fees": "Gebühren",
-        "description": "Beschreibung",
-        "descriptionPlaceholder": "Optionale Transaktionsnotizen..."
+        "description": "Beschreibung"
       },
       "addTransaction": "Transaktion hinzufügen",
       "list": {
-        "title": "Ihre Transaktionen",
-        "count": "{{count}} Transaktionen",
         "headers": {
           "date": "Datum",
           "asset": "Asset",
@@ -1605,80 +1404,41 @@
     },
     "liabilities": {
       "title": "Verbindlichkeiten & Schulden",
-      "subtitle": "Verfolgen Sie Ihre Schulden und finanziellen Verpflichtungen",
-      "optional": "Dieser Schritt ist optional - Sie können Schulden später konfigurieren, falls erforderlich.",
       "form": {
         "name": "Name der Verbindlichkeit",
-        "namePlaceholder": "z.B. Hypothek, Autokredit",
         "type": "Verbindlichkeitstyp",
         "amount": "Gesamtbetrag",
         "interestRate": "Zinssatz (%)",
-        "interestRatePlaceholder": "Jährlicher Zinssatz",
-        "monthlyPayment": "Monatliche Zahlung",
-        "description": "Beschreibung",
-        "descriptionPlaceholder": "Zusätzliche Details..."
+        "description": "Beschreibung"
       },
-      "addLiability": "Verbindlichkeit hinzufügen",
-      "list": {
-        "title": "Ihre Verbindlichkeiten",
-        "count": "{{count}} Verbindlichkeiten",
-        "totalDebt": "Gesamtschuld",
-        "monthlyPayments": "Monatliche Zahlungen"
-      }
+      "addLiability": "Verbindlichkeit hinzufügen"
     },
     "income": {
       "title": "Einkommensquellen",
-      "subtitle": "Konfigurieren Sie Ihre Einkommensströme und Verdienstquellen",
-      "optional": "Dieser Schritt ist optional - Sie können später Einkommensquellen hinzufügen, falls erforderlich.",
       "form": {
         "name": "Name der Einkommensquelle",
-        "namePlaceholder": "z.B. Gehalt, Freelancing",
         "type": "Einkommenstyp",
-        "monthlyAmount": "Monatlicher Betrag",
         "isPassive": "Ist das passives Einkommen?",
-        "description": "Beschreibung",
-        "descriptionPlaceholder": "Zusätzliche Details..."
+        "description": "Beschreibung"
       },
-      "addIncome": "Einkommensquelle hinzufügen",
-      "list": {
-        "title": "Ihre Einkommensquellen",
-        "count": "{{count}} Einkommensquellen",
-        "noIncome": "Noch keine Einkommensquellen hinzugefügt",
-        "monthlyAmount": "Monatlicher Betrag",
-        "annualAmount": "Jährlicher Betrag",
-        "totalMonthly": "Gesamtes monatliches Einkommen"
-      }
+      "addIncome": "Einkommensquelle hinzufügen"
     },
     "completion": {
       "title": "Setup abgeschlossen!",
-      "subtitle": "Ihr Passiveinkommen-Rechner ist jetzt konfiguriert und einsatzbereit.",
       "summary": {
-        "title": "Setup-Zusammenfassung",
         "assets": "Assets konfiguriert",
         "transactions": "Transaktionen hinzugefügt",
         "liabilities": "Verbindlichkeiten verfolgt",
         "income": "Einkommensquellen",
-        "totalPortfolioValue": "Gesamtportfoliowert",
         "monthlyIncome": "Monatliches Einkommen",
         "monthlyExpenses": "Monatliche Schuldenzahlungen"
-      },
-      "nextSteps": {
-        "title": "Was kommt als Nächstes?",
-        "step1": "Erkunden Sie Ihr Dashboard für einen Überblick über Ihre Finanzen",
-        "step2": "Fügen Sie weitere Transaktionen hinzu, wenn Sie Investitionen tätigen",
-        "step3": "Nutzen Sie den Analytics-Bereich, um Ihren Fortschritt zu verfolgen",
-        "step4": "Richten Sie finanzielle Ziele und Meilensteine ein"
-      },
-      "motivation": "Herzlichen Glückwunsch! Sie haben einen wichtigen Schritt in Richtung finanzieller Unabhängigkeit gemacht. Ihr Passiveinkommen-Rechner ist jetzt bereit, Ihnen beim Verfolgen und Wachsen Ihres Vermögens zu helfen."
+      }
     },
     "fileImport": {
       "title": "Daten importieren",
       "dragDrop": "Dateien hier hinziehen und ablegen",
       "or": "oder",
       "clickToSelect": "klicken, um Dateien auszuwählen",
-      "maxFileSize": "Maximale Dateigröße",
-      "validating": "Datei wird validiert...",
-      "processing": "Daten werden verarbeitet...",
       "success": "Datei erfolgreich verarbeitet!",
       "error": "Fehler beim Verarbeiten der Datei",
       "chooseDifferentFile": "Andere Datei wählen",
@@ -1708,8 +1468,7 @@
           "description": "Wählen Sie aus unseren vorkonfigurierten Asset-Vorlagen, um schnell zu beginnen."
         },
         "selectedAssets": {
-          "title": "Ausgewählte Assets",
-          "count": "{{count}}"
+          "title": "Ausgewählte Assets"
         },
         "showMore": "Alle {{count}} Assets anzeigen",
         "showLess": "Weniger anzeigen",
