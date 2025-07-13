@@ -94,7 +94,7 @@ class Logger {
     }
   }
 
-  static infoAPI(message: string, requestData?: any, responseData?: any): void {
+  static infoAPI(message: string, requestData?: unknown, responseData?: unknown): void {
     if (featureFlag_Debug_Log_API || featureFlag_Debug_AllLogs) {
       let logMessage = `API: ${message}`;
       if (requestData) {

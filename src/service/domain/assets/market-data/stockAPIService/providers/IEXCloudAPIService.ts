@@ -6,6 +6,27 @@ import {
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
 
+// IEX Cloud API response interfaces
+interface IEXCloudHistoryData {
+  date: string;
+  open?: number;
+  high?: number;
+  low?: number;
+  close: number;
+  volume?: number;
+  minute?: string;
+}
+
+interface IEXCloudIntradayData {
+  date: string;
+  minute: string;
+  open?: number;
+  high?: number;
+  low?: number;
+  close: number;
+  volume?: number;
+}
+
 /**
  * IEX Cloud API Service Provider
  * Implements the IStockAPIService interface with IEX Cloud API
@@ -53,7 +74,7 @@ export class IEXCloudAPIService extends BaseStockAPIService {
       const data = await this.makeRequest(url);
       this.checkForAPIErrors(data);
       
-      const entries: StockHistoryEntry[] = data.map((item: any) => ({
+      const entries: StockHistoryEntry[] = data.map((item: IEXCloudHistoryData) => ({
         date: item.date,
         open: item.open,
         high: item.high,
@@ -90,7 +111,7 @@ export class IEXCloudAPIService extends BaseStockAPIService {
       const data = await this.makeRequest(url);
       this.checkForAPIErrors(data);
       
-      const entries: StockHistoryEntry[] = data.map((item: any) => ({
+      const entries: StockHistoryEntry[] = data.map((item: IEXCloudIntradayData) => ({
         date: item.date,
         open: item.open || item.close,
         high: item.high || item.close,

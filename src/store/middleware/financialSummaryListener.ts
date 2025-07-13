@@ -1,4 +1,4 @@
-import { Middleware, MiddlewareAPI, AnyAction } from '@reduxjs/toolkit';
+import { Middleware, MiddlewareAPI, AnyAction, Dispatch } from '@reduxjs/toolkit';
 import { RootState } from '@/store';
 import { calculateFinancialSummary, calculateAssetFocusData, invalidateFinancialSummary } from '@/store/slices/domain/transactionsSlice';
 import Logger from '@/service/shared/logging/Logger/logger';
@@ -45,7 +45,7 @@ const shouldRecalculateAssetFocusData = (state: RootState): boolean => {
 };
 
 // Middleware to automatically trigger financial summary and asset focus data recalculation when relevant data changes
-export const financialSummaryMiddleware: Middleware<object, RootState> = (store: MiddlewareAPI<any, RootState>) => (next) => (action: unknown) => {
+export const financialSummaryMiddleware: Middleware<object, RootState> = (store: MiddlewareAPI<Dispatch, RootState>) => (next) => (action: unknown) => {
   const result = next(action);
   
   // Listen for successful data changes
@@ -76,7 +76,7 @@ export const financialSummaryMiddleware: Middleware<object, RootState> = (store:
       if (shouldRecalculateFinancialSummary(state)) {
         Logger.info('FinancialSummaryMiddleware: Triggering financial summary recalculation');
         const financialData = getFinancialData(state);
-        store.dispatch(calculateFinancialSummary(financialData) as any);
+        store.dispatch(calculateFinancialSummary(financialData));
       } else {
         // Invalidate cache to force recalculation next time
         store.dispatch(invalidateFinancialSummary());
@@ -86,7 +86,7 @@ export const financialSummaryMiddleware: Middleware<object, RootState> = (store:
       if ((type.startsWith('transactions/') || type.startsWith('assetDefinitions/')) && 
           shouldRecalculateAssetFocusData(state)) {
         Logger.info('FinancialSummaryMiddleware: Triggering asset focus data recalculation');
-        store.dispatch(calculateAssetFocusData() as any);
+        store.dispatch(calculateAssetFocusData());
       }
     }
   }

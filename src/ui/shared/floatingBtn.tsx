@@ -4,6 +4,7 @@ import { Fab } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 
+// eslint-disable-next-line react-refresh/only-export-components
 export enum ButtonAlignment {
   LEFT = "LEFT",
   CENTER = "CENTER",

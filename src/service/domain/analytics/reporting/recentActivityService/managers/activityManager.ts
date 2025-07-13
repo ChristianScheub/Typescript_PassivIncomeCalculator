@@ -1,5 +1,5 @@
 
-import { RecentActivity, ActivityType, ActivityServiceConfig } from '@/types/domains/analytics/reporting';
+import { RecentActivity, ActivityType, ActivityServiceConfig, AnalyticsActivity, AnalyticsCategory, AnalyticsSubCategory } from '@/types/domains/analytics/reporting';
 import { createStorageManager } from './storageManager';
 import { createActivityFactory } from '../core/activityFactory';
 import Logger from "@/service/shared/logging/Logger/logger";
@@ -88,7 +88,7 @@ export const createActivityManager = (config: ActivityServiceConfig) => {
       // Remove the old analytics activity with matching category/subcategory
       activities = activities.filter(activity => {
         if (activity.type === 'analytics') {
-          const analyticsActivity = activity as any;
+          const analyticsActivity = activity as AnalyticsActivity;
           return !(analyticsActivity.category === oldCategory && 
                   analyticsActivity.subCategory === oldSubCategory);
         }
@@ -96,7 +96,7 @@ export const createActivityManager = (config: ActivityServiceConfig) => {
       });
       
       // Create and add the new analytics activity
-      const newActivity = activityFactory.createAnalyticsActivity(newCategory as any, newSubCategory as any);
+      const newActivity = activityFactory.createAnalyticsActivity(newCategory as AnalyticsCategory, newSubCategory as AnalyticsSubCategory);
       activities.unshift(newActivity);
       
       storageManager.saveActivities('analytics', activities);

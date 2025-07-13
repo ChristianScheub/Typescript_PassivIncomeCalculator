@@ -17,9 +17,9 @@ interface NavigationHistoryItem {
   subCategory?: PortfolioSubCategory;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface PortfolioHubContainerProps {
   // Currently no props needed - could add future props here
-   
 }
 
 const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {

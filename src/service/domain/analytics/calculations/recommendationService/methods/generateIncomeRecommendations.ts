@@ -7,6 +7,7 @@ import Logger from '@/service/shared/logging/Logger/logger';
 export const generateIncomeRecommendations = (
   assets: Asset[],
   income: Income[],
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   assetDefinitions: AssetDefinition[] = [],
   portfolioCache?: { totals: { monthlyIncome: number } } | null // Optional portfolio cache
 ): PortfolioRecommendation[] => {
@@ -96,6 +97,7 @@ export const generateIncomeRecommendations = (
 
   // 13. Interest Income
   // Now: If user has >5 assets, but none generate any income (no bonds, no dividend stocks, no rental, etc.)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const incomeGeneratingAssets = assets.filter(asset => {
     // This should be replaced with real logic: asset generates income if it's a bond, dividend stock, or rental property
     // For now, we assume all functions return empty arrays (TODO implementation)
@@ -161,11 +163,13 @@ const findAssetsWithoutIncome = (): Asset[] => {
   return [];
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const findBondAssets = (): Asset[] => {
   // TODO: Find bond assets
   return [];
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const findIrregularIncome = (_income: Income[]): Income[] => {
   // TODO: Find income with irregular payment schedules
   return [];

@@ -36,7 +36,7 @@ const ForecastContainer: React.FC<ForecastContainerProps> = ({ onBack }) => {
         'update forecast values',
         async () => {
           const action = updateForecastValues();
-          await (dispatch as any)(action);
+          await dispatch(action);
         },
         () => {}
       );
@@ -51,7 +51,7 @@ const ForecastContainer: React.FC<ForecastContainerProps> = ({ onBack }) => {
         'initial forecast load',
         async () => {
           const action = updateForecastValues();
-          await (dispatch as any)(action);
+          await dispatch(action);
         },
         () => {}
       );

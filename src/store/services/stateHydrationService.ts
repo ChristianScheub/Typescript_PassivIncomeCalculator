@@ -215,6 +215,7 @@ export class StateHydrationService {
   /**
    * Transform simple state slices (liabilities, expenses, income)
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private static transformSimpleState(data: Record<string, unknown>, _sliceName: string) {
     return {
       items: data?.items || [],
@@ -226,7 +227,7 @@ export class StateHydrationService {
   /**
    * Transform custom analytics state
    */
-  private static transformCustomAnalyticsState(analyticsData: any) {
+  private static transformCustomAnalyticsState(analyticsData: Record<string, unknown>) {
     return {
       charts: analyticsData?.charts || [],
       isConfigPanelOpen: false,
@@ -237,17 +238,17 @@ export class StateHydrationService {
   /**
    * Transform unified config state (replaces API, dividend API, AI config, dashboard settings)
    */
-  private static transformConfigState(state: any) {
-    const apiData = state.apiConfig;
-    const dividendApiData = state.dividendApiConfig;
-    const aiData = state.aiConfig;
-    const dashboardData = state.dashboardSettings;
+  private static transformConfigState(state: Record<string, unknown>) {
+    const apiData = state.apiConfig as Record<string, unknown> | undefined;
+    const dividendApiData = state.dividendApiConfig as Record<string, unknown> | undefined;
+    const aiData = state.aiConfig as Record<string, unknown> | undefined;
+    const dashboardData = state.dashboardSettings as Record<string, unknown> | undefined;
     
     return {
       apis: {
         stock: {
           enabled: apiData?.isEnabled ?? (this.getStorageValue('stock_api_enabled') === 'true'),
-          selectedProvider: apiData?.selectedProvider ?? ((this.getStorageValue('selected_stock_api_provider') as any) || 'finnhub'),
+          selectedProvider: apiData?.selectedProvider ?? ((this.getStorageValue('selected_stock_api_provider') as string) || 'finnhub'),
           apiKeys: apiData?.apiKeys || {
             finnhub: this.getStorageValue('finnhub_api_key') || undefined,
             yahoo: this.getStorageValue('yahoo_api_key') || undefined,
@@ -309,7 +310,8 @@ export class StateHydrationService {
   /**
    * Transform snackbar state
    */
-  private static transformSnackbarState(_snackbarData: any) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  private static transformSnackbarState(_snackbarData: Record<string, unknown>) {
     return {
       messages: [],
       open: false

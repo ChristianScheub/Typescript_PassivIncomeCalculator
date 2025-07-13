@@ -44,7 +44,7 @@ export class ModelManager {
       // Erstelle neue MLCEngine mit erweiterten Konfigurationen
       const engineConfig = {
         // Konfiguration für größeren Context Window
-        initProgressCallback: (report: any) => {
+        initProgressCallback: (report: { progress: number; timeElapsed: number; text: string }) => {
           // Convert progress from decimal to percentage and round
           const progressPercentage = report.progress;
           Logger.infoService(`ModelManager: Loading progress: ${progressPercentage * 100}%`);
@@ -181,7 +181,7 @@ export class ModelManager {
 
       return completion.choices[0]?.message?.content || 'AI analysis could not be generated due to prompt length constraints.';
     } catch (error) {
-      Logger.error('ModelManager: Even truncated prompt failed');
+      Logger.error(`ModelManager: Even truncated prompt failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
       return 'Financial analysis temporarily unavailable. Please try again with a simpler request.';
     }
   }

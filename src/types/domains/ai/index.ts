@@ -126,9 +126,9 @@ export interface SerializedReduxState {
   expenses: Expense[];
   income: Income[];
   customAnalytics: Record<string, unknown>;
-  forecast: any;
-  apiConfig: any;
-  calculatedData: any;
+  forecast: Record<string, unknown>;
+  apiConfig: Record<string, unknown>;
+  calculatedData: Record<string, unknown>;
   timestamp: string;
 }
 

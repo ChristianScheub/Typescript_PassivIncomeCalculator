@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../shared/Card';
 import { recentActivityService } from '@/service';
-import type { PortfolioCategory, PortfolioSubCategory } from '@/types/domains/analytics/reporting';
+import type { PortfolioCategory, PortfolioSubCategory, PortfolioActivity } from '@/types/domains/analytics/reporting';
 
 interface PortfolioRecentActivitiesProps {
   portfolioData: {
@@ -32,13 +32,13 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
 }) => {
   const { t } = useTranslation();
 
-  // Icon mapping for activities
-  const iconMap = {
-    Wallet, CreditCard, ReceiptText, Landmark, Activity, BarChart3, Plus, TrendingUp,
-    Target, Star
-  };
-
   const recentPortfolioActivities = useMemo(() => {
+    // Icon mapping for activities
+    const iconMap = {
+      Wallet, CreditCard, ReceiptText, Landmark, Activity, BarChart3, Plus, TrendingUp,
+      Target, Star
+    };
+
     const history = recentActivityService.getActivitiesByType('portfolio', maxActivities);
     
     if (history.length === 0) {
@@ -73,8 +73,8 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
 
     // Map actual history to components
     return history
-      .filter((entry): entry is any => entry.type === 'portfolio') // Type guard for portfolio activities
-      .map((entry: any, index: number) => {
+      .filter((entry): entry is PortfolioActivity => entry.type === 'portfolio') // Type guard for portfolio activities
+      .map((entry: PortfolioActivity, index: number) => {
         const IconComponent = iconMap[entry.icon as keyof typeof iconMap] || Wallet;
         const colors = ['text-blue-500', 'text-green-500', 'text-orange-500'];
         

@@ -6,6 +6,33 @@ import {
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
 
+// Yahoo Finance API response interface
+interface YahooFinanceChartResponse {
+  chart: {
+    result: Array<{
+      meta: {
+        currency?: string;
+        symbol: string;
+        regularMarketPrice?: number;
+      };
+      timestamp: number[];
+      indicators: {
+        quote: Array<{
+          open: (number | null)[];
+          high: (number | null)[];
+          low: (number | null)[];
+          close: (number | null)[];
+          volume: (number | null)[];
+        }>;
+      };
+    }>;
+    error?: {
+      code: string;
+      description: string;
+    };
+  };
+}
+
 /**
  * Yahoo Finance API Service Provider (Capacitor + Typescript)
  * Implementiert das IStockAPIService Interface mit echten API-Aufrufen (ohne API-Key)
@@ -20,7 +47,7 @@ export class YahooAPIService extends BaseStockAPIService {
   }
 
 
-  private async fetchChart(symbol: string, interval: string, range: string): Promise<any> {
+  private async fetchChart(symbol: string, interval: string, range: string): Promise<YahooFinanceChartResponse> {
     if (!symbol || !interval || !range) {
       throw new Error('Symbol, interval, and range are required parameters');
     }

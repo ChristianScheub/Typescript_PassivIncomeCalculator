@@ -12,8 +12,26 @@ import { calculateTotalMonthlyLiabilityPayments } from '../../../../financial/li
 import { calculatePassiveIncome, calculateTotalMonthlyIncome } from '../../../../financial/income/incomeCalculatorService/methods/calculateIncome';
 import { calculateTotalAssetIncomeForMonth } from '../../../../assets/calculations/assetCalculatorService/methods/calculateAssetIncome';
 
+interface RawProjectionData {
+  month?: Date | string;
+  netCashFlow?: number;
+  incomeTotal?: number;
+  expenseTotal?: number;
+  liabilityTotal?: number;
+  assetIncomeBreakdown?: {
+    dividends?: number;
+    bonds?: number;
+    realEstate?: number;
+    crypto?: number;
+    commodities?: number;
+    other?: number;
+  };
+  expenseBreakdown?: { [key: string]: number };
+  liabilityBreakdown?: { [key: string]: number };
+}
+
 function mapCalculatorToMonthlyProjection(
-  projections: any[]
+  projections: RawProjectionData[]
 ): MonthlyProjection[] {
   let cumulativeCashFlow = 0;
   return projections.map((p) => {

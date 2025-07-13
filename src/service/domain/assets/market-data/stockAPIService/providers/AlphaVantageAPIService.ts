@@ -6,6 +6,15 @@ import {
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
 
+// Alpha Vantage API response interfaces
+interface AlphaVantageTimeSeriesData {
+  "1. open": string;
+  "2. high": string;
+  "3. low": string;
+  "4. close": string;
+  "5. volume": string;
+}
+
 /**
  * Alpha Vantage API Service Provider
  * Implements the simplified IStockAPIService interface
@@ -56,7 +65,7 @@ export class AlphaVantageAPIService extends BaseStockAPIService {
       const series = response?.[`Time Series (${interval})`];
       if (!series) throw new Error('No intraday data found');
       
-      const entries: StockHistoryEntry[] = Object.entries(series).map(([date, values]: [string, any]) => ({
+      const entries: StockHistoryEntry[] = Object.entries(series).map(([date, values]: [string, AlphaVantageTimeSeriesData]) => ({
         date: date.split(' ')[0],
         timestamp: this.parseTimestamp(date),
         open: parseFloat(values["1. open"]),
@@ -95,7 +104,7 @@ export class AlphaVantageAPIService extends BaseStockAPIService {
       const series = response["Time Series (Daily)"];
       if (!series) throw new Error('No daily history data found');
       
-      let entries: StockHistoryEntry[] = Object.entries(series).map(([date, values]: [string, any]) => ({
+      let entries: StockHistoryEntry[] = Object.entries(series).map(([date, values]: [string, AlphaVantageTimeSeriesData]) => ({
         date,
         timestamp: this.parseTimestamp(date),
         open: parseFloat(values["1. open"]),

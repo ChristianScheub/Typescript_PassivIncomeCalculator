@@ -7,6 +7,7 @@ import { DividendHistoryEntry } from '@/types/domains/assets/dividends';
 import { parseDividendHistoryFromApiResult } from '@/utils/parseDividendHistoryFromApiResult';
 import type { DividendFrequency } from '@/types/shared/base/enums';
 import dividendApiService from '@/service/domain/assets/market-data/dividendAPIService';
+import type { DividendData } from '@/service/domain/assets/market-data/dividendAPIService';
 import { StandardCrudState, createSliceLogger, standardReducerPatterns } from '../../common/slicePatterns';
 
 // Using standardized CRUD state interface
@@ -168,7 +169,7 @@ export const fetchAndUpdateDividends = createAsyncThunk(
   async (definition: AssetDefinition) => {
     Logger.info('[fetchAndUpdateDividends] called for: ' + definition.fullName);
     if (!definition.ticker) throw new Error('Kein Ticker für Asset vorhanden');
-    let result: any;
+    let result: { dividends: DividendData[] };
     try {
       Logger.info('[fetchAndUpdateDividends] about to call fetchDividends');
       result = await dividendApiService.fetchDividends(definition.ticker, { interval: '1d', range: '2y' });
@@ -183,12 +184,10 @@ export const fetchAndUpdateDividends = createAsyncThunk(
     // Robust handling: if result.dividends is an array, map directly; else, use parser for raw API result
     if (Array.isArray(result?.dividends)) {
       dividendHistory = result.dividends
-        .filter((div: any) => div.amount != null && (div.date || div.lastDividendDate))
-        .map((div: any) => ({
+        .filter((div: DividendData) => div.amount != null && (div.lastDividendDate))
+        .map((div: DividendData) => ({
           date: div.lastDividendDate
             ? new Date(div.lastDividendDate).toISOString()
-            : div.date
-            ? new Date(div.date * 1000).toISOString()
             : '',
           amount: div.amount,
           source: 'api',

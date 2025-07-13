@@ -3,6 +3,11 @@ import Logger from '@/service/shared/logging/Logger/logger';
 import { DividendData } from '../../types';
 import { detectDividendFrequency } from '../../utils/detectDividendFrequency';
 
+interface YahooDividendItem {
+  date?: number;
+  amount: number;
+}
+
 export async function fetchDividendsYahoo(ticker: string, opts?: { interval?: string; range?: string }): Promise<DividendData[]> {
   const interval = opts?.interval || '1m';
   const range = opts?.range || 'max';
@@ -35,12 +40,12 @@ export async function fetchDividendsYahoo(ticker: string, opts?: { interval?: st
   const dividendArray = Object.values(events);
 
   // Sortiere nach Datum (falls gewünscht)
-  dividendArray.sort((a: any, b: any) => (a.date ?? 0) - (b.date ?? 0));
+  dividendArray.sort((a: YahooDividendItem, b: YahooDividendItem) => (a.date ?? 0) - (b.date ?? 0));
 
   const frequency = detectDividendFrequency(dividendArray as { date?: number }[]);
 
   // Mapping zu DividendData[]
-  const dividends: DividendData[] = dividendArray.map((item: any) => ({
+  const dividends: DividendData[] = dividendArray.map((item: YahooDividendItem) => ({
     amount: item.amount,
     frequency,
     lastDividendDate: item.date ? new Date(item.date * 1000).toISOString().slice(0, 10) : undefined,

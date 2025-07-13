@@ -83,24 +83,19 @@ self.onmessage = function (e: MessageEvent<WorkerRequest>) {
     if (e.data.type === 'updateBatch') {
       updateBatchStockPrices(e.data.definitions).then(results => {
         const response: WorkerResponse = { type: 'batchResult', results };
-        // @ts-expect-error postMessage is available in worker context
         self.postMessage(response);
       }).catch(error => {
-        // @ts-expect-error postMessage is available in worker context
         self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
       });
     } else if (e.data.type === 'updateSingle') {
       updateSingleStockPrice(e.data.definition).then(result => {
         const response: WorkerResponse = { type: 'singleResult', result };
-        // @ts-expect-error postMessage is available in worker context
         self.postMessage(response);
       }).catch(error => {
-        // @ts-expect-error postMessage is available in worker context
         self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
       });
     }
   } catch (err: unknown) {
-    // @ts-expect-error postMessage is available in worker context
     self.postMessage({ type: 'error', error: err instanceof Error ? err.message : String(err) });
   }
 };

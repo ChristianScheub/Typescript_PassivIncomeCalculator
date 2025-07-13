@@ -5,13 +5,14 @@ import { StoreState } from '../..';
 import Logger from '@service/shared/logging/Logger/logger';
 import { hydrateStore } from '../../actions/hydrateAction';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import { AssetDefinition } from '@/types/domains/assets/entities';
 
 // Helper functions to calculate income for different asset types
-const getAssetDefinition = (position: PortfolioPosition, assetDefinitions: any[]): any | undefined => {
+const getAssetDefinition = (position: PortfolioPosition, assetDefinitions: AssetDefinition[]): AssetDefinition | undefined => {
   return assetDefinitions.find(def => def.id === position.assetDefinitionId);
 };
 
-const calculateStockDividendIncome = (position: PortfolioPosition, month: number, assetDefinitions: any[]): number => {
+const calculateStockDividendIncome = (position: PortfolioPosition, month: number, assetDefinitions: AssetDefinition[]): number => {
   const assetDefinition = getAssetDefinition(position, assetDefinitions);
   if (!assetDefinition?.dividendInfo?.frequency || assetDefinition.dividendInfo.frequency === 'none') {
     return 0;
@@ -26,7 +27,7 @@ const calculateStockDividendIncome = (position: PortfolioPosition, month: number
   }
 };
 
-const calculateBondInterestIncome = (position: PortfolioPosition, assetDefinitions: any[]): number => {
+const calculateBondInterestIncome = (position: PortfolioPosition, assetDefinitions: AssetDefinition[]): number => {
   const assetDefinition = getAssetDefinition(position, assetDefinitions);
   if (assetDefinition?.bondInfo?.interestRate === undefined) {
     return 0;
@@ -37,7 +38,7 @@ const calculateBondInterestIncome = (position: PortfolioPosition, assetDefinitio
   return isFinite(monthlyInterest) ? monthlyInterest : 0;
 };
 
-const calculateRealEstateIncome = (position: PortfolioPosition, assetDefinitions: any[]): number => {
+const calculateRealEstateIncome = (position: PortfolioPosition, assetDefinitions: AssetDefinition[]): number => {
   const assetDefinition = getAssetDefinition(position, assetDefinitions);
   if (assetDefinition?.rentalInfo?.baseRent === undefined) {
     return 0;
@@ -47,7 +48,7 @@ const calculateRealEstateIncome = (position: PortfolioPosition, assetDefinitions
 };
 
 // Helper function to calculate monthly income from portfolio positions for a specific month
-const calculatePortfolioMonthlyIncome = (positions: PortfolioPosition[], month: number, assetDefinitions: any[]): number => {
+const calculatePortfolioMonthlyIncome = (positions: PortfolioPosition[], month: number, assetDefinitions: AssetDefinition[]): number => {
   let totalIncome = 0;
   positions.forEach(position => {
     const assetDefinition = getAssetDefinition(position, assetDefinitions);

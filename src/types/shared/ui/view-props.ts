@@ -46,7 +46,7 @@ export interface CategoryFormData {
   color?: string;
   isActive?: boolean;
   sortOrder?: number;
-  [key: string]: any; // Index signature to allow additional properties
+  [key: string]: unknown; // Index signature to allow additional properties
 }
 
 export interface OptionFormData {
@@ -79,15 +79,15 @@ export interface ChartInteractionProps {
 }
 
 // Calendar view props
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface CalendarViewProps extends ChartInteractionProps {
   // Add specific calendar props here
-   
 }
 
 // Loading view props
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface LoadingViewProps extends TranslationProps {
   // Additional loading-specific props can be added here
-   
 }
 
 // Generic list view props

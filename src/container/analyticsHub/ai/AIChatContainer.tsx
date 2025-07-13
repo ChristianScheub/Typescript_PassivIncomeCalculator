@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/hooks/redux';
 import { useLLMService } from '@/hooks/useLLMService';
 import AIChatView from '@/view/analytics-hub/ai/AIChatView';
 import type { AIChatMessage, AIChatViewProps } from '@/types/domains/analytics/ai';
+import type { Expense, Liability } from '@/types/domains/financial/entities';
+import type { AssetWithValue } from '@/types/domains/portfolio/assetWithValue';
 import AIContextService from '@service/domain/ai/contextService';
 import Logger from '@service/shared/logging/Logger/logger';
 
@@ -43,12 +45,12 @@ export const AIChatContainer: React.FC<AIChatContainerProps> = ({ onBack }) => {
   const [viewMode, setViewMode] = useState<'financialOverview' | 'allAssets'>('financialOverview');
 
   // Calculate current financial metrics for context
-  const financialSnapshot = {
+  const financialSnapshot = useMemo(() => ({
     totalAssets: portfolioCache?.totals?.totalValue || 0,
     monthlyIncome: portfolioCache?.totals?.monthlyIncome || 0,
-    totalExpenses: expenses.reduce((sum: number, exp: any) => sum + (exp.paymentSchedule?.amount || 0), 0),
-    netWorth: (portfolioCache?.totals?.totalValue || 0) - liabilities.reduce((sum: number, lib: any) => sum + (lib.currentBalance || 0), 0)
-  };
+    totalExpenses: expenses.reduce((sum: number, exp: Expense) => sum + (exp.paymentSchedule?.amount || 0), 0),
+    netWorth: (portfolioCache?.totals?.totalValue || 0) - liabilities.reduce((sum: number, lib: Liability) => sum + (lib.currentBalance || 0), 0)
+  }), [portfolioCache?.totals?.totalValue, portfolioCache?.totals?.monthlyIncome, expenses, liabilities]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -172,7 +174,7 @@ export const AIChatContainer: React.FC<AIChatContainerProps> = ({ onBack }) => {
   ];
 
   // Hilfsfunktion: Mapping AssetWithValue (Store) → AssetWithValue (zentraler Typ)
-  function mapAssetWithValueForAI(assetWithValue: any): import('@/types/domains/portfolio/assetWithValue').AssetWithValue {
+  function mapAssetWithValueForAI(assetWithValue: AssetWithValue): AssetWithValue {
     return {
       assetDefinition: assetWithValue.assetDefinition,
       value: assetWithValue.value,

@@ -18,7 +18,7 @@ export function calculateProjectedIncome(
   }
 
   // Use compositeCalculatorService instead of direct import to avoid circular dependency
-  const result = compositeCalculatorService.calculateDividendSchedule(newDividendInfo as any, totalQuantity);
+  const result = compositeCalculatorService.calculateDividendSchedule(newDividendInfo as DividendInfo, totalQuantity);
   
   return isFinite(result.monthlyAmount) ? result.monthlyAmount : 0;
 }

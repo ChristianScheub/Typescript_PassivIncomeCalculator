@@ -486,7 +486,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
                 ] as const;
                 const rawFrequency = updatedDefinition.dividendInfo.frequency;
                 const frequency: DividendFrequency =
-                  allowedFrequencies.includes(rawFrequency as any)
+                  allowedFrequencies.includes(rawFrequency as DividendFrequency)
                     ? (rawFrequency as DividendFrequency)
                     : "custom";
                 updatedDefinition.dividendInfo = {

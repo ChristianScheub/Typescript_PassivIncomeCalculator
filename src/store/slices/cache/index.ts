@@ -28,7 +28,8 @@ export {
 } from '../domain/transactionsSlice';
 
 // Store state management helpers
-export const selectIsStoreHydrated = (_state: any) => true;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const selectIsStoreHydrated = (_state: { [key: string]: unknown }) => true;
 export const clearAllCache = () => ({ type: 'transactions/invalidateAllCaches' });
 export const invalidateAllCache = () => ({ type: 'transactions/invalidateAllCaches' });
 

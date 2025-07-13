@@ -13,6 +13,7 @@ function isActionWithType(action: unknown): action is AnyAction {
  * Monitors localStorage size and warns when approaching limits
  * Provides storage health monitoring for the application
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const storageValidationMiddleware: Middleware<object, StoreState> = (_store) => (next) => (action: unknown) => {
   // Process the action first
   const result = next(action);

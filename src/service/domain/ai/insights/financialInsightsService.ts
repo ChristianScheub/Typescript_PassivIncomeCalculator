@@ -4,9 +4,38 @@ import type {
   FinancialInsightsService as IFinancialInsightsService 
 } from '@/types/domains/ai';
 import type { RootState } from '@/store';
-import { Income, Expense, Liability } from '@/types/domains/financial/entities';
+import { Expense, Liability } from '@/types/domains/financial/entities';
 import { modelManager } from '../llm/modelManager';
 import Logger from '@service/shared/logging/Logger/logger';
+
+interface FinancialSummary {
+  totalAssets: number;
+  monthlyIncome: number;
+  assetsCount: number;
+  incomeCount: number;
+  totalExpenses: number;
+}
+
+interface PortfolioData {
+  totalValue?: number;
+  positions?: Array<{ symbol: string; value: number }>;
+  largestPosition?: string;
+  diversificationScore?: string;
+}
+
+interface BudgetData {
+  monthlyIncome?: number;
+  monthlyExpenses?: number;
+  savingsRate?: number;
+  largestExpenseCategory?: string;
+}
+
+interface ForecastData {
+  projectedGrowth?: number;
+  timeHorizon?: number;
+  riskLevel?: string;
+  expectedReturn?: number;
+}
 
 /**
  * Financial Insights Service
@@ -145,7 +174,7 @@ Finanzübersicht:
   /**
    * Berechnet Konfidenz basierend auf verfügbaren Daten
    */
-  private calculateConfidence(summary: any): number {
+  private calculateConfidence(summary: FinancialSummary): number {
     let confidence = 0.5; // Basis-Konfidenz
 
     // Erhöhe Konfidenz basierend auf verfügbaren Daten
@@ -161,7 +190,7 @@ Finanzübersicht:
   /**
    * Generiert Portfolio-spezifische Beratung
    */
-  async generatePortfolioAdvice(portfolioData: any): Promise<FinancialInsightResponse> {
+  async generatePortfolioAdvice(portfolioData: PortfolioData): Promise<FinancialInsightResponse> {
     try {
       if (!modelManager.isReady()) {
         throw new Error('AI model not loaded. Please load a model first.');
@@ -192,7 +221,7 @@ Gib konkrete Empfehlungen zur Portfoliooptimierung, Risikomanagement und Diversi
   /**
    * Generiert Budget-Empfehlungen
    */
-  async generateBudgetRecommendations(financialData: any): Promise<FinancialInsightResponse> {
+  async generateBudgetRecommendations(financialData: BudgetData): Promise<FinancialInsightResponse> {
     try {
       if (!modelManager.isReady()) {
         throw new Error('AI model not loaded. Please load a model first.');
@@ -223,7 +252,7 @@ Gib konkrete Empfehlungen zur Budgetoptimierung, Ausgabenreduzierung und Sparstr
   /**
    * Generiert Prognose-Einblicke
    */
-  async generateForecastInsights(forecastData: any): Promise<FinancialInsightResponse> {
+  async generateForecastInsights(forecastData: ForecastData): Promise<FinancialInsightResponse> {
     try {
       if (!modelManager.isReady()) {
         throw new Error('AI model not loaded. Please load a model first.');

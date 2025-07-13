@@ -4,6 +4,8 @@ import { useAppSelector } from "@/hooks/redux";
 import { useLLMService } from "@/hooks/useLLMService";
 import AIInsightsView from "@/view/analytics-hub/ai/AIInsightsView";
 import type { AIInsightsViewProps } from "@/types/domains/analytics/ai";
+import type { FinancialInsightResponse, LLMResponse } from "@/types/domains/ai";
+import type { Expense, Liability } from "@/types/domains/financial/entities";
 
 interface AIInsightsContainerProps {
   onBack: () => void;
@@ -23,7 +25,7 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
   const { items: liabilities } = reduxState.liabilities;
 
   // Local state
-  const [insights, setInsights] = useState<any>(null);
+  const [insights, setInsights] = useState<FinancialInsightResponse | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastGenerated, setLastGenerated] = useState<Date | null>(null);
@@ -33,16 +35,16 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
     totalAssets: portfolioCache?.totals?.totalValue || 0,
     monthlyIncome: portfolioCache?.totals?.monthlyIncome || 0,
     totalExpenses: expenses.reduce(
-      (sum: number, exp: any) => sum + (exp.paymentSchedule?.amount || 0),
+      (sum: number, exp: Expense) => sum + (exp.paymentSchedule?.amount || 0),
       0
     ),
     totalLiabilities: liabilities.reduce(
-      (sum: number, lib: any) => sum + (lib.currentBalance || 0),
+      (sum: number, lib: Liability) => sum + (lib.currentBalance || 0),
       0
     ),
     assetsCount: assets.length,
     incomeSourcesCount: income.length,
-    expenseCategories: new Set(expenses.map((e: any) => e.category)).size,
+    expenseCategories: new Set(expenses.map((e: Expense) => e.category)).size,
   };
 
   const netWorth =
@@ -77,7 +79,7 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
         summary: result?.insight || "AI analysis generated successfully",
         confidence: result?.confidence || 0.8,
         recommendations: result?.recommendations?.length
-          ? result.recommendations.map((rec: any) => ({
+          ? result.recommendations.map((rec: NonNullable<LLMResponse['recommendations']>[0]) => ({
               type: rec.type,
               title: rec.title,
               description: rec.description,

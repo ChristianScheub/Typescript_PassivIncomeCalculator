@@ -35,14 +35,13 @@ const categoryOptionSchema = z.object({
 });
 
 // Form adapter to bridge React Hook Form with view expectations
-const createFormAdapter = <T extends Record<string, any>>(form: UseFormReturn<T>) => ({
+const createFormAdapter = <T extends Record<string, unknown>>(form: UseFormReturn<T>) => ({
   control: form.control,
   handleSubmit: (callback: (data: T) => void) => form.handleSubmit(callback),
   reset: form.reset,
   formState: form.formState,
   watch: form.watch,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setValue: (field: string, value: unknown) => form.setValue(field as any, value as any),
+  setValue: (field: keyof T, value: unknown) => form.setValue(field, value as T[keyof T]),
   getValues: form.getValues,
 });
 

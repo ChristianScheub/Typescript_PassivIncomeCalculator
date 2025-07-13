@@ -40,4 +40,4 @@ export const clearDatabase = async (): Promise<void> => {
 /**
  * Development utility - call this from browser console to reset database
  */
-(window as any).clearFinanceDatabase = clearDatabase;
+(window as { clearFinanceDatabase?: () => void }).clearFinanceDatabase = clearDatabase;
