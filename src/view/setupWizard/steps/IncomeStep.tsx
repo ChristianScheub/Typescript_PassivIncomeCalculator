@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { IncomeStepData, SimplifiedIncome } from '@/types/domains/setupWizard';
 
 interface IncomeStepProps {
@@ -14,6 +15,7 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
   onAddIncome,
   onRemoveIncome
 }) => {
+  const { t } = useTranslation();
   const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [newIncome, setNewIncome] = useState<SimplifiedIncome>({
     name: '',
@@ -65,10 +67,10 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
           </div>
           <div className="ml-3 text-sm">
             <label htmlFor="skip-income" className="font-medium text-gray-700">
-              Skip income tracking for now
+              {t('setupWizard.steps.income.skipOption.title')}
             </label>
             <p className="text-gray-500">
-              This step is optional. You can add income source information later.
+              {t('setupWizard.steps.income.skipOption.description')}
             </p>
           </div>
         </div>
@@ -79,18 +81,17 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
           {/* Introduction */}
           <div className="text-center">
             <h4 className="text-lg font-medium text-gray-900 mb-4">
-              Track Your Income Sources
+              {t('setupWizard.steps.income.title')}
             </h4>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Add your various income sources to understand your cash flow. 
-              This includes salary, freelance work, passive income from investments, and other sources.
+              {t('setupWizard.steps.income.description')}
             </p>
           </div>
 
           {/* Existing Income Sources */}
           {stepData.incomes.length > 0 && (
             <div className="space-y-4">
-              <h5 className="font-medium text-gray-900">Your Income Sources ({stepData.incomes.length})</h5>
+              <h5 className="font-medium text-gray-900">{t('setupWizard.steps.income.yourIncomes')} ({stepData.incomes.length})</h5>
               <div className="space-y-3">
                 {stepData.incomes.map((income) => (
                   <div key={`${income.name}-${income.type}`} className="border border-gray-200 rounded-lg p-4">
@@ -104,11 +105,11 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                           <div>
-                            <span className="text-gray-500">Monthly Amount:</span>
+                            <span className="text-gray-500">{t('setupWizard.steps.income.summary.monthlyAmount')}</span>
                             <p className="font-medium text-green-600">${income.monthlyAmount.toLocaleString()}</p>
                           </div>
                           <div>
-                            <span className="text-gray-500">Annual Amount:</span>
+                            <span className="text-gray-500">{t('setupWizard.steps.income.summary.annualAmount')}</span>
                             <p className="font-medium">${(income.monthlyAmount * 12).toLocaleString()}</p>
                           </div>
                         </div>
@@ -137,7 +138,7 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
                     <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                   </svg>
                   <div>
-                    <h6 className="font-medium text-green-900">Total Monthly Income</h6>
+                    <h6 className="font-medium text-green-900">{t('setupWizard.steps.income.totalMonthlyIncome')}</h6>
                     <p className="text-green-800">
                       ${stepData.incomes.reduce((sum, income) => sum + income.monthlyAmount, 0).toLocaleString()} / month
                       <span className="ml-2">
@@ -160,42 +161,42 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
               <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              <span className="mt-2 block text-sm font-medium text-gray-900">Add Income Source</span>
+              <span className="mt-2 block text-sm font-medium text-gray-900">{t('setupWizard.steps.income.addIncomeSource')}</span>
             </button>
           ) : (
             <div className="border border-gray-300 rounded-lg p-6 space-y-4">
-              <h5 className="font-medium text-gray-900">Add New Income Source</h5>
+              <h5 className="font-medium text-gray-900">{t('setupWizard.steps.income.addNewIncomeSource')}</h5>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="income-name" className="block text-sm font-medium text-gray-700">Source Name *</label>
+                  <label htmlFor="income-name" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.income.form.sourceName')}</label>
                   <input
                     id="income-name"
                     type="text"
                     value={newIncome.name}
                     onChange={(e) => setNewIncome({ ...newIncome, name: e.target.value })}
-                    placeholder="e.g. Main Job, Freelance Client, Rental Property"
+                    placeholder={t('setupWizard.steps.income.form.sourceNamePlaceholder')}
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
                 
                 <div>
-                  <label htmlFor="income-type" className="block text-sm font-medium text-gray-700">Income Type *</label>
+                  <label htmlFor="income-type" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.income.form.incomeType')}</label>
                   <select
                     id="income-type"
                     value={newIncome.type}
                     onChange={(e) => setNewIncome({ ...newIncome, type: e.target.value as 'salary' | 'freelance' | 'passive' | 'other' })}
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
-                    <option value="salary">Salary/Wages</option>
-                    <option value="freelance">Freelance/Contract</option>
-                    <option value="passive">Passive Income</option>
-                    <option value="other">Other</option>
+                    <option value="salary">{t('setupWizard.steps.income.types.salary')}</option>
+                    <option value="freelance">{t('setupWizard.steps.income.types.freelance')}</option>
+                    <option value="passive">{t('setupWizard.steps.income.types.passive')}</option>
+                    <option value="other">{t('setupWizard.steps.income.types.other')}</option>
                   </select>
                 </div>
                 
                 <div>
-                  <label htmlFor="income-monthly-amount" className="block text-sm font-medium text-gray-700">Monthly Amount ($) *</label>
+                  <label htmlFor="income-monthly-amount" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.income.form.monthlyAmount')}</label>
                   <input
                     id="income-monthly-amount"
                     type="number"
@@ -207,7 +208,7 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
                 </div>
                 
                 <div>
-                  <label htmlFor="income-annual-amount" className="block text-sm font-medium text-gray-700">Annual Amount (calculated)</label>
+                  <label htmlFor="income-annual-amount" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.income.form.annualAmount')}</label>
                   <input
                     id="income-annual-amount"
                     type="text"
@@ -219,13 +220,13 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
               </div>
               
               <div>
-                <label htmlFor="income-description" className="block text-sm font-medium text-gray-700">Description (Optional)</label>
+                <label htmlFor="income-description" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.income.form.description')}</label>
                 <textarea
                   id="income-description"
                   value={newIncome.description}
                   onChange={(e) => setNewIncome({ ...newIncome, description: e.target.value })}
                   rows={2}
-                  placeholder="Additional details about this income source"
+                  placeholder={t('setupWizard.steps.income.form.descriptionPlaceholder')}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
@@ -236,7 +237,7 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
                   onClick={() => setShowIncomeForm(false)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('setupWizard.steps.income.actions.cancel')}
                 </button>
                 <button
                   type="button"
@@ -244,7 +245,7 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
                   disabled={!newIncome.name || newIncome.monthlyAmount <= 0}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add Income Source
+                  {t('setupWizard.steps.income.actions.addIncomeSource')}
                 </button>
               </div>
             </div>
@@ -252,12 +253,12 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
 
           {/* Income Type Guidelines */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h5 className="font-medium text-blue-900 mb-2">Income Type Guidelines</h5>
+            <h5 className="font-medium text-blue-900 mb-2">{t('setupWizard.steps.income.typeGuidelines.title')}</h5>
             <div className="text-sm text-blue-800 space-y-1">
-              <p><strong>Salary/Wages:</strong> Regular employment income, bonuses, commissions</p>
-              <p><strong>Freelance/Contract:</strong> Independent contractor work, consulting fees</p>
-              <p><strong>Passive Income:</strong> Dividends, rental income, royalties, interest</p>
-              <p><strong>Other:</strong> Government benefits, gifts, irregular income</p>
+              <p><strong>{t('setupWizard.steps.income.types.salary')}:</strong> {t('setupWizard.steps.income.typeGuidelines.salary')}</p>
+              <p><strong>{t('setupWizard.steps.income.types.freelance')}:</strong> {t('setupWizard.steps.income.typeGuidelines.freelance')}</p>
+              <p><strong>{t('setupWizard.steps.income.types.passive')}:</strong> {t('setupWizard.steps.income.typeGuidelines.passive')}</p>
+              <p><strong>{t('setupWizard.steps.income.types.other')}:</strong> {t('setupWizard.steps.income.typeGuidelines.other')}</p>
             </div>
           </div>
         </>

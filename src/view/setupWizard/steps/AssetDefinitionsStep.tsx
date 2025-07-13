@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AssetDefinitionsStepData, AssetTemplate, CustomAssetDefinition } from '@/types/domains/setupWizard';
 
 interface AssetDefinitionsStepProps {
@@ -22,6 +23,7 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
   onAddCustomAsset,
   onRemoveCustomAsset
 }) => {
+  const { t } = useTranslation();
   const [showAllTemplates, setShowAllTemplates] = useState(false);
   const [newCustomAsset, setNewCustomAsset] = useState<CustomAssetDefinition>({
     name: '',
@@ -69,10 +71,10 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
           </div>
           <div className="ml-3 text-sm">
             <label htmlFor="skip-assets" className="font-medium text-gray-700">
-              Skip asset definitions for now
+              {t('setupWizard.steps.assetDefinitions.skipOption.title')}
             </label>
             <p className="text-gray-500">
-              You can add assets later from the portfolio section.
+              {t('setupWizard.steps.assetDefinitions.skipOption.description')}
             </p>
           </div>
         </div>
@@ -84,10 +86,10 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
           <div className="space-y-6">
             <div>
               <h4 className="text-lg font-medium text-gray-900 mb-4">
-                Choose from Popular Assets
+                {t('setupWizard.steps.assetDefinitions.popularAssets.title')}
               </h4>
               <p className="text-gray-600 mb-6">
-                Select from our pre-configured asset templates to get started quickly.
+                {t('setupWizard.steps.assetDefinitions.popularAssets.description')}
               </p>
             </div>
 
@@ -95,7 +97,7 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
             {stepData.selectedTemplates.length > 0 && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h5 className="font-medium text-blue-900 mb-2">
-                  Selected Assets ({stepData.selectedTemplates.length})
+                  {t('setupWizard.steps.assetDefinitions.selectedAssets.title')} ({stepData.selectedTemplates.length})
                 </h5>
                 <div className="flex flex-wrap gap-2">
                   {stepData.selectedTemplates.map((template) => (
@@ -179,7 +181,7 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
                 onClick={() => setShowAllTemplates(!showAllTemplates)}
                 className="text-blue-600 hover:text-blue-500 font-medium text-sm"
               >
-                {showAllTemplates ? 'Show Less' : `Show All ${availableTemplates.length} Assets`}
+                {showAllTemplates ? t('setupWizard.steps.assetDefinitions.showLess') : t('setupWizard.steps.assetDefinitions.showMore', { count: availableTemplates.length })}
               </button>
             </div>
           </div>
@@ -188,10 +190,10 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
           <div className="space-y-6">
             <div className="border-t pt-6">
               <h4 className="text-lg font-medium text-gray-900 mb-4">
-                Add Custom Assets
+                {t('setupWizard.steps.assetDefinitions.customAssets.title')}
               </h4>
               <p className="text-gray-600 mb-6">
-                Don't see what you're looking for? Add your own custom assets.
+                {t('setupWizard.steps.assetDefinitions.customAssets.description')}
               </p>
 
               {/* Custom Assets List */}
@@ -231,74 +233,74 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
                   <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                  <span className="mt-2 block text-sm font-medium text-gray-900">Add Custom Asset</span>
+                  <span className="mt-2 block text-sm font-medium text-gray-900">{t('setupWizard.steps.assetDefinitions.customAssets.addButton')}</span>
                 </button>
               ) : (
                 <div className="border border-gray-300 rounded-lg p-6 space-y-4">
-                  <h5 className="font-medium text-gray-900">Add Custom Asset</h5>
+                  <h5 className="font-medium text-gray-900">{t('setupWizard.steps.assetDefinitions.customAssets.addButton')}</h5>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="asset-name" className="block text-sm font-medium text-gray-700">Name</label>
+                      <label htmlFor="asset-name" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.assetDefinitions.customAssets.form.name')}</label>
                       <input
                         id="asset-name"
                         type="text"
                         value={newCustomAsset.name}
                         onChange={(e) => setNewCustomAsset({ ...newCustomAsset, name: e.target.value })}
-                        placeholder="e.g. Tesla Inc."
+                        placeholder={t('setupWizard.steps.assetDefinitions.customAssets.form.namePlaceholder')}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       />
                     </div>
                     
                     <div>
-                      <label htmlFor="asset-symbol" className="block text-sm font-medium text-gray-700">Symbol</label>
+                      <label htmlFor="asset-symbol" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.assetDefinitions.customAssets.form.symbol')}</label>
                       <input
                         id="asset-symbol"
                         type="text"
                         value={newCustomAsset.symbol}
                         onChange={(e) => setNewCustomAsset({ ...newCustomAsset, symbol: e.target.value.toUpperCase() })}
-                        placeholder="e.g. TSLA"
+                        placeholder={t('setupWizard.steps.assetDefinitions.customAssets.form.symbolPlaceholder')}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       />
                     </div>
                     
                     <div>
-                      <label htmlFor="asset-type" className="block text-sm font-medium text-gray-700">Type</label>
+                      <label htmlFor="asset-type" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.assetDefinitions.customAssets.form.type')}</label>
                       <select
                         id="asset-type"
                         value={newCustomAsset.type}
                         onChange={(e) => setNewCustomAsset({ ...newCustomAsset, type: e.target.value as 'stock' | 'etf' | 'bond' | 'crypto' | 'other' })}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       >
-                        <option value="stock">Stock</option>
-                        <option value="etf">ETF</option>
-                        <option value="bond">Bond</option>
-                        <option value="crypto">Cryptocurrency</option>
-                        <option value="other">Other</option>
+                        <option value="stock">{t('setupWizard.steps.assetDefinitions.customAssets.types.stock')}</option>
+                        <option value="etf">{t('setupWizard.steps.assetDefinitions.customAssets.types.etf')}</option>
+                        <option value="bond">{t('setupWizard.steps.assetDefinitions.customAssets.types.bond')}</option>
+                        <option value="crypto">{t('setupWizard.steps.assetDefinitions.customAssets.types.crypto')}</option>
+                        <option value="other">{t('setupWizard.steps.assetDefinitions.customAssets.types.other')}</option>
                       </select>
                     </div>
                     
                     <div>
-                      <label htmlFor="asset-category" className="block text-sm font-medium text-gray-700">Category</label>
+                      <label htmlFor="asset-category" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.assetDefinitions.customAssets.form.category')}</label>
                       <input
                         id="asset-category"
                         type="text"
                         value={newCustomAsset.category}
                         onChange={(e) => setNewCustomAsset({ ...newCustomAsset, category: e.target.value })}
-                        placeholder="e.g. Technology, Healthcare"
+                        placeholder={t('setupWizard.steps.assetDefinitions.customAssets.form.categoryPlaceholder')}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       />
                     </div>
                   </div>
                   
                   <div>
-                    <label htmlFor="asset-description" className="block text-sm font-medium text-gray-700">Description (Optional)</label>
+                    <label htmlFor="asset-description" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.assetDefinitions.customAssets.form.description')}</label>
                     <textarea
                       id="asset-description"
                       value={newCustomAsset.description}
                       onChange={(e) => setNewCustomAsset({ ...newCustomAsset, description: e.target.value })}
                       rows={2}
-                      placeholder="Brief description of the asset"
+                      placeholder={t('setupWizard.steps.assetDefinitions.customAssets.form.descriptionPlaceholder')}
                       className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                   </div>
@@ -309,7 +311,7 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
                       onClick={() => setShowCustomAssetForm(false)}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                     >
-                      Cancel
+                      {t('setupWizard.steps.assetDefinitions.customAssets.actions.cancel')}
                     </button>
                     <button
                       type="button"
@@ -317,7 +319,7 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
                       disabled={!newCustomAsset.name || !newCustomAsset.symbol}
                       className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Add Asset
+                      {t('setupWizard.steps.assetDefinitions.customAssets.actions.addAsset')}
                     </button>
                   </div>
                 </div>
