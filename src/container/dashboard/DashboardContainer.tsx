@@ -58,7 +58,7 @@ const DashboardContainer: React.FC = () => {
     
     if (financialSummaryCache) {
       // Extract only the financial data, excluding cache metadata
-      const { lastCalculated, inputHash, ...coreData } = financialSummaryCache;
+      const { lastCalculated: _, inputHash: __, ...coreData } = financialSummaryCache;
       return { ...defaultSummary, ...coreData };
     }
     
@@ -81,7 +81,7 @@ const DashboardContainer: React.FC = () => {
     if (hasData && !hasValidFinancialSummary) {
       Logger.info('DashboardContainer: Financial summary missing or all zero, triggering calculation');
       Logger.info(`DashboardContainer: Data available - assets: ${assets.length}, assetDefinitions: ${assetDefinitions.length}, income: ${income.length}, expenses: ${expenses.length}, liabilities: ${liabilities.length}`);
-      dispatch(calculateFinancialSummary({ liabilities, expenses, income }) as any);
+      dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
     }
   }, [dispatch, financialSummaryCache, assets, assetDefinitions, income, expenses, liabilities]);
 
@@ -149,7 +149,7 @@ const DashboardContainer: React.FC = () => {
     if (hasData && !hasValidFinancialSummary) {
       Logger.info('DashboardContainer: Financial summary missing or all zero, triggering calculation');
       Logger.info(`DashboardContainer: Data available - assets: ${assets.length}, assetDefinitions: ${assetDefinitions.length}, income: ${income.length}, expenses: ${expenses.length}, liabilities: ${liabilities.length}`);
-      dispatch(calculateFinancialSummary({ liabilities, expenses, income }) as any);
+      dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
     }
   }, [dispatch, financialSummaryCache, assets, assetDefinitions, income, expenses, liabilities]);
   

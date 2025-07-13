@@ -1,7 +1,9 @@
 import type { 
   FinancialInsightRequest, 
-  FinancialInsightResponse 
+  FinancialInsightResponse,
+  ModelStatus
 } from '@/types/domains/ai';
+import type { Asset } from '@/types/domains/financial/entities';
 
 /**
  * AI Analytics Types for Analytics Hub Integration
@@ -44,7 +46,7 @@ export interface AIAnalyticsProps {
 
 export interface AIChatViewProps {
   onBack: () => void;
-  modelStatus: Record<string, unknown>;
+  modelStatus: ModelStatus;
   messages: AIChatMessage[];
   inputValue: string;
   isTyping: boolean;
@@ -55,7 +57,7 @@ export interface AIChatViewProps {
     totalExpenses: number;
     netWorth: number;
   };
-  assets: Record<string, unknown>[];
+  assets: Asset[];
   suggestedQuestions: string[];
   messagesEndRef: React.RefObject<HTMLDivElement>;
   inputRef: React.RefObject<HTMLInputElement>;
@@ -81,9 +83,9 @@ export interface AIChatCardProps {
 
 export interface AIInsightsViewProps {
   onBack: () => void;
-  modelStatus: Record<string, unknown>;
+  modelStatus: ModelStatus;
   isGenerating: boolean;
-  insights: Record<string, unknown>;
+  insights: FinancialInsightResponse | null;
   error: string | null;
   lastGenerated: Date | null;
   financialMetrics: {

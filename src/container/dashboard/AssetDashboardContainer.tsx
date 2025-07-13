@@ -59,7 +59,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
     if (hasData && !hasValidFinancialSummary) {
       Logger.info('AssetDashboardContainer: Financial summary missing or all zero, triggering calculation');
       Logger.info(`AssetDashboardContainer: Data available - income: ${income.length}, expenses: ${expenses.length}, liabilities: ${liabilities.length}`);
-      dispatch(calculateFinancialSummary({ liabilities, expenses, income }) as any);
+      dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
     }
   }, [dispatch, financialSummary.data, liabilities, expenses, income]);
 
@@ -73,7 +73,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
     if (hasAssets && !hasValidAssetFocusData) {
       Logger.info('AssetDashboardContainer: Asset focus data missing or empty, triggering calculation');
       Logger.info(`AssetDashboardContainer: Data available - transactions: ${transactions.length}, assetDefinitions: ${assetDefinitions.length}`);
-      dispatch(calculateAssetFocusData() as any);
+      dispatch(calculateAssetFocusData());
     }
   }, [dispatch, assetFocusData.data, transactions.length, assetDefinitions.length]);
 
@@ -230,7 +230,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
     executeAsyncOperation(
       'update intraday history',
       async () => {
-        const stockDefinitions = assetDefinitions.filter((def: any) => def.type === 'stock' && def.ticker);
+        const stockDefinitions = assetDefinitions.filter((def: AssetDefinition) => def.type === 'stock' && def.ticker);
         Logger.info(`Found ${stockDefinitions.length} stock definitions to update`);
         
         if (stockDefinitions.length === 0) {
@@ -281,7 +281,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
       <AssetDashboardView
         portfolioHistory={enhancedPortfolioHistory}
         assetsWithValues={assetsWithValues}
-        portfolioSummary={portfolioSummary as any}
+        portfolioSummary={portfolioSummary}
         selectedTimeRange={assetFocus.timeRange}
         onTimeRangeChange={handleTimeRangeChange}
         onRefresh={handleRefresh}
