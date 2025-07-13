@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormSetValue } from 'react-hook-form';
+import { UseFormSetValue, UseFormWatch, FieldValues } from 'react-hook-form';
 import { FormGrid, StandardFormField } from '../forms/FormGrid';
 import { useTranslation } from 'react-i18next';
 import { AssetType } from '@/types/shared';
@@ -9,8 +9,8 @@ interface BaseAssetFieldsProps {
   assetType: AssetType;
   quantity?: number;
   currentPrice?: number;
-  watch: (field: string) => any;
-  setValue: UseFormSetValue<any>;
+  watch: UseFormWatch<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
   showCalculatedValue?: boolean;
 }
 

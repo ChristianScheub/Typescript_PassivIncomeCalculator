@@ -44,7 +44,7 @@ export interface AIAnalyticsProps {
 
 export interface AIChatViewProps {
   onBack: () => void;
-  modelStatus: any;
+  modelStatus: Record<string, unknown>;
   messages: AIChatMessage[];
   inputValue: string;
   isTyping: boolean;
@@ -55,7 +55,7 @@ export interface AIChatViewProps {
     totalExpenses: number;
     netWorth: number;
   };
-  assets: any[];
+  assets: Record<string, unknown>[];
   suggestedQuestions: string[];
   messagesEndRef: React.RefObject<HTMLDivElement>;
   inputRef: React.RefObject<HTMLInputElement>;
@@ -81,9 +81,9 @@ export interface AIChatCardProps {
 
 export interface AIInsightsViewProps {
   onBack: () => void;
-  modelStatus: any;
+  modelStatus: Record<string, unknown>;
   isGenerating: boolean;
-  insights: any;
+  insights: Record<string, unknown>;
   error: string | null;
   lastGenerated: Date | null;
   financialMetrics: {
