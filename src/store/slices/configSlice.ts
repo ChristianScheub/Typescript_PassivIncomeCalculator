@@ -82,6 +82,11 @@ const initialState: ConfigState = {
         [StockAPIProvider.FINNHUB]: StateHydrationService.getStorageValue('finnhub_api_key') || undefined,
         [StockAPIProvider.YAHOO]: StateHydrationService.getStorageValue('yahoo_api_key') || undefined,
         [StockAPIProvider.ALPHA_VANTAGE]: StateHydrationService.getStorageValue('alpha_vantage_api_key') || undefined,
+        [StockAPIProvider.IEX_CLOUD]: StateHydrationService.getStorageValue('iex_cloud_api_key') || undefined,
+        [StockAPIProvider.TWELVE_DATA]: StateHydrationService.getStorageValue('twelve_data_api_key') || undefined,
+        [StockAPIProvider.QUANDL]: StateHydrationService.getStorageValue('quandl_api_key') || undefined,
+        [StockAPIProvider.EOD_HISTORICAL_DATA]: StateHydrationService.getStorageValue('eod_historical_data_api_key') || undefined,
+        [StockAPIProvider.POLYGON_IO]: StateHydrationService.getStorageValue('polygon_io_api_key') || undefined,
       },
     },
     dividend: {

@@ -45,7 +45,12 @@ export type Variant = 'primary' | 'secondary' | 'success' | 'warning' | 'error' 
 export enum StockAPIProvider {
   FINNHUB = 'finnhub',
   YAHOO = 'yahoo',
-  ALPHA_VANTAGE = 'alpha_vantage'
+  ALPHA_VANTAGE = 'alpha_vantage',
+  IEX_CLOUD = 'iex_cloud',
+  TWELVE_DATA = 'twelve_data',
+  QUANDL = 'quandl',
+  EOD_HISTORICAL_DATA = 'eod_historical_data',
+  POLYGON_IO = 'polygon_io'
 }
 
 export type DividendApiProvider = 'yahoo' | 'finnhub';
