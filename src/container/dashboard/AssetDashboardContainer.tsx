@@ -11,13 +11,12 @@ import { usePortfolioIntradayView, usePortfolioHistoryView } from '../../hooks/u
 import AssetDashboardView from '@/view/finance-hub/overview/AssetDashboardView';
 import AssetDetailModal from '@/view/finance-hub/overview/AssetDetailModal';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
-import stockAPIService from '@/service/domain/assets/market-data/stockAPIService';
 import { useAsyncOperation } from '../../utils/containerUtils';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
-import { addIntradayPriceHistory } from '../../utils/priceHistoryUtils';
 import Logger from '@/service/shared/logging/Logger/logger';
 import { useTranslation } from 'react-i18next';
 import { calculateFinancialSummary, calculateAssetFocusData } from '@/store/slices/domain/transactionsSlice';
+import { marketDataWorkerService } from '@/service/shared/workers/marketDataWorkerService';
 
 const AssetFocusDashboardContainer: React.FC = () => {
   const navigate = useNavigate();
@@ -227,7 +226,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
 
   // Intraday history update handler
   const handleUpdateIntradayHistory = useCallback(async () => {
-    Logger.infoService("Asset Focus intraday history update triggered");
+    Logger.infoService("Asset Focus intraday history update triggered using worker");
     executeAsyncOperation(
       'update intraday history',
       async () => {
@@ -239,56 +238,39 @@ const AssetFocusDashboardContainer: React.FC = () => {
           return;
         }
         
-        for (const definition of stockDefinitions) {
-          if (!definition.ticker) continue;
-          try {
-            Logger.info(`Updating intraday history for ${definition.ticker}`);
-            Logger.info(`Current priceHistory length: ${(definition.priceHistory || []).length}`);
+        // Use worker service for batch intraday updates
+        const response = await marketDataWorkerService.stockHistory.updateBatchIntraday(stockDefinitions, 1);
+        
+        if (response.type === 'error') {
+          throw new Error(response.error);
+        }
+        
+        if (response.type === 'batchResult' && response.results) {
+          const successfulResults = response.results.filter(result => result.success && result.updatedDefinition);
+          
+          for (const result of successfulResults) {
+            const updatedDefinition = result.updatedDefinition!;
+            Logger.info(`Successfully updated intraday history for ${updatedDefinition.ticker}: ${result.entriesCount} entries processed`);
             
-            Logger.info(`About to call stockAPIService.getIntradayHistory for ${definition.ticker}`);
-            const intradayData = await stockAPIService.getIntradayHistory(definition.ticker);
-            Logger.info(`Successfully called stockAPIService.getIntradayHistory for ${definition.ticker}`);
-            Logger.info(`Received ${intradayData.entries.length} intraday entries for ${definition.ticker}`);
-            
-            if (!intradayData.entries || intradayData.entries.length === 0) {
-              Logger.warn(`No intraday data received for ${definition.ticker}`);
-              continue;
+            try {
+              await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+                updateAssetDefinition(updatedDefinition)
+              );
+            } catch (error) {
+              Logger.error(`Failed to dispatch update for ${updatedDefinition.ticker}: ${error}`);
             }
-            
-            // Merge with existing price history preserving minute-level timestamps
-            const newPriceEntries = intradayData.entries.map((entry: any) => ({
-              date: new Date(entry.timestamp).toISOString(), // Keep full timestamp for intraday data
-              price: entry.close,
-              source: 'api' as const
-            }));
-            
-            Logger.info(`Mapped ${newPriceEntries.length} new intraday price entries for ${definition.ticker}`);
-            Logger.info(`Sample new entry: ${JSON.stringify(newPriceEntries[0])}`);
-            Logger.info(`First entry timestamp: ${newPriceEntries[0]?.date}, Last entry timestamp: ${newPriceEntries[newPriceEntries.length - 1]?.date}`);
-            
-            // Use addIntradayPriceHistory to preserve minute-level data
-            const existingHistory = definition.priceHistory || [];
-            Logger.info(`Existing history for ${definition.ticker}: ${existingHistory.length} entries`);
-            
-            // Use the imported utility function to properly handle intraday data
-            const updatedHistory = addIntradayPriceHistory(newPriceEntries, existingHistory, 500);
-            
-            Logger.info(`Final priceHistory length for ${definition.ticker}: ${updatedHistory.length} (was ${existingHistory.length}, added ${newPriceEntries.length} intraday entries)`);
-            Logger.info(`Intraday data preserved with minute-level timestamps for ${definition.ticker}`);
-            const updatedDefinition = {
-              ...definition,
-              priceHistory: updatedHistory,
-              lastPriceUpdate: new Date().toISOString()
-            };
-            
-            Logger.info(`Dispatching updateAssetDefinition for ${definition.ticker}...`);
-            await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
-              updateAssetDefinition(updatedDefinition)
-            );
-            Logger.info(`Successfully updated intraday history for ${definition.ticker}: ${intradayData.entries.length} entries processed, ${updatedHistory.length} total entries`);
-          } catch (error) {
-            Logger.error(`Failed to update intraday history for ${definition.ticker}: ${JSON.stringify(error)}`);
           }
+          
+          // Log any failures
+          const failedResults = response.results.filter(result => !result.success);
+          if (failedResults.length > 0) {
+            Logger.warn(`${failedResults.length} intraday updates failed:`);
+            failedResults.forEach(result => {
+              Logger.warn(`- ${result.symbol}: ${result.error}`);
+            });
+          }
+          
+          Logger.info(`Successfully processed intraday data for ${successfulResults.length} assets`);
         }
       }
     );
