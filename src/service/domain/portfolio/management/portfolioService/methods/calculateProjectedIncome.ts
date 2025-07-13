@@ -1,6 +1,6 @@
 import { AssetDefinition, Transaction as Asset, DividendInfo } from '@/types/domains/assets';
 import { getCurrentQuantity } from '../../../../../../utils/transactionCalculations';
-import compositeCalculatorService from '../../../financial/calculations/compositeCalculatorService';
+import compositeCalculatorService from '../../../../financial/calculations/compositeCalculatorService';
 
 export function calculateProjectedIncome(
   assets: Asset[], 

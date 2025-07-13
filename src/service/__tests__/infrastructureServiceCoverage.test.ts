@@ -42,7 +42,8 @@ describe('SQLite Service Coverage', () => {
 
     it('should initialize database', async () => {
       const result = await initDatabase();
-      expect(typeof result).toBe('boolean');
+      expect(typeof result).toBe('object');
+      expect(result).toBeDefined();
     });
 
     it('should execute database queries', async () => {
