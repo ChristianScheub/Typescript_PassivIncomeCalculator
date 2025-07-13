@@ -1891,18 +1891,226 @@
       "processing": "Daten werden verarbeitet...",
       "success": "Datei erfolgreich verarbeitet!",
       "error": "Fehler beim Verarbeiten der Datei",
+      "chooseDifferentFile": "Andere Datei wählen",
+      "removeFile": "Datei entfernen",
+      "browseFiles": "Dateien durchsuchen",
+      "supportedFiles": "Unterstützt {{formats}} Dateien bis zu {{maxSize}}MB",
       "validation": {
         "invalidFormat": "Ungültiges Dateiformat",
         "fileTooLarge": "Dateigröße überschreitet Limit",
         "invalidData": "Ungültige Datenstruktur",
-        "missingColumns": "Fehlende erforderliche Spalten"
+        "missingColumns": "Fehlende erforderliche Spalten",
+        "fileTypeNotSupported": "Dateityp nicht unterstützt. Akzeptierte Formate: {{formats}}"
       }
     },
     "progress": {
       "saving": "Speichern...",
       "saved": "Gespeichert!",
+      "processing": "Verarbeiten...",
       "step": "Schritt {{current}} von {{total}}",
       "completion": "{{percent}}% abgeschlossen"
+    },
+    "steps": {
+      "assetDefinitions": {
+        "skipOption": {
+          "title": "Asset-Definitionen vorerst überspringen",
+          "description": "Sie können Assets später im Portfolio-Bereich hinzufügen."
+        },
+        "popularAssets": {
+          "title": "Aus beliebten Assets wählen",
+          "description": "Wählen Sie aus unseren vorkonfigurierten Asset-Vorlagen, um schnell zu beginnen."
+        },
+        "selectedAssets": {
+          "title": "Ausgewählte Assets",
+          "count": "{{count}}"
+        },
+        "showMore": "Alle {{count}} Assets anzeigen",
+        "showLess": "Weniger anzeigen",
+        "customAssets": {
+          "title": "Benutzerdefinierte Assets hinzufügen",
+          "description": "Finden Sie nicht, was Sie suchen? Fügen Sie Ihre eigenen benutzerdefinierten Assets hinzu.",
+          "addButton": "Benutzerdefiniertes Asset hinzufügen",
+          "form": {
+            "name": "Name",
+            "namePlaceholder": "z.B. Tesla Inc.",
+            "symbol": "Symbol", 
+            "symbolPlaceholder": "z.B. TSLA",
+            "type": "Typ",
+            "category": "Kategorie",
+            "categoryPlaceholder": "z.B. Technologie, Gesundheitswesen",
+            "description": "Beschreibung (Optional)",
+            "descriptionPlaceholder": "Kurze Beschreibung des Assets"
+          },
+          "types": {
+            "stock": "Aktie",
+            "etf": "ETF", 
+            "bond": "Anleihe",
+            "crypto": "Kryptowährung",
+            "other": "Andere"
+          },
+          "actions": {
+            "cancel": "Abbrechen",
+            "addAsset": "Asset hinzufügen"
+          }
+        }
+      },
+      "income": {
+        "skipOption": {
+          "title": "Einkommensverfolgung vorerst überspringen",
+          "description": "Dieser Schritt ist optional. Sie können später Einkommensquelleninformationen hinzufügen."
+        },
+        "title": "Verfolgen Sie Ihre Einkommensquellen",
+        "description": "Fügen Sie Ihre verschiedenen Einkommensquellen hinzu, um Ihren Cashflow zu verstehen. Dies umfasst Gehalt, Freelance-Arbeit, passives Einkommen aus Investitionen und andere Quellen.",
+        "yourIncomes": "Ihre Einkommensquellen",
+        "totalMonthlyIncome": "Gesamtes monatliches Einkommen",
+        "addIncomeSource": "Einkommensquelle hinzufügen",
+        "addNewIncomeSource": "Neue Einkommensquelle hinzufügen",
+        "form": {
+          "sourceName": "Quellenname *",
+          "sourceNamePlaceholder": "z.B. Hauptjob, Freelance-Kunde, Mietobjekt",
+          "incomeType": "Einkommenstyp *",
+          "monthlyAmount": "Monatlicher Betrag ($) *",
+          "annualAmount": "Jährlicher Betrag (berechnet)",
+          "description": "Beschreibung (Optional)",
+          "descriptionPlaceholder": "Zusätzliche Details zu dieser Einkommensquelle"
+        },
+        "types": {
+          "salary": "Gehalt/Lohn",
+          "freelance": "Freelance/Vertrag", 
+          "passive": "Passives Einkommen",
+          "other": "Andere"
+        },
+        "typeGuidelines": {
+          "title": "Einkommenstyp-Richtlinien",
+          "salary": "Gehalt/Lohn: Regelmäßiges Beschäftigungseinkommen, Boni, Provisionen",
+          "freelance": "Freelance/Vertrag: Selbstständige Vertragsarbeit, Beratungsgebühren",
+          "passive": "Passives Einkommen: Dividenden, Mieteinnahmen, Lizenzgebühren, Zinsen",
+          "other": "Andere: Staatliche Leistungen, Geschenke, unregelmäßiges Einkommen"
+        },
+        "summary": {
+          "monthlyAmount": "Monatlicher Betrag:",
+          "annualAmount": "Jährlicher Betrag:"
+        },
+        "actions": {
+          "cancel": "Abbrechen",
+          "addIncomeSource": "Einkommensquelle hinzufügen"
+        }
+      },
+      "liabilities": {
+        "skipOption": {
+          "title": "Verbindlichkeitsverfolgung vorerst überspringen",
+          "description": "Dieser Schritt ist optional. Sie können später Schulden- und Verbindlichkeitsinformationen hinzufügen."
+        },
+        "title": "Verfolgen Sie Ihre Verbindlichkeiten",
+        "description": "Fügen Sie Ihre Schulden und Verbindlichkeiten hinzu, um ein vollständiges Bild Ihrer finanziellen Gesundheit zu erhalten. Dies umfasst Hypotheken, Kreditkarten, Darlehen und andere Schulden.",
+        "yourLiabilities": "Ihre Verbindlichkeiten",
+        "totalLiabilities": "Gesamtverbindlichkeiten",
+        "monthlyPayments": "Monatliche Zahlungen",
+        "addLiability": "Verbindlichkeit hinzufügen",
+        "addNewLiability": "Neue Verbindlichkeit hinzufügen",
+        "form": {
+          "name": "Name *",
+          "namePlaceholder": "z.B. Hypothek, Kreditkarte, Studienkredit",
+          "totalAmount": "Gesamtschuldenbetrag ($) *",
+          "interestRate": "Zinssatz (% pro Jahr)",
+          "interestRatePlaceholder": "z.B. 4,5",
+          "monthlyPayment": "Monatliche Zahlung ($)",
+          "description": "Beschreibung (Optional)",
+          "descriptionPlaceholder": "Zusätzliche Details zu dieser Verbindlichkeit"
+        },
+        "commonTypes": {
+          "title": "Häufige Verbindlichkeitstypen",
+          "mortgage": "• Hypothek/Immobilienkredit",
+          "creditCards": "• Kreditkarten", 
+          "studentLoans": "• Studienkredite",
+          "autoLoans": "• Autokredite",
+          "personalLoans": "• Privatkredite",
+          "lineOfCredit": "• Kreditlinie"
+        },
+        "summary": {
+          "amount": "Betrag:",
+          "interestRate": "Zinssatz:",
+          "monthlyPayment": "Monatliche Zahlung:"
+        },
+        "actions": {
+          "cancel": "Abbrechen",
+          "addLiability": "Verbindlichkeit hinzufügen"
+        }
+      },
+      "transactions": {
+        "noAssets": {
+          "title": "Noch keine Assets definiert",
+          "description": "Sie können später Transaktionen hinzufügen, sobald Sie einige Assets definiert haben, oder Sie können jetzt Transaktionen hinzufügen, wenn Sie bereits Ihre Asset-Symbole/Namen kennen.",
+          "tip": "Tipp: Sie können zum vorherigen Schritt zurückgehen, um zuerst Assets hinzuzufügen, oder diesen Schritt überspringen und später darauf zurückkommen."
+        },
+        "skipOption": {
+          "title": "Transaktionen vorerst überspringen",
+          "description": "Sie können die Transaktionshistorie später im Portfolio-Bereich hinzufügen."
+        },
+        "howToAdd": "Wie möchten Sie Transaktionen hinzufügen?",
+        "methods": {
+          "manual": "Transaktionen manuell hinzufügen",
+          "bulkImport": "Aus Datei importieren (CSV/JSON)"
+        },
+        "importFormat": {
+          "title": "Transaktions-Importformat",
+          "required": "Erforderliche Spalten: asset_symbol, type (buy/sell/dividend), amount, date",
+          "optional": "Optionale Spalten: quantity, notes",
+          "dateFormat": "Datumsformat: YYYY-MM-DD (z.B. 2024-01-15)"
+        },
+        "yourTransactions": "Ihre Transaktionen",
+        "addTransaction": "Transaktion hinzufügen",
+        "addNewTransaction": "Neue Transaktion hinzufügen",
+        "form": {
+          "asset": "Asset",
+          "assetPlaceholder": "Asset auswählen",
+          "assetInputPlaceholder": "Asset-Symbol eingeben (z.B. AAPL, MSFT)",
+          "assetInputHelp": "Geben Sie das Asset-Symbol oder die Kennung für Ihre Transaktion ein",
+          "type": "Typ",
+          "amount": "Betrag ($)",
+          "quantity": "Menge (Optional)",
+          "date": "Datum",
+          "notes": "Notizen (Optional)"
+        },
+        "types": {
+          "buy": "Kaufen",
+          "sell": "Verkaufen",
+          "dividend": "Dividende"
+        },
+        "actions": {
+          "cancel": "Abbrechen",
+          "addTransaction": "Transaktion hinzufügen"
+        }
+      },
+      "completion": {
+        "title": "Setup abgeschlossen!",
+        "description": "Großartige Arbeit! Sie haben Ihren Passiveinkommen-Rechner erfolgreich konfiguriert. Hier ist eine Zusammenfassung dessen, was Sie eingerichtet haben.",
+        "summary": {
+          "assetsCount": "Assets definiert",
+          "transactionsCount": "Transaktionen", 
+          "liabilitiesCount": "Verbindlichkeiten",
+          "totalLiabilities": "Gesamtverbindlichkeiten",
+          "monthlyIncome": "Monatliches Einkommen",
+          "stepSkipped": "Schritt wurde übersprungen"
+        },
+        "configurationSummary": "Konfigurationszusammenfassung",
+        "selectedTemplates": "Ausgewählte Vorlagen:",
+        "customAssets": "Benutzerdefinierte Assets:",
+        "transactionHistory": "Ihre Transaktionshistorie wurde aufgezeichnet und wird zur Berechnung Ihrer Portfolio-Performance und passiven Einkommensprognosen verwendet.",
+        "financialOverview": "Finanzübersicht",
+        "totalMonthlyIncome": "Gesamtes monatliches Einkommen:",
+        "annual": "Jährlich:",
+        "totalLiabilities": "Gesamtverbindlichkeiten:",
+        "nextSteps": {
+          "title": "Was kommt als Nächstes?",
+          "step1": "• Ihr Passiveinkommen-Rechner ist jetzt einsatzbereit",
+          "step2": "• Besuchen Sie das Dashboard, um Ihre Portfolio-Übersicht und Prognosen zu sehen", 
+          "step3": "• Nutzen Sie den Analytics-Bereich, um tiefer in Ihre Finanzdaten einzutauchen",
+          "step4": "• Sie können jederzeit weitere Assets, Transaktionen hinzufügen und Ihre Informationen in den Einstellungen aktualisieren"
+        },
+        "completeButton": "Setup abschließen & zum Dashboard gehen",
+        "savingConfiguration": "Konfiguration wird gespeichert..."
+      }
     }
   }
 }

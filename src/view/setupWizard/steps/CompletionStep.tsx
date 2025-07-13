@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { StepDataCollection } from '@/types/domains/setupWizard';
 
 interface CompletionStepProps {
@@ -12,6 +13,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
   onComplete,
   isLoading = false
 }) => {
+  const { t } = useTranslation();
   const getStepSummary = () => {
     const summary = {
       assets: stepData.assetDefinitions.selectedTemplates.length + stepData.assetDefinitions.customAssets.length,
@@ -37,12 +39,11 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
         </div>
         
         <h3 className="text-xl font-medium text-gray-900 mb-4">
-          Setup Complete!
+          {t('setupWizard.steps.completion.title')}
         </h3>
         
         <p className="text-gray-600 max-w-2xl mx-auto">
-          Great job! You've successfully configured your passive income calculator. 
-          Here's a summary of what you've set up.
+          {t('setupWizard.steps.completion.description')}
         </p>
       </div>
 
@@ -57,12 +58,12 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-blue-900">Assets Defined</p>
+              <p className="text-sm font-medium text-blue-900">{t('setupWizard.steps.completion.summary.assetsCount')}</p>
               <p className="text-2xl font-bold text-blue-600">{summary.assets}</p>
             </div>
           </div>
           {stepData.assetDefinitions.skipStep && (
-            <p className="text-xs text-blue-700 mt-2">Step was skipped</p>
+            <p className="text-xs text-blue-700 mt-2">{t('setupWizard.steps.completion.summary.stepSkipped')}</p>
           )}
         </div>
 
@@ -75,12 +76,12 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-green-900">Transactions</p>
+              <p className="text-sm font-medium text-green-900">{t('setupWizard.steps.completion.summary.transactionsCount')}</p>
               <p className="text-2xl font-bold text-green-600">{summary.transactions}</p>
             </div>
           </div>
           {stepData.transactions.skipStep && (
-            <p className="text-xs text-green-700 mt-2">Step was skipped</p>
+            <p className="text-xs text-green-700 mt-2">{t('setupWizard.steps.completion.summary.stepSkipped')}</p>
           )}
         </div>
 
@@ -93,14 +94,14 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-red-900">Liabilities</p>
+              <p className="text-sm font-medium text-red-900">{t('setupWizard.steps.completion.summary.liabilitiesCount')}</p>
               <p className="text-2xl font-bold text-red-600">
                 {summary.liabilities > 0 ? `$${summary.totalLiabilities.toLocaleString()}` : '0'}
               </p>
             </div>
           </div>
           {stepData.liabilities.skipStep && (
-            <p className="text-xs text-red-700 mt-2">Step was skipped</p>
+            <p className="text-xs text-red-700 mt-2">{t('setupWizard.steps.completion.summary.stepSkipped')}</p>
           )}
         </div>
 
@@ -113,21 +114,21 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
               </svg>
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-purple-900">Monthly Income</p>
+              <p className="text-sm font-medium text-purple-900">{t('setupWizard.steps.completion.summary.monthlyIncome')}</p>
               <p className="text-2xl font-bold text-purple-600">
                 {summary.income > 0 ? `$${summary.totalMonthlyIncome.toLocaleString()}` : '0'}
               </p>
             </div>
           </div>
           {stepData.income.skipStep && (
-            <p className="text-xs text-purple-700 mt-2">Step was skipped</p>
+            <p className="text-xs text-purple-700 mt-2">{t('setupWizard.steps.completion.summary.stepSkipped')}</p>
           )}
         </div>
       </div>
 
       {/* Detailed Summary */}
       <div className="bg-gray-50 rounded-lg p-6">
-        <h4 className="text-lg font-medium text-gray-900 mb-4">Configuration Summary</h4>
+        <h4 className="text-lg font-medium text-gray-900 mb-4">{t('setupWizard.steps.completion.configurationSummary')}</h4>
         
         <div className="space-y-4">
           {/* Assets */}
@@ -137,7 +138,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 {stepData.assetDefinitions.selectedTemplates.length > 0 && (
                   <div>
-                    <p className="text-gray-600">Selected Templates:</p>
+                    <p className="text-gray-600">{t('setupWizard.steps.completion.selectedTemplates')}</p>
                     <ul className="list-disc list-inside text-gray-800">
                       {stepData.assetDefinitions.selectedTemplates.map(template => (
                         <li key={template.id}>{template.symbol} - {template.name}</li>
@@ -147,7 +148,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
                 )}
                 {stepData.assetDefinitions.customAssets.length > 0 && (
                   <div>
-                    <p className="text-gray-600">Custom Assets:</p>
+                    <p className="text-gray-600">{t('setupWizard.steps.completion.customAssets')}</p>
                     <ul className="list-disc list-inside text-gray-800">
                       {stepData.assetDefinitions.customAssets.map((asset) => (
                         <li key={`${asset.symbol}-${asset.name}`}>{asset.symbol} - {asset.name}</li>
@@ -164,7 +165,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
             <div>
               <h5 className="font-medium text-gray-900 mb-2">Transactions ({summary.transactions})</h5>
               <div className="text-sm text-gray-600">
-                <p>Your transaction history has been recorded and will be used to calculate your portfolio performance and passive income projections.</p>
+                <p>{t('setupWizard.steps.completion.transactionHistory')}</p>
               </div>
             </div>
           )}
@@ -172,18 +173,18 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
           {/* Financial Overview */}
           {(summary.income > 0 || summary.liabilities > 0) && (
             <div>
-              <h5 className="font-medium text-gray-900 mb-2">Financial Overview</h5>
+              <h5 className="font-medium text-gray-900 mb-2">{t('setupWizard.steps.completion.financialOverview')}</h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 {summary.income > 0 && (
                   <div>
-                    <p className="text-gray-600">Total Monthly Income:</p>
+                    <p className="text-gray-600">{t('setupWizard.steps.completion.totalMonthlyIncome')}</p>
                     <p className="font-medium text-green-600">${summary.totalMonthlyIncome.toLocaleString()}</p>
-                    <p className="text-gray-500">Annual: ${(summary.totalMonthlyIncome * 12).toLocaleString()}</p>
+                    <p className="text-gray-500">{t('setupWizard.steps.completion.annual')}: ${(summary.totalMonthlyIncome * 12).toLocaleString()}</p>
                   </div>
                 )}
                 {summary.liabilities > 0 && (
                   <div>
-                    <p className="text-gray-600">Total Liabilities:</p>
+                    <p className="text-gray-600">{t('setupWizard.steps.completion.totalLiabilities')}</p>
                     <p className="font-medium text-red-600">${summary.totalLiabilities.toLocaleString()}</p>
                   </div>
                 )}
@@ -195,12 +196,12 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
 
       {/* Next Steps */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h4 className="font-medium text-blue-900 mb-3">What's Next?</h4>
+        <h4 className="font-medium text-blue-900 mb-3">{t('setupWizard.steps.completion.nextSteps.title')}</h4>
         <div className="text-sm text-blue-800 space-y-2">
-          <p>• Your passive income calculator is now ready to use</p>
-          <p>• Visit the dashboard to see your portfolio overview and projections</p>
-          <p>• Use the analytics section to dive deeper into your financial data</p>
-          <p>• You can always add more assets, transactions, and update your information in the settings</p>
+          <p>{t('setupWizard.steps.completion.nextSteps.step1')}</p>
+          <p>{t('setupWizard.steps.completion.nextSteps.step2')}</p>
+          <p>{t('setupWizard.steps.completion.nextSteps.step3')}</p>
+          <p>{t('setupWizard.steps.completion.nextSteps.step4')}</p>
         </div>
       </div>
 
@@ -218,11 +219,11 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Saving Configuration...
+              {t('setupWizard.steps.completion.savingConfiguration')}
             </>
           ) : (
             <>
-              Complete Setup & Go to Dashboard
+              {t('setupWizard.steps.completion.completeButton')}
               <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>

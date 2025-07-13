@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { WizardProgress } from '@/types/domains/setupWizard';
 
 interface StepIndicatorProps {
@@ -7,6 +8,7 @@ interface StepIndicatorProps {
 }
 
 const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' }) => {
+  const { t } = useTranslation();
   const getStepCircleClasses = (isCompleted: boolean, isActive: boolean) => {
     if (isCompleted) return 'bg-green-500 text-white';
     if (isActive) return 'bg-blue-600 text-white ring-4 ring-blue-200';
@@ -68,10 +70,10 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' 
                     ${getStepLabelClasses(isActive, isCompleted)}
                   `}
                 >
-                  {stepConfig.title}
+                  {t(stepConfig.title)}
                 </div>
                 {stepConfig.isOptional && (
-                  <div className="text-xs text-gray-400 mt-1">Optional</div>
+                  <div className="text-xs text-gray-400 mt-1">{t('setupWizard.general.stepStatus.optional')}</div>
                 )}
               </div>
               
@@ -114,10 +116,10 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ progress, className = '' 
       {/* Progress Text */}
       <div className="text-center mt-4">
         <p className="text-sm text-gray-600">
-          Step {progress.currentStepIndex + 1} of {progress.totalSteps}
+          {t('setupWizard.progress.step', { current: progress.currentStepIndex + 1, total: progress.totalSteps })}
         </p>
         <p className="text-xs text-gray-500 mt-1">
-          {progress.completionPercentage}% Complete
+          {t('setupWizard.progress.completion', { percent: progress.completionPercentage })}
         </p>
       </div>
     </div>

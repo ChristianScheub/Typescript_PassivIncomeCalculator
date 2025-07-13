@@ -9,49 +9,48 @@ import {
 import { WizardStep } from '@/types/shared/base/enums';
 import { StepConfig } from '../interfaces/ISetupWizardService';
 import Logger from '@/service/shared/logging/Logger/logger';
-import { t } from 'i18next';
 
 export const getStepsConfiguration = (): StepConfig[] => {
   return [
     {
       step: WizardStep.WELCOME,
-      title: t('setupWizard.steps.welcome.title'),
-      description: t('setupWizard.steps.welcome.description'),
+      title: 'setupWizard.general.steps.welcome',
+      description: 'setupWizard.welcome.title',
       isOptional: false,
       isConditional: false
     },
     {
       step: WizardStep.ASSET_DEFINITIONS,
-      title: t('setupWizard.steps.assetDefinitions.title'),
-      description: t('setupWizard.steps.assetDefinitions.description'),
+      title: 'setupWizard.general.steps.assetDefinitions',
+      description: 'setupWizard.assets.title',
       isOptional: true,
       isConditional: false
     },
     {
       step: WizardStep.TRANSACTIONS,
-      title: t('setupWizard.steps.transactions.title'),
-      description: t('setupWizard.steps.transactions.description'),
+      title: 'setupWizard.general.steps.transactions',
+      description: 'setupWizard.transactions.title',
       isOptional: true,
       isConditional: false
     },
     {
       step: WizardStep.LIABILITIES,
-      title: t('setupWizard.steps.liabilities.title'),
-      description: t('setupWizard.steps.liabilities.description'),
+      title: 'setupWizard.general.steps.liabilities',
+      description: 'setupWizard.liabilities.title',
       isOptional: true,
       isConditional: false
     },
     {
       step: WizardStep.INCOME,
-      title: t('setupWizard.steps.income.title'),
-      description: t('setupWizard.steps.income.description'),
+      title: 'setupWizard.general.steps.income',
+      description: 'setupWizard.income.title',
       isOptional: true,
       isConditional: false
     },
     {
       step: WizardStep.COMPLETION,
-      title: t('setupWizard.steps.completion.title'),
-      description: t('setupWizard.steps.completion.description'),
+      title: 'setupWizard.general.steps.completion',
+      description: 'setupWizard.completion.title',
       isOptional: false,
       isConditional: false
     }
