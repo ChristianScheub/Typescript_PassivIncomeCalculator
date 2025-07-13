@@ -335,7 +335,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
             <Toggle
               checked={isApiEnabled}
-              onChange={onApiToggle ? onApiToggle : () => {}}
+              onChange={onApiToggle || (() => {})}
               id="api-toggle"
               label={t('settings.enableStockApi')}
             />

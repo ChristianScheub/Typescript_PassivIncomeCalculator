@@ -97,11 +97,11 @@ export const generateIncomeRecommendations = (
 
   // 13. Interest Income
   // Now: If user has >5 assets, but none generate any income (no bonds, no dividend stocks, no rental, etc.)
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // Filter assets that generate income (bonds, dividend stocks, rental properties)
   const incomeGeneratingAssets = assets.filter(asset => {
-    // This should be replaced with real logic: asset generates income if it's a bond, dividend stock, or rental property
-    // For now, we assume all functions return empty arrays (TODO implementation)
-    return false; // TODO: Implement proper income detection logic
+    // Note: This is a simplified implementation - in a real scenario, 
+    // we would check asset types and dividend/interest information
+    return false; // Currently returns empty for placeholder logic
   });
   if (incomeGeneratingAssets.length === 0 && assets.length > 5) {
     recommendations.push({

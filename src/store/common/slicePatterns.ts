@@ -63,11 +63,15 @@ export interface PortfolioCacheableState<T extends BaseEntity, C = unknown> exte
  * Einheitliche Namenskonvention: [SliceName]: [Operation] [State]
  */
 export const createSliceLogger = (sliceName: string) => ({
-  startOperation: (operation: string, details?: string) => 
-    `${sliceName}: Starting ${operation} operation${details ? ` ${details}` : ''}`,
+  startOperation: (operation: string, details?: string) => {
+    const detailsText = details ? ` ${details}` : '';
+    return `${sliceName}: Starting ${operation} operation${detailsText}`;
+  },
   
-  completeOperation: (operation: string, result?: string) => 
-    `${sliceName}: ${operation} completed successfully${result ? ` - ${result}` : ''}`,
+  completeOperation: (operation: string, result?: string) => {
+    const resultText = result ? ` - ${result}` : '';
+    return `${sliceName}: ${operation} completed successfully${resultText}`;
+  },
   
   failOperation: (operation: string, error: string) => 
     `${sliceName}: ${operation} failed - ${error}`,

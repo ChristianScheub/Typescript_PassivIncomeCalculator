@@ -176,51 +176,47 @@ async function updateBatchStockIntraday(
 // --- Worker Event Handling ---
 
 self.onmessage = function (e: MessageEvent<WorkerRequest>) {
-  try {
-    if (e.data.type === 'updateBatch') {
-      updateBatchStockHistory(e.data.definitions, e.data.period).then(results => {
-        const response: WorkerResponse = { type: 'batchResult', results };
-        self.postMessage(response);
-      }).catch(error => {
-        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
-      });
-    } else if (e.data.type === 'updateSingle') {
-      updateSingleStockHistory(e.data.definition, e.data.period).then(result => {
-        const response: WorkerResponse = { type: 'singleResult', result };
-        self.postMessage(response);
-      }).catch(error => {
-        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
-      });
-    } else if (e.data.type === 'updateBatchDefault') {
-      updateBatchStockHistory(e.data.definitions).then(results => {
-        const response: WorkerResponse = { type: 'batchResult', results };
-        self.postMessage(response);
-      }).catch(error => {
-        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
-      });
-    } else if (e.data.type === 'updateSingleDefault') {
-      updateSingleStockHistory(e.data.definition).then(result => {
-        const response: WorkerResponse = { type: 'singleResult', result };
-        self.postMessage(response);
-      }).catch(error => {
-        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
-      });
-    } else if (e.data.type === 'updateBatchIntraday') {
-      updateBatchStockIntraday(e.data.definitions, e.data.days).then(results => {
-        const response: WorkerResponse = { type: 'batchResult', results };
-        self.postMessage(response);
-      }).catch(error => {
-        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
-      });
-    } else if (e.data.type === 'updateSingleIntraday') {
-      updateSingleStockIntraday(e.data.definition, e.data.days).then(result => {
-        const response: WorkerResponse = { type: 'singleResult', result };
-        self.postMessage(response);
-      }).catch(error => {
-        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
-      });
-    }
-  } catch (err: unknown) {
-    self.postMessage({ type: 'error', error: err instanceof Error ? err.message : String(err) });
+  if (e.data.type === 'updateBatch') {
+    updateBatchStockHistory(e.data.definitions, e.data.period).then(results => {
+      const response: WorkerResponse = { type: 'batchResult', results };
+      self.postMessage(response);
+    }).catch(error => {
+      self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
+    });
+  } else if (e.data.type === 'updateSingle') {
+    updateSingleStockHistory(e.data.definition, e.data.period).then(result => {
+      const response: WorkerResponse = { type: 'singleResult', result };
+      self.postMessage(response);
+    }).catch(error => {
+      self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
+    });
+  } else if (e.data.type === 'updateBatchDefault') {
+    updateBatchStockHistory(e.data.definitions).then(results => {
+      const response: WorkerResponse = { type: 'batchResult', results };
+      self.postMessage(response);
+    }).catch(error => {
+      self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
+    });
+  } else if (e.data.type === 'updateSingleDefault') {
+    updateSingleStockHistory(e.data.definition).then(result => {
+      const response: WorkerResponse = { type: 'singleResult', result };
+      self.postMessage(response);
+    }).catch(error => {
+      self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
+    });
+  } else if (e.data.type === 'updateBatchIntraday') {
+    updateBatchStockIntraday(e.data.definitions, e.data.days).then(results => {
+      const response: WorkerResponse = { type: 'batchResult', results };
+      self.postMessage(response);
+    }).catch(error => {
+      self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
+    });
+  } else if (e.data.type === 'updateSingleIntraday') {
+    updateSingleStockIntraday(e.data.definition, e.data.days).then(result => {
+      const response: WorkerResponse = { type: 'singleResult', result };
+      self.postMessage(response);
+    }).catch(error => {
+      self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
+    });
   }
 };

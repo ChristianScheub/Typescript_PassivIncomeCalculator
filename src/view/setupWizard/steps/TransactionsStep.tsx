@@ -264,10 +264,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                             if (isAssetDefinition(asset)) {
                               id = asset.id ?? asset.ticker ?? '';
                               display = `${asset.ticker ?? asset.id ?? ''} - ${asset.name ?? asset.fullName ?? ''}`;
-                            } else if (isAssetTemplate(asset)) {
-                              id = asset.symbol;
-                              display = `${asset.symbol} - ${asset.name}`;
-                            } else if (isCustomAsset(asset)) {
+                            } else if (isAssetTemplate(asset) || isCustomAsset(asset)) {
                               id = asset.symbol;
                               display = `${asset.symbol} - ${asset.name}`;
                             } else {
