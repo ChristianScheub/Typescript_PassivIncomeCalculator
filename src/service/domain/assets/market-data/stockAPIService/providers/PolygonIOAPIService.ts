@@ -1,43 +1,29 @@
-import { IStockAPIService } from '../interfaces/IStockAPIService';
+import { BaseStockAPIService } from './BaseStockAPIService';
 import {
   StockPrice,
   StockHistory,
   StockHistoryEntry
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { CapacitorHttp } from '@capacitor/core';
 
 /**
  * Polygon.io API Service Provider
  * Implements the IStockAPIService interface with Polygon.io API
  * API Documentation: https://polygon.io/docs/stocks
  */
-export class PolygonIOAPIService implements IStockAPIService {
-  private apiKey: string;
-  private static readonly baseUrl = 'https://api.polygon.io';
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    Logger.info('Initialized PolygonIOAPIService');
-  }
+export class PolygonIOAPIService extends BaseStockAPIService {
+  protected readonly baseUrl = 'https://api.polygon.io';
+  protected readonly providerName = 'Polygon.io';
 
   async getCurrentStockPrice(symbol: string): Promise<StockPrice> {
     Logger.info(`Polygon.io: Getting current price for ${symbol}`);
     
     try {
       // Use the previous close endpoint for current price data
-      const url = `${PolygonIOAPIService.baseUrl}/v2/aggs/ticker/${symbol}/prev?adjusted=true&apikey=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
+      const url = `${this.baseUrl}/v2/aggs/ticker/${symbol}/prev?adjusted=true&apikey=${this.apiKey}`;
+      const data = await this.makeRequest(url);
       
-      if (response.status !== 200) {
-        throw new Error(`Polygon.io API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
-      
-      if (data.status !== 'OK') {
-        throw new Error(`Polygon.io API error: ${data.error || 'Unknown error'}`);
-      }
+      this.checkForAPIErrors(data);
 
       if (!data.results || data.results.length === 0) {
         throw new Error(`No data available for symbol ${symbol}`);
@@ -67,30 +53,19 @@ export class PolygonIOAPIService implements IStockAPIService {
     Logger.info(`Polygon.io: Getting ${days} days history for ${symbol}`);
     
     try {
-      const endDate = new Date();
-      const startDate = new Date(endDate.getTime() - (days * 24 * 60 * 60 * 1000));
-      
-      const startDateStr = startDate.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
+      const { startDateStr, endDateStr } = this.calculateDateRange(days);
       
       // Use aggregates endpoint with daily timespan
-      const url = `${PolygonIOAPIService.baseUrl}/v2/aggs/ticker/${symbol}/range/1/day/${startDateStr}/${endDateStr}?adjusted=true&sort=asc&apikey=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
+      const url = `${this.baseUrl}/v2/aggs/ticker/${symbol}/range/1/day/${startDateStr}/${endDateStr}?adjusted=true&sort=asc&apikey=${this.apiKey}`;
+      const data = await this.makeRequest(url);
       
-      if (response.status !== 200) {
-        throw new Error(`Polygon.io API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
-      
-      if (data.status !== 'OK') {
-        throw new Error(`Polygon.io API error: ${data.error || 'Unknown error'}`);
-      }
+      this.checkForAPIErrors(data);
 
       if (!data.results || data.results.length === 0) {
         throw new Error(`No data available for symbol ${symbol}`);
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const entries: StockHistoryEntry[] = data.results.map((item: any) => {
         const date = new Date(item.t);
         return {
@@ -101,7 +76,7 @@ export class PolygonIOAPIService implements IStockAPIService {
           close: item.c,
           volume: item.v,
           timestamp: item.t,
-          midday: (item.h + item.l) / 2
+          midday: this.calculateMidday(item.h, item.l)
         };
       });
 
@@ -117,38 +92,23 @@ export class PolygonIOAPIService implements IStockAPIService {
     }
   }
 
-  async getHistory30Days(symbol: string): Promise<StockHistory> {
-    return this.getHistory(symbol, 30);
-  }
-
   async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
     Logger.info(`Polygon.io: Getting ${days} days intraday history for ${symbol}`);
     
     try {
-      const endDate = new Date();
-      const startDate = new Date(endDate.getTime() - (days * 24 * 60 * 60 * 1000));
-      
-      const startDateStr = startDate.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
+      const { startDateStr, endDateStr } = this.calculateDateRange(days);
       
       // Use aggregates endpoint with minute timespan for intraday
-      const url = `${PolygonIOAPIService.baseUrl}/v2/aggs/ticker/${symbol}/range/1/minute/${startDateStr}/${endDateStr}?adjusted=true&sort=asc&limit=50000&apikey=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
+      const url = `${this.baseUrl}/v2/aggs/ticker/${symbol}/range/1/minute/${startDateStr}/${endDateStr}?adjusted=true&sort=asc&limit=50000&apikey=${this.apiKey}`;
+      const data = await this.makeRequest(url);
       
-      if (response.status !== 200) {
-        throw new Error(`Polygon.io API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
-      
-      if (data.status !== 'OK') {
-        throw new Error(`Polygon.io API error: ${data.error || 'Unknown error'}`);
-      }
+      this.checkForAPIErrors(data);
 
       if (!data.results || data.results.length === 0) {
         throw new Error(`No intraday data available for symbol ${symbol}`);
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const entries: StockHistoryEntry[] = data.results.map((item: any) => {
         const date = new Date(item.t);
         return {

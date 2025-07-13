@@ -1,43 +1,29 @@
-import { IStockAPIService } from '../interfaces/IStockAPIService';
+import { BaseStockAPIService } from './BaseStockAPIService';
 import {
   StockPrice,
   StockHistory,
   StockHistoryEntry
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { CapacitorHttp } from '@capacitor/core';
 
 /**
  * EOD Historical Data API Service Provider
  * Implements the IStockAPIService interface with EOD Historical Data API
  * API Documentation: https://eodhistoricaldata.com/financial-apis/
  */
-export class EODHistoricalDataAPIService implements IStockAPIService {
-  private apiKey: string;
-  private static readonly baseUrl = 'https://eodhistoricaldata.com/api';
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    Logger.info('Initialized EODHistoricalDataAPIService');
-  }
+export class EODHistoricalDataAPIService extends BaseStockAPIService {
+  protected readonly baseUrl = 'https://eodhistoricaldata.com/api';
+  protected readonly providerName = 'EOD Historical Data';
 
   async getCurrentStockPrice(symbol: string): Promise<StockPrice> {
     Logger.info(`EOD Historical Data: Getting current price for ${symbol}`);
     
     try {
       // Use real-time data endpoint for current price
-      const url = `${EODHistoricalDataAPIService.baseUrl}/real-time/${symbol}?api_token=${this.apiKey}&fmt=json`;
-      const response = await CapacitorHttp.get({ url });
+      const url = `${this.baseUrl}/real-time/${symbol}?api_token=${this.apiKey}&fmt=json`;
+      const data = await this.makeRequest(url);
       
-      if (response.status !== 200) {
-        throw new Error(`EOD Historical Data API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
-      
-      if (data.code && data.message) {
-        throw new Error(`EOD Historical Data API error: ${data.message}`);
-      }
+      this.checkForAPIErrors(data);
 
       return {
         symbol: data.code || symbol,
@@ -57,29 +43,18 @@ export class EODHistoricalDataAPIService implements IStockAPIService {
     Logger.info(`EOD Historical Data: Getting ${days} days history for ${symbol}`);
     
     try {
-      const endDate = new Date();
-      const startDate = new Date(endDate.getTime() - (days * 24 * 60 * 60 * 1000));
+      const { startDateStr, endDateStr } = this.calculateDateRange(days);
       
-      const startDateStr = startDate.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
+      const url = `${this.baseUrl}/eod/${symbol}?api_token=${this.apiKey}&from=${startDateStr}&to=${endDateStr}&fmt=json`;
+      const data = await this.makeRequest(url);
       
-      const url = `${EODHistoricalDataAPIService.baseUrl}/eod/${symbol}?api_token=${this.apiKey}&from=${startDateStr}&to=${endDateStr}&fmt=json`;
-      const response = await CapacitorHttp.get({ url });
-      
-      if (response.status !== 200) {
-        throw new Error(`EOD Historical Data API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
-      
-      if (data.error) {
-        throw new Error(`EOD Historical Data API error: ${data.error}`);
-      }
+      this.checkForAPIErrors(data);
 
       if (!Array.isArray(data)) {
         throw new Error(`No data available for symbol ${symbol}`);
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const entries: StockHistoryEntry[] = data.map((item: any) => ({
         date: item.date,
         open: parseFloat(item.open),
@@ -87,8 +62,8 @@ export class EODHistoricalDataAPIService implements IStockAPIService {
         low: parseFloat(item.low),
         close: parseFloat(item.close),
         volume: item.volume ? parseInt(item.volume) : undefined,
-        timestamp: new Date(item.date).getTime(),
-        midday: (parseFloat(item.high) + parseFloat(item.low)) / 2
+        timestamp: this.parseTimestamp(item.date),
+        midday: this.calculateMidday(parseFloat(item.high), parseFloat(item.low))
       }));
 
       return {
@@ -103,38 +78,23 @@ export class EODHistoricalDataAPIService implements IStockAPIService {
     }
   }
 
-  async getHistory30Days(symbol: string): Promise<StockHistory> {
-    return this.getHistory(symbol, 30);
-  }
-
   async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
     Logger.info(`EOD Historical Data: Getting ${days} days intraday history for ${symbol}`);
     
     try {
-      const endDate = new Date();
-      const startDate = new Date(endDate.getTime() - (days * 24 * 60 * 60 * 1000));
-      
-      const startDateStr = startDate.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
+      const { startDateStr, endDateStr } = this.calculateDateRange(days);
       
       // Use intraday endpoint with 1m interval
-      const url = `${EODHistoricalDataAPIService.baseUrl}/intraday/${symbol}?api_token=${this.apiKey}&interval=1m&from=${startDateStr}&to=${endDateStr}&fmt=json`;
-      const response = await CapacitorHttp.get({ url });
+      const url = `${this.baseUrl}/intraday/${symbol}?api_token=${this.apiKey}&interval=1m&from=${startDateStr}&to=${endDateStr}&fmt=json`;
+      const data = await this.makeRequest(url);
       
-      if (response.status !== 200) {
-        throw new Error(`EOD Historical Data API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
-      
-      if (data.error) {
-        throw new Error(`EOD Historical Data API error: ${data.error}`);
-      }
+      this.checkForAPIErrors(data);
 
       if (!Array.isArray(data)) {
         throw new Error(`No intraday data available for symbol ${symbol}`);
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const entries: StockHistoryEntry[] = data.map((item: any) => ({
         date: item.datetime.split(' ')[0], // Extract date part
         open: parseFloat(item.open),
@@ -142,7 +102,7 @@ export class EODHistoricalDataAPIService implements IStockAPIService {
         low: parseFloat(item.low),
         close: parseFloat(item.close),
         volume: item.volume ? parseInt(item.volume) : undefined,
-        timestamp: new Date(item.datetime).getTime(),
+        timestamp: this.parseTimestamp(item.datetime),
         midday: parseFloat(item.close) // For intraday, use close as midday
       }));
 

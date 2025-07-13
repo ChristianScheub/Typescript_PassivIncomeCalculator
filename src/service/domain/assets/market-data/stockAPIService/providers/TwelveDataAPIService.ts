@@ -1,47 +1,32 @@
-import { IStockAPIService } from '../interfaces/IStockAPIService';
+import { BaseStockAPIService } from './BaseStockAPIService';
 import {
   StockPrice,
   StockHistory,
   StockHistoryEntry
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { CapacitorHttp } from '@capacitor/core';
 
 /**
  * Twelve Data API Service Provider
  * Implements the IStockAPIService interface with Twelve Data API
  * API Documentation: https://twelvedata.com/docs
  */
-export class TwelveDataAPIService implements IStockAPIService {
-  private apiKey: string;
-  private static readonly baseUrl = 'https://api.twelvedata.com';
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    Logger.info('Initialized TwelveDataAPIService');
-  }
+export class TwelveDataAPIService extends BaseStockAPIService {
+  protected readonly baseUrl = 'https://api.twelvedata.com';
+  protected readonly providerName = 'Twelve Data';
 
   async getCurrentStockPrice(symbol: string): Promise<StockPrice> {
     Logger.info(`Twelve Data: Getting current price for ${symbol}`);
     
     try {
-      const url = `${TwelveDataAPIService.baseUrl}/price?symbol=${symbol}&apikey=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
+      const url = `${this.baseUrl}/price?symbol=${symbol}&apikey=${this.apiKey}`;
+      const data = await this.makeRequest(url);
       
-      if (response.status !== 200) {
-        throw new Error(`Twelve Data API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
-      
-      if (data.code && data.message) {
-        throw new Error(`Twelve Data API error: ${data.message}`);
-      }
+      this.checkForAPIErrors(data);
 
       // Get additional quote data for change information
-      const quoteUrl = `${TwelveDataAPIService.baseUrl}/quote?symbol=${symbol}&apikey=${this.apiKey}`;
-      const quoteResponse = await CapacitorHttp.get({ url: quoteUrl });
-      const quoteData = quoteResponse.data;
+      const quoteUrl = `${this.baseUrl}/quote?symbol=${symbol}&apikey=${this.apiKey}`;
+      const quoteData = await this.makeRequest(quoteUrl);
       
       return {
         symbol: symbol,
@@ -62,24 +47,17 @@ export class TwelveDataAPIService implements IStockAPIService {
     
     try {
       // Calculate the appropriate interval and outputsize
-      let interval = '1day';
-      let outputsize = Math.min(days, 365).toString();
+      const interval = '1day';
+      const outputsize = Math.min(days, 365).toString();
       
-      const url = `${TwelveDataAPIService.baseUrl}/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputsize}&apikey=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
+      const url = `${this.baseUrl}/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputsize}&apikey=${this.apiKey}`;
+      const data = await this.makeRequest(url);
       
-      if (response.status !== 200) {
-        throw new Error(`Twelve Data API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
-      
-      if (data.code && data.message) {
-        throw new Error(`Twelve Data API error: ${data.message}`);
-      }
+      this.checkForAPIErrors(data);
 
       const values = data.values || [];
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const entries: StockHistoryEntry[] = values.map((item: any) => ({
         date: item.datetime.split(' ')[0], // Extract date part
         open: parseFloat(item.open),
@@ -87,8 +65,8 @@ export class TwelveDataAPIService implements IStockAPIService {
         low: parseFloat(item.low),
         close: parseFloat(item.close),
         volume: item.volume ? parseInt(item.volume) : undefined,
-        timestamp: new Date(item.datetime).getTime(),
-        midday: (parseFloat(item.high) + parseFloat(item.low)) / 2
+        timestamp: this.parseTimestamp(item.datetime),
+        midday: this.calculateMidday(parseFloat(item.high), parseFloat(item.low))
       }));
 
       return {
@@ -103,10 +81,6 @@ export class TwelveDataAPIService implements IStockAPIService {
     }
   }
 
-  async getHistory30Days(symbol: string): Promise<StockHistory> {
-    return this.getHistory(symbol, 30);
-  }
-
   async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
     Logger.info(`Twelve Data: Getting ${days} days intraday history for ${symbol}`);
     
@@ -115,21 +89,14 @@ export class TwelveDataAPIService implements IStockAPIService {
       const interval = '1min';
       const outputsize = Math.min(days * 390, 5000).toString(); // Market is ~390 minutes per day, max 5000 points
       
-      const url = `${TwelveDataAPIService.baseUrl}/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputsize}&apikey=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
+      const url = `${this.baseUrl}/time_series?symbol=${symbol}&interval=${interval}&outputsize=${outputsize}&apikey=${this.apiKey}`;
+      const data = await this.makeRequest(url);
       
-      if (response.status !== 200) {
-        throw new Error(`Twelve Data API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
-      
-      if (data.code && data.message) {
-        throw new Error(`Twelve Data API error: ${data.message}`);
-      }
+      this.checkForAPIErrors(data);
 
       const values = data.values || [];
       
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const entries: StockHistoryEntry[] = values.map((item: any) => ({
         date: item.datetime.split(' ')[0], // Extract date part
         open: parseFloat(item.open),
@@ -137,7 +104,7 @@ export class TwelveDataAPIService implements IStockAPIService {
         low: parseFloat(item.low),
         close: parseFloat(item.close),
         volume: item.volume ? parseInt(item.volume) : undefined,
-        timestamp: new Date(item.datetime).getTime(),
+        timestamp: this.parseTimestamp(item.datetime),
         midday: parseFloat(item.close) // For intraday, use close as midday
       }));
 
