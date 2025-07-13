@@ -1262,10 +1262,7 @@
     "analyze": "Analysieren",
     "recentActivity": "Letzte Aktivitäten",
     "totalAssets": "Gesamtvermögen",
-    "upcomingEvents": "Anstehende Ereignisse",
-    "assetEvents": "Asset-Ereignisse & Termine",
     "lastUpdated": "Zuletzt aktualisiert",
-    "noEvents": "Keine Ereignisse geplant",
     "addAssetsForEvents": "Fügen Sie Assets hinzu, um deren Termine und Ereignisse hier zu sehen",
     "historyFeature": "Asset-Historie Funktion",
     "historyComingSoon": "Detaillierte Asset-Historie-Verfolgung folgt bald. Dies wird den kompletten Lebenszyklus Ihrer Assets zeigen.",
@@ -1652,18 +1649,30 @@
         "complete": "Setup abschließen"
       },
       "steps": {
-        "welcome": "Willkommen",
-        "assetDefinitions": "Asset-Definitionen",
-        "transactions": "Transaktionen",
-        "liabilities": "Verbindlichkeiten",
-        "income": "Einkommensquellen",
-        "completion": "Setup abschließen"
-      },
-      "stepStatus": {
-        "current": "Aktuell",
-        "completed": "Abgeschlossen",
-        "pending": "Ausstehend",
-        "optional": "Optional"
+        "welcome": {
+          "title": "Willkommen",
+          "description": "Willkommen beim Einrichtungsassistenten. Beginnen Sie mit StrictFinance."
+        },
+        "assetDefinitions": {
+          "title": "Asset-Definitionen",
+          "description": "Definieren Sie Ihre Assets aus Vorlagen oder erstellen Sie benutzerdefinierte Assets."
+        },
+        "transactions": {
+          "title": "Transaktionen",
+          "description": "Fügen Sie Ihre Asset-Transaktionen hinzu."
+        },
+        "liabilities": {
+          "title": "Verbindlichkeiten",
+          "description": "Verfolgen Sie Ihre Schulden und Verbindlichkeiten."
+        },
+        "income": {
+          "title": "Einkommensquellen",
+          "description": "Definieren Sie Ihre Einkommensquellen."
+        },
+        "completion": {
+          "title": "Einrichtung abschließen",
+          "description": "Überprüfen und schließen Sie Ihre Einrichtung ab."
+        }
       }
     },
     "welcome": {

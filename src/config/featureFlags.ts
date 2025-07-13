@@ -13,6 +13,7 @@ const featureFlag_Debug_Log_Error: boolean = true; //Show error logs in the cons
 const featureFlag_Debug_Log_Analytics: boolean = false; //Show analytics logs in the console
 const featureFlag_Debug_Log_Cache: boolean = false; //Show cache logs in the console
 const featureFlag_Debug_Log_API: boolean = true; //Show API service logs in the console
+const featureFlag_SetupImport: boolean = false; //Enable setup import feature
 
 export {
   featureFlag_Debug_Log_Analytics,
@@ -26,5 +27,6 @@ export {
   featureFlag_Debug_Log_Warning,
   featureFlag_Debug_Log_Info,
   featureFlag_Debug_Log_Cache,
-  featureFlag_Debug_Log_API
+  featureFlag_Debug_Log_API,
+  featureFlag_SetupImport
 };

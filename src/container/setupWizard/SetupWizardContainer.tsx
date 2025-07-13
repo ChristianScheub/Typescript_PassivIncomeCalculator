@@ -28,7 +28,7 @@ import {
 } from '@/store/slices/ui/setupWizardSlice';
 import { showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/ui/snackbarSlice';
 import { ImportValidationResult } from '@/types/domains/setupWizard';
-import { WizardStep } from '@/types/shared/base/enums';
+import sqliteService from '@/service/infrastructure/sqlLiteService';
 
 const SetupWizardContainer: React.FC = () => {
   const navigate = useNavigate();
@@ -96,27 +96,35 @@ const SetupWizardContainer: React.FC = () => {
   }, [dispatch]);
 
   // File import handlers
-  const handleFileSelect = useCallback(async (file: File, type: 'csv' | 'json') => {
+  const handleFileSelect = useCallback((file: File) => {
     try {
-      const result = await setupWizardService.importDataFromFile(file, type);
-      
-      if (result.success && result.data) {
-        dispatch(showSuccessSnackbar('File imported successfully!'));
-        
-        // Process imported data based on current step
-        if (currentStep === WizardStep.WELCOME && result.data.assets) {
-          // Convert imported assets to templates
-          // This would need to be implemented based on the data format
+      const reader = new FileReader();
+
+      reader.onload = async (e) => {
+        try {
+          const fileContent = e.target?.result as string;
+
+          await sqliteService.importData(fileContent);
+          dispatch(showSuccessSnackbar('File imported successfully!'));
+
+          // Refresh the page to reload all data
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } catch (error) {
+          dispatch(showErrorSnackbar(`Import failed: ${error instanceof Error ? error.message : String(error)}`));
         }
-      } else {
-        result.errors?.forEach(error => {
-          dispatch(showErrorSnackbar(error));
-        });
-      }
+      };
+
+      reader.onerror = () => {
+        dispatch(showErrorSnackbar('Failed to read the file. Please try again.'));
+      };
+
+      reader.readAsText(file);
     } catch (error) {
-      dispatch(showErrorSnackbar(`Import failed: ${error}`));
+      dispatch(showErrorSnackbar(`Unexpected error: ${error instanceof Error ? error.message : String(error)}`));
     }
-  }, [currentStep, dispatch]);
+  }, [dispatch]);
 
   const handleValidationResult = useCallback((result: ImportValidationResult) => {
     if (!result.isValid) {

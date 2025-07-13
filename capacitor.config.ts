@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.passiveincome.calculator',
-  appName: 'PassiveIncomeCalculator',
+  appName: 'StrictFinance',
   webDir: 'dist'
 };
 

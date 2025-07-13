@@ -7,7 +7,7 @@ import { clearAllExpenses } from '@/store/slices/domain';
 import { clearAllAssetCategories } from '@/store/slices/domain';
 
 /**
- * Löscht NUR den Redux-Cache (calculatedData, customAnalytics) und den LocalStorage-Key 'passiveIncomeCalculator'.
+ * Löscht NUR den Redux-Cache (calculatedData, customAnalytics) und den LocalStorage-Key 'StrictFinance'.
  * Keine weiteren Datenbanken (z.B. IndexedDB) werden angefasst.
  */
 export const clearReduxCacheOnly = async (dispatch: Dispatch): Promise<void> => {
@@ -17,5 +17,5 @@ export const clearReduxCacheOnly = async (dispatch: Dispatch): Promise<void> => 
   dispatch(clearAllForecast());
   dispatch(clearAllExpenses());
   dispatch(clearAllAssetCategories());
-  localStorage.removeItem('passiveIncomeCalculator');
+  localStorage.removeItem('StrictFinance');
 };

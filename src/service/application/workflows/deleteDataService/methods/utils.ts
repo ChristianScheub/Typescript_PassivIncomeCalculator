@@ -19,7 +19,7 @@ export async function clearSQLiteStores(stores: StoreNames[]): Promise<void> {
 }
 
 export function clearLocalStorageData(keys: string[]): void {
-    const currentStorage = localStorage.getItem('passiveIncomeCalculator');
+    const currentStorage = localStorage.getItem('StrictFinance');
     if (currentStorage) {
         const parsed = JSON.parse(currentStorage);
         keys.forEach(key => {
@@ -35,6 +35,6 @@ export function clearLocalStorageData(keys: string[]): void {
                 parsed[key] = { items: [], status: 'idle', error: null };
             }
         });
-        localStorage.setItem('passiveIncomeCalculator', JSON.stringify(parsed));
+        localStorage.setItem('StrictFinance', JSON.stringify(parsed));
     }
 }

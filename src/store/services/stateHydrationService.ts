@@ -8,7 +8,7 @@ type Status = 'idle' | 'loading' | 'succeeded' | 'failed';
  * Separated from store creation for better maintainability
  */
 export class StateHydrationService {
-  private static readonly STORAGE_KEY = 'passiveIncomeCalculator';
+  private static readonly STORAGE_KEY = 'StrictFinance';
   private static readonly MAX_STORAGE_SIZE = 10 * 1024 * 1024; // 10MB limit
   private static readonly LEGACY_KEYS = [
     'stock_api_enabled',

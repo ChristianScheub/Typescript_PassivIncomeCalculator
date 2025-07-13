@@ -9,7 +9,7 @@ import { StateHydrationService } from './stateHydrationService';
  * CRITICAL: Only persists summary data and cache, NOT raw transactions or assetDefinitions
  */
 export class StatePersistenceService {
-  private static readonly STORAGE_KEY = 'passiveIncomeCalculator';
+  private static readonly STORAGE_KEY = 'StrictFinance';
   private static readonly THROTTLE_DELAY = 1000; // 1 second throttle
   private static saveTimeout: NodeJS.Timeout | null = null;
 

@@ -8,48 +8,50 @@ import {
 } from '@/types/domains/setupWizard';
 import { WizardStep } from '@/types/shared/base/enums';
 import { StepConfig } from '../interfaces/ISetupWizardService';
+import Logger from '@/service/shared/logging/Logger/logger';
+import { t } from 'i18next';
 
 export const getStepsConfiguration = (): StepConfig[] => {
   return [
     {
       step: WizardStep.WELCOME,
-      title: 'Welcome',
-      description: 'Welcome to the setup wizard. Get started with your passive income calculator.',
+      title: t('setupWizard.steps.welcome.title'),
+      description: t('setupWizard.steps.welcome.description'),
       isOptional: false,
       isConditional: false
     },
     {
       step: WizardStep.ASSET_DEFINITIONS,
-      title: 'Asset Definitions',
-      description: 'Define your assets from templates or create custom ones.',
+      title: t('setupWizard.steps.assetDefinitions.title'),
+      description: t('setupWizard.steps.assetDefinitions.description'),
       isOptional: true,
       isConditional: false
     },
     {
       step: WizardStep.TRANSACTIONS,
-      title: 'Transactions',
-      description: 'Add your asset transactions.',
+      title: t('setupWizard.steps.transactions.title'),
+      description: t('setupWizard.steps.transactions.description'),
       isOptional: true,
       isConditional: false
     },
     {
       step: WizardStep.LIABILITIES,
-      title: 'Liabilities',
-      description: 'Track your debts and liabilities.',
+      title: t('setupWizard.steps.liabilities.title'),
+      description: t('setupWizard.steps.liabilities.description'),
       isOptional: true,
       isConditional: false
     },
     {
       step: WizardStep.INCOME,
-      title: 'Income Sources',
-      description: 'Define your income sources.',
+      title: t('setupWizard.steps.income.title'),
+      description: t('setupWizard.steps.income.description'),
       isOptional: true,
       isConditional: false
     },
     {
       step: WizardStep.COMPLETION,
-      title: 'Complete Setup',
-      description: 'Review and complete your setup.',
+      title: t('setupWizard.steps.completion.title'),
+      description: t('setupWizard.steps.completion.description'),
       isOptional: false,
       isConditional: false
     }
@@ -322,11 +324,14 @@ export const saveWizardData = async (stepData: StepDataCollection): Promise<bool
   // This would integrate with the existing Redux store and save the data
   // For now, return true as a placeholder
   try {
-    // Implementation would dispatch actions to save data to the main store
-    console.log('Saving wizard data:', stepData);
+    // ToDO Implementation would dispatch actions to save data to the main store
+    Logger.info('Saving wizard data:'+stepData);
     return true;
   } catch (error) {
-    console.error('Error saving wizard data:', error);
+    Logger.errorStack(
+      'Error saving wizard data:',
+      error instanceof Error ? error : new Error(String(error))
+    );
     return false;
   }
 };
