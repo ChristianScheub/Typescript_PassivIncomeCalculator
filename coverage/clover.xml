@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1752436643343" clover="3.2.0">
-  <project timestamp="1752436643343" name="All files">
-    <metrics statements="4202" coveredstatements="296" conditionals="2332" coveredconditionals="175" methods="741" coveredmethods="88" elements="7275" coveredelements="559" complexity="0" loc="4202" ncloc="4202" packages="44" files="136" classes="136"/>
+<coverage generated="1752437006397" clover="3.2.0">
+  <project timestamp="1752437006397" name="All files">
+    <metrics statements="4202" coveredstatements="329" conditionals="2332" coveredconditionals="177" methods="741" coveredmethods="91" elements="7275" coveredelements="597" complexity="0" loc="4202" ncloc="4202" packages="44" files="136" classes="136"/>
     <package name="application.notifications.alertsService.methods">
       <metrics statements="168" coveredstatements="0" conditionals="153" coveredconditionals="0" methods="23" coveredmethods="0"/>
       <file name="calculateAlertPriority.ts" path="/home/runner/work/Typescript_PassivIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/application/notifications/alertsService/methods/calculateAlertPriority.ts">
@@ -4581,42 +4581,42 @@
       </file>
     </package>
     <package name="shared.utilities.helper">
-      <metrics statements="149" coveredstatements="0" conditionals="52" coveredconditionals="0" methods="26" coveredmethods="0"/>
+      <metrics statements="149" coveredstatements="33" conditionals="52" coveredconditionals="2" methods="26" coveredmethods="3"/>
       <file name="downloadFile.ts" path="/home/runner/work/Typescript_PassivIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/shared/utilities/helper/downloadFile.ts">
-        <metrics statements="33" coveredstatements="0" conditionals="2" coveredconditionals="0" methods="3" coveredmethods="0"/>
-        <line num="1" count="0" type="stmt"/>
-        <line num="2" count="0" type="stmt"/>
-        <line num="3" count="0" type="stmt"/>
-        <line num="5" count="0" type="stmt"/>
-        <line num="6" count="0" type="stmt"/>
-        <line num="7" count="0" type="stmt"/>
-        <line num="8" count="0" type="stmt"/>
-        <line num="9" count="0" type="stmt"/>
-        <line num="11" count="0" type="stmt"/>
-        <line num="16" count="0" type="stmt"/>
-        <line num="18" count="0" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
-        <line num="27" count="0" type="cond" truecount="0" falsecount="2"/>
-        <line num="28" count="0" type="stmt"/>
-        <line num="30" count="0" type="stmt"/>
-        <line num="34" count="0" type="stmt"/>
-        <line num="35" count="0" type="stmt"/>
-        <line num="36" count="0" type="stmt"/>
-        <line num="37" count="0" type="stmt"/>
-        <line num="38" count="0" type="stmt"/>
-        <line num="39" count="0" type="stmt"/>
-        <line num="40" count="0" type="stmt"/>
-        <line num="41" count="0" type="stmt"/>
-        <line num="42" count="0" type="stmt"/>
-        <line num="45" count="0" type="stmt"/>
-        <line num="46" count="0" type="stmt"/>
-        <line num="47" count="0" type="stmt"/>
-        <line num="48" count="0" type="stmt"/>
-        <line num="49" count="0" type="stmt"/>
-        <line num="50" count="0" type="stmt"/>
-        <line num="51" count="0" type="stmt"/>
-        <line num="52" count="0" type="stmt"/>
-        <line num="54" count="0" type="stmt"/>
+        <metrics statements="33" coveredstatements="33" conditionals="2" coveredconditionals="2" methods="3" coveredmethods="3"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="17" type="stmt"/>
+        <line num="7" count="17" type="stmt"/>
+        <line num="8" count="17" type="stmt"/>
+        <line num="9" count="17" type="stmt"/>
+        <line num="11" count="15" type="stmt"/>
+        <line num="16" count="10" type="stmt"/>
+        <line num="18" count="10" type="stmt"/>
+        <line num="23" count="9" type="stmt"/>
+        <line num="27" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="28" count="6" type="stmt"/>
+        <line num="30" count="9" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="35" count="6" type="stmt"/>
+        <line num="36" count="6" type="stmt"/>
+        <line num="37" count="6" type="stmt"/>
+        <line num="38" count="6" type="stmt"/>
+        <line num="39" count="6" type="stmt"/>
+        <line num="40" count="6" type="stmt"/>
+        <line num="41" count="6" type="stmt"/>
+        <line num="42" count="6" type="stmt"/>
+        <line num="45" count="1" type="stmt"/>
+        <line num="46" count="23" type="stmt"/>
+        <line num="47" count="23" type="stmt"/>
+        <line num="48" count="23" type="stmt"/>
+        <line num="49" count="23" type="stmt"/>
+        <line num="50" count="23" type="stmt"/>
+        <line num="51" count="23" type="stmt"/>
+        <line num="52" count="23" type="stmt"/>
+        <line num="54" count="23" type="stmt"/>
       </file>
       <file name="fontSizeHelper.ts" path="/home/runner/work/Typescript_PassivIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/shared/utilities/helper/fontSizeHelper.ts">
         <metrics statements="11" coveredstatements="0" conditionals="6" coveredconditionals="0" methods="1" coveredmethods="0"/>
