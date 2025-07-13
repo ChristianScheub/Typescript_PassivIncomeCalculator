@@ -95,4 +95,3 @@ self.onmessage = function (e: MessageEvent<WorkerRequest>) {
     });
   }
 };
-};

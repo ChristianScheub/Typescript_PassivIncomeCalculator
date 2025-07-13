@@ -98,7 +98,7 @@ export const generateIncomeRecommendations = (
   // 13. Interest Income
   // Now: If user has >5 assets, but none generate any income (no bonds, no dividend stocks, no rental, etc.)
   // Filter assets that generate income (bonds, dividend stocks, rental properties)
-  const incomeGeneratingAssets = assets.filter(asset => {
+  const incomeGeneratingAssets = assets.filter(() => {
     // Note: This is a simplified implementation - in a real scenario, 
     // we would check asset types and dividend/interest information
     return false; // Currently returns empty for placeholder logic

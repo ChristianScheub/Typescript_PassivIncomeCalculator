@@ -65,12 +65,15 @@ async function updateSingleDividendData(
             lastDividendDate?: string; 
             date?: number 
           };
+          let dividendDate = '';
+          if (dividend.lastDividendDate) {
+            dividendDate = new Date(dividend.lastDividendDate).toISOString();
+          } else if (dividend.date) {
+            dividendDate = new Date(dividend.date * 1000).toISOString();
+          }
+          
           return {
-            date: dividend.lastDividendDate
-              ? new Date(dividend.lastDividendDate).toISOString()
-              : dividend.date
-              ? new Date(dividend.date * 1000).toISOString()
-              : '',
+            date: dividendDate,
             amount: dividend.amount,
             source: 'api' as const,
             currency,
