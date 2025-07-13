@@ -149,6 +149,7 @@ const findHighExpenseCategories = (
     .filter(cat => cat.percentage > 30);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const findSeasonalExpenses = (_expenses: Expense[]): Expense[] => {
   // TODO: Find expenses with seasonal patterns
   return [];

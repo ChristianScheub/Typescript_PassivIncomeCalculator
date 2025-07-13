@@ -7,7 +7,7 @@
 
 import { execSync } from 'child_process';
 
-const MAX_LINT_ISSUES = 125;
+const MAX_LINT_ISSUES = 20;
 
 try {
   // Run ESLint and capture output

@@ -9,5 +9,5 @@ export interface DeleteDataService {
     clearAllData(): Promise<void>;
     clearPartialData(): Promise<void>;
     clearPortfolioHistory(): Promise<void>;
-    clearReduxCacheOnly(dispatch: any): Promise<void>;
+    clearReduxCacheOnly(dispatch: (action: { type: string; payload?: unknown }) => void): Promise<void>;
 }

@@ -215,6 +215,7 @@ export class StateHydrationService {
   /**
    * Transform simple state slices (liabilities, expenses, income)
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   private static transformSimpleState(data: Record<string, unknown>, _sliceName: string) {
     return {
       items: data?.items || [],

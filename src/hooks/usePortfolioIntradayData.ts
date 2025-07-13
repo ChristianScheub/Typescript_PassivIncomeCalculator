@@ -45,7 +45,7 @@ export function usePortfolioIntradayData(): Array<{ date: string; value: number;
     ) {
       dispatch(calculatePortfolioIntradayDataDirect({
         portfolioCacheId: 'default'
-      }) as any);
+      }));
     }
   }, [
     dispatch, 

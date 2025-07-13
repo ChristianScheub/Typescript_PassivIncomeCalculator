@@ -5,13 +5,14 @@ import { StoreState } from '../..';
 import Logger from '@service/shared/logging/Logger/logger';
 import { hydrateStore } from '../../actions/hydrateAction';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import { AssetDefinition } from '@/types/domains/assets/entities';
 
 // Helper functions to calculate income for different asset types
-const getAssetDefinition = (position: PortfolioPosition, assetDefinitions: any[]): any | undefined => {
+const getAssetDefinition = (position: PortfolioPosition, assetDefinitions: AssetDefinition[]): AssetDefinition | undefined => {
   return assetDefinitions.find(def => def.id === position.assetDefinitionId);
 };
 
-const calculateStockDividendIncome = (position: PortfolioPosition, month: number, assetDefinitions: any[]): number => {
+const calculateStockDividendIncome = (position: PortfolioPosition, month: number, assetDefinitions: AssetDefinition[]): number => {
   const assetDefinition = getAssetDefinition(position, assetDefinitions);
   if (!assetDefinition?.dividendInfo?.frequency || assetDefinition.dividendInfo.frequency === 'none') {
     return 0;
