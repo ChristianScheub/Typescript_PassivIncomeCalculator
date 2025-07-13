@@ -98,7 +98,7 @@ Object.defineProperty(global, 'IDBObjectStore', {
 });
 
 // Mock React for hook testing
-const React = require('react');
+import React from 'react';
 Object.defineProperty(React, 'useState', {
   value: jest.fn((initial) => [initial, jest.fn()]),
   writable: true,

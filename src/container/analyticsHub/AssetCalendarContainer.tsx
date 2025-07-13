@@ -78,7 +78,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
         categoryData: { categories: assetCategories, categoryOptions, categoryAssignments } 
       }));
     }
-  }, [assets.length, assetDefinitions.length, portfolioCache, dispatch, assetCategories, categoryOptions, categoryAssignments]);
+  }, [assets.length, assetDefinitions, portfolioCache, dispatch, assetCategories, categoryOptions, categoryAssignments]);
 
   // Get portfolio data from cache or provide empty fallback
   const portfolioData = useMemo(() => {
@@ -258,7 +258,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
         Logger.info(`  Rental Income: ${amount}`);
       }
     });
-  }, [filteredPositions]);
+  }, [filteredPositions, assetDefinitions]);
   
   // Memoize months data calculation with portfolio positions
   const monthsData = useMemo(() => {
@@ -341,7 +341,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
       Logger.info(`  ${m.name}: ${m.totalIncome} from ${m.positions.length} positions`);
     });
     return data;
-  }, [filteredPositions, monthNames, calculatePositionIncomeForMonth, selectedYear, assetDefinitions]);
+  }, [filteredPositions, monthNames, calculatePositionIncomeForMonth, selectedYear, assetDefinitions, getForecastForMonth]);
 
   // Memoize selected month data
   const selectedMonthData = useMemo(() => {
@@ -406,13 +406,13 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   }
 
   // Hilfsfunktion: Gibt alle forecast-Einträge für einen Monat/Jahr zurück, die noch nicht in der echten History sind
-  function getForecastForMonth(assetDefinition: AssetDefinition, month: number, year: number): DividendHistoryEntry[] {
+  const getForecastForMonth = useCallback((assetDefinition: AssetDefinition, month: number, year: number): DividendHistoryEntry[] => {
     if (!assetDefinition?.dividendForecast3Y || !Array.isArray(assetDefinition.dividendForecast3Y)) return [];
     return assetDefinition.dividendForecast3Y.filter((entry: DividendHistoryEntry) => {
       const d = new Date(entry.date);
       return d.getMonth() + 1 === month && d.getFullYear() === year && isMonthMissingInHistory(assetDefinition.dividendHistory, month, year);
     });
-  }
+  }, []);
 
   return (
     <AssetCalendarView

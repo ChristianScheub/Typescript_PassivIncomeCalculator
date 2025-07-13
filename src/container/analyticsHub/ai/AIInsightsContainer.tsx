@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "@/hooks/redux";
 import { useLLMService } from "@/hooks/useLLMService";
@@ -31,7 +31,7 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
   const [lastGenerated, setLastGenerated] = useState<Date | null>(null);
 
   // Calculate current financial metrics
-  const financialMetrics = {
+  const financialMetrics = useMemo(() => ({
     totalAssets: portfolioCache?.totals?.totalValue || 0,
     monthlyIncome: portfolioCache?.totals?.monthlyIncome || 0,
     totalExpenses: expenses.reduce(
@@ -45,7 +45,7 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
     assetsCount: assets.length,
     incomeSourcesCount: income.length,
     expenseCategories: new Set(expenses.map((e: Expense) => e.category)).size,
-  };
+  }), [portfolioCache, expenses, liabilities, assets.length, income.length]);
 
   const netWorth =
     financialMetrics.totalAssets - financialMetrics.totalLiabilities;
@@ -61,9 +61,9 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
     if (modelStatus === "loaded" && !insights && !isGenerating) {
       handleGenerateInsights();
     }
-  }, [modelStatus]);
+  }, [modelStatus, handleGenerateInsights, insights, isGenerating]);
 
-  const handleGenerateInsights = async () => {
+  const handleGenerateInsights = useCallback(async () => {
     try {
       setIsGenerating(true);
       setError(null);
@@ -117,7 +117,7 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
     } finally {
       setIsGenerating(false);
     }
-  };
+  }, [reduxState, financialMetrics, savingsRate, t, setInsights, setLastGenerated, setError, setIsGenerating, generateFinancialInsights]);
 
   const viewProps: AIInsightsViewProps = {
     onBack,

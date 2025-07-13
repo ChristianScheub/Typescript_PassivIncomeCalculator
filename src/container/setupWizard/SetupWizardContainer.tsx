@@ -28,6 +28,7 @@ import {
 } from '@/store/slices/ui/setupWizardSlice';
 import { showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/ui/snackbarSlice';
 import { ImportValidationResult } from '@/types/domains/setupWizard';
+import { Income, IncomeType } from '@/types/domains/financial/entities';
 import sqliteService from '@/service/infrastructure/sqlLiteService';
 // NEU: Importiere die Domain-Thunks für persistente Speicherung
 import {
@@ -175,8 +176,8 @@ const SetupWizardContainer: React.FC = () => {
         ];
         for (const def of assetDefs) {
           try {
-            await dispatch(addAssetDefinition(def) as any);
-          } catch (e) {
+            await dispatch(addAssetDefinition(def));
+          } catch {
             dispatch(showErrorSnackbar(`Failed to add asset definition: ${def.name || def.ticker}`));
             return;
           }
@@ -208,8 +209,8 @@ const SetupWizardContainer: React.FC = () => {
               purchaseQuantity: tx.quantity ?? 1,
               purchaseDate: tx.date,
               notes: tx.notes
-            }) as any);
-          } catch (e) {
+            }));
+          } catch {
             dispatch(showErrorSnackbar(`Failed to add transaction for asset: ${tx.assetId}`));
             return;
           }
@@ -225,8 +226,8 @@ const SetupWizardContainer: React.FC = () => {
               currentBalance: liab.amount,
               interestRate: liab.interestRate,
               notes: liab.description,
-            }) as any);
-          } catch (e) {
+            }));
+          } catch {
             dispatch(showErrorSnackbar(`Failed to add liability: ${liab.name}`));
             return;
           }
@@ -238,8 +239,8 @@ const SetupWizardContainer: React.FC = () => {
             // Only allow valid IncomeTypes
             const allowedTypes = ['salary', 'interest', 'other'];
             const mappedType = allowedTypes.includes(inc.type) ? inc.type : 'other';
-            const incomeObj: any = {
-              type: mappedType,
+            const incomeObj: Partial<Income> = {
+              type: mappedType as IncomeType,
               isPassive: inc.type === 'passive',
               startDate: new Date().toISOString(),
               notes: inc.description,
@@ -251,8 +252,8 @@ const SetupWizardContainer: React.FC = () => {
                 amount: inc.monthlyAmount,
               };
             }
-            await dispatch(addIncome(incomeObj) as any);
-          } catch (e) {
+            await dispatch(addIncome(incomeObj));
+          } catch {
             dispatch(showErrorSnackbar(`Failed to add income: ${inc.name || ''}`));
             return;
           }
@@ -277,7 +278,7 @@ const SetupWizardContainer: React.FC = () => {
     } catch (error) {
       dispatch(showErrorSnackbar(`Failed to complete setup: ${error}`));
     }
-  }, [stepData, dispatch, markSetupCompleted]);
+  }, [stepData, dispatch, markSetupCompleted, persistedAssetDefinitions]);
 
   // Redirect if wizard is already completed (nur wenn wirklich nötig)
   useEffect(() => {
@@ -297,7 +298,7 @@ const SetupWizardContainer: React.FC = () => {
       description: template.description,
       isActive: true,
     };
-    await dispatch(addAssetDefinition(def) as any);
+    await dispatch(addAssetDefinition(def));
     dispatch(addAssetTemplate(template));
   }, [dispatch]);
 
@@ -311,7 +312,7 @@ const SetupWizardContainer: React.FC = () => {
       description: asset.description,
       isActive: true,
     };
-    await dispatch(addAssetDefinition(def) as any);
+    await dispatch(addAssetDefinition(def));
     dispatch(addCustomAsset(asset));
   }, [dispatch]);
 
