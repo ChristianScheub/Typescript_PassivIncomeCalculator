@@ -6,7 +6,7 @@ import {
   WizardProgress,
   StepNavigationOptions,
 } from "@/types/domains/setupWizard";
-import { Card } from "../shared";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../shared";
 
 interface SetupWizardLayoutProps {
   children: React.ReactNode;
@@ -37,8 +37,8 @@ const SetupWizardLayout: React.FC<SetupWizardLayoutProps> = ({
 }) => {
   const { t } = useTranslation();
   const currentStepConfig = progress.stepsConfig[progress.currentStepIndex];
-  const displayTitle = title || currentStepConfig?.title;
-  const displayDescription = description || currentStepConfig?.description;
+  const displayTitle = title || (currentStepConfig?.title ? t(currentStepConfig.title) : '');
+  const displayDescription = description || (currentStepConfig?.description ? t(currentStepConfig.description) : '');
 
   return (
     <div className={`min-h-screen bg-gray-50 ${className}`}>
@@ -64,45 +64,36 @@ const SetupWizardLayout: React.FC<SetupWizardLayoutProps> = ({
       </div>
 
       {/* Main Content - Mobile First */}
-
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
-        <div className="bg-white rounded-lg sm:rounded-xl shadow-sm sm:shadow-lg">
+        <Card className="shadow-sm sm:shadow-lg">
           {/* Step Header */}
           {displayTitle !== "Welcome" && (
-            <Card>
-              <div className="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-200">
-                <div className="text-center">
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
-                    {displayTitle}
-                  </h2>
-                  {displayDescription && (
-                    <p className="text-gray-600 text-sm sm:text-base">
-                      {displayDescription}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </Card>
+            <CardHeader className="text-center border-b border-gray-200">
+              <CardTitle>{displayTitle}</CardTitle>
+              {displayDescription && (
+                <CardDescription className="text-sm sm:text-base">
+                  {displayDescription}
+                </CardDescription>
+              )}
+            </CardHeader>
           )}
 
           {/* Step Content - Mobile Optimized */}
-          <div className="px-4 sm:px-6 py-6 sm:py-8">
+          <CardContent className="py-6 sm:py-8">
             <div className="max-w-2xl mx-auto">{children}</div>
-          </div>
+          </CardContent>
 
           {/* Navigation - Mobile First */}
-          <Card>
-            <div className="px-4 sm:px-6 pb-4 sm:pb-6">
-              <StepNavigation
-                navigationOptions={navigationOptions}
-                onNext={onNext}
-                onBack={onBack}
-                onSkip={onSkip}
-                isLoading={isLoading}
-              />
-            </div>
-          </Card>
-        </div>
+          <CardFooter className="flex-col">
+            <StepNavigation
+              navigationOptions={navigationOptions}
+              onNext={onNext}
+              onBack={onBack}
+              onSkip={onSkip}
+              isLoading={isLoading}
+            />
+          </CardFooter>
+        </Card>
       </div>
 
       {/* Auto-save Indicator - Mobile Optimized */}
@@ -129,7 +120,7 @@ const SetupWizardLayout: React.FC<SetupWizardLayoutProps> = ({
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <span className="text-blue-800 text-sm">Saving...</span>
+            <span className="text-blue-800 text-sm">{t('setupWizard.progress.saving')}</span>
           </div>
         </div>
       )}

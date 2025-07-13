@@ -1901,6 +1901,7 @@
     "progress": {
       "saving": "Speichern...",
       "saved": "Gespeichert!",
+      "processing": "Verarbeiten...",
       "step": "Schritt {{current}} von {{total}}",
       "completion": "{{percent}}% abgeschlossen"
     }
