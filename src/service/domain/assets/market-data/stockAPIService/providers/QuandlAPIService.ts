@@ -32,7 +32,7 @@ export class QuandlAPIService extends BaseStockAPIService {
         throw new Error(`Quandl API error: ${data.quandl_error.message}`);
       }
 
-      if (!data.dataset_data || !data.dataset_data.data || data.dataset_data.data.length === 0) {
+      if (!data.dataset_data?.data || data.dataset_data.data.length === 0) {
         throw new Error(`No data available for symbol ${symbol}`);
       }
 
@@ -79,7 +79,7 @@ export class QuandlAPIService extends BaseStockAPIService {
         throw new Error(`Quandl API error: ${data.quandl_error.message}`);
       }
 
-      if (!data.dataset_data || !data.dataset_data.data) {
+      if (!data.dataset_data?.data) {
         throw new Error(`No data available for symbol ${symbol}`);
       }
 
@@ -102,10 +102,13 @@ export class QuandlAPIService extends BaseStockAPIService {
         midday: this.calculateMidday(item[highIndex], item[lowIndex])
       }));
 
+      // Quandl returns newest first, reverse for chronological order
+      const reversedEntries = [...entries].reverse();
+
       return {
         symbol: symbol,
-        entries: entries.reverse(), // Quandl returns newest first, reverse for chronological order
-        data: entries.reverse(), // Add data property for compatibility
+        entries: reversedEntries,
+        data: reversedEntries, // Add data property for compatibility
         currency: 'USD'
       };
     } catch (error) {

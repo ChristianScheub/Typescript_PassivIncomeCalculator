@@ -42,7 +42,7 @@ export class IEXCloudAPIService extends BaseStockAPIService {
     
     try {
       // IEX Cloud uses range parameter
-      let range = '1m'; // default to 1 month
+      let range: string;
       if (days <= 7) range = '5d';
       else if (days <= 30) range = '1m';
       else if (days <= 90) range = '3m';

@@ -69,9 +69,12 @@ export class TwelveDataAPIService extends BaseStockAPIService {
         midday: this.calculateMidday(parseFloat(item.high), parseFloat(item.low))
       }));
 
+      // Twelve Data returns newest first, reverse for chronological order
+      const reversedEntries = [...entries].reverse();
+
       return {
         symbol: symbol,
-        entries: entries.reverse(), // Twelve Data returns newest first, reverse for chronological order
+        entries: reversedEntries,
         currency: 'USD',
         source: 'twelve_data'
       };
@@ -108,9 +111,12 @@ export class TwelveDataAPIService extends BaseStockAPIService {
         midday: parseFloat(item.close) // For intraday, use close as midday
       }));
 
+      // Twelve Data returns newest first, reverse for chronological order
+      const reversedEntries = [...entries].reverse();
+
       return {
         symbol: symbol,
-        entries: entries.reverse(), // Twelve Data returns newest first, reverse for chronological order
+        entries: reversedEntries,
         currency: 'USD',
         source: 'twelve_data'
       };
