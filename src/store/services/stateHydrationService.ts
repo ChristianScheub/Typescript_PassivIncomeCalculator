@@ -77,7 +77,7 @@ export class StateHydrationService {
     try {
       let total = 0;
       for (const key in localStorage) {
-        if (localStorage.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(localStorage, key)) {
           total += localStorage[key].length + key.length;
         }
       }
@@ -91,7 +91,7 @@ export class StateHydrationService {
   /**
    * Validate state structure before loading
    */
-  static validateStateStructure(state: any): boolean {
+  static validateStateStructure(state: unknown): boolean {
     if (!state || typeof state !== 'object') {
       Logger.warn('Invalid state structure: not an object');
       return false;
@@ -157,7 +157,7 @@ export class StateHydrationService {
   /**
    * Transform and validate persisted state structure
    */
-  private static transformPersistedState(state: any) {
+  private static transformPersistedState(state: Record<string, unknown>) {
     // Transform other state slices
     const transformedState = {
       // Transactions werden NICHT mehr aus localStorage geladen (zu groß, aus DB geladen)
@@ -202,7 +202,7 @@ export class StateHydrationService {
   /**
    * Transform asset categories state
    */
-  private static transformAssetCategoriesState(categoriesData: any) {
+  private static transformAssetCategoriesState(categoriesData: Record<string, unknown>) {
     return {
       categories: categoriesData?.categories || [],
       categoryOptions: categoriesData?.categoryOptions || [],
@@ -215,7 +215,7 @@ export class StateHydrationService {
   /**
    * Transform simple state slices (liabilities, expenses, income)
    */
-  private static transformSimpleState(data: any, _sliceName: string) {
+  private static transformSimpleState(data: Record<string, unknown>, _sliceName: string) {
     return {
       items: data?.items || [],
       status: 'idle' as Status,

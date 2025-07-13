@@ -47,7 +47,7 @@ export const generateIncomeRecommendations = (
   }
 
   // 10. Dividend Assets
-  const dividendAssets = findDividendAssets(assets, assetDefinitions);
+  const dividendAssets = findDividendAssets();
   if (dividendAssets.length === 0 && assets.length > 0) {
     recommendations.push({
       id: 'add-dividend-assets',
@@ -62,8 +62,8 @@ export const generateIncomeRecommendations = (
   }
 
   // 11. Rental Income Optimization
-  const realEstateAssets = findRealEstateAssets(assets, assetDefinitions);
-  const assetsWithoutIncome = findAssetsWithoutIncome(realEstateAssets, assetDefinitions);
+  const realEstateAssets = findRealEstateAssets();
+  const assetsWithoutIncome = findAssetsWithoutIncome();
   if (
     (realEstateAssets.length < 4 && assetsWithoutIncome.length >= 2) ||
     (realEstateAssets.length >= 4 && assetsWithoutIncome.length / realEstateAssets.length > 0.4)
@@ -98,12 +98,8 @@ export const generateIncomeRecommendations = (
   // Now: If user has >5 assets, but none generate any income (no bonds, no dividend stocks, no rental, etc.)
   const incomeGeneratingAssets = assets.filter(asset => {
     // This should be replaced with real logic: asset generates income if it's a bond, dividend stock, or rental property
-    // For now, we assume findBondAssets, findDividendAssets, and realEstateAssets with income
-    return (
-      findBondAssets([asset], assetDefinitions).length > 0 ||
-      findDividendAssets([asset], assetDefinitions).length > 0 ||
-      (findRealEstateAssets([asset], assetDefinitions).length > 0 && findAssetsWithoutIncome([asset], assetDefinitions).length === 0)
-    );
+    // For now, we assume all functions return empty arrays (TODO implementation)
+    return false; // TODO: Implement proper income detection logic
   });
   if (incomeGeneratingAssets.length === 0 && assets.length > 5) {
     recommendations.push({
@@ -150,22 +146,22 @@ export const generateIncomeRecommendations = (
 };
 
 // Helper functions
-const findDividendAssets = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Asset[] => {
+const findDividendAssets = (): Asset[] => {
   // TODO: Find assets with dividend information
   return [];
 };
 
-const findRealEstateAssets = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Asset[] => {
+const findRealEstateAssets = (): Asset[] => {
   // TODO: Find real estate assets
   return [];
 };
 
-const findAssetsWithoutIncome = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Asset[] => {
+const findAssetsWithoutIncome = (): Asset[] => {
   // TODO: Find assets without configured income
   return [];
 };
 
-const findBondAssets = (_assets: Asset[], _assetDefinitions: AssetDefinition[]): Asset[] => {
+const findBondAssets = (): Asset[] => {
   // TODO: Find bond assets
   return [];
 };
