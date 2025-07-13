@@ -75,7 +75,7 @@ export function useAutoPortfolioHistoryUpdate() {
     const timeoutId = setTimeout(performRecalculation, 1000);
     
     return () => clearTimeout(timeoutId);
-  }, [isHydrated, assetDefinitions, portfolioCache, triggerRecalculation]);
+  }, [isHydrated, assetDefinitions, portfolioCache, triggerRecalculation, createAssetDefinitionsHash]);
 }
 
 export default useAutoPortfolioHistoryUpdate;

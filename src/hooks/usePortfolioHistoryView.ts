@@ -163,8 +163,11 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
   }, [
     isHydrated,
     portfolioCache?.positions?.length,
+    portfolioCache.positions,
     assetDefinitions.length,
+    assetDefinitions,
     portfolioIntradayStatus,
+    portfolioIntradayData.length,
     dispatch
   ]);
 
@@ -298,7 +301,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
     };
 
     loadPortfolioHistoryData();
-  }, [timeRange, isHydrated, portfolioCache?.positions?.length, assetDefinitions.length]);
+  }, [timeRange, isHydrated, portfolioCache?.positions?.length, portfolioCache.positions, assetDefinitions.length, assetDefinitions, dispatch]);
 
   // Return data based on time range with proper structure for PortfolioHistoryView
   const transformedData = useMemo(() => {

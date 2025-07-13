@@ -142,10 +142,10 @@ export const AssetCategoryAssignmentSelector: React.FC<AssetCategoryAssignmentSe
                   {getCategoryName(assignment.categoryId)}:
                 </span>
                 <div className="flex items-center gap-1">
-                  {('color' in (option || {})) && (option as any).color && (
+                  {option && 'color' in option && typeof (option as { color?: string }).color === 'string' && (
                     <div 
                       className="w-3 h-3 rounded-full border border-gray-300"
-                      style={{ backgroundColor: (option as any).color }}
+                      style={{ backgroundColor: (option as { color: string }).color }}
                     />
                   )}
                   <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -206,15 +206,15 @@ export const AssetCategoryAssignmentSelector: React.FC<AssetCategoryAssignmentSe
                       onClick={() => handleAddAssignment(selectedCategoryId, option.id)}
                       className="flex items-center gap-2 p-2 text-left text-sm border border-gray-200 dark:border-gray-600 rounded hover:bg-white dark:hover:bg-gray-600"
                     >
-                      {('color' in (option || {})) && (option as any).color && (
+                      {option && 'color' in option && typeof (option as { color?: string }).color === 'string' && (
                         <div 
                           className="w-3 h-3 rounded-full border border-gray-300"
-                          style={{ backgroundColor: (option as any).color }}
+                          style={{ backgroundColor: (option as { color: string }).color }}
                         />
                       )}
                       <span className="text-gray-900 dark:text-gray-100">{option.name}</span>
-                      {('description' in (option || {})) && (option as any).description && (
-                        <span className="text-xs text-gray-500">({((option as any).description)})</span>
+                      {option && 'description' in option && typeof (option as { description?: string }).description === 'string' && (
+                        <span className="text-xs text-gray-500">({(option as { description: string }).description})</span>
                       )}
                     </button>
                   ))}
