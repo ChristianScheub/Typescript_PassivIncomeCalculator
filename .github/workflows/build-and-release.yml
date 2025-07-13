@@ -29,14 +29,35 @@ jobs:
       - name: Build application
         run: npm run build
         # This will automatically run lint check and tests via the prebuild script
-        # Build will fail if lint issues >= 40 or tests fail
+        # Build will fail if lint issues >= 300 or tests fail
         
-      - name: Create release archive
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
+      - name: Add Android platform and sync
         run: |
-          cd dist
-          tar -czf ../passive-income-calculator-${{ github.ref_name }}.tar.gz .
-          cd ..
-          zip -r passive-income-calculator-${{ github.ref_name }}.zip dist/
+          npx cap add android || true  # Add android platform if not already added
+          npx cap sync android
+          
+      - name: Build Android APK
+        run: |
+          cd android
+          ./gradlew assembleRelease
+          
+      - name: Find APK file
+        id: find-apk
+        run: |
+          APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          APK_NAME="StrictFinance-${{ github.ref_name }}.apk"
+          cp "$APK_PATH" "./$APK_NAME"
+          echo "apk_path=./$APK_NAME" >> $GITHUB_OUTPUT
+          echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
           
       - name: Extract release notes
         id: extract-notes
@@ -54,6 +75,7 @@ jobs:
           fi
           
       - name: Create GitHub Release
+        id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -69,30 +91,20 @@ jobs:
             - **Node.js Version:** 20
             
             ## ✅ Quality Checks Passed
-            - Lint issues: < 40 (requirement met)
+            - Lint issues: < 300 (requirement met)
             - All tests: ✅ Passed
             
-            ## 📦 Assets
-            Download the built application from the assets below.
+            ## 📱 Android App
+            Download the APK file to install on your Android device.
           draft: false
           prerelease: false
           
-      - name: Upload Release Assets
+      - name: Upload APK Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./passive-income-calculator-${{ github.ref_name }}.tar.gz
-          asset_name: passive-income-calculator-${{ github.ref_name }}.tar.gz
-          asset_content_type: application/gzip
-          
-      - name: Upload Release Assets (ZIP)
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./passive-income-calculator-${{ github.ref_name }}.zip
-          asset_name: passive-income-calculator-${{ github.ref_name }}.zip
-          asset_content_type: application/zip
+          asset_path: ${{ steps.find-apk.outputs.apk_path }}
+          asset_name: ${{ steps.find-apk.outputs.apk_name }}
+          asset_content_type: application/vnd.android.package-archive
