@@ -134,7 +134,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
           {/* Assets */}
           {summary.assets > 0 && (
             <div>
-              <h5 className="font-medium text-gray-900 mb-2">Assets ({summary.assets})</h5>
+              <h5 className="font-medium text-gray-900 mb-2">{t('setupWizard.steps.completion.detailSummary.assetsTitle', { count: summary.assets })}</h5>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                 {stepData.assetDefinitions.selectedTemplates.length > 0 && (
                   <div>
@@ -163,7 +163,7 @@ const CompletionStep: React.FC<CompletionStepProps> = ({
           {/* Transactions */}
           {summary.transactions > 0 && (
             <div>
-              <h5 className="font-medium text-gray-900 mb-2">Transactions ({summary.transactions})</h5>
+              <h5 className="font-medium text-gray-900 mb-2">{t('setupWizard.steps.completion.detailSummary.transactionsTitle', { count: summary.transactions })}</h5>
               <div className="text-sm text-gray-600">
                 <p>{t('setupWizard.steps.completion.transactionHistory')}</p>
               </div>

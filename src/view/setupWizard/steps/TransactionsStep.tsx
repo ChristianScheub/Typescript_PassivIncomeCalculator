@@ -62,7 +62,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
     }
     
     const symbol = 'symbol' in asset ? asset.symbol : assetId;
-    const name = 'name' in asset ? asset.name : 'Custom Asset';
+    const name = 'name' in asset ? asset.name : t('setupWizard.steps.transactions.customAsset');
     return `${symbol} - ${name}`;
   };
 
@@ -186,7 +186,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                 <div className="space-y-4">
                   <h5 className="font-medium text-gray-900">{t('setupWizard.steps.transactions.yourTransactions')} ({stepData.transactions.length})</h5>
                   <div className="space-y-3">
-                    {stepData.transactions.map((transaction) => (
+                    {stepData.transactions.map((transaction, index) => (
                       <div key={`${transaction.assetId}-${transaction.date}-${transaction.amount}`} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
                         <div className="flex-1">
                           <div className="flex items-center space-x-4">

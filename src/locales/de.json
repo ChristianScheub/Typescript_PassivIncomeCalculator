@@ -2061,6 +2061,7 @@
         "yourTransactions": "Ihre Transaktionen",
         "addTransaction": "Transaktion hinzufügen",
         "addNewTransaction": "Neue Transaktion hinzufügen",
+        "customAsset": "Benutzerdefiniertes Asset",
         "form": {
           "asset": "Asset",
           "assetPlaceholder": "Asset auswählen",
@@ -2101,6 +2102,10 @@
         "totalMonthlyIncome": "Gesamtes monatliches Einkommen:",
         "annual": "Jährlich:",
         "totalLiabilities": "Gesamtverbindlichkeiten:",
+        "detailSummary": {
+          "assetsTitle": "Assets ({{count}})",
+          "transactionsTitle": "Transaktionen ({{count}})"
+        },
         "nextSteps": {
           "title": "Was kommt als Nächstes?",
           "step1": "• Ihr Passiveinkommen-Rechner ist jetzt einsatzbereit",

@@ -1816,6 +1816,7 @@
         "yourTransactions": "Your Transactions",
         "addTransaction": "Add Transaction",
         "addNewTransaction": "Add New Transaction",
+        "customAsset": "Custom Asset",
         "form": {
           "asset": "Asset",
           "assetPlaceholder": "Select an asset",
@@ -1856,6 +1857,10 @@
         "totalMonthlyIncome": "Total Monthly Income:",
         "annual": "Annual:",
         "totalLiabilities": "Total Liabilities:",
+        "detailSummary": {
+          "assetsTitle": "Assets ({{count}})",
+          "transactionsTitle": "Transactions ({{count}})"
+        },
         "nextSteps": {
           "title": "What's Next?",
           "step1": "• Your passive income calculator is now ready to use",
