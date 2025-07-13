@@ -1,6 +1,6 @@
 import React from 'react';
 import { AssetType } from '@/types/shared/base/enums';
-import { UseFormSetValue, FieldErrors, useForm } from 'react-hook-form';
+import { UseFormSetValue, FieldErrors } from 'react-hook-form';
 import type { AssetFormData } from '@/types/domains/forms/form-data';
 import {
   StandardFormField,
@@ -37,12 +37,6 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
 
-  const {
-    // Remove unused destructured variables: handleSubmit, formWatch, formSetValue, formErrors, reset
-  } = useForm<AssetFormData>({
-    // ...existing code...
-  });
-
   return (
     <StandardFormWrapper
       title={title}
@@ -51,9 +45,8 @@ export const MaterialAssetFormView: React.FC<MaterialAssetFormViewProps> = ({
       formRef={formRef}
     >
       <RequiredSection>
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         <BasicAssetInformation 
-          watch={watch as any}
+          watch={watch as <K extends keyof AssetFormData>(field: K) => AssetFormData[K]}
           setValue={setValue}
           errors={errors}
           isDefinition={false}

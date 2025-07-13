@@ -203,7 +203,7 @@ interface CustomAnalyticsViewProps {
 const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPositions }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { charts, isConfigPanelOpen, editingChartId } = useAppSelector((state: { customAnalytics: any; }) => state.customAnalytics);
+  const { charts, isConfigPanelOpen, editingChartId } = useAppSelector((state: { customAnalytics: { charts: CustomAnalyticsConfig[]; isConfigPanelOpen: boolean; editingChartId: string | null; }; }) => state.customAnalytics);
   
   // Get data needed for charts
   const cache = useAppSelector(state => state.transactions.cache);
@@ -248,7 +248,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
     return calculatorService.calculateIncomeAnalytics(positions);
   }, [filteredPositions, cache?.positions]);
 
-  const editingChart = editingChartId ? charts.find((chart: CustomAnalyticsConfig) => chart.id === editingChartId) || null : null;
+  const editingChart = editingChartId ? charts.find((chart) => chart.id === editingChartId) || null : null;
 
   const handleAddChart = () => {
     dispatch(openConfigPanel(null));
@@ -476,7 +476,7 @@ const CustomAnalyticsView: React.FC<CustomAnalyticsViewProps> = ({ filteredPosit
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {charts.map((chart: CustomAnalyticsConfig) => (
+            {charts.map((chart) => (
               <div
                 key={chart.id}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 relative group"

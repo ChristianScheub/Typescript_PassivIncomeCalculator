@@ -1,13 +1,13 @@
 // Recursively remove undefined, null, and extraneous fields from an object
 // Optionally, restrict to allowed keys (schemaKeys)
-function cleanArray(arr: any[], schemaKeys?: string[]): any[] {
+function cleanArray(arr: unknown[], schemaKeys?: string[]): unknown[] {
   return arr
-    .map((item) => (typeof item === 'object' && item !== null ? deepCleanObject(item, schemaKeys) : item))
+    .map((item) => (typeof item === 'object' && item !== null ? deepCleanObject(item as Record<string, unknown>, schemaKeys) : item))
     .filter((v) => v != null && (typeof v !== 'object' || Array.isArray(v) || Object.keys(v).length > 0));
 }
 
-function cleanObject(obj: any, schemaKeys?: string[]): any {
-  const cleaned: any = {};
+function cleanObject(obj: Record<string, unknown>, schemaKeys?: string[]): Record<string, unknown> {
+  const cleaned: Record<string, unknown> = {};
   const keys = schemaKeys || Object.keys(obj);
   for (const key of keys) {
     if (!(key in obj)) continue;
@@ -18,7 +18,7 @@ function cleanObject(obj: any, schemaKeys?: string[]): any {
       // Arrays should always be preserved, even if empty
       cleaned[key] = arr;
     } else if (typeof value === 'object') {
-      const nested = deepCleanObject(value);
+      const nested = deepCleanObject(value as Record<string, unknown>);
       if (nested && Object.keys(nested).length > 0) cleaned[key] = nested;
     } else {
       cleaned[key] = value;
@@ -29,10 +29,8 @@ function cleanObject(obj: any, schemaKeys?: string[]): any {
 
 export function deepCleanObject<T extends object>(obj: T, schemaKeys?: string[]): T {
   if (Array.isArray(obj)) {
-    // @ts-ignore
-    return cleanArray(obj, schemaKeys) as any;
+    return cleanArray(obj, schemaKeys) as T;
   }
   if (typeof obj !== 'object' || obj === null) return obj;
-  // @ts-ignore
-  return cleanObject(obj, schemaKeys);
+  return cleanObject(obj as Record<string, unknown>, schemaKeys) as T;
 }

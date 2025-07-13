@@ -41,22 +41,19 @@ self.onmessage = function (e: MessageEvent<WorkerRequest>) {
       const intraday = calculatePortfolioIntraday(e.data.params.assetDefinitions, e.data.params.portfolioPositions);
       const history = calculatePortfolioHistory(assets, e.data.params.assetDefinitions);
       const response: WorkerResponse = { type: 'resultAll', intraday, history };
-      // @ts-ignore
       self.postMessage(response);
     } else if (e.data.type === 'calculateIntraday') {
       const data = calculatePortfolioIntraday(e.data.params.assetDefinitions, e.data.params.portfolioPositions);
       const response: WorkerResponse = { type: 'resultIntraday', data };
-      // @ts-ignore
       self.postMessage(response);
     } else if (e.data.type === 'calculateHistory') {
       const assets = flattenPortfolioPositionsToAssets(e.data.params.portfolioPositions);
       const data = calculatePortfolioHistory(assets, e.data.params.assetDefinitions);
       const response: WorkerResponse = { type: 'resultHistory', data };
-      // @ts-ignore
       self.postMessage(response);
     }
-  } catch (err: any) {
-    // @ts-ignore
-    self.postMessage({ type: 'error', error: err?.message || String(err) });
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    self.postMessage({ type: 'error', error: errorMessage });
   }
 };

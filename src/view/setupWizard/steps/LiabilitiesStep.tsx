@@ -85,8 +85,8 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
             <div className="space-y-4">
               <h5 className="font-medium text-gray-900">{t('setupWizard.steps.liabilities.yourLiabilities')} ({stepData.liabilities.length})</h5>
               <div className="space-y-3">
-                {stepData.liabilities.map((liability) => (
-                  <div key={`${liability.name}-${liability.type}`} className="border border-gray-200 rounded-lg p-4">
+                {stepData.liabilities.map((liability, index) => (
+                  <div key={`${liability.name}-${index}`} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <h6 className="font-medium text-gray-900">{liability.name}</h6>

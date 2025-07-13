@@ -93,7 +93,7 @@ const IncomeStep: React.FC<IncomeStepProps> = ({
             <div className="space-y-4">
               <h5 className="font-medium text-gray-900">{t('setupWizard.steps.income.yourIncomes')} ({stepData.incomes.length})</h5>
               <div className="space-y-3">
-                {stepData.incomes.map((income) => (
+                {stepData.incomes.map((income, index) => (
                   <div key={`${income.name}-${income.type}`} className="border border-gray-200 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">

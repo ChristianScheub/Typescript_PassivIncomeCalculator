@@ -199,7 +199,7 @@ const AssetDefinitionsStep: React.FC<AssetDefinitionsStepProps> = ({
               {/* Custom Assets List */}
               {stepData.customAssets.length > 0 && (
                 <div className="space-y-3 mb-6">
-                  {stepData.customAssets.map((asset) => (
+                  {stepData.customAssets.map((asset, index) => (
                     <div key={`${asset.symbol}-${asset.name}`} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
                       <div>
                         <h5 className="font-medium text-gray-900">{asset.symbol} - {asset.name}</h5>
