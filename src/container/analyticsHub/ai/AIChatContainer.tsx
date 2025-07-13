@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/hooks/redux';
 import { useLLMService } from '@/hooks/useLLMService';
@@ -45,12 +45,12 @@ export const AIChatContainer: React.FC<AIChatContainerProps> = ({ onBack }) => {
   const [viewMode, setViewMode] = useState<'financialOverview' | 'allAssets'>('financialOverview');
 
   // Calculate current financial metrics for context
-  const financialSnapshot = {
+  const financialSnapshot = useMemo(() => ({
     totalAssets: portfolioCache?.totals?.totalValue || 0,
     monthlyIncome: portfolioCache?.totals?.monthlyIncome || 0,
     totalExpenses: expenses.reduce((sum: number, exp: Expense) => sum + (exp.paymentSchedule?.amount || 0), 0),
     netWorth: (portfolioCache?.totals?.totalValue || 0) - liabilities.reduce((sum: number, lib: Liability) => sum + (lib.currentBalance || 0), 0)
-  };
+  }), [portfolioCache?.totals?.totalValue, portfolioCache?.totals?.monthlyIncome, expenses, liabilities]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

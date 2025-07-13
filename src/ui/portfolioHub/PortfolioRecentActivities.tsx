@@ -87,7 +87,7 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
           onClick: () => onCategoryChange(entry.category, entry.subCategory)
         };
       });
-  }, [portfolioData, onCategoryChange, t, maxActivities]);
+  }, [portfolioData, onCategoryChange, t, maxActivities, iconMap]);
 
   return (
     <Card>

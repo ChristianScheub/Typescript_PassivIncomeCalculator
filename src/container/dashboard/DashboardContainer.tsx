@@ -58,6 +58,7 @@ const DashboardContainer: React.FC = () => {
     
     if (financialSummaryCache) {
       // Extract only the financial data, excluding cache metadata
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { lastCalculated: _, inputHash: __, ...coreData } = financialSummaryCache;
       return { ...defaultSummary, ...coreData };
     }
