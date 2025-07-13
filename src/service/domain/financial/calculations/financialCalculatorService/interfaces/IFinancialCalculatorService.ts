@@ -1,4 +1,4 @@
-import { Transaction as Asset } from '@/types/domains/assets/';
+import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
 import { 
   Income, 
   Liability, 
@@ -42,6 +42,6 @@ export interface IFinancialCalculatorService {
   ) => MonthlyProjection[];
 
   // Portfolio Analytics
-  calculatePortfolioAnalytics: (positions: PortfolioPosition[], assetDefinitions?: any[]) => PortfolioAnalyticsData;
-  calculateIncomeAnalytics: (positions: PortfolioPosition[], assetDefinitions?: any[]) => IncomeAnalyticsData;
+  calculatePortfolioAnalytics: (positions: PortfolioPosition[], assetDefinitions?: AssetDefinition[]) => PortfolioAnalyticsData;
+  calculateIncomeAnalytics: (positions: PortfolioPosition[], assetDefinitions?: AssetDefinition[]) => IncomeAnalyticsData;
 }

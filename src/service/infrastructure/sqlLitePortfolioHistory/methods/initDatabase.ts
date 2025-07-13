@@ -29,7 +29,9 @@ export const initPortfolioHistoryDatabase = async () => {
         console.log('Removing intradayEntries store for version 2');
         
         // Delete the intradayEntries store if it exists
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if ((db.objectStoreNames as any).contains('intradayEntries')) {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (db as any).deleteObjectStore('intradayEntries');
           console.log('intradayEntries store removed successfully');
         }

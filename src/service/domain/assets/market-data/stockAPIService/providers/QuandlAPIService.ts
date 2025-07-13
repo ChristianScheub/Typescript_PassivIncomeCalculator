@@ -91,7 +91,7 @@ export class QuandlAPIService extends BaseStockAPIService {
       const closeIndex = columnNames.indexOf('Close');
       const volumeIndex = columnNames.indexOf('Volume');
       
-      const entries: StockHistoryEntry[] = data.dataset_data.data.map((item: any[]) => ({
+      const entries: StockHistoryEntry[] = (data as { dataset_data: { data: (string | number)[][] } }).dataset_data.data.map((item: (string | number)[]) => ({
         date: item[dateIndex],
         open: item[openIndex],
         high: item[highIndex],

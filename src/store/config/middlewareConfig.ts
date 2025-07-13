@@ -25,12 +25,12 @@ export const middlewareConfig = (getDefaultMiddleware: Parameters<typeof configu
     },
   }).concat(
     // Cache management middleware (order-sensitive)
-    portfolioCacheMiddleware as any,           // Portfolio cache invalidation
-    calculatedDataCacheMiddleware as any,     // Calculated data cache management  
-    assetCalculationCacheMiddleware as any,   // Asset calculation cache
-    financialSummaryMiddleware as any,        // Financial summary auto-calculation
-    storageValidationMiddleware as any,       // Storage health monitoring
-    dataChangeMiddleware as any,              // Data mutation handling (should be last)
+    portfolioCacheMiddleware,           // Portfolio cache invalidation
+    calculatedDataCacheMiddleware,     // Calculated data cache management  
+    assetCalculationCacheMiddleware,   // Asset calculation cache
+    financialSummaryMiddleware,        // Financial summary auto-calculation
+    storageValidationMiddleware,       // Storage health monitoring
+    dataChangeMiddleware,              // Data mutation handling (should be last)
   );
 
   if (process.env.NODE_ENV === 'development') {

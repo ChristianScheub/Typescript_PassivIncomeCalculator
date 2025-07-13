@@ -76,7 +76,7 @@ export const financialSummaryMiddleware: Middleware<object, RootState> = (store:
       if (shouldRecalculateFinancialSummary(state)) {
         Logger.info('FinancialSummaryMiddleware: Triggering financial summary recalculation');
         const financialData = getFinancialData(state);
-        store.dispatch(calculateFinancialSummary(financialData) as any);
+        store.dispatch(calculateFinancialSummary(financialData));
       } else {
         // Invalidate cache to force recalculation next time
         store.dispatch(invalidateFinancialSummary());
@@ -86,7 +86,7 @@ export const financialSummaryMiddleware: Middleware<object, RootState> = (store:
       if ((type.startsWith('transactions/') || type.startsWith('assetDefinitions/')) && 
           shouldRecalculateAssetFocusData(state)) {
         Logger.info('FinancialSummaryMiddleware: Triggering asset focus data recalculation');
-        store.dispatch(calculateAssetFocusData() as any);
+        store.dispatch(calculateAssetFocusData());
       }
     }
   }
