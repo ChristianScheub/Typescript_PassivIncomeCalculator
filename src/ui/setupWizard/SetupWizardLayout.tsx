@@ -67,7 +67,7 @@ const SetupWizardLayout: React.FC<SetupWizardLayoutProps> = ({
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <Card className="shadow-sm sm:shadow-lg">
           {/* Step Header */}
-          {displayTitle !== "Welcome" && (
+          {displayTitle !== t('setupWizard.general.steps.welcome') && (
             <CardHeader className="text-center border-b border-gray-200">
               <CardTitle>{displayTitle}</CardTitle>
               {displayDescription && (

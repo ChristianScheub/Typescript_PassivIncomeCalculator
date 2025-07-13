@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TransactionsStepData, SimplifiedTransaction, AssetTemplate, CustomAssetDefinition } from '@/types/domains/setupWizard';
 import QuickDataImport from '@ui/setupWizard/QuickDataImport';
 
@@ -19,6 +20,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
   onRemoveTransaction,
   onFileSelect
 }) => {
+  const { t } = useTranslation();
   const [showTransactionForm, setShowTransactionForm] = useState(false);
   const [newTransaction, setNewTransaction] = useState<SimplifiedTransaction>({
     assetId: '',
@@ -85,11 +87,11 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
             </div>
             <div className="ml-3">
               <h3 className="text-sm font-medium text-blue-800">
-                No Assets Defined Yet
+                {t('setupWizard.steps.transactions.noAssets.title')}
               </h3>
               <div className="mt-2 text-sm text-blue-700">
-                <p>You can add transactions later once you've defined some assets, or you can add transactions now if you already know your asset symbols/names.</p>
-                <p className="mt-2"><strong>Tip:</strong> You can go back to the previous step to add assets first, or skip this step and return to it later.</p>
+                <p>{t('setupWizard.steps.transactions.noAssets.description')}</p>
+                <p className="mt-2"><strong>{t('setupWizard.steps.transactions.noAssets.tip')}</strong></p>
               </div>
             </div>
           </div>
@@ -110,10 +112,10 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
           </div>
           <div className="ml-3 text-sm">
             <label htmlFor="skip-transactions" className="font-medium text-gray-700">
-              Skip transactions for now
+              {t('setupWizard.steps.transactions.skipOption.title')}
             </label>
             <p className="text-gray-500">
-              You can add transaction history later from the portfolio section.
+              {t('setupWizard.steps.transactions.skipOption.description')}
             </p>
           </div>
         </div>
@@ -124,7 +126,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
           {/* Bulk Import Option */}
           <div className="space-y-4">
             <h4 className="text-lg font-medium text-gray-900">
-              How would you like to add transactions?
+              {t('setupWizard.steps.transactions.howToAdd')}
             </h4>
             
             <div className="space-y-3">
@@ -138,7 +140,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                   className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
                 />
                 <label htmlFor="manual-entry" className="ml-3 block text-sm font-medium text-gray-700">
-                  Add transactions manually
+                  {t('setupWizard.steps.transactions.methods.manual')}
                 </label>
               </div>
               
@@ -152,7 +154,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                   className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
                 />
                 <label htmlFor="bulk-import" className="ml-3 block text-sm font-medium text-gray-700">
-                  Import from file (CSV/JSON)
+                  {t('setupWizard.steps.transactions.methods.bulkImport')}
                 </label>
               </div>
             </div>
@@ -168,11 +170,11 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
               />
               
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h5 className="font-medium text-blue-900 mb-2">Transaction Import Format</h5>
+                <h5 className="font-medium text-blue-900 mb-2">{t('setupWizard.steps.transactions.importFormat.title')}</h5>
                 <div className="text-sm text-blue-800 space-y-1">
-                  <p><strong>Required columns:</strong> asset_symbol, type (buy/sell/dividend), amount, date</p>
-                  <p><strong>Optional columns:</strong> quantity, notes</p>
-                  <p><strong>Date format:</strong> YYYY-MM-DD (e.g., 2024-01-15)</p>
+                  <p><strong>{t('setupWizard.steps.transactions.importFormat.required')}</strong></p>
+                  <p><strong>{t('setupWizard.steps.transactions.importFormat.optional')}</strong></p>
+                  <p><strong>{t('setupWizard.steps.transactions.importFormat.dateFormat')}</strong></p>
                 </div>
               </div>
             </div>
@@ -182,7 +184,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
               {/* Existing Transactions */}
               {stepData.transactions.length > 0 && (
                 <div className="space-y-4">
-                  <h5 className="font-medium text-gray-900">Your Transactions ({stepData.transactions.length})</h5>
+                  <h5 className="font-medium text-gray-900">{t('setupWizard.steps.transactions.yourTransactions')} ({stepData.transactions.length})</h5>
                   <div className="space-y-3">
                     {stepData.transactions.map((transaction) => (
                       <div key={`${transaction.assetId}-${transaction.date}-${transaction.amount}`} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
@@ -227,15 +229,15 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                   <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                   </svg>
-                  <span className="mt-2 block text-sm font-medium text-gray-900">Add Transaction</span>
+                  <span className="mt-2 block text-sm font-medium text-gray-900">{t('setupWizard.steps.transactions.addTransaction')}</span>
                 </button>
               ) : (
                 <div className="border border-gray-300 rounded-lg p-6 space-y-4">
-                  <h5 className="font-medium text-gray-900">Add New Transaction</h5>
+                  <h5 className="font-medium text-gray-900">{t('setupWizard.steps.transactions.addNewTransaction')}</h5>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label htmlFor="transaction-asset" className="block text-sm font-medium text-gray-700">Asset</label>
+                      <label htmlFor="transaction-asset" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.transactions.form.asset')}</label>
                       {hasAssets ? (
                         <select
                           id="transaction-asset"
@@ -243,7 +245,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                           onChange={(e) => setNewTransaction({ ...newTransaction, assetId: e.target.value })}
                           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                         >
-                          <option value="">Select an asset</option>
+                          <option value="">{t('setupWizard.steps.transactions.form.assetPlaceholder')}</option>
                           {availableAssets.map((asset) => {
                             const id = 'id' in asset ? asset.id : asset.symbol;
                             const display = `${asset.symbol} - ${asset.name}`;
@@ -256,7 +258,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                         <input
                           id="transaction-asset"
                           type="text"
-                          placeholder="Enter asset symbol (e.g., AAPL, MSFT)"
+                          placeholder={t('setupWizard.steps.transactions.form.assetInputPlaceholder')}
                           value={newTransaction.assetId}
                           onChange={(e) => setNewTransaction({ ...newTransaction, assetId: e.target.value })}
                           className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
@@ -264,27 +266,27 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                       )}
                       {!hasAssets && (
                         <p className="mt-1 text-xs text-gray-500">
-                          Enter the asset symbol or identifier for your transaction
+                          {t('setupWizard.steps.transactions.form.assetInputHelp')}
                         </p>
                       )}
                     </div>
                     
                     <div>
-                      <label htmlFor="transaction-type" className="block text-sm font-medium text-gray-700">Type</label>
+                      <label htmlFor="transaction-type" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.transactions.form.type')}</label>
                       <select
                         id="transaction-type"
                         value={newTransaction.type}
                         onChange={(e) => setNewTransaction({ ...newTransaction, type: e.target.value as 'buy' | 'sell' | 'dividend' })}
                         className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                       >
-                        <option value="buy">Buy</option>
-                        <option value="sell">Sell</option>
-                        <option value="dividend">Dividend</option>
+                        <option value="buy">{t('setupWizard.steps.transactions.types.buy')}</option>
+                        <option value="sell">{t('setupWizard.steps.transactions.types.sell')}</option>
+                        <option value="dividend">{t('setupWizard.steps.transactions.types.dividend')}</option>
                       </select>
                     </div>
                     
                     <div>
-                      <label htmlFor="transaction-amount" className="block text-sm font-medium text-gray-700">Amount ($)</label>
+                      <label htmlFor="transaction-amount" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.transactions.form.amount')}</label>
                       <input
                         id="transaction-amount"
                         type="number"
@@ -296,7 +298,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                     </div>
                     
                     <div>
-                      <label htmlFor="transaction-quantity" className="block text-sm font-medium text-gray-700">Quantity (Optional)</label>
+                      <label htmlFor="transaction-quantity" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.transactions.form.quantity')}</label>
                       <input
                         id="transaction-quantity"
                         type="number"
@@ -308,7 +310,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                     </div>
                     
                     <div>
-                      <label htmlFor="transaction-date" className="block text-sm font-medium text-gray-700">Date</label>
+                      <label htmlFor="transaction-date" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.transactions.form.date')}</label>
                       <input
                         id="transaction-date"
                         type="date"
@@ -320,7 +322,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                   </div>
                   
                   <div>
-                    <label htmlFor="transaction-notes" className="block text-sm font-medium text-gray-700">Notes (Optional)</label>
+                    <label htmlFor="transaction-notes" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.transactions.form.notes')}</label>
                     <textarea
                       id="transaction-notes"
                       value={newTransaction.notes}
@@ -336,7 +338,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                       onClick={() => setShowTransactionForm(false)}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                     >
-                      Cancel
+                      {t('setupWizard.steps.transactions.actions.cancel')}
                     </button>
                     <button
                       type="button"
@@ -344,7 +346,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                       disabled={!newTransaction.assetId || newTransaction.amount <= 0}
                       className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Add Transaction
+                      {t('setupWizard.steps.transactions.actions.addTransaction')}
                     </button>
                   </div>
                 </div>

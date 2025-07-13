@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { LiabilitiesStepData, SimplifiedLiability } from '@/types/domains/setupWizard';
 
 interface LiabilitiesStepProps {
@@ -14,6 +15,7 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
   onAddLiability,
   onRemoveLiability
 }) => {
+  const { t } = useTranslation();
   const [showLiabilityForm, setShowLiabilityForm] = useState(false);
   const [newLiability, setNewLiability] = useState<SimplifiedLiability>({
     name: '',
@@ -57,10 +59,10 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
           </div>
           <div className="ml-3 text-sm">
             <label htmlFor="skip-liabilities" className="font-medium text-gray-700">
-              Skip liabilities tracking for now
+              {t('setupWizard.steps.liabilities.skipOption.title')}
             </label>
             <p className="text-gray-500">
-              This step is optional. You can add debt and liability information later.
+              {t('setupWizard.steps.liabilities.skipOption.description')}
             </p>
           </div>
         </div>
@@ -71,18 +73,17 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
           {/* Introduction */}
           <div className="text-center">
             <h4 className="text-lg font-medium text-gray-900 mb-4">
-              Track Your Liabilities
+              {t('setupWizard.steps.liabilities.title')}
             </h4>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Add your debts and liabilities to get a complete picture of your financial health. 
-              This includes mortgages, credit cards, loans, and other debts.
+              {t('setupWizard.steps.liabilities.description')}
             </p>
           </div>
 
           {/* Existing Liabilities */}
           {stepData.liabilities.length > 0 && (
             <div className="space-y-4">
-              <h5 className="font-medium text-gray-900">Your Liabilities ({stepData.liabilities.length})</h5>
+              <h5 className="font-medium text-gray-900">{t('setupWizard.steps.liabilities.yourLiabilities')} ({stepData.liabilities.length})</h5>
               <div className="space-y-3">
                 {stepData.liabilities.map((liability) => (
                   <div key={`${liability.name}-${liability.type}`} className="border border-gray-200 rounded-lg p-4">
@@ -91,18 +92,18 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
                         <h6 className="font-medium text-gray-900">{liability.name}</h6>
                         <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                           <div>
-                            <span className="text-gray-500">Amount:</span>
+                            <span className="text-gray-500">{t('setupWizard.steps.liabilities.summary.amount')}</span>
                             <p className="font-medium text-red-600">${liability.amount.toLocaleString()}</p>
                           </div>
                           {liability.interestRate && (
                             <div>
-                              <span className="text-gray-500">Interest Rate:</span>
+                              <span className="text-gray-500">{t('setupWizard.steps.liabilities.summary.interestRate')}</span>
                               <p className="font-medium">{liability.interestRate}%</p>
                             </div>
                           )}
                           {liability.monthlyPayment && (
                             <div>
-                              <span className="text-gray-500">Monthly Payment:</span>
+                              <span className="text-gray-500">{t('setupWizard.steps.liabilities.summary.monthlyPayment')}</span>
                               <p className="font-medium">${liability.monthlyPayment.toLocaleString()}</p>
                             </div>
                           )}
@@ -132,12 +133,12 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
                   <div>
-                    <h6 className="font-medium text-red-900">Total Liabilities</h6>
+                    <h6 className="font-medium text-red-900">{t('setupWizard.steps.liabilities.totalLiabilities')}</h6>
                     <p className="text-red-800">
                       ${stepData.liabilities.reduce((sum, liability) => sum + liability.amount, 0).toLocaleString()}
                       {stepData.liabilities.some(l => l.monthlyPayment) && (
                         <span className="ml-2">
-                          • Monthly Payments: ${stepData.liabilities.reduce((sum, liability) => sum + (liability.monthlyPayment || 0), 0).toLocaleString()}
+                          • {t('setupWizard.steps.liabilities.monthlyPayments')}: ${stepData.liabilities.reduce((sum, liability) => sum + (liability.monthlyPayment || 0), 0).toLocaleString()}
                         </span>
                       )}
                     </p>
@@ -157,27 +158,27 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
               <svg className="mx-auto h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
-              <span className="mt-2 block text-sm font-medium text-gray-900">Add Liability</span>
+              <span className="mt-2 block text-sm font-medium text-gray-900">{t('setupWizard.steps.liabilities.addLiability')}</span>
             </button>
           ) : (
             <div className="border border-gray-300 rounded-lg p-6 space-y-4">
-              <h5 className="font-medium text-gray-900">Add New Liability</h5>
+              <h5 className="font-medium text-gray-900">{t('setupWizard.steps.liabilities.addNewLiability')}</h5>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
-                  <label htmlFor="liability-name" className="block text-sm font-medium text-gray-700">Name *</label>
+                  <label htmlFor="liability-name" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.liabilities.form.name')}</label>
                   <input
                     id="liability-name"
                     type="text"
                     value={newLiability.name}
                     onChange={(e) => setNewLiability({ ...newLiability, name: e.target.value })}
-                    placeholder="e.g. Home Mortgage, Credit Card, Student Loan"
+                    placeholder={t('setupWizard.steps.liabilities.form.namePlaceholder')}
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
                 
                 <div>
-                  <label htmlFor="liability-amount" className="block text-sm font-medium text-gray-700">Total Amount Owed ($) *</label>
+                  <label htmlFor="liability-amount" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.liabilities.form.totalAmount')}</label>
                   <input
                     id="liability-amount"
                     type="number"
@@ -189,20 +190,20 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
                 </div>
                 
                 <div>
-                  <label htmlFor="liability-interest-rate" className="block text-sm font-medium text-gray-700">Interest Rate (% per year)</label>
+                  <label htmlFor="liability-interest-rate" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.liabilities.form.interestRate')}</label>
                   <input
                     id="liability-interest-rate"
                     type="number"
                     step="0.01"
                     value={newLiability.interestRate || ''}
                     onChange={(e) => setNewLiability({ ...newLiability, interestRate: parseFloat(e.target.value) || undefined })}
-                    placeholder="e.g. 4.5"
+                    placeholder={t('setupWizard.steps.liabilities.form.interestRatePlaceholder')}
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   />
                 </div>
                 
                 <div>
-                  <label htmlFor="liability-monthly-payment" className="block text-sm font-medium text-gray-700">Monthly Payment ($)</label>
+                  <label htmlFor="liability-monthly-payment" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.liabilities.form.monthlyPayment')}</label>
                   <input
                     id="liability-monthly-payment"
                     type="number"
@@ -215,13 +216,13 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
               </div>
               
               <div>
-                <label htmlFor="liability-description" className="block text-sm font-medium text-gray-700">Description (Optional)</label>
+                <label htmlFor="liability-description" className="block text-sm font-medium text-gray-700">{t('setupWizard.steps.liabilities.form.description')}</label>
                 <textarea
                   id="liability-description"
                   value={newLiability.description}
                   onChange={(e) => setNewLiability({ ...newLiability, description: e.target.value })}
                   rows={2}
-                  placeholder="Additional details about this liability"
+                  placeholder={t('setupWizard.steps.liabilities.form.descriptionPlaceholder')}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
@@ -232,7 +233,7 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
                   onClick={() => setShowLiabilityForm(false)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                 >
-                  Cancel
+                  {t('setupWizard.steps.liabilities.actions.cancel')}
                 </button>
                 <button
                   type="button"
@@ -240,7 +241,7 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
                   disabled={!newLiability.name || newLiability.amount <= 0}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add Liability
+                  {t('setupWizard.steps.liabilities.actions.addLiability')}
                 </button>
               </div>
             </div>
@@ -248,14 +249,14 @@ const LiabilitiesStep: React.FC<LiabilitiesStepProps> = ({
 
           {/* Common Liability Types */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h5 className="font-medium text-blue-900 mb-2">Common Liability Types</h5>
+            <h5 className="font-medium text-blue-900 mb-2">{t('setupWizard.steps.liabilities.commonTypes.title')}</h5>
             <div className="text-sm text-blue-800 grid grid-cols-2 md:grid-cols-3 gap-2">
-              <div>• Mortgage/Home Loan</div>
-              <div>• Credit Cards</div>
-              <div>• Student Loans</div>
-              <div>• Auto Loans</div>
-              <div>• Personal Loans</div>
-              <div>• Line of Credit</div>
+              <div>{t('setupWizard.steps.liabilities.commonTypes.mortgage')}</div>
+              <div>{t('setupWizard.steps.liabilities.commonTypes.creditCards')}</div>
+              <div>{t('setupWizard.steps.liabilities.commonTypes.studentLoans')}</div>
+              <div>{t('setupWizard.steps.liabilities.commonTypes.autoLoans')}</div>
+              <div>{t('setupWizard.steps.liabilities.commonTypes.personalLoans')}</div>
+              <div>{t('setupWizard.steps.liabilities.commonTypes.lineOfCredit')}</div>
             </div>
           </div>
         </>

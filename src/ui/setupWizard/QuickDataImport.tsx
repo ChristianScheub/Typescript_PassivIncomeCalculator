@@ -38,7 +38,7 @@ const QuickDataImport: React.FC<QuickDataImportProps> = ({
       const validationResult: ImportValidationResult = {
         isValid: false,
         warnings: [],
-        errors: [`File type not supported. Accepted formats: ${acceptedFormats.join(', ')}`]
+        errors: [t('setupWizard.fileImport.validation.fileTypeNotSupported', { formats: acceptedFormats.join(', ') })]
       };
       onValidationResult?.(validationResult);
       return;
@@ -121,14 +121,14 @@ const QuickDataImport: React.FC<QuickDataImportProps> = ({
                 onClick={handleBrowseClick}
                 className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Choose Different File
+                {t('setupWizard.fileImport.chooseDifferentFile')}
               </button>
               <button
                 type="button"
                 onClick={handleClearFile}
                 className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Remove File
+                {t('setupWizard.fileImport.removeFile')}
               </button>
             </div>
           </div>
@@ -154,11 +154,11 @@ const QuickDataImport: React.FC<QuickDataImportProps> = ({
               onClick={handleBrowseClick}
               className="w-full sm:w-auto px-6 py-3 sm:py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Browse Files
+              {t('setupWizard.fileImport.browseFiles')}
             </button>
 
             <p className="text-xs text-gray-500 px-2">
-              Supports {acceptedFormats.join(', ')} files up to {maxFileSize}MB
+              {t('setupWizard.fileImport.supportedFiles', { formats: acceptedFormats.join(', '), maxSize: maxFileSize })}
             </p>
           </div>
         )}
