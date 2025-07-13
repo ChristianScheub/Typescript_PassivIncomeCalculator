@@ -50,11 +50,6 @@ export const dataValidationUtils = {
     return typeof value === 'string' && value.trim().length >= minLength;
   },
 
-  isValidEmail: (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  },
-
   // Transaction validation
   validateTransaction: (transaction: TransactionInput): ValidationResult => {
     const errors: string[] = [];
@@ -163,7 +158,7 @@ export const dataValidationUtils = {
     // Symbol validation
     if (!dataValidationUtils.isValidString(asset.symbol)) {
       errors.push('Asset symbol is required');
-    } else if (asset.symbol.length > 10) {
+    } else if (asset.symbol && asset.symbol.length > 10) {
       warnings.push('Asset symbol is unusually long');
     }
 

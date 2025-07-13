@@ -72,22 +72,6 @@ describe('DataValidationUtils', () => {
         expect(dataValidationUtils.isValidString(null)).toBe(false);
       });
     });
-
-    describe('isValidEmail', () => {
-      test('should return true for valid emails', () => {
-        expect(dataValidationUtils.isValidEmail('test@example.com')).toBe(true);
-        expect(dataValidationUtils.isValidEmail('user.name@domain.co.uk')).toBe(true);
-        expect(dataValidationUtils.isValidEmail('test+tag@example.org')).toBe(true);
-      });
-
-      test('should return false for invalid emails', () => {
-        expect(dataValidationUtils.isValidEmail('invalid-email')).toBe(false);
-        expect(dataValidationUtils.isValidEmail('test@')).toBe(false);
-        expect(dataValidationUtils.isValidEmail('@example.com')).toBe(false);
-        expect(dataValidationUtils.isValidEmail('test@example')).toBe(false);
-        expect(dataValidationUtils.isValidEmail('')).toBe(false);
-      });
-    });
   });
 
   describe('Transaction validation', () => {
