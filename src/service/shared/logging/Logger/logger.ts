@@ -113,9 +113,21 @@ class Logger {
     }
   }
 
+  static warnService(message: string): void {
+    if (featureFlag_Debug_Log_Service || featureFlag_Debug_AllLogs) {
+      this.log(this.formatMessage(`Service Warning: ${message}`, "⚙️⚠️"));
+    }
+  }
+
   static error(message: string): void {
     if (featureFlag_Debug_Log_Error || featureFlag_Debug_AllLogs) {
       this.log(this.formatMessage(`ERROR: ${message}`, "‼️🆘"));
+    }
+  }
+
+  static errorService(message: string): void {
+    if (featureFlag_Debug_Log_Service || featureFlag_Debug_AllLogs) {
+      this.log(this.formatMessage(`Service Error: ${message}`, "⚙️‼️"));
     }
   }
 

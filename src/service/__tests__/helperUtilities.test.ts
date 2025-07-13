@@ -3,7 +3,7 @@ import { getDynamicFontSize } from '../shared/utilities/helper/fontSizeHelper';
 import { renderHook, act } from '@testing-library/react';
 
 // Mock formatService for fontSizeHelper
-jest.mock('@/service/infrastructure', () => ({
+jest.mock('../infrastructure', () => ({
   formatService: {
     formatCurrency: jest.fn((value) => {
       // Simple mock currency formatting

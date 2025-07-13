@@ -12,11 +12,11 @@ jest.mock('../shared/logging/Logger/logger', () => ({
   warn: jest.fn()
 }));
 
-jest.mock('@/utils/dividendCacheUtils', () => ({
+jest.mock('../../utils/dividendCacheUtils', () => ({
   getCachedDividendData: jest.fn()
 }));
 
-jest.mock('@/service/domain/financial/income/incomeCalculatorService/methods/calculatePayment', () => ({
+jest.mock('../domain/financial/income/incomeCalculatorService/methods/calculatePayment', () => ({
   calculateDividendSchedule: jest.fn((dividendInfo, quantity) => ({
     monthlyAmount: (dividendInfo.amount * quantity) / 12,
     annualAmount: dividendInfo.amount * quantity
@@ -27,7 +27,7 @@ jest.mock('@/service/domain/financial/income/incomeCalculatorService/methods/cal
   })
 }));
 
-jest.mock('@/utils/transactionCalculations', () => ({
+jest.mock('../../utils/transactionCalculations', () => ({
   getCurrentQuantity: jest.fn((asset) => asset.quantity || 100)
 }));
 

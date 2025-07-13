@@ -47,7 +47,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Configure this in repository secrets
         
     - name: Archive coverage reports
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-reports
         path: |

@@ -4,7 +4,9 @@ module.exports = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
   testMatch: [
     "**/__tests__/**/*.(ts|tsx|js)",
-    "**/*.(test|spec).(ts|tsx|js)"
+    "**/*.(test|spec).(ts|tsx|js)",
+    "!**/__tests__/mockServices.ts",
+    "!**/__tests__/setup.ts"
   ],
   setupFilesAfterEnv: ["<rootDir>/src/test/setup.ts"],
   collectCoverage: true,

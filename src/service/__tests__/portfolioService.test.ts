@@ -19,11 +19,11 @@ jest.mock('../domain/portfolio/management/portfolioService/portfolioCalculations
   }))
 }));
 
-jest.mock('@/utils/transactionCalculations', () => ({
+jest.mock('../../utils/transactionCalculations', () => ({
   getCurrentQuantity: jest.fn((transaction) => transaction.quantity || 100)
 }));
 
-jest.mock('@service/domain/financial/calculations/compositeCalculatorService', () => ({
+jest.mock('../domain/financial/calculations/compositeCalculatorService', () => ({
   calculateDividendSchedule: jest.fn((dividendInfo, quantity) => ({
     monthlyAmount: (dividendInfo.amount || 1) * quantity,
     annualAmount: (dividendInfo.amount || 1) * quantity * 12

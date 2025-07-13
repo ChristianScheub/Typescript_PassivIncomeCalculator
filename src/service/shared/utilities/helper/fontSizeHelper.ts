@@ -1,4 +1,4 @@
-import { formatService } from "@/service/infrastructure";
+import { formatService } from "../../../infrastructure";
 
 /**
  * Helper function to get dynamic font size based on number of digits in currency value

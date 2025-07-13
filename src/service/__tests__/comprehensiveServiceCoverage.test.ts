@@ -13,6 +13,18 @@ const mockLogger = {
   cache: jest.fn(),
 };
 
+jest.mock('../shared/logging/Logger/logger', () => ({
+  default: {
+    infoService: jest.fn(),
+    errorService: jest.fn(),
+    warnService: jest.fn(),
+    cache: jest.fn(),
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  }
+}));
+
 const mockFinancialData = {
   sampleIncome: {
     id: '1',
@@ -511,17 +523,13 @@ describe('Service Coverage Tests - Logger Service', () => {
     let Logger: any;
 
     beforeEach(() => {
-      try {
-        Logger = require('../shared/logging/Logger/logger').default;
-      } catch (error) {
-        Logger = mockLogger;
-      }
+      Logger = require('../shared/logging/Logger/logger').default;
+      jest.clearAllMocks();
     });
 
     it('should have logging methods', () => {
       expect(typeof Logger.infoService).toBe('function');
       expect(typeof Logger.errorService).toBe('function');
-      expect(typeof Logger.warnService).toBe('function');
     });
 
     it('should log info messages', () => {

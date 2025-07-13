@@ -10,7 +10,7 @@ jest.mock('../shared/logging/Logger/logger', () => ({
   infoService: jest.fn()
 }));
 
-jest.mock('@/utils/dividendCacheUtils', () => ({
+jest.mock('../../utils/dividendCacheUtils', () => ({
   getCachedDividendData: jest.fn(),
   invalidateDividendCache: jest.fn()
 }));

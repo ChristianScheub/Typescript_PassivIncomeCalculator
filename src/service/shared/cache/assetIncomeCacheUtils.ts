@@ -2,7 +2,7 @@ import { Transaction as Asset } from "@/types/domains/assets/entities";
 import Logger from "@/service/shared/logging/Logger/logger";
 import { 
   getCachedDividendData
-} from "@/utils/dividendCacheUtils";
+} from "../../../utils/dividendCacheUtils";
 
 // Optimized function: Check if all assets have cached data
 export const areAssetsCached = (assets: Asset[]): boolean => {
