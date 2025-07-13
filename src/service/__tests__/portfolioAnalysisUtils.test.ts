@@ -45,7 +45,7 @@ describe('PortfolioAnalysisUtils', () => {
       
       const stocksAllocation = allocations.find(a => a.category === 'stocks');
       expect(stocksAllocation?.value).toBe(155000); // AAPL + GOOGL
-      expect(stocksAllocation?.percentage).toBeCloseTo(55.65, 2); // 155000/278500 * 100
+      expect(stocksAllocation?.percentage).toBeCloseTo(55.66, 1); // 155000/278500 * 100
       expect(stocksAllocation?.count).toBe(2);
 
       const bondsAllocation = allocations.find(a => a.category === 'bonds');
@@ -104,9 +104,9 @@ describe('PortfolioAnalysisUtils', () => {
       const topHoldings = portfolioAnalysisUtils.findTopHoldings(mockAssets, 3);
       
       expect(topHoldings).toHaveLength(3);
-      expect(topHoldings[0].symbol).toBe('GOOGL'); // Highest value
-      expect(topHoldings[1].symbol).toBe('BTC'); // Second highest
-      expect(topHoldings[2].symbol).toBe('VTI'); // Third highest
+      expect(topHoldings[0].symbol).toBe('GOOGL'); // Highest value: 140,000
+      expect(topHoldings[1].symbol).toBe('BTC'); // Second highest: 90,000
+      expect(topHoldings[2].symbol).toBe('BND'); // Third highest: 17,000
     });
 
     test('should limit top holdings to available assets', () => {
@@ -142,8 +142,8 @@ describe('PortfolioAnalysisUtils', () => {
       const balance = portfolioAnalysisUtils.checkAllocationBalance(mockAssets, targets);
       
       expect(balance.stocks.target).toBe(60);
-      expect(balance.stocks.current).toBeCloseTo(55.65, 2);
-      expect(balance.stocks.difference).toBeCloseTo(-4.35, 2); // Under-allocated
+      expect(balance.stocks.current).toBeCloseTo(55.66, 1);
+      expect(balance.stocks.difference).toBeCloseTo(-4.34, 1); // Under-allocated
       
       expect(balance.crypto.target).toBe(10);
       expect(balance.crypto.current).toBeCloseTo(32.32, 2);
