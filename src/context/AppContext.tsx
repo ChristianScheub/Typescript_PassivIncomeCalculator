@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
 import { Theme } from '@/types/shared/base/enums';
 import { AppContextType } from '@/types/shared/ui/context';
@@ -11,7 +11,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const isMobile = !isDesktop;
 
   // Theme toggler
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
     localStorage.setItem('finance-app-theme', newTheme);
@@ -22,7 +22,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     } else {
       document.documentElement.classList.remove('dark');
     }
-  };
+  }, [theme]);
 
   // Initialize theme from localStorage
   useEffect(() => {
@@ -51,6 +51,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAppContext = () => {
   const context = useContext(AppContext);
   if (context === undefined) {

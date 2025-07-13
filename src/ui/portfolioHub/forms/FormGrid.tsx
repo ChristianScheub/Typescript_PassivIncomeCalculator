@@ -69,6 +69,7 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
 }));
 
 // Standard field styles for consistent form appearance
+// eslint-disable-next-line react-refresh/only-export-components
 export const standardFieldStyles = {
   '& .MuiOutlinedInput-root': {
     borderRadius: 2,

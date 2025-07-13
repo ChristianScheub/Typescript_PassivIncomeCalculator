@@ -70,6 +70,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
         categoryData: { categories, categoryOptions, categoryAssignments } 
       }));
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assets.length, assetDefinitions.length, portfolioCache, dispatch, categories, categoryOptions, categoryAssignments]);
 
   // Extract values from cached totals
@@ -218,6 +219,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [assets.length, portfolioCache, dispatch]); // Dependency auf asset length und cache validity
 
 

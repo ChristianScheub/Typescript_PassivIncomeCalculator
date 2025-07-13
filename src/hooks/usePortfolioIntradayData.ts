@@ -14,7 +14,11 @@ export function usePortfolioIntradayData(): Array<{ date: string; value: number;
   const isHydrated = useAppSelector(state => !!state.transactions.cache);
 
   const intradayDataObj = portfolioCache?.intradayData;
-  const portfolioIntradayData = intradayDataObj?.data || [];
+  
+  const portfolioIntradayData = useMemo(() => {
+    return intradayDataObj?.data || [];
+  }, [intradayDataObj]);
+  
   const portfolioIntradayStatus = intradayDataObj ? 'succeeded' : 'idle';
 
   // Load portfolio intraday data from IndexedDB on first hydration

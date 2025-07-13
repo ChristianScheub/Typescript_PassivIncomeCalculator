@@ -55,4 +55,5 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
 );
 Select.displayName = "Select";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { Select, selectVariants };

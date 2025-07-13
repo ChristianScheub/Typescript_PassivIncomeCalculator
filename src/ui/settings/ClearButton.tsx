@@ -10,6 +10,7 @@ const LoadingSpinner: React.FC = () => (
 );
 
 // Helper function to get button text based on status
+// eslint-disable-next-line react-refresh/only-export-components
 export const getButtonText = (status: string, t: TFunction, loadingKey: string, successKey: string, defaultKey: string): string => {
   if (status === 'loading' || status === 'saving' || status === 'clearing') {
     return t(loadingKey);
@@ -21,6 +22,7 @@ export const getButtonText = (status: string, t: TFunction, loadingKey: string, 
 };
 
 // Helper function to get clear button icon
+// eslint-disable-next-line react-refresh/only-export-components
 export const getClearButtonIcon = (status: ClearStatus) => {
   if (status === 'clearing') {
     return <LoadingSpinner />;

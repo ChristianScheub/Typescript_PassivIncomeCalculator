@@ -43,4 +43,5 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 Input.displayName = "Input";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export { Input, inputVariants };

@@ -32,13 +32,13 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
 }) => {
   const { t } = useTranslation();
 
-  // Icon mapping for activities
-  const iconMap = {
-    Wallet, CreditCard, ReceiptText, Landmark, Activity, BarChart3, Plus, TrendingUp,
-    Target, Star
-  };
-
   const recentPortfolioActivities = useMemo(() => {
+    // Icon mapping for activities
+    const iconMap = {
+      Wallet, CreditCard, ReceiptText, Landmark, Activity, BarChart3, Plus, TrendingUp,
+      Target, Star
+    };
+
     const history = recentActivityService.getActivitiesByType('portfolio', maxActivities);
     
     if (history.length === 0) {
@@ -87,7 +87,7 @@ export const PortfolioRecentActivities: React.FC<PortfolioRecentActivitiesProps>
           onClick: () => onCategoryChange(entry.category, entry.subCategory)
         };
       });
-  }, [portfolioData, onCategoryChange, t, maxActivities, iconMap]);
+  }, [portfolioData, onCategoryChange, t, maxActivities]);
 
   return (
     <Card>

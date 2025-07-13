@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { useAppSelector } from './redux';
 import { usePortfolioHistoryRecalculation } from './usePortfolioHistoryView';
 import { AssetDefinition } from '@/types/domains/assets';
@@ -20,7 +20,7 @@ export function useAutoPortfolioHistoryUpdate() {
   const hasInitializedRef = useRef(false);
   
   // Create hash from asset definitions and their price history
-  const createAssetDefinitionsHash = () => {
+  const createAssetDefinitionsHash = useCallback(() => {
     if (!assetDefinitions || assetDefinitions.length === 0) return '';
     
     const hashInput = assetDefinitions
@@ -36,7 +36,7 @@ export function useAutoPortfolioHistoryUpdate() {
       hash = hash & hash; // Convert to 32bit integer
     }
     return hash.toString();
-  };
+  }, [assetDefinitions]);
   
   useEffect(() => {
     if (!isHydrated || !portfolioCache?.positions || assetDefinitions.length === 0) {

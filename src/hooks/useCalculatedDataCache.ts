@@ -26,13 +26,13 @@ export const useCalculatedDataCache = () => {
   const expenses = useAppSelector((state) => state.expenses.items);
   const income = useAppSelector((state) => state.income.items);
   
-  const getState = () => {
+  const getState = useCallback(() => {
     return {
       liabilities,
       expenses,
       income,
     };
-  };
+  }, [liabilities, expenses, income]);
 
   // Cache invalidation functions
   const clearCache = useCallback(() => {
@@ -55,7 +55,7 @@ export const useCalculatedDataCache = () => {
     Logger.cache('useCalculatedDataCache: Refreshing financial summary');
     const { liabilities, expenses, income } = getState();
     dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
-  }, [dispatch]);
+  }, [dispatch, getState]);
 
   const refreshPortfolioHistory = useCallback((timeRange: AssetFocusTimeRange) => {
     Logger.cache(`useCalculatedDataCache: Refreshing portfolio history for ${timeRange}`);

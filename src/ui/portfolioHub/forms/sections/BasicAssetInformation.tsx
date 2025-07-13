@@ -8,6 +8,7 @@ import { AssetType } from '@/types/shared/base/enums';
 import { Button } from "../../../shared/Button";
 import { Toggle } from '@/ui/shared';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function getErrorMessage(error: unknown): string | undefined {
   if (!error) return undefined;
   if (typeof error === 'string') return error;

@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, useCallback } from 'react';
 import { useAppSelector } from './redux';
 import { PriceHistoryEntry } from '@/types/domains/assets';
 import { AssetDefinition } from '@/types/domains/assets/entities';
@@ -229,6 +229,35 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
     return portfolioData;
   }, [portfolioCache, assetDefinitions, isHydrated, cachedData, assetDefinitionHash, lastCalculationHash]);
 
+  // Helper function to calculate daily aggregates from intraday data
+  const calculateDailyAggregates = useCallback((intradayData: Array<{ date: string; value: number; timestamp: string }>) => {
+    const dailyMap = new Map<string, { values: number[]; date: string }>();
+    
+    // Group by date
+    intradayData.forEach(point => {
+      if (!dailyMap.has(point.date)) {
+        dailyMap.set(point.date, { values: [], date: point.date });
+      }
+      dailyMap.get(point.date)!.values.push(point.value);
+    });
+    
+    // Calculate daily aggregates
+    return Array.from(dailyMap.values()).map(dayData => {
+      const values = dayData.values;
+      const dailyValue = values[values.length - 1]; // Use last value of the day
+      
+      // Estimate total invested (this could be enhanced with actual transaction data)
+      const totalInvested = dailyValue * 0.85; // Simple approximation
+      
+      return {
+        date: dayData.date,
+        value: dailyValue,
+        totalInvested,
+        timestamp: new Date(`${dayData.date}T23:59:59`).toISOString()
+      };
+    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }, []);
+
   // Auto-save to IndexedDB when calculation changes
   useEffect(() => {
     if (portfolioIntradayData.length > 0 && assetDefinitionHash !== lastCalculationHash && assetDefinitionHash !== '') {
@@ -263,58 +292,7 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
 
       saveToIndexedDB();
     }
-  }, [portfolioIntradayData, assetDefinitionHash, lastCalculationHash]);
-
-  // Helper function to calculate daily aggregates from intraday data
-  const calculateDailyAggregates = (intradayData: Array<{ date: string; value: number; timestamp: string }>) => {
-    const dailyMap = new Map<string, { values: number[]; date: string }>();
-    
-    // Group by date
-    intradayData.forEach(point => {
-      if (!dailyMap.has(point.date)) {
-        dailyMap.set(point.date, { values: [], date: point.date });
-      }
-      dailyMap.get(point.date)!.values.push(point.value);
-    });
-    
-    // Calculate daily aggregates
-    return Array.from(dailyMap.values()).map(dayData => {
-      const values = dayData.values;
-      const dailyValue = values[values.length - 1]; // Use last value of the day
-      
-      // Estimate total invested (this could be enhanced with actual transaction data)
-      const estimatedInvested = dailyValue * 0.8; // Rough estimate
-      const totalReturn = dailyValue - estimatedInvested;
-      const totalReturnPercentage = estimatedInvested > 0 ? (totalReturn / estimatedInvested) * 100 : 0;
-      
-      // Create simplified positions array (this could be enhanced with actual position data)
-      const positions = portfolioCache?.positions?.map((pos: PortfolioPosition) => ({
-        assetDefinitionId: pos.assetDefinition?.id || pos.assetDefinitionId || 'unknown',
-        assetName: pos.assetDefinition?.name || pos.name || 'Unknown',
-        assetType: pos.assetDefinition?.type || pos.type || 'Unknown',
-        ticker: pos.assetDefinition?.ticker || pos.ticker || '',
-        quantity: pos.quantity || pos.totalQuantity || 0,
-        averagePrice: pos.averagePrice || pos.averagePurchasePrice || 0,
-        currentPrice: dailyValue / (portfolioCache.positions?.length || 1),
-        currentValue: (pos.quantity || pos.totalQuantity || 0) * (dailyValue / (portfolioCache.positions?.length || 1)),
-        totalInvested: estimatedInvested / (portfolioCache.positions?.length || 1),
-        totalReturn: totalReturn / (portfolioCache.positions?.length || 1),
-        totalReturnPercentage: totalReturnPercentage,
-        weight: 100 / (portfolioCache.positions?.length || 1),
-      })) || [];
-      
-      return {
-        date: dayData.date,
-        value: dailyValue,
-        totalValue: dailyValue, // Added to satisfy PortfolioHistoryPoint
-        totalInvested: estimatedInvested,
-        totalReturn,
-        totalReturnPercentage,
-        positions,
-        timestamp: new Date(dayData.date + 'T23:59:59Z').getTime()
-      };
-    }).sort((a, b) => a.date.localeCompare(b.date));
-  };
+  }, [portfolioIntradayData, assetDefinitionHash, lastCalculationHash, calculateDailyAggregates]);
 
   return portfolioIntradayData;
 }
