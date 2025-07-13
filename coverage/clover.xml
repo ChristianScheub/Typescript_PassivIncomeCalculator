@@ -1,11 +1,91 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1752412470302" clover="3.2.0">
-  <project timestamp="1752412470302" name="All files">
-    <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0" elements="3" coveredelements="0" complexity="0" loc="2" ncloc="2" packages="1" files="1" classes="1"/>
-    <file name="getDashboardQuickActions.ts" path="/home/runner/work/Typescript_PassivIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/infrastructure/configService/methods/getDashboardQuickActions.ts">
-      <metrics statements="2" coveredstatements="0" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
-      <line num="1" count="0" type="stmt"/>
+<coverage generated="1752412738964" clover="3.2.0">
+  <project timestamp="1752412738964" name="All files">
+    <metrics statements="76" coveredstatements="48" conditionals="36" coveredconditionals="24" methods="34" coveredmethods="28" elements="146" coveredelements="100" complexity="0" loc="76" ncloc="76" packages="1" files="3" classes="3"/>
+    <file name="financialCalculatorUtils.ts" path="/home/runner/work/Typescript_PassivIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/shared/utilities/financialCalculatorUtils.ts">
+      <metrics statements="42" coveredstatements="40" conditionals="22" coveredconditionals="20" methods="24" coveredmethods="24"/>
+      <line num="29" count="1" type="stmt"/>
+      <line num="32" count="13" type="cond" truecount="3" falsecount="1"/>
+      <line num="34" count="3" type="stmt"/>
+      <line num="36" count="5" type="stmt"/>
+      <line num="38" count="5" type="stmt"/>
+      <line num="40" count="0" type="stmt"/>
+      <line num="45" count="2" type="stmt"/>
+      <line num="46" count="6" type="stmt"/>
+      <line num="51" count="2" type="stmt"/>
+      <line num="52" count="6" type="stmt"/>
+      <line num="54" count="4" type="stmt"/>
+      <line num="59" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="60" count="3" type="stmt"/>
+      <line num="65" count="14" type="cond" truecount="3" falsecount="1"/>
+      <line num="67" count="6" type="stmt"/>
+      <line num="69" count="4" type="stmt"/>
+      <line num="71" count="4" type="stmt"/>
+      <line num="73" count="0" type="stmt"/>
+      <line num="78" count="2" type="stmt"/>
+      <line num="79" count="7" type="stmt"/>
+      <line num="84" count="1" type="stmt"/>
+      <line num="86" count="1" type="stmt"/>
+      <line num="87" count="4" type="stmt"/>
+      <line num="88" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="89" count="1" type="stmt"/>
+      <line num="91" count="3" type="stmt"/>
+      <line num="95" count="1" type="stmt"/>
+      <line num="100" count="9" type="cond" truecount="4" falsecount="0"/>
+      <line num="101" count="5" type="stmt"/>
+      <line num="103" count="4" type="stmt"/>
+      <line num="107" count="2" type="stmt"/>
+      <line num="108" count="6" type="stmt"/>
+      <line num="114" count="5" type="stmt"/>
+      <line num="118" count="5" type="stmt"/>
+      <line num="122" count="2" type="cond" truecount="2" falsecount="0"/>
+      <line num="123" count="1" type="stmt"/>
+      <line num="128" count="4" type="stmt"/>
+      <line num="132" count="4" type="stmt"/>
+      <line num="137" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="138" count="3" type="stmt"/>
+      <line num="142" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="143" count="3" type="stmt"/>
+    </file>
+    <file name="mathUtils.ts" path="/home/runner/work/Typescript_PassivIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/shared/utilities/mathUtils.ts">
+      <metrics statements="8" coveredstatements="8" conditionals="4" coveredconditionals="4" methods="4" coveredmethods="4"/>
+      <line num="5" count="1" type="stmt"/>
+      <line num="6" count="5" type="stmt"/>
+      <line num="7" count="5" type="stmt"/>
+      <line num="9" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="10" count="1" type="stmt"/>
+      <line num="12" count="3" type="stmt"/>
+      <line num="15" count="4" type="cond" truecount="2" falsecount="0"/>
+      <line num="16" count="3" type="stmt"/>
+    </file>
+    <file name="setupWizardService.ts" path="/home/runner/work/Typescript_PassivIncomeCalculator/Typescript_PassivIncomeCalculator/src/service/shared/utilities/setupWizardService.ts">
+      <metrics statements="26" coveredstatements="0" conditionals="10" coveredconditionals="0" methods="6" coveredmethods="0"/>
       <line num="4" count="0" type="stmt"/>
+      <line num="6" count="0" type="stmt"/>
+      <line num="7" count="0" type="stmt"/>
+      <line num="8" count="0" type="stmt"/>
+      <line num="9" count="0" type="stmt"/>
+      <line num="15" count="0" type="stmt"/>
+      <line num="16" count="0" type="stmt"/>
+      <line num="17" count="0" type="stmt"/>
+      <line num="20" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="22" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="23" count="0" type="stmt"/>
+      <line num="31" count="0" type="stmt"/>
+      <line num="32" count="0" type="stmt"/>
+      <line num="33" count="0" type="stmt"/>
+      <line num="35" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="43" count="0" type="stmt"/>
+      <line num="44" count="0" type="stmt"/>
+      <line num="45" count="0" type="stmt"/>
+      <line num="47" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="55" count="0" type="stmt"/>
+      <line num="62" count="0" type="stmt"/>
+      <line num="69" count="0" type="stmt"/>
+      <line num="70" count="0" type="stmt"/>
+      <line num="72" count="0" type="cond" truecount="0" falsecount="2"/>
+      <line num="73" count="0" type="stmt"/>
+      <line num="78" count="0" type="stmt"/>
     </file>
   </project>
 </coverage>

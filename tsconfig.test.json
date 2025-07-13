@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "types": ["jest", "@jest/globals", "node"]
+  },
+  "include": [
+    "src/**/*",
+    "src/test/**/*",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}

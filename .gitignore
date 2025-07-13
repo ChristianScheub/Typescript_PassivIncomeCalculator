@@ -6,3 +6,11 @@ package-lock.json
 ios
 android
 NewAssets.json
+
+# Test coverage
+coverage/
+*.lcov
+jest.config.old.js
+
+# Test reports
+TEST_COVERAGE_REPORT.md
