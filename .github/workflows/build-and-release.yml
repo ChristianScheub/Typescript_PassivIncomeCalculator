@@ -1,0 +1,110 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on version tags like v1.0.0, v2.1.3, etc.
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write  # Required for creating releases
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build application
+        run: npm run build
+        # This will automatically run lint check and tests via the prebuild script
+        # Build will fail if lint issues >= 300 or tests fail
+        
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
+      - name: Add Android platform and sync
+        run: |
+          npx cap add android || true  # Add android platform if not already added
+          npx cap sync android
+          
+      - name: Build Android APK
+        run: |
+          cd android
+          ./gradlew assembleRelease
+          
+      - name: Find APK file
+        id: find-apk
+        run: |
+          APK_PATH=$(find android/app/build/outputs/apk/release -name "*.apk" | head -1)
+          APK_NAME="StrictFinance-${{ github.ref_name }}.apk"
+          cp "$APK_PATH" "./$APK_NAME"
+          echo "apk_path=./$APK_NAME" >> $GITHUB_OUTPUT
+          echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
+          
+      - name: Extract release notes
+        id: extract-notes
+        run: |
+          # Extract version from tag (remove 'v' prefix if present)
+          VERSION=${GITHUB_REF_NAME#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          
+          # Try to extract release notes from CHANGELOG.md if it exists
+          if [ -f "CHANGELOG.md" ]; then
+            # Extract notes for this version (basic implementation)
+            echo "release_notes=Release $VERSION - Built from commit ${{ github.sha }}" >> $GITHUB_OUTPUT
+          else
+            echo "release_notes=Release $VERSION - Built from commit ${{ github.sha }}" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: Release ${{ steps.extract-notes.outputs.version }}
+          body: |
+            ${{ steps.extract-notes.outputs.release_notes }}
+            
+            ## 📋 Build Information
+            - **Commit:** ${{ github.sha }}
+            - **Build Date:** ${{ github.run_id }}
+            - **Node.js Version:** 20
+            
+            ## ✅ Quality Checks Passed
+            - Lint issues: < 300 (requirement met)
+            - All tests: ✅ Passed
+            
+            ## 📱 Android App
+            Download the APK file to install on your Android device.
+          draft: false
+          prerelease: false
+          
+      - name: Upload APK Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ steps.find-apk.outputs.apk_path }}
+          asset_name: ${{ steps.find-apk.outputs.apk_name }}
+          asset_content_type: application/vnd.android.package-archive
