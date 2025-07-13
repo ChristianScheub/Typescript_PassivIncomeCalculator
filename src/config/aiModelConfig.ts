@@ -33,7 +33,7 @@ export const TINYLLAMA_MODEL_CONFIG: LLMModelConfig = {
 /**
  * Model configuration factory
  */
-export const getModelConfig = (_environment?: 'development' | 'production'): LLMModelConfig => {
+export const getModelConfig = (): LLMModelConfig => {
   // Immer TinyLlama in beiden Modi verwenden (da es browserbasiert ist)
   return TINYLLAMA_MODEL_CONFIG;
 };

@@ -22,10 +22,10 @@ export const dbOperations = {
     const db = await initDatabase();
     try {
       // Log the item and its keys before update
-      // eslint-disable-next-line no-console
+       
       console.log('[DB UPDATE] Store:', storeName, 'Item:', item, 'Keys:', Object.keys(item));
       const result = await db.put(storeName, item);
-      // eslint-disable-next-line no-console
+       
       console.log('[DB UPDATE] Success:', result);
       return result;
     } catch (error) {

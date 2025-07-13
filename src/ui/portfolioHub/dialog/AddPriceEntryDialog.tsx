@@ -107,7 +107,7 @@ export const AddPriceEntryDialog: React.FC<AddPriceEntryDialogProps> = ({
             type="number"
             required
             value={price}
-            onChange={(value: any) => setPrice(Number(value))}
+            onChange={(value: string | number) => setPrice(Number(value))}
             error={errors.price}
             step={0.01}
             min={0.01}

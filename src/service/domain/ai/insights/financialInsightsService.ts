@@ -4,6 +4,7 @@ import type {
   FinancialInsightsService as IFinancialInsightsService 
 } from '@/types/domains/ai';
 import type { RootState } from '@/store';
+import { Income, Expense, Liability } from '@/types/domains/financial/entities';
 import { modelManager } from '../llm/modelManager';
 import Logger from '@service/shared/logging/Logger/logger';
 
@@ -55,21 +56,21 @@ class FinancialInsightsService implements IFinancialInsightsService {
     return {
       totalAssets: transactions.cache?.totals?.totalValue || 0,
       monthlyIncome: transactions.cache?.totals?.monthlyIncome || 0,
-      totalExpenses: expenses.items.reduce((sum: number, exp: any) => sum + (exp.paymentSchedule?.amount || 0), 0),
-      totalLiabilities: liabilities.items.reduce((sum: number, lib: any) => sum + (lib.currentBalance || 0), 0),
+      totalExpenses: expenses.items.reduce((sum: number, exp: Expense) => sum + (exp.paymentSchedule?.amount || 0), 0),
+      totalLiabilities: liabilities.items.reduce((sum: number, lib: Liability) => sum + (lib.currentBalance || 0), 0),
       assetsCount: transactions.items.length,
       incomeCount: income.items.length,
       expensesCount: expenses.items.length,
       liabilitiesCount: liabilities.items.length,
       netWorth: (transactions.cache?.totals?.totalValue || 0) - 
-                liabilities.items.reduce((sum: number, lib: any) => sum + (lib.currentBalance || 0), 0)
+                liabilities.items.reduce((sum: number, lib: Liability) => sum + (lib.currentBalance || 0), 0)
     };
   }
 
   /**
    * Erstellt einen kontextuellen Prompt für das AI-Modell
    */
-  private buildFinancialPrompt(summary: any, requestType: string, customPrompt?: string): string {
+  private buildFinancialPrompt(summary: Record<string, unknown>, requestType: string, customPrompt?: string): string {
     const contextPrompt = `Du bist ein erfahrener Finanzberater. Analysiere folgende Finanzsituation:
 
 Finanzübersicht:
@@ -103,7 +104,7 @@ Finanzübersicht:
   /**
    * Parst und strukturiert die AI-Antwort
    */
-  private parseAIResponse(aiResponse: string, financialSummary: any): FinancialInsightResponse {
+  private parseAIResponse(aiResponse: string, financialSummary: Record<string, unknown>): FinancialInsightResponse {
     // Einfache Strukturierung der AI-Antwort
     const lines = aiResponse.split('\n').filter(line => line.trim());
     

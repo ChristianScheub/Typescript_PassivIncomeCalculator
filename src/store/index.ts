@@ -18,7 +18,7 @@ if (persistedState) {
 
 // Debug: Log config after hydration
 if (persistedState && persistedState.config && persistedState.config.dashboard) {
-  // eslint-disable-next-line no-console
+   
   console.info('[Hydration] Dashboard assetFocus nach Laden:', persistedState.config.dashboard.assetFocus);
 }
 

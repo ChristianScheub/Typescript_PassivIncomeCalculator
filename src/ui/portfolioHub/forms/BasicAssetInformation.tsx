@@ -12,8 +12,8 @@ interface BasicAssetInformationProps {
   country?: string;
   currentPrice?: number;
   showTicker?: boolean;
-  errors: Record<string, any>;
-  onChange: (field: string, value: any) => void;
+  errors: Record<string, unknown>;
+  onChange: (field: string, value: unknown) => void;
 }
 
 export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({

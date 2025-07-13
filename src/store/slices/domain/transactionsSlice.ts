@@ -4,6 +4,7 @@ import {
 } from '@/types/domains/assets/';
 import { AssetDefinition, AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/domains/assets';
 import { CachedDividends } from '@/types/domains/assets/calculations';
+import { Income, Expense, Liability } from '@/types/domains/financial/entities';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import { AssetFocusTimeRange } from '@/types/shared/analytics';
@@ -11,7 +12,7 @@ import { calculatePortfolioPositions, calculatePortfolioTotals } from '@service/
 import portfolioHistoryService from '@service/domain/portfolio/history/portfolioHistoryService';
 import assetFocusService from '@service/domain/dashboard/assetFocusService';
 import analyticsService from '@service/domain/analytics/calculations/financialAnalyticsService';
-import portfolioIntradayService from '@service/infrastructure/sqlLitePortfolioHistory';
+import portfolioIntradayService, { PortfolioIntradayPoint } from '@service/infrastructure/sqlLitePortfolioHistory';
 import sqliteService from '@service/infrastructure/sqlLiteService';
 import { v4 as uuidv4 } from '@/utils/uuid';
 import { generatePortfolioInputHash, simpleHash } from '@/utils/hashUtils';
@@ -313,9 +314,9 @@ export const calculateAssetFocusData = createAsyncThunk(
 export const calculateFinancialSummary = createAsyncThunk(
   'transactions/calculateFinancialSummary',
   async (payload: {
-    liabilities: any[];
-    expenses: any[];
-    income: any[];
+    liabilities: Liability[];
+    expenses: Expense[];
+    income: Income[];
   }, { getState }) => {
     const state = getState() as { transactions: TransactionsState; assetDefinitions: { items: AssetDefinition[] } };
     const { assets, assetDefinitions } = {
@@ -324,11 +325,11 @@ export const calculateFinancialSummary = createAsyncThunk(
     };
     
     const inputHash = simpleHash([
-      ...assets.map((a: any) => ({ id: a.id, updatedAt: a.updatedAt })),
-      ...assetDefinitions.map((a: any) => ({ id: a.id, updatedAt: a.updatedAt })),
-      ...payload.liabilities.map((l: any) => ({ id: l.id, updatedAt: l.updatedAt })),
-      ...payload.expenses.map((e: any) => ({ id: e.id, updatedAt: e.updatedAt })),
-      ...payload.income.map((i: any) => ({ id: i.id, updatedAt: i.updatedAt }))
+      ...assets.map((a: Asset) => ({ id: a.id, updatedAt: a.updatedAt })),
+      ...assetDefinitions.map((a: AssetDefinition) => ({ id: a.id, updatedAt: a.updatedAt })),
+      ...payload.liabilities.map((l: Liability) => ({ id: l.id, updatedAt: l.updatedAt })),
+      ...payload.expenses.map((e: Expense) => ({ id: e.id, updatedAt: e.updatedAt })),
+      ...payload.income.map((i: Income) => ({ id: i.id, updatedAt: i.updatedAt }))
     ]);
     
     // Check if we have valid cached data
@@ -381,7 +382,7 @@ export const calculatePortfolioIntradayData = createAsyncThunk(
     Logger.infoRedux('Transactions: Starting portfolio intraday calculation');
     
     try {
-      let portfolioData: any[] = [];
+      let portfolioData: PortfolioIntradayPoint[] = [];
       
       if (params.dateRange) {
         portfolioData = await portfolioIntradayService.getPortfolioIntradayByDateRange(
@@ -389,7 +390,7 @@ export const calculatePortfolioIntradayData = createAsyncThunk(
           params.dateRange.end
         );
       } else {
-        portfolioData = await portfolioIntradayService.getAll('portfolioIntradayData') as any[];
+        portfolioData = await portfolioIntradayService.getAll('portfolioIntradayData');
       }
       
       const convertedData = portfolioData.map(point => ({
@@ -481,7 +482,7 @@ const transactionsSlice = createSlice({
     },
     
     // Portfolio intraday data management actions
-    setIntradayData: (state, action: PayloadAction<any>) => {
+    setIntradayData: (state, action: PayloadAction<PortfolioIntradayPoint[]>) => {
       if (state.cache) {
         state.cache.intradayData = action.payload;
         Logger.cache('Set portfolio intraday data in cache');

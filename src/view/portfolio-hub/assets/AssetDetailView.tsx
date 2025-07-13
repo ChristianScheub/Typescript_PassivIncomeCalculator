@@ -2,6 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, TrendingUp, Calendar, DollarSign, Package, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import { AssetDefinition } from '@/types/domains/assets/entities';
 import { formatService } from '@service';
 import { PriceHistoryView } from '@ui/portfolioHub';
 import { PriceChart } from '@ui/portfolioHub';
@@ -17,7 +18,7 @@ interface AssetDetailViewProps {
 }
 
 // Helper: Accept assetDefinition as prop for all detail fields
-export const AssetDetailView: React.FC<AssetDetailViewProps & { assetDefinition?: any }> = ({
+export const AssetDetailView: React.FC<AssetDetailViewProps & { assetDefinition?: AssetDefinition }> = ({
   asset,
   assetDefinition,
   isOpen,
@@ -255,13 +256,13 @@ export const AssetDetailView: React.FC<AssetDetailViewProps & { assetDefinition?
                     </div>
                   )}
 
-                  {assetDefinition.sector && (
+                  {assetDefinition.sectors && assetDefinition.sectors.length > 0 && (
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600 dark:text-gray-400">
                         {t('assets.sector')}:
                       </span>
                       <span className="font-medium text-gray-900 dark:text-gray-100">
-                        {assetDefinition.sector}
+                        {assetDefinition.sectors.map(s => s.sector).join(', ')}
                       </span>
                     </div>
                   )}

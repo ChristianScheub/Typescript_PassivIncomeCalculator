@@ -34,18 +34,7 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200";
-      case "low":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200";
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200";
-    }
-  };
+
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-green-600 dark:text-green-400";
@@ -247,25 +236,14 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {insights.recommendations.map((rec: any, index: number) => (
+                  {insights.recommendations.map((rec: string, index: number) => (
                     <div
                       key={index}
                       className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                          {rec.title}
-                        </h4>
-                        <Badge className={getPriorityColor(rec.priority)}>
-                          {t(`ai.insights.priority.${rec.priority}`)}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                        {rec.description}
+                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                        {rec}
                       </p>
-                      <div className="text-xs text-blue-600 dark:text-blue-400">
-                        {t("ai.insights.impact")}: {rec.impact}
-                      </div>
                     </div>
                   ))}
                 </div>

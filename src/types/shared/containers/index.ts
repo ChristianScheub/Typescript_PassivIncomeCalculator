@@ -72,5 +72,5 @@ export interface AssetDefinitionHandlers {
 // Calendar container specific types
 export interface CalendarContainerProps extends ChartContainerHandlers {
   // Calendar-specific props can be added here
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+   
 }

@@ -1,6 +1,7 @@
 import Logger from '@service/shared/logging/Logger/logger';
 import type { AssetDefinition } from '@/types/domains/assets/entities';
 import type { AssetWithValue } from '@/types/domains/portfolio/assetWithValue';
+import type { Income, Expense, Liability } from '@/types/domains/financial/entities';
 
 /**
  * Types for AI Context Service
@@ -13,14 +14,14 @@ export interface FinancialSnapshot {
 }
 
 export interface FinancialData {
-  income: any[];
-  expenses: any[];
-  liabilities: any[];
+  income: Income[];
+  expenses: Expense[];
+  liabilities: Liability[];
   assetFocusData?: {
     assetsWithValues?: AssetWithValue[];
     assetDefinitions?: AssetDefinition[];
   };
-  financialSummary?: any;
+  financialSummary?: FinancialSnapshot;
 }
 
 /**
@@ -38,7 +39,7 @@ export class AIContextService {
     }
 
     // Group assets by type and calculate totals
-    const assetsByType = assetFocusData.assetsWithValues.reduce((acc: any, assetWithValue: AssetWithValue) => {
+    const assetsByType = assetFocusData.assetsWithValues.reduce((acc: Record<string, { count: number; totalValue: number }>, assetWithValue: AssetWithValue) => {
       const type = assetWithValue.assetDefinition?.type || 'Unknown';
       if (!acc[type]) {
         acc[type] = { count: 0, totalValue: 0 };
@@ -50,7 +51,7 @@ export class AIContextService {
 
     // Format the summary
     return Object.entries(assetsByType)
-      .map(([type, data]: [string, any]) => 
+      .map(([type, data]: [string, { count: number; totalValue: number }]) => 
         `- ${type}: ${data.count} assets, Total Value: €${data.totalValue.toLocaleString()}`
       )
       .join('\n');
@@ -144,16 +145,16 @@ export class AIContextService {
     
     const { income, expenses, liabilities, assetFocusData, financialSummary } = financialData;
     
-    function formatIncomeDetails(income: any[]): string {
-      return income.map((inc: any) => `${inc.name || 'Unnamed'}: €${(inc.amount || 0).toLocaleString()}`).join(', ');
+    function formatIncomeDetails(income: Income[]): string {
+      return income.map((inc: Income) => `${inc.name || 'Unnamed'}: €${(inc.paymentSchedule?.amount || 0).toLocaleString()}`).join(', ');
     }
 
-    function formatExpenseDetails(expenses: any[]): string {
-      return expenses.map((exp: any) => `${exp.name || 'Unnamed'}: €${(exp.paymentSchedule?.amount || 0).toLocaleString()}`).join(', ');
+    function formatExpenseDetails(expenses: Expense[]): string {
+      return expenses.map((exp: Expense) => `${exp.name || 'Unnamed'}: €${(exp.paymentSchedule?.amount || 0).toLocaleString()}`).join(', ');
     }
 
-    function formatLiabilityDetails(liabilities: any[]): string {
-      return liabilities.map((lib: any) => `${lib.name || 'Unnamed'}: €${(lib.currentBalance || 0).toLocaleString()}`).join(', ');
+    function formatLiabilityDetails(liabilities: Liability[]): string {
+      return liabilities.map((lib: Liability) => `${lib.name || 'Unnamed'}: €${(lib.currentBalance || 0).toLocaleString()}`).join(', ');
     }
 
     return `User Question: ${userQuestion}
@@ -164,7 +165,7 @@ Portfolio Overview:
 - Total Assets Value: €${financialSnapshot.totalAssets.toLocaleString()}
 - Monthly Income: €${financialSnapshot.monthlyIncome.toLocaleString()}
 - Monthly Expenses: €${financialSnapshot.totalExpenses.toLocaleString()}
-- Total Liabilities: €${liabilities.reduce((sum: number, lib: any) => sum + (lib.currentBalance || 0), 0).toLocaleString()}
+- Total Liabilities: €${liabilities.reduce((sum: number, lib: Liability) => sum + (lib.currentBalance || 0), 0).toLocaleString()}
 
 Financial Summary & Calculations:
 ${financialSummary ? `- Financial Summary Available: Yes

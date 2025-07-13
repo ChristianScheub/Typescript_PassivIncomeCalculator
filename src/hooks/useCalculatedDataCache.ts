@@ -20,14 +20,17 @@ import Logger from '@/service/shared/logging/Logger/logger';
  */
 export const useCalculatedDataCache = () => {
   const dispatch = useAppDispatch() as ThunkDispatch<RootState, unknown, AnyAction>;
+  
+  // Get state values at the top level of the hook
+  const liabilities = useAppSelector((state) => state.liabilities.items);
+  const expenses = useAppSelector((state) => state.expenses.items);
+  const income = useAppSelector((state) => state.income.items);
+  
   const getState = () => {
-    // useAppSelector gibt keinen direkten Zugriff auf den State, daher ggf. workaround nötig
-    // In Hooks: useSelector kann als Ersatz dienen, aber für Callbacks ggf. als Parameter übergeben
-    // Hier: Wir holen die Werte direkt in jedem Callback
     return {
-      liabilities: useAppSelector((state) => state.liabilities.items),
-      expenses: useAppSelector((state) => state.expenses.items),
-      income: useAppSelector((state) => state.income.items),
+      liabilities,
+      expenses,
+      income,
     };
   };
 
@@ -45,7 +48,7 @@ export const useCalculatedDataCache = () => {
   // Refresh functions that get required data from Redux store
   const refreshAssetFocusData = useCallback(() => {
     Logger.cache('useCalculatedDataCache: Refreshing asset focus data');
-    dispatch(calculateAssetFocusData() as any);
+    dispatch(calculateAssetFocusData());
   }, [dispatch]);
 
   const refreshFinancialSummary = useCallback(() => {
@@ -56,7 +59,7 @@ export const useCalculatedDataCache = () => {
 
   const refreshPortfolioHistory = useCallback((timeRange: AssetFocusTimeRange) => {
     Logger.cache(`useCalculatedDataCache: Refreshing portfolio history for ${timeRange}`);
-    dispatch(calculatePortfolioHistory({ timeRange }) as any);
+    dispatch(calculatePortfolioHistory({ timeRange }));
   }, [dispatch]);
 
   const refreshAllData = useCallback((timeRange?: AssetFocusTimeRange) => {
@@ -97,7 +100,7 @@ export const usePortfolioHistory = (timeRange: AssetFocusTimeRange) => {
   const dispatch = useAppDispatch();
 
   const refresh = useCallback(() => {
-    dispatch(calculatePortfolioHistory({ timeRange }) as any);
+    dispatch(calculatePortfolioHistory({ timeRange }));
   }, [dispatch, timeRange]);
 
   return {
@@ -114,7 +117,7 @@ export const useAssetFocusData = () => {
   const dispatch = useAppDispatch();
 
   const refresh = useCallback(() => {
-    dispatch(calculateAssetFocusData() as any);
+    dispatch(calculateAssetFocusData());
   }, [dispatch]);
 
   return {

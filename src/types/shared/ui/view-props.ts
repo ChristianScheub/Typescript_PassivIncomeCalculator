@@ -81,13 +81,13 @@ export interface ChartInteractionProps {
 // Calendar view props
 export interface CalendarViewProps extends ChartInteractionProps {
   // Add specific calendar props here
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+   
 }
 
 // Loading view props
 export interface LoadingViewProps extends TranslationProps {
   // Additional loading-specific props can be added here
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+   
 }
 
 // Generic list view props

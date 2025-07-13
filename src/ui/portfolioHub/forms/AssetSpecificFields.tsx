@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormSetValue } from 'react-hook-form';
+import { UseFormSetValue, UseFormWatch, FieldValues } from 'react-hook-form';
 import { OptionalSection } from '../forms/StandardFormWrapper';
 import { useTranslation } from 'react-i18next';
 import { BaseAssetFields } from './BaseAssetFields';
@@ -9,8 +9,8 @@ interface AssetSpecificFieldsProps {
   assetType: AssetType;
   quantity?: number;
   currentPrice?: number;
-  watch: (field: string) => any;
-  setValue: UseFormSetValue<any>;
+  watch: UseFormWatch<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
 }
 
 export const AssetSpecificFields: React.FC<AssetSpecificFieldsProps> = ({

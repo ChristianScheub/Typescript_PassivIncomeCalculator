@@ -8,10 +8,13 @@ import { AssetType } from '@/types/shared/base/enums';
 import { Button } from "../../../shared/Button";
 import { Toggle } from '@/ui/shared';
 
-export function getErrorMessage(error: any): string | undefined {
+export function getErrorMessage(error: unknown): string | undefined {
   if (!error) return undefined;
   if (typeof error === 'string') return error;
-  if (typeof error.message === 'string') return error.message;
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message: unknown }).message === 'string') {
+    return (error as { message: string }).message;
+  }
   return undefined;
 }
 

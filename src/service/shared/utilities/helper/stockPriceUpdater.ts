@@ -96,7 +96,7 @@ export class StockPriceUpdater {
       const msg =
         "Für folgende Assets konnte kein Preis abgerufen werden:\n" +
         failedTickers.map(f => `${f.ticker} (${f.name})`).join("\n");
-      // eslint-disable-next-line no-alert
+       
       alert(msg);
     }
 
@@ -298,7 +298,7 @@ export class StockPriceUpdater {
       const msg =
         "Für folgende Assets konnte keine Historie abgerufen werden:\n" +
         failedTickers.map(f => `${f.ticker} (${f.name})`).join("\n");
-      // eslint-disable-next-line no-alert
+       
       alert(msg);
     }
 

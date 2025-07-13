@@ -91,7 +91,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
       }
 
       // Remove assetDefinition if present (to avoid type error)
-      const { assetDefinition, ...cleanedData } = data as any;
+      const { assetDefinition: _assetDefinition, ...cleanedData } = data as Record<string, unknown>;
 
       // Determine transaction date based on type
       let transactionDate: string;
@@ -107,6 +107,8 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
         ...cleanedData,
         // Store only the reference ID, not the full object
         assetDefinitionId: selectedDefinition.id,
+        name: `${data.transactionType.toUpperCase()} ${selectedDefinition.fullName}`,
+        transactionType: data.transactionType,
         // Asset transaction specific fields
         type: selectedDefinition.type,
         value: totalValue,

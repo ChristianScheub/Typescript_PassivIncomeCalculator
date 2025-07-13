@@ -17,7 +17,8 @@ export abstract class BaseStockAPIService implements IStockAPIService {
 
   constructor(apiKey: string = '') {
     this.apiKey = apiKey;
-    Logger.info(`Initialized ${this.providerName}APIService`);
+    // Abstract property will be available in concrete classes
+    // Logger.info(`Initialized ${this.providerName}APIService`);
   }
 
   /**

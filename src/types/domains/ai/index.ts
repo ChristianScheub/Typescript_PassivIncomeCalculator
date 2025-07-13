@@ -1,4 +1,7 @@
 import type { RootState } from '@/store';
+import type { PortfolioPosition } from '@/types/domains/portfolio/position';
+import type { Income, Expense, Liability } from '@/types/domains/financial/entities';
+import type { AssetCategory } from '@/types/domains/assets/categories';
 
 /**
  * LLM Service Types
@@ -100,29 +103,29 @@ export interface FinancialInsightsService {
   /**
    * Generate portfolio-specific advice
    */
-  generatePortfolioAdvice(portfolioData: any): Promise<FinancialInsightResponse>;
+  generatePortfolioAdvice(portfolioData: { positions: PortfolioPosition[]; [key: string]: unknown }): Promise<FinancialInsightResponse>;
   
   /**
    * Generate budget recommendations
    */
-  generateBudgetRecommendations(financialData: any): Promise<FinancialInsightResponse>;
+  generateBudgetRecommendations(financialData: { income: Income[]; expenses: Expense[]; liabilities: Liability[]; [key: string]: unknown }): Promise<FinancialInsightResponse>;
   
   /**
    * Generate forecast insights
    */
-  generateForecastInsights(forecastData: any): Promise<FinancialInsightResponse>;
+  generateForecastInsights(forecastData: Record<string, unknown>): Promise<FinancialInsightResponse>;
 }
 
 /**
  * Redux State Serialization Types
  */
 export interface SerializedReduxState {
-  transactions: any;
-  assetCategories: any;
-  liabilities: any;
-  expenses: any;
-  income: any;
-  customAnalytics: any;
+  transactions: Record<string, unknown>;
+  assetCategories: AssetCategory[];
+  liabilities: Liability[];
+  expenses: Expense[];
+  income: Income[];
+  customAnalytics: Record<string, unknown>;
   forecast: any;
   apiConfig: any;
   calculatedData: any;

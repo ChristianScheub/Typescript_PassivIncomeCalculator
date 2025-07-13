@@ -4,7 +4,8 @@ import {
   FieldValues,
   UseFormProps,
   SubmitHandler,
-  DefaultValues
+  DefaultValues,
+  FieldErrors
 } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCallback } from 'react';
@@ -70,7 +71,7 @@ export function useSharedForm<T extends FieldValues>({
       form.trigger();
       if (onError && errors && typeof errors === 'object' && 'message' in errors) {
         // Only call onError if error is a FieldErrors object
-        onError(errors as any); // fallback, but ideally onError should only be called with FieldErrors
+        onError(errors as FieldErrors<T>);
       }
     };
 
@@ -95,7 +96,7 @@ export type FormArrayOperation<T> = {
 }
 
 // Form array helper hook with proper typing
-export function useFormArray<TForm extends FieldValues, T = any>(
+export function useFormArray<TForm extends FieldValues, T>(
   form: UseFormReturn<TForm>, 
   name: import('react-hook-form').Path<TForm>
 ): FormArrayOperation<T> & { fields: T[] } {
@@ -104,13 +105,13 @@ export function useFormArray<TForm extends FieldValues, T = any>(
     fields: (getValues(name) as T[]) || [],
     append: (value: T) => {
       const current = (getValues(name) as T[]) || [];
-      setValue(name, [...current, value] as any, { shouldValidate: true });
+      setValue(name, [...current, value] as import('react-hook-form').PathValue<TForm, typeof name>, { shouldValidate: true });
     },
     remove: (index: number) => {
       const current = (getValues(name) as T[]) || [];
       setValue(
         name,
-        current.filter((_, i: number) => i !== index) as any,
+        current.filter((_, i: number) => i !== index) as import('react-hook-form').PathValue<TForm, typeof name>,
         { shouldValidate: true }
       );
     },
@@ -118,7 +119,7 @@ export function useFormArray<TForm extends FieldValues, T = any>(
       const current = (getValues(name) as T[]) || [];
       setValue(
         name,
-        current.map((item: T, i: number) => (i === index ? value : item)) as any,
+        current.map((item: T, i: number) => (i === index ? value : item)) as import('react-hook-form').PathValue<TForm, typeof name>,
         { shouldValidate: true }
       );
     },
