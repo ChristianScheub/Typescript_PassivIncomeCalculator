@@ -27,7 +27,6 @@ export const AssetsList: React.FC<{
   sortedPortfolioAssets,
   assets,
   sortedAssets,
-  portfolioData: _portfolioData,
   getAssetTypeLabel,
   handleAssetClick,
   onSetEditingAsset,

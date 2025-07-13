@@ -1,6 +1,8 @@
 import { useMemo, useEffect, useState } from 'react';
 import { useAppSelector } from './redux';
 import { PriceHistoryEntry } from '@/types/domains/assets';
+import { AssetDefinition } from '@/types/domains/assets/entities';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import portfolioHistoryService, { 
   PortfolioIntradayPoint 
 } from '@/service/infrastructure/sqlLitePortfolioHistory';
@@ -27,7 +29,7 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
     if (!assetDefinitions || assetDefinitions.length === 0) return '';
     
     const hashInput = assetDefinitions
-      .map((asset: any) => `${asset.id}-${asset.ticker || 'NO_TICKER'}-${JSON.stringify(asset.priceHistory || [])}`)
+      .map((asset: AssetDefinition) => `${asset.id}-${asset.ticker || 'NO_TICKER'}-${JSON.stringify(asset.priceHistory || [])}`)
       .sort()
       .join('|');
     
@@ -109,7 +111,7 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
     const allTimestamps = new Set<string>();
     const assetDataMap: Record<string, Record<string, number>> = {};
 
-    assetDefinitions.forEach((definition: any) => {
+    assetDefinitions.forEach((definition: AssetDefinition) => {
       if (!definition.priceHistory || definition.priceHistory.length === 0) {
         Logger.infoService(`❌ No price history for asset: ${definition.ticker || definition.id}`);
         return;
@@ -119,7 +121,7 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
       assetDataMap[ticker] = {};
 
       // Filter for intraday entries in the last 5 days
-      const intradayEntries = definition.priceHistory.filter((entry: any) => {
+      const intradayEntries = definition.priceHistory.filter((entry: PriceHistoryEntry) => {
         const entryDate = entry.date.split('T')[0];
         const hasTime = entry.date.includes('T') && entry.date.length > 10;
         const isInRange = datesRange.includes(entryDate);
@@ -128,14 +130,14 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
 
       Logger.infoService(`Asset ${ticker}: ${intradayEntries.length} intraday entries of ${definition.priceHistory.length} total`);
 
-      intradayEntries.forEach((entry: any) => {
+      intradayEntries.forEach((entry: PriceHistoryEntry) => {
         allTimestamps.add(entry.date);
         assetDataMap[ticker][entry.date] = entry.price;
       });
     });
 
     // Helper function to find the last available price
-    const findLastAvailablePrice = (assetDefinition: any, targetTimestamp: string): number | null => {
+    const findLastAvailablePrice = (assetDefinition: AssetDefinition, targetTimestamp: string): number | null => {
       const ticker = assetDefinition.ticker || assetDefinition.id;
       const assetTimestampMap = assetDataMap[ticker];
       
@@ -188,8 +190,8 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
       let assetsWithPrices = 0;
       const debugInfo: string[] = [];
 
-      portfolioCache.positions.forEach((position: any) => {
-        const definition = assetDefinitions.find((def: any) => def.id === position.assetDefinitionId);
+      portfolioCache.positions.forEach((position: PortfolioPosition) => {
+        const definition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
         if (!definition) {
           debugInfo.push(`No definition for position with ID: ${position.assetDefinitionId}`);
           return;
@@ -234,7 +236,7 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
         try {
           Logger.infoService('💾 Saving calculated portfolio intraday data to IndexedDB...');
           
-          const portfolioPoints: PortfolioIntradayPoint[] = portfolioIntradayData.map((data: any) => ({
+          const portfolioPoints: PortfolioIntradayPoint[] = portfolioIntradayData.map((data: PortfolioIntradayPoint) => ({
             timestamp: data.timestamp,
             date: data.date,
             value: data.value
@@ -286,7 +288,7 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
       const totalReturnPercentage = estimatedInvested > 0 ? (totalReturn / estimatedInvested) * 100 : 0;
       
       // Create simplified positions array (this could be enhanced with actual position data)
-      const positions = portfolioCache?.positions?.map((pos: any) => ({
+      const positions = portfolioCache?.positions?.map((pos: PortfolioPosition) => ({
         assetDefinitionId: pos.assetDefinition?.id || pos.assetDefinitionId || 'unknown',
         assetName: pos.assetDefinition?.name || pos.name || 'Unknown',
         assetType: pos.assetDefinition?.type || pos.type || 'Unknown',

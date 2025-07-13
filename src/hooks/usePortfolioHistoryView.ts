@@ -1,6 +1,8 @@
 import { useAppSelector, useAppDispatch } from './redux';
 import { useEffect, useRef, useMemo, useState } from 'react';
-import portfolioHistoryService from '@/service/infrastructure/sqlLitePortfolioHistory';
+import { AssetDefinition, Transaction } from '@/types/domains/assets/entities';
+import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import portfolioHistoryService, { PortfolioIntradayPoint } from '@/service/infrastructure/sqlLitePortfolioHistory';
 import {
   setPortfolioIntradayData,
   setPortfolioIntradayStatus,
@@ -22,8 +24,8 @@ function getPortfolioHistoryWorker() {
  * Generic utility to recalculate portfolio history and intraday data using the worker and persist results.
  * Returns: { intraday, history }
  */
-export async function recalculatePortfolioHistoryAndIntraday({ assetDefinitions, portfolioPositions }: { assetDefinitions: any[]; portfolioPositions: any[] }) {
-  return new Promise<{ intraday: any[]; history: any[] }>((resolve, reject) => {
+export async function recalculatePortfolioHistoryAndIntraday({ assetDefinitions, portfolioPositions }: { assetDefinitions: AssetDefinition[]; portfolioPositions: PortfolioPosition[] }) {
+  return new Promise<{ intraday: PortfolioIntradayPoint[]; history: PortfolioIntradayPoint[] }>((resolve, reject) => {
     const worker = getPortfolioHistoryWorker();
     worker.postMessage({
       type: 'calculateAll',
@@ -233,7 +235,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         dispatch(setPortfolioIntradayData(intraday));
         dispatch(setPortfolioIntradayStatus('succeeded'));
         // Update local state für history
-        return history.map((point: any) => ({
+        return history.map((point: PortfolioIntradayPoint) => ({
           date: point.date,
           totalValue: point.totalValue,
           change: point.totalReturn,
@@ -253,7 +255,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
             const startDateStr = startDate.toISOString().split('T')[0];
             const endDateStr = today.toISOString().split('T')[0];
             const result = await getCombined1WHistory(startDateStr, endDateStr, portfolioHistoryService);
-            setPortfolioHistoryData(result as any);
+            setPortfolioHistoryData(result);
           } catch (error) {
             Logger.error('Error in 1W history: ' + (error instanceof Error ? error.message : String(error)));
             setPortfolioHistoryData([]);
@@ -275,7 +277,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
                 totalValue: point.totalValue,
                 change: point.totalReturn,
                 changePercentage: point.totalReturnPercentage
-              })) as any);
+              })));
               isLoadingRef.current = false;
               return;
             }
@@ -286,7 +288,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
           const startDateStr = startDate.toISOString().split('T')[0];
           const endDateStr = today.toISOString().split('T')[0];
           const data = await getHistoryFromDbOrRecalculate(startDateStr, endDateStr);
-          setPortfolioHistoryData(data as any);
+          setPortfolioHistoryData(data);
         }
       } catch (error) {
         Logger.error(`❌ Failed to load portfolio history data for ${timeRange}: ` + (error instanceof Error ? error.message : String(error)));
@@ -304,7 +306,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
       return [];
     }
     if (timeRange === '1W') {
-      return (portfolioHistoryData as any[]).map((item: any) => ({
+      return portfolioHistoryData.map((item) => ({
         date: item.date,
         totalValue: typeof item.totalValue === 'number' && !isNaN(item.totalValue) ? item.totalValue : 0,
         change: typeof item.change === 'number' ? item.change : 0,
@@ -312,7 +314,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         type: item.type || 'intraday'
       }));
     }
-    const transformed = portfolioHistoryData.map((item: any) => ({
+    const transformed = portfolioHistoryData.map((item) => ({
       date: item.date,
       totalValue: typeof item.totalValue === 'number' && !isNaN(item.totalValue) ? item.totalValue : 0,
       change: typeof item.change === 'number' ? item.change : 0,
@@ -357,14 +359,14 @@ export function usePortfolioHistoryRecalculation() {
 interface CombinedHistoryPoint {
   date: string;
   value: number;
-  transactions: Array<any>;
+  transactions: Transaction[];
   type: 'intraday' | 'daily';
 }
 
 async function getCombined1WHistory(
   startDateStr: string,
   endDateStr: string,
-  portfolioHistoryService: any
+  portfolioHistoryService: typeof portfolioHistoryService
 ): Promise<CombinedHistoryPoint[]> {
   const [intraday, daily] = await Promise.all([
     portfolioHistoryService.getPortfolioIntradayByDateRange(startDateStr, endDateStr),

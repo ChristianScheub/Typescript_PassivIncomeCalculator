@@ -1,11 +1,11 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { OptionalSection } from "../StandardFormWrapper";
-import { UseFormSetValue } from "react-hook-form";
+import { UseFormSetValue, FieldValues } from "react-hook-form";
 import { SectorAllocation } from "@/types/domains/portfolio/allocations";
 
 interface SectorSectionProps {
-  setValue: UseFormSetValue<any>;
+  setValue: UseFormSetValue<FieldValues>;
   sectors: SectorAllocation[];
   setSectors: (sectors: SectorAllocation[]) => void;
   updateSector: (index: number, field: "sector" | "percentage", value: string | number) => void;

@@ -2,11 +2,11 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { FormGrid, StandardFormField } from "../FormGrid";
 import { AssetType } from "@/types/shared/";
-import { UseFormSetValue } from "react-hook-form";
+import { UseFormSetValue, UseFormWatch, FieldValues } from "react-hook-form";
 
 interface AdditionalInformationSectionProps {
-  watch: (field: string) => any;
-  setValue: ((name: string, value: any) => void) | UseFormSetValue<any>;
+  watch: UseFormWatch<FieldValues>;
+  setValue: UseFormSetValue<FieldValues>;
   selectedType: AssetType;
 }
 

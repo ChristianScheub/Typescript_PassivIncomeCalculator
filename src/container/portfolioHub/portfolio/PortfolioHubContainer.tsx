@@ -19,7 +19,7 @@ interface NavigationHistoryItem {
 
 interface PortfolioHubContainerProps {
   // Currently no props needed - could add future props here
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+   
 }
 
 const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {

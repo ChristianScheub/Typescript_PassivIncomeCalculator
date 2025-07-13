@@ -12,7 +12,7 @@ export enum ButtonAlignment {
 
 interface FloatingBtnProps {
   alignment: ButtonAlignment;
-  icon: IconType | React.ComponentType<any>;
+  icon: IconType | React.ComponentType<Record<string, unknown>>;
   onClick: () => void;
   backgroundColor?: string;
   hoverBackgroundColor?: string;
