@@ -1,11 +1,10 @@
-import { IStockAPIService } from '../interfaces/IStockAPIService';
+import { BaseStockAPIService } from './BaseStockAPIService';
 import { 
   StockPrice,
   StockHistory,
   StockHistoryEntry
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { CapacitorHttp } from '@capacitor/core';
 import exchangeService from '@service/domain/financial/exchange/exchangeService';
 
 const BASE_URL = 'https://finnhub.io/api/v1';
@@ -36,19 +35,15 @@ interface FinnhubCandle {
  * Finnhub API Service Provider
  * Implements the simplified IStockAPIService interface using Finnhub API
  */
-export class FinnhubAPIService implements IStockAPIService {
-  private readonly apiKey: string;
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    Logger.info('Initialized FinnhubAPIService with simplified interface');
-  }
+export class FinnhubAPIService extends BaseStockAPIService {
+  protected readonly baseUrl = BASE_URL;
+  protected readonly providerName = 'Finnhub';
 
   /**
    * Fetch data from Finnhub API
    */
   private async fetchFromAPI<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
-    const url = new URL(`${BASE_URL}${endpoint}`);
+    const url = new URL(`${this.baseUrl}${endpoint}`);
     
     // Add API key
     url.searchParams.append('token', this.apiKey);
@@ -59,16 +54,7 @@ export class FinnhubAPIService implements IStockAPIService {
     });
 
     try {
-      const response = await CapacitorHttp.get({
-        url: url.toString(),
-        headers: {},
-      });
-
-      if (response.status !== 200) {
-        throw new Error(`API request failed with status ${response.status}: ${response.data}`);
-      }
-
-      return response.data;
+      return await this.makeRequest(url.toString());
     } catch (error) {
       Logger.error(`Finnhub API request failed: ${error}`);
       throw error;
@@ -105,11 +91,10 @@ export class FinnhubAPIService implements IStockAPIService {
   }
 
   /**
-   * Calculate midday price from high and low
+   * Calculate midday price from high and low (override base method for clarity)
    */
   private calculateMiddayPrice(high: number, low: number): number {
-    // Use average of high and low as midday approximation
-    return (high + low) / 2;
+    return this.calculateMidday(high, low);
   }
 
   /**
@@ -208,11 +193,11 @@ export class FinnhubAPIService implements IStockAPIService {
   }
 
   /**
-   * Get 30 days of historical stock data
+   * Get 30 days of historical stock data (use base implementation)
    */
-  async getHistory30Days(symbol: string): Promise<StockHistory> {
-    return this.getHistory(symbol, 30);
-  }
+  // async getHistory30Days(symbol: string): Promise<StockHistory> {
+  //   return this.getHistory(symbol, 30);
+  // }
 
   /**
    * Get intraday stock data (5-minute intervals for specified days)

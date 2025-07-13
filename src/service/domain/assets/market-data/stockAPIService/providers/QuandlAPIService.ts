@@ -1,11 +1,10 @@
-import { IStockAPIService } from '../interfaces/IStockAPIService';
+import { BaseStockAPIService } from './BaseStockAPIService';
 import {
   StockPrice,
   StockHistory,
   StockHistoryEntry
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { CapacitorHttp } from '@capacitor/core';
 
 /**
  * Quandl API Service Provider
@@ -13,14 +12,9 @@ import { CapacitorHttp } from '@capacitor/core';
  * API Documentation: https://docs.quandl.com/docs
  * Note: Quandl is now part of Nasdaq Data Link
  */
-export class QuandlAPIService implements IStockAPIService {
-  private apiKey: string;
-  private static readonly baseUrl = 'https://data.nasdaq.com/api/v3';
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    Logger.info('Initialized QuandlAPIService');
-  }
+export class QuandlAPIService extends BaseStockAPIService {
+  protected readonly baseUrl = 'https://data.nasdaq.com/api/v3';
+  protected readonly providerName = 'Quandl';
 
   async getCurrentStockPrice(symbol: string): Promise<StockPrice> {
     Logger.info(`Quandl: Getting current price for ${symbol}`);
@@ -29,14 +23,10 @@ export class QuandlAPIService implements IStockAPIService {
       // Quandl requires dataset specification, using EOD (End of Day) data from WIKI database
       // For current price, we get the latest data point
       const dataset = `WIKI/${symbol}`;
-      const url = `${QuandlAPIService.baseUrl}/datasets/${dataset}/data.json?rows=1&api_key=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
+      const url = `${this.baseUrl}/datasets/${dataset}/data.json?rows=1&api_key=${this.apiKey}`;
+      const data = await this.makeRequest(url);
       
-      if (response.status !== 200) {
-        throw new Error(`Quandl API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
+      this.checkForAPIErrors(data);
       
       if (data.quandl_error) {
         throw new Error(`Quandl API error: ${data.quandl_error.message}`);
@@ -63,7 +53,7 @@ export class QuandlAPIService implements IStockAPIService {
         symbol: symbol,
         price: price,
         currency: 'USD', // Quandl WIKI data is in USD
-        timestamp: new Date(latestData[dateIndex]).getTime(),
+        timestamp: this.parseTimestamp(latestData[dateIndex]),
         change: change,
         changePercent: changePercent
       };
@@ -78,20 +68,12 @@ export class QuandlAPIService implements IStockAPIService {
     
     try {
       const dataset = `WIKI/${symbol}`;
-      const endDate = new Date();
-      const startDate = new Date(endDate.getTime() - (days * 24 * 60 * 60 * 1000));
+      const { startDateStr, endDateStr } = this.calculateDateRange(days);
       
-      const startDateStr = startDate.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
+      const url = `${this.baseUrl}/datasets/${dataset}/data.json?start_date=${startDateStr}&end_date=${endDateStr}&api_key=${this.apiKey}`;
+      const data = await this.makeRequest(url);
       
-      const url = `${QuandlAPIService.baseUrl}/datasets/${dataset}/data.json?start_date=${startDateStr}&end_date=${endDateStr}&api_key=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
-      
-      if (response.status !== 200) {
-        throw new Error(`Quandl API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
+      this.checkForAPIErrors(data);
       
       if (data.quandl_error) {
         throw new Error(`Quandl API error: ${data.quandl_error.message}`);
@@ -116,15 +98,15 @@ export class QuandlAPIService implements IStockAPIService {
         low: item[lowIndex],
         close: item[closeIndex],
         volume: volumeIndex !== -1 ? item[volumeIndex] : undefined,
-        timestamp: new Date(item[dateIndex]).getTime(),
-        midday: (item[highIndex] + item[lowIndex]) / 2
+        timestamp: this.parseTimestamp(item[dateIndex]),
+        midday: this.calculateMidday(item[highIndex], item[lowIndex])
       }));
 
       return {
         symbol: symbol,
         entries: entries.reverse(), // Quandl returns newest first, reverse for chronological order
-        currency: 'USD',
-        source: 'quandl'
+        data: entries.reverse(), // Add data property for compatibility
+        currency: 'USD'
       };
     } catch (error) {
       Logger.error(`Quandl API request failed: ${error}`);
@@ -132,9 +114,10 @@ export class QuandlAPIService implements IStockAPIService {
     }
   }
 
-  async getHistory30Days(symbol: string): Promise<StockHistory> {
-    return this.getHistory(symbol, 30);
-  }
+  // Use the default implementation from BaseStockAPIService
+  // async getHistory30Days(symbol: string): Promise<StockHistory> {
+  //   return this.getHistory(symbol, 30);
+  // }
 
   async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
     Logger.info(`Quandl: Intraday data not available for ${symbol} - using daily data instead`);

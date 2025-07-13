@@ -1,38 +1,27 @@
-import { IStockAPIService } from '../interfaces/IStockAPIService';
+import { BaseStockAPIService } from './BaseStockAPIService';
 import {
   StockPrice,
   StockHistory,
   StockHistoryEntry
 } from '@/types/domains/assets/';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { CapacitorHttp } from '@capacitor/core';
 
 /**
  * IEX Cloud API Service Provider
  * Implements the IStockAPIService interface with IEX Cloud API
  * API Documentation: https://iexcloud.io/docs/api/
  */
-export class IEXCloudAPIService implements IStockAPIService {
-  private apiKey: string;
-  private static readonly baseUrl = 'https://cloud.iexapis.com/stable';
-
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
-    Logger.info('Initialized IEXCloudAPIService');
-  }
+export class IEXCloudAPIService extends BaseStockAPIService {
+  protected readonly baseUrl = 'https://cloud.iexapis.com/stable';
+  protected readonly providerName = 'IEX Cloud';
 
   async getCurrentStockPrice(symbol: string): Promise<StockPrice> {
     Logger.info(`IEX Cloud: Getting current price for ${symbol}`);
     
     try {
-      const url = `${IEXCloudAPIService.baseUrl}/stock/${symbol}/quote?token=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
-      
-      if (response.status !== 200) {
-        throw new Error(`IEX Cloud API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
+      const url = `${this.baseUrl}/stock/${symbol}/quote?token=${this.apiKey}`;
+      const data = await this.makeRequest(url);
+      this.checkForAPIErrors(data);
       
       return {
         symbol: data.symbol,
@@ -60,14 +49,9 @@ export class IEXCloudAPIService implements IStockAPIService {
       else if (days <= 180) range = '6m';
       else range = '1y';
 
-      const url = `${IEXCloudAPIService.baseUrl}/stock/${symbol}/chart/${range}?token=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
-      
-      if (response.status !== 200) {
-        throw new Error(`IEX Cloud API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
+      const url = `${this.baseUrl}/stock/${symbol}/chart/${range}?token=${this.apiKey}`;
+      const data = await this.makeRequest(url);
+      this.checkForAPIErrors(data);
       
       const entries: StockHistoryEntry[] = data.map((item: any) => ({
         date: item.date,
@@ -76,15 +60,15 @@ export class IEXCloudAPIService implements IStockAPIService {
         low: item.low,
         close: item.close,
         volume: item.volume,
-        timestamp: new Date(item.date).getTime(),
-        midday: (item.high + item.low) / 2 // Calculate midday as average of high and low
+        timestamp: this.parseTimestamp(item.date),
+        midday: this.calculateMidday(item.high, item.low)
       }));
 
       return {
         symbol: symbol,
         entries: entries,
         currency: 'USD',
-        source: 'iex_cloud'
+        data: entries // Add data property for compatibility
       };
     } catch (error) {
       Logger.error(`IEX Cloud API request failed: ${error}`);
@@ -92,23 +76,19 @@ export class IEXCloudAPIService implements IStockAPIService {
     }
   }
 
-  async getHistory30Days(symbol: string): Promise<StockHistory> {
-    return this.getHistory(symbol, 30);
-  }
+  // Use the default implementation from BaseStockAPIService
+  // async getHistory30Days(symbol: string): Promise<StockHistory> {
+  //   return this.getHistory(symbol, 30);
+  // }
 
   async getIntradayHistory(symbol: string, days: number = 1): Promise<StockHistory> {
     Logger.info(`IEX Cloud: Getting ${days} days intraday history for ${symbol}`);
     
     try {
       // For intraday data, use the intraday-prices endpoint
-      const url = `${IEXCloudAPIService.baseUrl}/stock/${symbol}/intraday-prices?token=${this.apiKey}`;
-      const response = await CapacitorHttp.get({ url });
-      
-      if (response.status !== 200) {
-        throw new Error(`IEX Cloud API error! status: ${response.status}`);
-      }
-
-      const data = response.data;
+      const url = `${this.baseUrl}/stock/${symbol}/intraday-prices?token=${this.apiKey}`;
+      const data = await this.makeRequest(url);
+      this.checkForAPIErrors(data);
       
       const entries: StockHistoryEntry[] = data.map((item: any) => ({
         date: item.date,
@@ -117,7 +97,7 @@ export class IEXCloudAPIService implements IStockAPIService {
         low: item.low || item.close,
         close: item.close,
         volume: item.volume || 0,
-        timestamp: new Date(`${item.date} ${item.minute}`).getTime(),
+        timestamp: this.parseTimestamp(`${item.date} ${item.minute}`),
         midday: item.close // For intraday, use close as midday
       })).filter((entry: StockHistoryEntry) => entry.close !== null);
 
@@ -125,7 +105,7 @@ export class IEXCloudAPIService implements IStockAPIService {
         symbol: symbol,
         entries: entries,
         currency: 'USD',
-        source: 'iex_cloud'
+        data: entries // Add data property for compatibility
       };
     } catch (error) {
       Logger.error(`IEX Cloud API request failed: ${error}`);

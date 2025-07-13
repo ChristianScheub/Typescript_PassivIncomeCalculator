@@ -15,7 +15,7 @@ export abstract class BaseStockAPIService implements IStockAPIService {
   protected abstract readonly baseUrl: string;
   protected abstract readonly providerName: string;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string = '') {
     this.apiKey = apiKey;
     Logger.info(`Initialized ${this.providerName}APIService`);
   }
