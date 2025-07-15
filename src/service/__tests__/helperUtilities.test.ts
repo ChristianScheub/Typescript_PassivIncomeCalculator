@@ -47,10 +47,13 @@ describe('Helper Utilities', () => {
     });
 
     test('should return true for desktop screen width', () => {
-      Object.defineProperty(window, 'innerWidth', {
-        writable: true,
-        configurable: true,
-        value: 1200
+      // Set desktop width before rendering
+      act(() => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 1200
+        });
       });
 
       const { result } = renderHook(() => useDeviceCheck());
@@ -116,10 +119,12 @@ describe('Helper Utilities', () => {
 
     test('should handle boundary case at 1024px', () => {
       // Test exactly at the boundary
-      Object.defineProperty(window, 'innerWidth', {
-        writable: true,
-        configurable: true,
-        value: 1024
+      act(() => {
+        Object.defineProperty(window, 'innerWidth', {
+          writable: true,
+          configurable: true,
+          value: 1024
+        });
       });
 
       const { result } = renderHook(() => useDeviceCheck());
@@ -158,7 +163,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should return largest font size for small numbers (4 or fewer digits)', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       formatService.formatCurrency.mockReturnValue('$1,234');
       
       const result = getDynamicFontSize(1234);
@@ -168,7 +173,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should return medium-large font size for 5 digits', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       formatService.formatCurrency.mockReturnValue('$12,345');
       
       const result = getDynamicFontSize(12345);
@@ -177,7 +182,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should return medium font size for 6 digits', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       formatService.formatCurrency.mockReturnValue('$123,456');
       
       const result = getDynamicFontSize(123456);
@@ -186,7 +191,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should return smallest font size for 7+ digits', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       formatService.formatCurrency.mockReturnValue('$1,234,567');
       
       const result = getDynamicFontSize(1234567);
@@ -195,7 +200,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should handle very large numbers (8+ digits)', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       formatService.formatCurrency.mockReturnValue('$12,345,678');
       
       const result = getDynamicFontSize(12345678);
@@ -204,7 +209,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should handle zero value', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       formatService.formatCurrency.mockReturnValue('$0');
       
       const result = getDynamicFontSize(0);
@@ -213,7 +218,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should handle negative values', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       formatService.formatCurrency.mockReturnValue('-$1,234');
       
       const result = getDynamicFontSize(-1234);
@@ -222,7 +227,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should handle decimal values', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       formatService.formatCurrency.mockReturnValue('$1,234.56');
       
       const result = getDynamicFontSize(1234.56);
@@ -231,7 +236,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should extract only digits from formatted currency', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       // Mock a currency format with lots of non-digit characters
       formatService.formatCurrency.mockReturnValue('€ 1.234.567,89 EUR');
       
@@ -242,7 +247,7 @@ describe('Helper Utilities', () => {
     });
 
     test('should handle edge cases at boundaries', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       
       // Test exactly 4 digits
       formatService.formatCurrency.mockReturnValue('$9,999');
@@ -268,7 +273,7 @@ describe('Helper Utilities', () => {
 
   describe('Integration tests', () => {
     test('should work together for responsive design scenarios', () => {
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       
       // Test small value on different screen sizes
       formatService.formatCurrency.mockReturnValue('$1,234');
@@ -298,7 +303,7 @@ describe('Helper Utilities', () => {
       expect(result.current).toBe(false);
       
       // Test font size with extreme values
-      const { formatService } = require('@/service/infrastructure');
+      const { formatService } = require('../infrastructure');
       formatService.formatCurrency.mockReturnValue('$999,999,999,999');
       
       const fontSize = getDynamicFontSize(999999999999);

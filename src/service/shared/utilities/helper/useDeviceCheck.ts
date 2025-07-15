@@ -7,6 +7,8 @@ export const useDeviceCheck = () => {
     const checkDevice = () => {
       if (window.innerWidth >= 1024) {
         setIsDesktop(true);
+      } else {
+        setIsDesktop(false);
       }
     };
     checkDevice();
