@@ -17,6 +17,11 @@ interface AISettingsSectionProps {
   onAIToggle: (enabled: boolean) => void;
 }
 
+const getLoadingStatusText = (t: (key: string) => string, modelStatus: string, loadingProgress: number) => {
+  const statusText = t(`ai.model.states.${modelStatus}`);
+  return `${statusText} ${loadingProgress}%`;
+};
+
 /**
  * AI Settings Section Component
  * Manages AI model configuration and loading
@@ -116,7 +121,7 @@ export const AISettingsSection: React.FC<AISettingsSectionProps> = ({
                 {getStatusIcon()}
                 <span>
                   {modelStatus === "loading" || isLoading
-                    ? `${t(`ai.model.states.${modelStatus}`)} ${loadingProgress}%`
+                    ? getLoadingStatusText(t, modelStatus, loadingProgress)
                     : t(`ai.model.states.${modelStatus}`)}
                 </span>
               </Badge>

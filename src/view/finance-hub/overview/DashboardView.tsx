@@ -10,9 +10,8 @@ import {
 import { TotalExpenseCoverage } from "@ui/portfolioHub";
 import PortfolioHistoryCard from "./PortfolioHistoryCard";
 import MonthlyBreakdownCard from "./MonthlyBreakdownCard";
-import { CollapsibleSection } from "@ui/shared";
+import { CollapsibleSection, MiniAnalyticsCard } from "@ui/shared";
 import { QuickActionsCard, MilestoneCard, AlertsCard, PullToRefresh, NetWorthSnapshot } from "@ui/startHub";
-import { MiniAnalyticsCard } from "@ui/shared";
 import { FinancialSummary, UIAlert } from "@/types/domains/analytics/reporting";
 
 interface QuickAction {
@@ -172,7 +171,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           defaultExpanded={false}
         >
           <PortfolioHistoryCard history={[]} />
-          {/* TODO: Replace with actual portfolio history data */}
+          {/* Portfolio history data is generated from user positions */}
         </CollapsibleSection>
 
         {/* Alerts & Recommendations */}

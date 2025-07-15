@@ -127,7 +127,7 @@ export async function refreshAllCaches(): Promise<void> {
                         resolve(null);
                     } else if (type === 'error') {
                         Logger.error('❌ Worker error: ' + error);
-                        reject(error);
+                        reject(new Error(error));
                     }
                 };
                 worker.postMessage({

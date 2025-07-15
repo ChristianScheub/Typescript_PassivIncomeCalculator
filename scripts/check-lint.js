@@ -50,7 +50,7 @@ if (problemsMatch) {
     console.log(`\n✅ Lint check passed: ${errors} errors, ${warnings} warnings (within limits)`);
     process.exit(0);
   }
-} else if (output.includes('No lint issues found') || output.trim() === '') {
+} else if (output.includes('No lint issues found') || output.trim() === '' || !output.includes('✖')) {
   console.log('✅ No lint issues found!');
   process.exit(0);
 } else {

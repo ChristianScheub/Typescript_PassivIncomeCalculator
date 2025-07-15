@@ -129,7 +129,7 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
     financialMetrics,
     netWorth,
     savingsRate,
-    onGenerateInsights: handleGenerateInsights,
+    onGenerateInsights: () => { handleGenerateInsights().catch(console.error); },
   };
 
   return <AIInsightsView {...viewProps} />;

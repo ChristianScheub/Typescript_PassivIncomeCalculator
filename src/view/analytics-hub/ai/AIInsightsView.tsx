@@ -19,6 +19,18 @@ import {
 } from "lucide-react";
 import { Badge } from "@/ui/shared/common/Badge";
 
+const getModelStatusVariant = (status: string) => {
+  if (status === "loaded") return "success";
+  if (status === "loading") return "warning";
+  return "destructive";
+};
+
+const getButtonText = (isGenerating: boolean, insights: unknown, t: (key: string) => string) => {
+  if (isGenerating) return t("ai.insights.generating");
+  if (insights) return t("ai.insights.regenerate");
+  return t("ai.insights.generate");
+};
+
 const AIInsightsView: React.FC<AIInsightsViewProps> = ({ 
   onBack,
   modelStatus,
@@ -60,13 +72,7 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
               {t("ai.model.status")}:
             </span>{" "}
             <Badge
-              variant={
-                modelStatus === "loaded"
-                  ? "success"
-                  : modelStatus === "loading"
-                  ? "warning"
-                  : "destructive"
-              }
+              variant={getModelStatusVariant(modelStatus)}
             >
               {t(`ai.model.states.${modelStatus}`)}
             </Badge>
@@ -238,7 +244,7 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
                 <div className="space-y-4">
                   {insights.recommendations.map((rec: string, index: number) => (
                     <div
-                      key={index}
+                      key={`recommendation-${rec.slice(0, 20)}-${index}`}
                       className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
                     >
                       <p className="text-sm text-gray-700 dark:text-gray-300">
@@ -263,11 +269,7 @@ const AIInsightsView: React.FC<AIInsightsViewProps> = ({
               className={`h-4 w-4 ${isGenerating ? "animate-spin" : ""}`}
             />
             <span>
-              {isGenerating
-                ? t("ai.insights.generating")
-                : insights
-                ? t("ai.insights.regenerate")
-                : t("ai.insights.generate")}
+              {getButtonText(isGenerating, insights, t)}
             </span>
           </Button>
         </div>

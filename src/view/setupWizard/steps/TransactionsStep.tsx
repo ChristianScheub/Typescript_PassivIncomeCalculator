@@ -268,6 +268,7 @@ const TransactionsStep: React.FC<TransactionsStepProps> = ({
                               id = asset.symbol;
                               display = `${asset.symbol} - ${asset.name}`;
                             } else {
+                              // Fallback for unknown asset types
                               id = '';
                               display = '';
                             }

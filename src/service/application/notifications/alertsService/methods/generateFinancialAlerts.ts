@@ -13,34 +13,16 @@ export const generateFinancialAlerts = (
   const maxAlerts = 3;
   const includeSuccess = true;
   const priorityThreshold = 1;
-  const excludeCategories: string[] = [];
 
   const alerts: FinancialAlert[] = [];
 
   // Generate alerts by category
-  if (!excludeCategories.includes('cashflow')) {
-    alerts.push(...generateCashflowAlerts(metrics));
-  }
-
-  if (!excludeCategories.includes('debt')) {
-    alerts.push(...generateDebtAlerts(metrics));
-  }
-
-  if (!excludeCategories.includes('passive_income')) {
-    alerts.push(...generatePassiveIncomeAlerts(metrics));
-  }
-
-  if (!excludeCategories.includes('savings')) {
-    alerts.push(...generateSavingsAlerts(metrics));
-  }
-
-  if (!excludeCategories.includes('emergency_fund')) {
-    alerts.push(...generateEmergencyFundAlerts(metrics));
-  }
-
-  if (!excludeCategories.includes('general')) {
-    alerts.push(...generateGeneralAlerts(metrics, includeSuccess));
-  }
+  alerts.push(...generateCashflowAlerts(metrics));
+  alerts.push(...generateDebtAlerts(metrics));
+  alerts.push(...generatePassiveIncomeAlerts(metrics));
+  alerts.push(...generateSavingsAlerts(metrics));
+  alerts.push(...generateEmergencyFundAlerts(metrics));
+  alerts.push(...generateGeneralAlerts(metrics, includeSuccess));
 
   // Filter by priority threshold and sort by priority (highest first)
   const filteredAlerts = alerts

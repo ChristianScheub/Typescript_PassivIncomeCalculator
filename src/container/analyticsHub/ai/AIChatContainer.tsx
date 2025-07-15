@@ -196,7 +196,7 @@ export const AIChatContainer: React.FC<AIChatContainerProps> = ({ onBack }) => {
     messagesEndRef,
     inputRef,
     onInputChange: setInputValue,
-    onSendMessage: handleSendMessage,
+    onSendMessage: () => { handleSendMessage().catch(console.error); },
     onKeyPress: handleKeyPress,
     onClearChat: clearChat,
     onSuggestedQuestionClick: handleSuggestedQuestionClick,
