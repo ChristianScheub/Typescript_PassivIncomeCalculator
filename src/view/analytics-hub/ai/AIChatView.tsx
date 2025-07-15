@@ -18,6 +18,12 @@ import {
   PieChart
 } from 'lucide-react';
 
+const getModelStatusVariant = (status: string) => {
+  if (status === 'loaded') return 'success';
+  if (status === 'loading') return 'warning';
+  return 'destructive';
+};
+
 const AIChatView: React.FC<AIChatViewProps> = ({
   onBack,
   modelStatus,
@@ -60,7 +66,7 @@ const AIChatView: React.FC<AIChatViewProps> = ({
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('ai.model.status')}: 
               </span>
-              <Badge variant={modelStatus === 'loaded' ? 'success' : modelStatus === 'loading' ? 'warning' : 'destructive'}>
+              <Badge variant={getModelStatusVariant(modelStatus)}>
                 {t(`ai.model.states.${modelStatus}`)}
               </Badge>
             </div>
