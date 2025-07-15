@@ -6,8 +6,8 @@ jest.mock('../domain/assets/market-data/stockAPIService/utils/fetch', () => ({
   getCurrency: jest.fn(() => 'EUR'),
 }));
 
-// Mock the Logger as a default export with static methods
-jest.mock('@/service/shared/logging/Logger/logger', () => ({
+// Mock the Logger
+jest.mock('../shared/logging/Logger/logger', () => ({
   default: {
     infoService: jest.fn(),
     errorService: jest.fn(),
@@ -19,6 +19,9 @@ jest.mock('@/service/shared/logging/Logger/logger', () => ({
 describe('FormatService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Reset the getCurrency mock to return EUR
+    const { getCurrency } = require('../domain/assets/market-data/stockAPIService/utils/fetch');
+    getCurrency.mockReturnValue('EUR');
   });
 
   describe('formatCurrency', () => {
@@ -119,6 +122,12 @@ describe('FormatService', () => {
     test.skip('should log the formatting operation', () => {
       // Skipping this test due to module resolution complexity
       // The formatPercentage function works correctly, logging is a secondary concern for testing
+      const Logger = require('../shared/logging/Logger/logger');
+      console.log('Logger object:', Logger);
+      console.log('Logger.default:', Logger.default);
+      console.log('Logger.infoService:', Logger.infoService);
+      formatPercentage(15.5);
+      expect(Logger.default.infoService).toHaveBeenCalledWith('Formatting percentage: 15.5');
     });
   });
 
