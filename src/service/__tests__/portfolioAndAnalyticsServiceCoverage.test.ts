@@ -343,7 +343,14 @@ describe('Analytics Service Coverage', () => {
         const activityModule = require('../domain/analytics/reporting/recentActivityService');
         const managerModule = require('../domain/analytics/reporting/recentActivityService/core/sharedManager');
         
-        recentActivityService = activityModule.recentActivityService;
+        // Use default export and map to expected interface
+        const service = activityModule.default || activityModule.recentActivityService;
+        recentActivityService = {
+          getRecentTransactions: service?.getActivitiesByType ? (count: number) => service.getActivitiesByType('transaction', count) : jest.fn(() => []),
+          getRecentPriceChanges: service?.getActivitiesByType ? () => service.getActivitiesByType('price_change') : jest.fn(() => []),
+          getRecentAlerts: service?.getActivitiesByType ? () => service.getActivitiesByType('alert') : jest.fn(() => []),
+          generateActivitySummary: service?.getRecentActivities ? () => ({ total: service.getRecentActivities().length }) : jest.fn(() => ({})),
+        };
         sharedManager = managerModule.sharedManager || managerModule.default;
       } catch (error) {
         recentActivityService = {

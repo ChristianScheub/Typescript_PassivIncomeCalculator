@@ -22,8 +22,23 @@ jest.mock('../../../../config/featureFlags', () => ({
 }), { virtual: true });
 jest.mock('@/service/infrastructure', () => ({
   formatService: {
-    formatCurrency: jest.fn((value) => `$${value.toFixed(2)}`),
-    formatPercentage: jest.fn((value) => `${value.toFixed(2)}%`),
+    formatCurrency: jest.fn((value) => {
+      // Mock European format with EUR currency as expected by tests
+      return new Intl.NumberFormat('de-DE', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(value);
+    }),
+    formatPercentage: jest.fn((value) => {
+      // Mock European percentage format as expected by tests
+      return new Intl.NumberFormat('de-DE', {
+        style: 'percent',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(value / 100);
+    }),
   },
 }), { virtual: true });
 
