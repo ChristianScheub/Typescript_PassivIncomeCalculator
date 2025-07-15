@@ -96,6 +96,18 @@ jest.mock('@/service/shared/logging/Logger/logger', () => ({
   errorService: jest.fn(),
   warnService: jest.fn(),
   cache: jest.fn(),
+  info: jest.fn(),
+  error: jest.fn(),
+  warn: jest.fn(),
+  default: {
+    infoService: jest.fn(),
+    errorService: jest.fn(),
+    warnService: jest.fn(),
+    cache: jest.fn(),
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  },
 }), { virtual: true });
 
 export {};
