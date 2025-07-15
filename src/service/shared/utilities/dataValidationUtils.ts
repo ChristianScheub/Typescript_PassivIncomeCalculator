@@ -32,21 +32,21 @@ export interface AssetInput {
 
 export const dataValidationUtils = {
   // Basic validation helpers
-  isValidNumber: (value: any): boolean => {
+  isValidNumber: (value: unknown): boolean => {
     return typeof value === 'number' && !isNaN(value) && isFinite(value);
   },
 
-  isPositiveNumber: (value: any): boolean => {
+  isPositiveNumber: (value: unknown): boolean => {
     return dataValidationUtils.isValidNumber(value) && value > 0;
   },
 
-  isValidDate: (value: any): boolean => {
+  isValidDate: (value: unknown): boolean => {
     if (!value) return false;
     const date = new Date(value);
     return date instanceof Date && !isNaN(date.getTime());
   },
 
-  isValidString: (value: any, minLength: number = 1): boolean => {
+  isValidString: (value: unknown, minLength: number = 1): boolean => {
     return typeof value === 'string' && value.trim().length >= minLength;
   },
 
@@ -228,7 +228,7 @@ export const dataValidationUtils = {
   },
 
   // Sanitization helpers
-  sanitizeNumericInput: (value: any): number | null => {
+  sanitizeNumericInput: (value: unknown): number | null => {
     if (typeof value === 'number') return value;
     if (typeof value === 'string') {
       const parsed = parseFloat(value.replace(/[^0-9.-]/g, ''));
@@ -237,20 +237,20 @@ export const dataValidationUtils = {
     return null;
   },
 
-  sanitizeStringInput: (value: any, maxLength: number = 255): string => {
+  sanitizeStringInput: (value: unknown, maxLength: number = 255): string => {
     if (typeof value !== 'string') return '';
     return value.trim().substring(0, maxLength);
   },
 
-  sanitizeDateInput: (value: any): Date | null => {
+  sanitizeDateInput: (value: unknown): Date | null => {
     if (!value) return null;
     const date = new Date(value);
     return isNaN(date.getTime()) ? null : date;
   },
 
   // Custom validation rules
-  createCustomValidator: (rules: Record<string, (value: any) => string | null>) => {
-    return (data: Record<string, any>): ValidationResult => {
+  createCustomValidator: (rules: Record<string, (value: unknown) => string | null>) => {
+    return (data: Record<string, unknown>): ValidationResult => {
       const errors: string[] = [];
       const warnings: string[] = [];
 

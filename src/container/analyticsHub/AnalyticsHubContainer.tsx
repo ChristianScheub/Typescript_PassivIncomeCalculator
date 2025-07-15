@@ -130,12 +130,8 @@ const AnalyticsHubContainer: React.FC<AnalyticsHubContainerProps> = ({ onBack })
     
     switch (selectedCategory) {
       case 'overview':
-        switch (selectedSubCategory) {
-          case 'dashboard':
-            return null; // Will show hub view
-          default:
-            return null; // Will show hub view
-        }
+        // All overview subcategories show hub view
+        return null;
         
       case 'forecasting':
         // All forecasting subcategories go to ForecastContainer

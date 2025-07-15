@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, CardTitle, CardContent, CollapsibleSection,Toggle,ConfirmationDialog } from '@ui/shared';
-import { Button } from '@ui/shared';
-import { ButtonGroup } from '@ui/shared';
+import { Card, CardHeader, CardTitle, CardContent, CollapsibleSection, Toggle, ConfirmationDialog, Button, ButtonGroup } from '@ui/shared';
 import { Download, Upload, Key, ChevronRight, Trash, Monitor, Brain } from 'lucide-react';
 import DebugSettings from '@/ui/settings/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '@/config/featureFlags';
@@ -335,7 +333,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             </div>
             <Toggle
               checked={isApiEnabled}
-              onChange={onApiToggle ? onApiToggle : () => {}}
+              onChange={onApiToggle || (() => {})}
               id="api-toggle"
               label={t('settings.enableStockApi')}
             />

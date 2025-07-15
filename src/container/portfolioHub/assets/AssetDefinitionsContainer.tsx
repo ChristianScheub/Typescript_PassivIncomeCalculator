@@ -6,8 +6,6 @@ import {
   addAssetDefinition,
   updateAssetDefinition,
   deleteAssetDefinition,
-} from "@/store/slices/domain";
-import {
   fetchAssetCategories,
   fetchAssetCategoryOptions,
   fetchAssetCategoryAssignments,

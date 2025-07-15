@@ -13,6 +13,12 @@ interface BarChartCashFlowProjectionProps {
 const CustomTooltip: React.FC<CashFlowTooltipPayload> = ({ active, payload, label }) => {
   const { t } = useTranslation();
 
+  const formatDisplayValue = (entry: CashFlowPayload, isIncome: boolean) => {
+    const prefix = isIncome ? '+' : '';
+    const value = isIncome ? entry.value : -Math.abs(entry.value);
+    return `${prefix}${formatService.formatCurrency(value)}`;
+  };
+
   if (active && payload && payload.length > 0) {
     // Prüfe ob Asset-Einkommen deutlich höher als normal ist (Dividendenzahlungen)
     const assetIncomeEntry = payload.find((entry: CashFlowPayload) => entry.dataKey === 'assetIncome');
@@ -64,7 +70,7 @@ const CustomTooltip: React.FC<CashFlowTooltipPayload> = ({ active, payload, labe
                 )}
               </span>
               <span className="text-sm font-medium" style={{ color: entry.color }}>
-                {isIncome ? '+' : ''}{formatService.formatCurrency(isIncome ? entry.value : -Math.abs(entry.value))}
+                {formatDisplayValue(entry, isIncome)}
               </span>
             </div>
           );

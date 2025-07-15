@@ -78,7 +78,7 @@ describe('AssetIncomeCalculations', () => {
     });
 
     test('should return null when quantity is zero or negative', () => {
-      const { getCurrentQuantity } = require('@/utils/transactionCalculations');
+      const { getCurrentQuantity } = require('../../../utils/transactionCalculations');
       getCurrentQuantity.mockReturnValue(0);
 
       const mockStockAsset = {
@@ -97,7 +97,7 @@ describe('AssetIncomeCalculations', () => {
     });
 
     test('should handle infinite or NaN values gracefully', () => {
-      const { calculateDividendSchedule } = require('@/service/domain/financial/income/incomeCalculatorService/methods/calculatePayment');
+      const { calculateDividendSchedule } = require('../domain/financial/income/incomeCalculatorService/methods/calculatePayment');
       calculateDividendSchedule.mockReturnValue({
         monthlyAmount: Infinity,
         annualAmount: NaN

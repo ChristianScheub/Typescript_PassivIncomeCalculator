@@ -65,12 +65,15 @@ async function updateSingleDividendData(
             lastDividendDate?: string; 
             date?: number 
           };
+          let dividendDate = '';
+          if (dividend.lastDividendDate) {
+            dividendDate = new Date(dividend.lastDividendDate).toISOString();
+          } else if (dividend.date) {
+            dividendDate = new Date(dividend.date * 1000).toISOString();
+          }
+          
           return {
-            date: dividend.lastDividendDate
-              ? new Date(dividend.lastDividendDate).toISOString()
-              : dividend.date
-              ? new Date(dividend.date * 1000).toISOString()
-              : '',
+            date: dividendDate,
             amount: dividend.amount,
             source: 'api' as const,
             currency,
@@ -170,28 +173,19 @@ async function updateBatchDividendData(
 // --- Worker Event Handling ---
 
 self.onmessage = function (e: MessageEvent<WorkerRequest>) {
-  try {
-    if (e.data.type === 'updateBatch') {
-      updateBatchDividendData(e.data.definitions, e.data.options).then(results => {
-        const response: WorkerResponse = { type: 'batchResult', results };
-        // @ts-expect-error postMessage is available in worker context
-        self.postMessage(response);
-      }).catch(error => {
-        // @ts-expect-error postMessage is available in worker context
-        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
-      });
-    } else if (e.data.type === 'updateSingle') {
-      updateSingleDividendData(e.data.definition, e.data.options).then(result => {
-        const response: WorkerResponse = { type: 'singleResult', result };
-        // @ts-expect-error postMessage is available in worker context
-        self.postMessage(response);
-      }).catch(error => {
-        // @ts-expect-error postMessage is available in worker context
-        self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
-      });
-    }
-  } catch (err: unknown) {
-    // @ts-expect-error postMessage is available in worker context
-    self.postMessage({ type: 'error', error: err instanceof Error ? err.message : String(err) });
+  if (e.data.type === 'updateBatch') {
+    updateBatchDividendData(e.data.definitions, e.data.options).then(results => {
+      const response: WorkerResponse = { type: 'batchResult', results };
+      self.postMessage(response);
+    }).catch(error => {
+      self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
+    });
+  } else if (e.data.type === 'updateSingle') {
+    updateSingleDividendData(e.data.definition, e.data.options).then(result => {
+      const response: WorkerResponse = { type: 'singleResult', result };
+      self.postMessage(response);
+    }).catch(error => {
+      self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
+    });
   }
 };

@@ -4,9 +4,7 @@ import { X, TrendingUp, Calendar, DollarSign, Package, ArrowUpRight, ArrowDownRi
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { AssetDefinition } from '@/types/domains/assets/entities';
 import { formatService } from '@service';
-import { PriceHistoryView } from '@ui/portfolioHub';
-import { PriceChart } from '@ui/portfolioHub';
-import { DividendHistoryView } from '@ui/portfolioHub';
+import { PriceHistoryView, PriceChart, DividendHistoryView } from '@ui/portfolioHub';
 import { featureFlag_Debug_View } from '../../../config/featureFlags';
 import { IconButton } from '@/ui/shared';
 

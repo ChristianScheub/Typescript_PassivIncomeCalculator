@@ -1,8 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '@ui/shared';
-import { Button } from '@ui/shared';
-import { MiniAnalyticsCard } from '@ui/shared';
+import { Card, Button, MiniAnalyticsCard } from '@ui/shared';
 import { ArrowLeft, TrendingUp, TrendingDown } from 'lucide-react';
 import { formatCurrency } from "@service/infrastructure/formatService/methods/formatCurrency";
 

@@ -78,7 +78,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
         categoryData: { categories: assetCategories, categoryOptions, categoryAssignments } 
       }));
     }
-  }, [assets.length, assetDefinitions.length, portfolioCache, dispatch, assetCategories, categoryOptions, categoryAssignments]);
+  }, [assets.length, assetDefinitions, portfolioCache, dispatch, assetCategories, categoryOptions, categoryAssignments]);
 
   // Get portfolio data from cache or provide empty fallback
   const portfolioData = useMemo(() => {
@@ -258,8 +258,26 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
         Logger.info(`  Rental Income: ${amount}`);
       }
     });
-  }, [filteredPositions]);
+  }, [filteredPositions, assetDefinitions]);
   
+  // Hilfsfunktion: Gibt true zurück, wenn für diesen Monat/Jahr KEIN Eintrag in der History existiert
+  function isMonthMissingInHistory(dividendHistory: DividendHistoryEntry[] | undefined, month: number, year: number): boolean {
+    // Nur Einträge mit amount > 0 zählen als "existierend"
+    return !dividendHistory?.some((entry: DividendHistoryEntry) => {
+      const d = new Date(entry.date);
+      return d.getMonth() + 1 === month && d.getFullYear() === year && (entry.amount ?? 0) > 0;
+    });
+  }
+
+  // Hilfsfunktion: Gibt alle forecast-Einträge für einen Monat/Jahr zurück, die noch nicht in der echten History sind
+  const getForecastForMonth = useCallback((assetDefinition: AssetDefinition, month: number, year: number): DividendHistoryEntry[] => {
+    if (!assetDefinition?.dividendForecast3Y || !Array.isArray(assetDefinition.dividendForecast3Y)) return [];
+    return assetDefinition.dividendForecast3Y.filter((entry: DividendHistoryEntry) => {
+      const d = new Date(entry.date);
+      return d.getMonth() + 1 === month && d.getFullYear() === year && isMonthMissingInHistory(assetDefinition.dividendHistory, month, year);
+    });
+  }, []);
+
   // Memoize months data calculation with portfolio positions
   const monthsData = useMemo(() => {
     Logger.info(`Calculating months data for ${filteredPositions.length} portfolio positions in year ${selectedYear}`);
@@ -341,7 +359,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
       Logger.info(`  ${m.name}: ${m.totalIncome} from ${m.positions.length} positions`);
     });
     return data;
-  }, [filteredPositions, monthNames, calculatePositionIncomeForMonth, selectedYear, assetDefinitions]);
+  }, [filteredPositions, monthNames, calculatePositionIncomeForMonth, selectedYear, assetDefinitions, getForecastForMonth]);
 
   // Memoize selected month data
   const selectedMonthData = useMemo(() => {
@@ -395,24 +413,6 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   useEffect(() => {
     Logger.info(`AssetCalendarContainer: ${assets.length} total assets, ${filteredPositions.length} filtered positions, tab: ${selectedTab}`);
   }, [assets.length, filteredPositions.length, selectedTab]);
-
-  // Hilfsfunktion: Gibt true zurück, wenn für diesen Monat/Jahr KEIN Eintrag in der History existiert
-  function isMonthMissingInHistory(dividendHistory: DividendHistoryEntry[] | undefined, month: number, year: number): boolean {
-    // Nur Einträge mit amount > 0 zählen als "existierend"
-    return !dividendHistory?.some((entry: DividendHistoryEntry) => {
-      const d = new Date(entry.date);
-      return d.getMonth() + 1 === month && d.getFullYear() === year && (entry.amount ?? 0) > 0;
-    });
-  }
-
-  // Hilfsfunktion: Gibt alle forecast-Einträge für einen Monat/Jahr zurück, die noch nicht in der echten History sind
-  function getForecastForMonth(assetDefinition: AssetDefinition, month: number, year: number): DividendHistoryEntry[] {
-    if (!assetDefinition?.dividendForecast3Y || !Array.isArray(assetDefinition.dividendForecast3Y)) return [];
-    return assetDefinition.dividendForecast3Y.filter((entry: DividendHistoryEntry) => {
-      const d = new Date(entry.date);
-      return d.getMonth() + 1 === month && d.getFullYear() === year && isMonthMissingInHistory(assetDefinition.dividendHistory, month, year);
-    });
-  }
 
   return (
     <AssetCalendarView

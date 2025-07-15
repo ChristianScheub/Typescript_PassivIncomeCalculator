@@ -2,11 +2,14 @@ import { AppDispatch, RootState } from "@/store/index";
 import { calculateFinancialSummary, calculateAssetFocusData } from "@/store/slices/domain/transactionsSlice"; // MIGRATED: Now in consolidated cache
 import Logger from "@/service/shared/logging/Logger/logger";
 import { isFinancialSummaryAllZero } from "@/utils/isFinancialSummaryValid";
-import { fetchAssetDefinitions } from '@/store/slices/domain';
-import { fetchTransactions,calculatePortfolioData } from '@/store/slices/domain';
-import { fetchLiabilities } from '@/store/slices/domain';
-import { fetchExpenses } from '@/store/slices/domain';
-import { fetchIncome } from '@/store/slices/domain';
+import { 
+  fetchAssetDefinitions,
+  fetchTransactions,
+  calculatePortfolioData,
+  fetchLiabilities,
+  fetchExpenses,
+  fetchIncome
+} from '@/store/slices/domain';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 
 /**

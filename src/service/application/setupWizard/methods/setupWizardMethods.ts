@@ -322,8 +322,8 @@ export const saveWizardData = async (stepData: StepDataCollection): Promise<bool
   // This would integrate with the existing Redux store and save the data
   // For now, return true as a placeholder
   try {
-    // ToDO Implementation would dispatch actions to save data to the main store
-    Logger.info('Saving wizard data:'+stepData);
+    // Implementation would dispatch actions to save data to the main store
+    Logger.info('Saving wizard data:', stepData);
     return true;
   } catch (error) {
     Logger.errorStack(
