@@ -56,13 +56,7 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
         100
       : 0;
 
-  // Auto-generate insights on mount
-  useEffect(() => {
-    if (modelStatus === "loaded" && !insights && !isGenerating) {
-      handleGenerateInsights();
-    }
-  }, [modelStatus, handleGenerateInsights, insights, isGenerating]);
-
+  // Callback for generating insights
   const handleGenerateInsights = useCallback(async () => {
     try {
       setIsGenerating(true);
@@ -118,6 +112,13 @@ const AIInsightsContainer: React.FC<AIInsightsContainerProps> = ({ onBack }) => 
       setIsGenerating(false);
     }
   }, [reduxState, financialMetrics, savingsRate, t, setInsights, setLastGenerated, setError, setIsGenerating, generateFinancialInsights]);
+
+  // Auto-generate insights on mount
+  useEffect(() => {
+    if (modelStatus === "loaded" && !insights && !isGenerating) {
+      handleGenerateInsights();
+    }
+  }, [modelStatus, handleGenerateInsights, insights, isGenerating]);
 
   const viewProps: AIInsightsViewProps = {
     onBack,

@@ -176,19 +176,15 @@ self.onmessage = function (e: MessageEvent<WorkerRequest>) {
   if (e.data.type === 'updateBatch') {
     updateBatchDividendData(e.data.definitions, e.data.options).then(results => {
       const response: WorkerResponse = { type: 'batchResult', results };
-      // @ts-expect-error postMessage is available in worker context
       self.postMessage(response);
     }).catch(error => {
-      // @ts-expect-error postMessage is available in worker context
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   } else if (e.data.type === 'updateSingle') {
     updateSingleDividendData(e.data.definition, e.data.options).then(result => {
       const response: WorkerResponse = { type: 'singleResult', result };
-      // @ts-expect-error postMessage is available in worker context
       self.postMessage(response);
     }).catch(error => {
-      // @ts-expect-error postMessage is available in worker context
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   }
