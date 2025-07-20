@@ -39,7 +39,10 @@ export const clearDatabase = async (): Promise<void> => {
 
 /**
  * Development utility - call this from browser console to reset database
+ * Nur im echten Browser-Kontext setzen, nicht im Worker/Node
  */
-(window as { clearFinanceDatabase?: () => void }).clearFinanceDatabase = () => {
-  clearDatabase().catch(console.error);
-};
+if (typeof window !== 'undefined') {
+  (window as { clearFinanceDatabase?: () => void }).clearFinanceDatabase = () => {
+    clearDatabase().catch(console.error);
+  };
+}

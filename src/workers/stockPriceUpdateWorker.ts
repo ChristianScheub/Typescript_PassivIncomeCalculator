@@ -9,10 +9,11 @@ interface StockPriceUpdateResult {
   error?: string;
 }
 
+
 // Message types for communication with main thread
 type WorkerRequest =
-  | { type: 'updateBatch', definitions: AssetDefinition[] }
-  | { type: 'updateSingle', definition: AssetDefinition };
+  | { type: 'updateBatch', definitions: AssetDefinition[], apiKeys: Record<string, string | undefined>, selectedProvider: string }
+  | { type: 'updateSingle', definition: AssetDefinition, apiKeys: Record<string, string | undefined>, selectedProvider: string };
 
 type WorkerResponse =
   | { type: 'batchResult', results: StockPriceUpdateResult[] }
@@ -23,7 +24,8 @@ type WorkerResponse =
 // All update logic is delegated to the existing StockPriceUpdater service.
 // This worker only orchestrates and provides batch processing with individual error handling.
 
-async function updateSingleStockPrice(definition: AssetDefinition): Promise<StockPriceUpdateResult> {
+
+async function updateSingleStockPrice(definition: AssetDefinition, apiKeys: Record<string, string | undefined>, selectedProvider: string): Promise<StockPriceUpdateResult> {
   try {
     if (definition.type !== 'stock' || !definition.ticker) {
       return {
@@ -34,7 +36,7 @@ async function updateSingleStockPrice(definition: AssetDefinition): Promise<Stoc
     }
 
     // Use existing service to update single definition
-    const updatedDefinitions = await StockPriceUpdater.updateStockPrices([definition]);
+    const updatedDefinitions = await StockPriceUpdater.updateStockPrices([definition], apiKeys, selectedProvider);
     
     if (updatedDefinitions.length > 0) {
       const updatedDefinition = updatedDefinitions[0];
@@ -59,20 +61,18 @@ async function updateSingleStockPrice(definition: AssetDefinition): Promise<Stoc
   }
 }
 
-async function updateBatchStockPrices(definitions: AssetDefinition[]): Promise<StockPriceUpdateResult[]> {
+
+async function updateBatchStockPrices(definitions: AssetDefinition[], apiKeys: Record<string, string | undefined>, selectedProvider: string): Promise<StockPriceUpdateResult[]> {
   const results: StockPriceUpdateResult[] = [];
-  
   // Filter to only stock definitions with tickers
   const stockDefinitions = definitions.filter(def => 
     def.type === 'stock' && def.ticker && def.autoUpdatePrice === true
   );
-
   // Process each definition individually to ensure partial failures don't stop the batch
   for (const definition of stockDefinitions) {
-    const result = await updateSingleStockPrice(definition);
+    const result = await updateSingleStockPrice(definition, apiKeys, selectedProvider);
     results.push(result);
   }
-
   return results;
 }
 
@@ -80,14 +80,14 @@ async function updateBatchStockPrices(definitions: AssetDefinition[]): Promise<S
 
 self.onmessage = function (e: MessageEvent<WorkerRequest>) {
   if (e.data.type === 'updateBatch') {
-    updateBatchStockPrices(e.data.definitions).then(results => {
+    updateBatchStockPrices(e.data.definitions, e.data.apiKeys, e.data.selectedProvider).then(results => {
       const response: WorkerResponse = { type: 'batchResult', results };
       self.postMessage(response);
     }).catch(error => {
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   } else if (e.data.type === 'updateSingle') {
-    updateSingleStockPrice(e.data.definition).then(result => {
+    updateSingleStockPrice(e.data.definition, e.data.apiKeys, e.data.selectedProvider).then(result => {
       const response: WorkerResponse = { type: 'singleResult', result };
       self.postMessage(response);
     }).catch(error => {

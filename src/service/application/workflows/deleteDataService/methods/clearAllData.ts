@@ -60,6 +60,8 @@ export async function clearAllData(): Promise<void> {
     // Reload page to ensure clean state
     setTimeout(() => {
         Logger.infoService("Reloading page after data clear");
-        window.location.reload();
+        if (typeof window !== 'undefined') {
+            window.location.reload();
+        }
     }, 1500);
 }

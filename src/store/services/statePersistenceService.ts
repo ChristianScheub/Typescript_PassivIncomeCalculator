@@ -27,7 +27,14 @@ export class StatePersistenceService {
     this.saveTimeout = setTimeout(() => {
       try {
         const stateToSave = this.prepareStateForSaving(state);
-        
+
+        // Debug: Log die API-Keys, die gespeichert werden
+        if (stateToSave?.config?.apis?.stock?.apiKeys) {
+          Logger.infoRedux('[Persist] API-Keys die gespeichert werden: ' + JSON.stringify(stateToSave.config.apis.stock.apiKeys));
+        } else {
+          Logger.warn('[Persist] Keine API-Keys im Persist-Objekt gefunden!');
+        }
+
         // Validate size before saving
         const serialized = JSON.stringify(stateToSave);
         const size = new Blob([serialized]).size;

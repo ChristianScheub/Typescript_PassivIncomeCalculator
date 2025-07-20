@@ -49,15 +49,15 @@ class Logger {
 
   private static getLogsFromLocalStorage(): string[] {
     if (this.isWorker) return [];
-    const storedLogs = typeof window !== 'undefined' ? localStorage.getItem(this.logKey) : null;
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') return [];
+    const storedLogs = localStorage.getItem(this.logKey);
     return storedLogs ? JSON.parse(storedLogs) : [];
   }
 
   private static saveLogsToLocalStorage(logs: string[]): void {
     if (this.isWorker) return;
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(this.logKey, JSON.stringify(logs));
-    }
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
+    localStorage.setItem(this.logKey, JSON.stringify(logs));
   }
   
   static log(message: string): void {

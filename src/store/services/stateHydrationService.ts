@@ -30,6 +30,7 @@ export class StateHydrationService {
    */
   static getStorageValue(key: string, defaultValue?: string): string | undefined {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') return defaultValue;
       return localStorage.getItem(key) || defaultValue;
     } catch (error) {
       Logger.error(`Failed to get localStorage value for key "${key}": ${error}`);
@@ -42,13 +43,13 @@ export class StateHydrationService {
    */
   static setStorageValue(key: string, value: string): boolean {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') return false;
       // Check storage size before setting
       const totalSize = this.getStorageSize();
       if (totalSize + new Blob([value]).size > this.MAX_STORAGE_SIZE) {
         Logger.warn(`Storage size limit exceeded for key "${key}"`);
         return false;
       }
-      
       localStorage.setItem(key, value);
       return true;
     } catch (error) {
@@ -62,6 +63,7 @@ export class StateHydrationService {
    */
   static removeStorageValue(key: string): boolean {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') return false;
       localStorage.removeItem(key);
       return true;
     } catch (error) {
@@ -75,6 +77,7 @@ export class StateHydrationService {
    */
   static getStorageSize(): number {
     try {
+      if (typeof window === 'undefined' || typeof localStorage === 'undefined') return 0;
       let total = 0;
       for (const key in localStorage) {
         if (Object.hasOwn(localStorage, key)) {
@@ -99,7 +102,8 @@ export class StateHydrationService {
 
     // Basic validation - but no size limits as these can be legitimate
     // We just check for obvious corruption or invalid data
-    if (state.transactions?.cache && typeof state.transactions.cache !== 'object') {
+    const s = state as Record<string, unknown>;
+    if (s.transactions && typeof s.transactions === 'object' && (s.transactions as Record<string, unknown>).cache && typeof (s.transactions as Record<string, unknown>).cache !== 'object') {
       Logger.warn('State validation failed: invalid transactions.cache structure');
       return false;
     }
@@ -159,13 +163,21 @@ export class StateHydrationService {
    */
   private static transformPersistedState(state: Record<string, unknown>) {
     // Transform other state slices
+    const s = state as Record<string, unknown>;
+    const transactions = (s.transactions ?? {}) as Record<string, unknown>;
+    const assetCategories = (s.assetCategories ?? {}) as Record<string, unknown>;
+    const liabilities = (s.liabilities ?? {}) as Record<string, unknown>;
+    const expenses = (s.expenses ?? {}) as Record<string, unknown>;
+    const income = (s.income ?? {}) as Record<string, unknown>;
+    const customAnalytics = (s.customAnalytics ?? {}) as Record<string, unknown>;
+    const snackbar = (s.snackbar ?? {}) as Record<string, unknown>;
     const transformedState = {
       // Transactions werden NICHT mehr aus localStorage geladen (zu groß, aus DB geladen)
       transactions: {
         items: [],
         status: 'idle' as Status,
         error: null,
-        cache: state.transactions?.cache || undefined,
+        cache: transactions.cache || undefined,
         lastCalculated: undefined,
         calculationMetadata: {
           lastCalculated: '',
@@ -185,14 +197,14 @@ export class StateHydrationService {
         status: 'idle' as Status,
         error: null
       },
-      assetCategories: this.transformAssetCategoriesState(state.assetCategories),
-      liabilities: this.transformSimpleState(state.liabilities, 'liabilities'),
-      expenses: this.transformSimpleState(state.expenses, 'expenses'),
-      income: this.transformSimpleState(state.income, 'income'),
-      customAnalytics: this.transformCustomAnalyticsState(state.customAnalytics),
-      forecast: state.forecast || {},
-      config: this.transformConfigState(state), // Unified config transformation
-      snackbar: this.transformSnackbarState(state.snackbar),
+      assetCategories: this.transformAssetCategoriesState(assetCategories),
+      liabilities: this.transformSimpleState(liabilities, 'liabilities'),
+      expenses: this.transformSimpleState(expenses, 'expenses'),
+      income: this.transformSimpleState(income, 'income'),
+      customAnalytics: this.transformCustomAnalyticsState(customAnalytics),
+      forecast: s.forecast || {},
+      config: this.transformConfigState(s), // Unified config transformation
+      snackbar: this.transformSnackbarState(snackbar),
     };
 
     Logger.infoRedux('State transformation completed');
@@ -239,6 +251,19 @@ export class StateHydrationService {
    * Transform unified config state (replaces API, dividend API, AI config, dashboard settings)
    */
   private static transformConfigState(state: Record<string, unknown>) {
+    // Check if we have the new unified config structure
+    const configData = state.config as Record<string, unknown> | undefined;
+    
+    // If we have the new unified config, use it directly with minimal transformation
+    if (configData && configData.apis) {
+      return {
+        ...configData,
+        status: 'idle',
+        error: null,
+      };
+    }
+    
+    // Fall back to legacy transformation for backwards compatibility
     const apiData = state.apiConfig as Record<string, unknown> | undefined;
     const dividendApiData = state.dividendApiConfig as Record<string, unknown> | undefined;
     const aiData = state.aiConfig as Record<string, unknown> | undefined;
@@ -285,16 +310,20 @@ export class StateHydrationService {
         hiddenSections: dashboardData?.hiddenSections ?? [],
         customLayout: dashboardData?.customLayout ?? {},
         assetFocus: {
-          timeRange: dashboardData?.assetFocus?.timeRange ?? '1M',
-          mode: dashboardData?.assetFocus?.mode ?? 'smartSummary',
+          timeRange: typeof dashboardData?.assetFocus === 'object' && dashboardData?.assetFocus !== null && 'timeRange' in dashboardData.assetFocus
+            ? (dashboardData.assetFocus as { timeRange?: string }).timeRange ?? '1M'
+            : '1M',
+          mode: typeof dashboardData?.assetFocus === 'object' && dashboardData?.assetFocus !== null && 'mode' in dashboardData.assetFocus
+            ? (dashboardData.assetFocus as { mode?: string }).mode ?? 'smartSummary'
+            : 'smartSummary',
         },
       },
       general: {
-        theme: (['light', 'dark', 'auto'] as const).includes(dashboardData?.theme)
+        theme: typeof dashboardData?.theme === 'string' && (['light', 'dark', 'auto'] as const).includes(dashboardData.theme as any)
           ? (dashboardData.theme as 'light' | 'dark' | 'auto')
           : 'auto',
         // Ensure MUI always gets a valid theme (never 'auto')
-        muiTheme: (['light', 'dark'] as const).includes(dashboardData?.theme)
+        muiTheme: typeof dashboardData?.theme === 'string' && (['light', 'dark'] as const).includes(dashboardData.theme as any)
           ? (dashboardData.theme as 'light' | 'dark')
           : 'light',
         language: 'en',
@@ -302,7 +331,7 @@ export class StateHydrationService {
         dateFormat: 'DD/MM/YYYY',
         numberFormat: 'de-DE',
       },
-      status: ['idle', 'loading', 'succeeded', 'failed'].includes(state?.config?.status) ? state.config.status : 'idle',
+      status: 'idle',
       error: null,
     };
   }

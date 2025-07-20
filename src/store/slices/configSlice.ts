@@ -7,7 +7,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { StockAPIProvider, DividendApiProvider } from '@/types/shared/base/enums';
 import { AssetFocusTimeRange } from '@/types/shared/analytics';
-import { StateHydrationService } from '../services/stateHydrationService';
+import { hydrateStore } from '../actions/hydrateAction';
 
 // Unified Configuration Interface
 interface ConfigState {
@@ -72,30 +72,18 @@ interface ConfigState {
   error: string | null;
 }
 
-// Initial state with hydration from localStorage
+// Initial state with basic defaults - hydration will load persisted values
 const initialState: ConfigState = {
   apis: {
     stock: {
-      enabled: StateHydrationService.getStorageValue('stock_api_enabled') === 'true',
-      selectedProvider: (StateHydrationService.getStorageValue('selected_stock_api_provider') as StockAPIProvider) || StockAPIProvider.FINNHUB,
-      apiKeys: {
-        [StockAPIProvider.FINNHUB]: StateHydrationService.getStorageValue('finnhub_api_key') || undefined,
-        [StockAPIProvider.YAHOO]: StateHydrationService.getStorageValue('yahoo_api_key') || undefined,
-        [StockAPIProvider.ALPHA_VANTAGE]: StateHydrationService.getStorageValue('alpha_vantage_api_key') || undefined,
-        [StockAPIProvider.IEX_CLOUD]: StateHydrationService.getStorageValue('iex_cloud_api_key') || undefined,
-        [StockAPIProvider.TWELVE_DATA]: StateHydrationService.getStorageValue('twelve_data_api_key') || undefined,
-        [StockAPIProvider.QUANDL]: StateHydrationService.getStorageValue('quandl_api_key') || undefined,
-        [StockAPIProvider.EOD_HISTORICAL_DATA]: StateHydrationService.getStorageValue('eod_historical_data_api_key') || undefined,
-        [StockAPIProvider.POLYGON_IO]: StateHydrationService.getStorageValue('polygon_io_api_key') || undefined,
-      },
+      enabled: false,
+      selectedProvider: StockAPIProvider.FINNHUB,
+      apiKeys: {},
     },
     dividend: {
-      enabled: StateHydrationService.getStorageValue('dividend_api_enabled') === 'true',
-      selectedProvider: (StateHydrationService.getStorageValue('selected_divi_api_provider') as DividendApiProvider) || 'yahoo',
-      apiKeys: {
-        finnhub: StateHydrationService.getStorageValue('divi_finnhub_api_key') || undefined,
-        yahoo: StateHydrationService.getStorageValue('divi_yahoo_api_key') || undefined,
-      },
+      enabled: false,
+      selectedProvider: 'yahoo',
+      apiKeys: {},
     },
     ai: {
       enabled: false,
@@ -227,6 +215,21 @@ const configSlice = createSlice({
     
     // Reset Configuration
     resetConfig: () => initialState,
+  },
+  extraReducers: (builder) => {
+    builder
+      // Handle store hydration
+      .addCase(hydrateStore, (state, action) => {
+        if (action.payload.config) {
+          return {
+            ...state,
+            ...action.payload.config,
+            status: 'idle',
+            error: null
+          };
+        }
+        return state;
+      });
   },
 });
 

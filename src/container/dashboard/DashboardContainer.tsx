@@ -7,6 +7,7 @@ import {
   calculateFinancialSummary
 } from '@/store/slices/domain/transactionsSlice'; // MIGRATED: Now using consolidated cache
 import DashboardView from '@/view/finance-hub/overview/DashboardView';
+import ErrorBoundary from '@/ui/shared/ErrorBoundary';
 import AssetFocusDashboardContainer from './AssetDashboardContainer';
 import analyticsService from '@/service/domain/analytics/calculations/financialAnalyticsService';
 import alertsService from '@/service/application/notifications/alertsService';
@@ -190,16 +191,18 @@ const DashboardContainer: React.FC = () => {
   // Default: Smart Summary Dashboard
   Logger.infoService("DashboardContainer: Rendering DashboardView (Smart Summary)");
   return (
-    <DashboardView
-      financialSummary={financialSummary}
-      quickActions={quickActions}
-      miniAnalytics={miniAnalytics}
-      milestones={milestones}
-      alerts={alerts}
-      navigationHandlers={navigationHandlers}
-      onRefresh={handleRefresh}
-      isRefreshing={isRefreshing}
-    />
+    <ErrorBoundary>
+      <DashboardView
+        financialSummary={financialSummary}
+        quickActions={quickActions}
+        miniAnalytics={miniAnalytics}
+        milestones={milestones}
+        alerts={alerts}
+        navigationHandlers={navigationHandlers}
+        onRefresh={handleRefresh}
+        isRefreshing={isRefreshing}
+      />
+    </ErrorBoundary>
   );
 };
 

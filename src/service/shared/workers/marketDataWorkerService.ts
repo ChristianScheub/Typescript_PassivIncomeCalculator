@@ -66,6 +66,8 @@ interface StockPriceUpdateRequest {
   type: 'updateBatch' | 'updateSingle';
   definitions?: AssetDefinition[];
   definition?: AssetDefinition;
+  apiKeys: Record<string, string | undefined>; // z.B. { FINNHUB: '...', YAHOO: '...', ... }
+  selectedProvider: string;
 }
 
 interface StockPriceUpdateResponse {
@@ -94,17 +96,21 @@ export class StockPriceWorkerService {
     );
   }
 
-  async updateBatch(definitions: AssetDefinition[]): Promise<StockPriceUpdateResponse> {
+  async updateBatch(definitions: AssetDefinition[], apiKeys: Record<string, string | undefined>, selectedProvider: string): Promise<StockPriceUpdateResponse> {
     return this.workerService.sendMessage({
       type: 'updateBatch',
-      definitions
+      definitions,
+      apiKeys,
+      selectedProvider
     });
   }
 
-  async updateSingle(definition: AssetDefinition): Promise<StockPriceUpdateResponse> {
+  async updateSingle(definition: AssetDefinition, apiKeys: Record<string, string | undefined>, selectedProvider: string): Promise<StockPriceUpdateResponse> {
     return this.workerService.sendMessage({
       type: 'updateSingle',
-      definition
+      definition,
+      apiKeys,
+      selectedProvider
     });
   }
 

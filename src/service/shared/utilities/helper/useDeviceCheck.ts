@@ -5,15 +5,20 @@ export const useDeviceCheck = () => {
 
   useEffect(() => {
     const checkDevice = () => {
-      if (window.innerWidth >= 1024) {
+      if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
         setIsDesktop(true);
       } else {
         setIsDesktop(false);
       }
     };
-    checkDevice();
-    window.addEventListener('resize', checkDevice);
-    return () => window.removeEventListener('resize', checkDevice);
+    if (typeof window !== 'undefined') {
+      checkDevice();
+      window.addEventListener('resize', checkDevice);
+      return () => window.removeEventListener('resize', checkDevice);
+    }
+    // Im Server/Worker-Kontext: immer false
+    setIsDesktop(false);
+    return undefined;
   }, []);
 
   return isDesktop;

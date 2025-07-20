@@ -2,17 +2,27 @@ import { createStoreConfig, type AppStore } from './config/storeConfig';
 import { StateHydrationService } from './services/stateHydrationService';
 import { StatePersistenceService } from './services/statePersistenceService';
 import { StoreInitializationService } from './services/storeInitializationService';
+import { hydrateStore } from './actions/hydrateAction';
 
 // Load persisted state
 const persistedState = StateHydrationService.loadPersistedState();
 
-// Create the store with clean configuration
-export const store: AppStore = createStoreConfig(persistedState);
+// Create the store without preloaded state to avoid type issues
+export const store: AppStore = createStoreConfig();
 
 // Initialize store based on whether we have persisted state
 if (persistedState) {
+  // Debug: Log what's being hydrated
+  console.log('[Store] Hydrating with config:', persistedState.config);
+  
+  // Dispatch hydration action to trigger all extraReducers
+  store.dispatch(hydrateStore(persistedState as never));
   StoreInitializationService.initializeWithPersistedState(store);
+  
+  // Debug: Log final config state
+  console.log('[Store] Final config state:', (store.getState() as import('./config/storeConfig').RootState).config);
 } else {
+  console.log('[Store] No persisted state found');
   StoreInitializationService.initializeWithoutPersistedState(store);
 }
 
