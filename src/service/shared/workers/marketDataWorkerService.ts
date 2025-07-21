@@ -126,6 +126,8 @@ interface StockHistoryUpdateRequest {
   definition?: AssetDefinition;
   period?: TimeRangePeriod;
   days?: number;
+  apiKeys?: Record<string, string | undefined>;
+  selectedProvider?: string;
 }
 
 interface StockHistoryUpdateResponse {
@@ -156,35 +158,43 @@ export class StockHistoryWorkerService {
     );
   }
 
-  async updateBatch(definitions: AssetDefinition[], period?: TimeRangePeriod): Promise<StockHistoryUpdateResponse> {
+  async updateBatch(definitions: AssetDefinition[], period?: TimeRangePeriod, apiKeys?: Record<string, string | undefined>, selectedProvider?: string): Promise<StockHistoryUpdateResponse> {
     return this.workerService.sendMessage({
       type: period ? 'updateBatch' : 'updateBatchDefault',
       definitions,
-      period
+      period,
+      apiKeys,
+      selectedProvider
     });
   }
 
-  async updateSingle(definition: AssetDefinition, period?: TimeRangePeriod): Promise<StockHistoryUpdateResponse> {
+  async updateSingle(definition: AssetDefinition, period?: TimeRangePeriod, apiKeys?: Record<string, string | undefined>, selectedProvider?: string): Promise<StockHistoryUpdateResponse> {
     return this.workerService.sendMessage({
       type: period ? 'updateSingle' : 'updateSingleDefault',
       definition,
-      period
+      period,
+      apiKeys,
+      selectedProvider
     });
   }
 
-  async updateBatchIntraday(definitions: AssetDefinition[], days?: number): Promise<StockHistoryUpdateResponse> {
+  async updateBatchIntraday(definitions: AssetDefinition[], days?: number, apiKeys?: Record<string, string | undefined>, selectedProvider?: string): Promise<StockHistoryUpdateResponse> {
     return this.workerService.sendMessage({
       type: 'updateBatchIntraday',
       definitions,
-      days
+      days,
+      apiKeys,
+      selectedProvider
     });
   }
 
-  async updateSingleIntraday(definition: AssetDefinition, days?: number): Promise<StockHistoryUpdateResponse> {
+  async updateSingleIntraday(definition: AssetDefinition, days?: number, apiKeys?: Record<string, string | undefined>, selectedProvider?: string): Promise<StockHistoryUpdateResponse> {
     return this.workerService.sendMessage({
       type: 'updateSingleIntraday',
       definition,
-      days
+      days,
+      apiKeys,
+      selectedProvider
     });
   }
 

@@ -319,11 +319,11 @@ export class StateHydrationService {
         },
       },
       general: {
-        theme: typeof dashboardData?.theme === 'string' && (['light', 'dark', 'auto'] as const).includes(dashboardData.theme as any)
+        theme: typeof dashboardData?.theme === 'string' && (['light', 'dark', 'auto'] as const).includes(dashboardData.theme as 'light' | 'dark' | 'auto')
           ? (dashboardData.theme as 'light' | 'dark' | 'auto')
           : 'auto',
         // Ensure MUI always gets a valid theme (never 'auto')
-        muiTheme: typeof dashboardData?.theme === 'string' && (['light', 'dark'] as const).includes(dashboardData.theme as any)
+        muiTheme: typeof dashboardData?.theme === 'string' && (['light', 'dark'] as const).includes(dashboardData.theme as 'light' | 'dark')
           ? (dashboardData.theme as 'light' | 'dark')
           : 'light',
         language: 'en',

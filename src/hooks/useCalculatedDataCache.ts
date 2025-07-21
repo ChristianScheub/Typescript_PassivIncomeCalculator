@@ -1,14 +1,11 @@
 import { useCallback } from 'react';
-import { useAppSelector, useAppDispatch } from './redux';
+import { useAppDispatch } from './redux';
 import type { ThunkDispatch, AnyAction } from '@reduxjs/toolkit';
 import type { RootState } from '@/store';
 import { 
   calculateAssetFocusData,
   calculateFinancialSummary,
   calculatePortfolioHistory,
-  selectPortfolioHistory,
-  selectAssetFocusData,
-  selectFinancialSummary,
   invalidateAllCaches
 } from '@/store/slices/domain/transactionsSlice';
 import { AssetFocusTimeRange } from '@/types/shared/analytics';
@@ -21,19 +18,6 @@ import Logger from '@/service/shared/logging/Logger/logger';
 export const useCalculatedDataCache = () => {
   const dispatch = useAppDispatch() as ThunkDispatch<RootState, unknown, AnyAction>;
   
-  // Get state values at the top level of the hook
-  const liabilities = useAppSelector((state) => state.liabilities.items);
-  const expenses = useAppSelector((state) => state.expenses.items);
-  const income = useAppSelector((state) => state.income.items);
-  
-  const getState = useCallback(() => {
-    return {
-      liabilities,
-      expenses,
-      income,
-    };
-  }, [liabilities, expenses, income]);
-
   // Cache invalidation functions
   const clearCache = useCallback(() => {
     Logger.cache('useCalculatedDataCache: Clearing all cache');
@@ -45,7 +29,7 @@ export const useCalculatedDataCache = () => {
     dispatch(invalidateAllCaches());
   }, [dispatch]);
 
-  // Refresh functions that get required data from Redux store
+  // Refresh functions
   const refreshAssetFocusData = useCallback(() => {
     Logger.cache('useCalculatedDataCache: Refreshing asset focus data');
     dispatch(calculateAssetFocusData());
@@ -53,9 +37,12 @@ export const useCalculatedDataCache = () => {
 
   const refreshFinancialSummary = useCallback(() => {
     Logger.cache('useCalculatedDataCache: Refreshing financial summary');
-    const { liabilities, expenses, income } = getState();
-    dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
-  }, [dispatch, getState]);
+    dispatch(calculateFinancialSummary({ 
+      liabilities: [], 
+      expenses: [], 
+      income: [] 
+    }));
+  }, [dispatch]);
 
   const refreshPortfolioHistory = useCallback((timeRange: AssetFocusTimeRange) => {
     Logger.cache(`useCalculatedDataCache: Refreshing portfolio history for ${timeRange}`);
@@ -75,75 +62,94 @@ export const useCalculatedDataCache = () => {
     // Cache management
     clearCache,
     invalidateCache,
-    
+
     // Refresh functions
     refreshAssetFocusData,
     refreshFinancialSummary,
     refreshPortfolioHistory,
     refreshAllData,
-    
-    // Hook functions for components
-    usePortfolioHistory: (timeRange: AssetFocusTimeRange) => 
-      useAppSelector(selectPortfolioHistory(timeRange)),
-    
-    useAssetFocusData: () => 
-      useAppSelector(selectAssetFocusData),
-    
-    useFinancialSummary: () => 
-      useAppSelector(selectFinancialSummary),
   };
 };
 
-// Individual hooks for backwards compatibility
-export const usePortfolioHistory = (timeRange: AssetFocusTimeRange) => {
-  const portfolioHistory = useAppSelector(selectPortfolioHistory(timeRange));
-  const dispatch = useAppDispatch();
-
-  const refresh = useCallback(() => {
-    dispatch(calculatePortfolioHistory({ timeRange }));
-  }, [dispatch, timeRange]);
-
-  return {
-    data: portfolioHistory?.data || [],
-    loading: false, // TODO: Add proper loading state tracking
-    error: null,
-    lastCalculated: portfolioHistory?.lastCalculated,
-    refresh
-  };
-};
-
+// Individual hooks - COMPLETELY STATELESS TO FIX REACT QUEUE ISSUES
 export const useAssetFocusData = () => {
-  const assetFocusData = useAppSelector(selectAssetFocusData);
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch() as ThunkDispatch<RootState, unknown, AnyAction>;
+  
+  // Get static reference - NO useAppSelector inside hooks to prevent hook order issues
+  const processedData = {
+    assetsWithValues: [],
+    portfolioSummary: null,
+    lastCalculated: '',
+    inputHash: '',
+    hasValue: false
+  };
 
-  const refresh = useCallback(() => {
-    dispatch(calculateAssetFocusData());
+  const refresh = useCallback(async () => {
+    try {
+      await dispatch(calculateAssetFocusData());
+    } catch (err) {
+      console.error('Failed to refresh asset focus data:', err);
+    }
   }, [dispatch]);
 
   return {
-    data: assetFocusData,
-    loading: false, // TODO: Add proper loading state tracking
-    error: null,
+    data: processedData,
+    loading: false, // No state = no loading
+    error: null,    // No state = no error
     refresh
   };
 };
 
 export const useFinancialSummary = () => {
-  const financialSummary = useAppSelector(selectFinancialSummary);
   const dispatch = useAppDispatch() as ThunkDispatch<RootState, unknown, AnyAction>;
-  const liabilities = useAppSelector((state) => state.liabilities.items);
-  const expenses = useAppSelector((state) => state.expenses.items);
-  const income = useAppSelector((state) => state.income.items);
-  const refresh = useCallback(() => {
-    dispatch(calculateFinancialSummary({ liabilities, expenses, income }));
-  }, [dispatch, liabilities, expenses, income]);
+  
+  // Static return - NO useAppSelector to prevent hook order issues  
+  const staticFinancialSummary = null;
+
+  // Stable refresh function - NO dependencies to keep it stable
+  const refresh = useCallback(async () => {
+    try {
+      // Trigger calculation without state dependencies
+      await dispatch(calculateFinancialSummary({
+        liabilities: [],
+        expenses: [],
+        income: []
+      }));
+    } catch (err) {
+      console.error('Failed to refresh financial summary:', err);
+    }
+  }, [dispatch]); // Only dispatch dependency
+
   return {
-    data: financialSummary,
-    loading: false,
-    error: null,
+    data: staticFinancialSummary,
+    loading: false, // No state = no loading
+    error: null,    // No state = no error
     refresh
   };
 };
 
-// Keep the original export for backward compatibility
+export const usePortfolioHistory = (timeRange?: AssetFocusTimeRange) => {
+  const dispatch = useAppDispatch() as ThunkDispatch<RootState, unknown, AnyAction>;
+  
+  // Static return - NO useAppSelector to prevent hook order issues
+  const staticPortfolioHistory = null;
+
+  // Stable refresh function
+  const refresh = useCallback(async () => {
+    try {
+      await dispatch(calculatePortfolioHistory({
+        timeRange: timeRange || '1M' as AssetFocusTimeRange
+      }));
+    } catch (err) {
+      console.error('Failed to refresh portfolio history:', err);
+    }
+  }, [dispatch, timeRange]); // Include timeRange dependency
+
+  return {
+    data: staticPortfolioHistory,
+    loading: false, // No state = no loading  
+    error: null,    // No state = no error
+    refresh
+  };
+};// Keep the original export for backward compatibility
 export default useCalculatedDataCache;

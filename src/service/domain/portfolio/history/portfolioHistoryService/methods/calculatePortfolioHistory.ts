@@ -1,7 +1,9 @@
 import { Asset, AssetDefinition } from '@/types/domains/assets';
 import { PortfolioHistoryHelper } from './portfolioHistoryHelper';
 import Logger from "@/service/shared/logging/Logger/logger";
-import { AssetPosition, PortfolioHistoryPoint } from '@/types/domains/portfolio';
+import { PortfolioHistoryPoint } from '@/types/domains/portfolio';
+import { getHistoricalPrice } from './getHistoricalPrice';
+import { getCurrentQuantity } from '@/utils/transactionCalculations';
 
 function calculatePortfolioHistory(
   assets: Asset[], 
@@ -12,7 +14,7 @@ function calculatePortfolioHistory(
   );
 
   // Prepare assets and get asset definition map
-  const { validAssets } = PortfolioHistoryHelper.prepareAssets(assets, assetDefinitions);
+  const { validAssets, assetDefMap } = PortfolioHistoryHelper.prepareAssets(assets, assetDefinitions);
   if (validAssets.length === 0) return [];
 
   // Get all unique dates
@@ -20,14 +22,73 @@ function calculatePortfolioHistory(
   Logger.infoService(`Processing ${allDates.length} unique dates`);
 
   const historyPoints: PortfolioHistoryPoint[] = [];
-  // Use AssetPosition instead of ServiceAssetPosition
-  const positions: Map<string, AssetPosition> = new Map();
 
   // Process each date to calculate portfolio value
   for (const date of allDates) {
-    historyPoints.push(
-      PortfolioHistoryHelper.createHistoryPoint(positions, date)
-    );
+    const normalizedDate = PortfolioHistoryHelper.normalizeDate(date);
+    
+    // Calculate portfolio value for this date
+    let totalValue = 0;
+    let totalInvested = 0;
+    
+    // Group assets by definition for position calculation
+    const assetsByDefinition = new Map<string, Asset[]>();
+    
+    validAssets.forEach(asset => {
+      const purchaseDate = PortfolioHistoryHelper.normalizeDate(asset.purchaseDate);
+      
+      // Only include assets purchased on or before this date
+      if (purchaseDate <= normalizedDate) {
+        const definitionId = asset.assetDefinitionId || 'unknown';
+        if (!assetsByDefinition.has(definitionId)) {
+          assetsByDefinition.set(definitionId, []);
+        }
+        assetsByDefinition.get(definitionId)!.push(asset);
+      }
+    });
+
+    // Calculate value for each position
+    assetsByDefinition.forEach((assetsInPosition, definitionId) => {
+      const assetDefinition = assetDefMap.get(definitionId);
+      if (!assetDefinition) return;
+
+      // Calculate total quantity for this position on this date
+      let totalQuantity = 0;
+      let totalCost = 0;
+
+      assetsInPosition.forEach(asset => {
+        const quantity = getCurrentQuantity(asset);
+        totalQuantity += quantity;
+        totalCost += (asset.purchasePrice || 0) * Math.abs(asset.purchaseQuantity || 0);
+      });
+
+      if (totalQuantity > 0) {
+        // Get historical price for this date
+        const price = getHistoricalPrice(assetDefinition, normalizedDate);
+        
+        if (price !== null && isFinite(price) && price > 0) {
+          const positionValue = totalQuantity * price;
+          totalValue += positionValue;
+          totalInvested += totalCost;
+          
+          Logger.infoService(
+            `Position ${assetDefinition.ticker || assetDefinition.fullName} on ${normalizedDate}: ${totalQuantity} × €${price.toFixed(2)} = €${positionValue.toFixed(2)}`
+          );
+        }
+      }
+    });
+
+    const totalReturn = totalValue - totalInvested;
+    const totalReturnPercentage = totalInvested > 0 ? (totalReturn / totalInvested) * 100 : 0;
+
+    historyPoints.push({
+      date: normalizedDate,
+      totalValue,
+      totalInvested,
+      totalReturn,
+      totalReturnPercentage,
+      positions: [] // Simplified - positions can be calculated separately if needed
+    });
   }
 
   Logger.infoService(`Generated ${historyPoints.length} portfolio history points`);

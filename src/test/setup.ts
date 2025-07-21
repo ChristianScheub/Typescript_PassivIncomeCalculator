@@ -119,13 +119,13 @@ jest.mock('@/service/shared/calculations/assetIncomeCalculations', () => ({
 
 // Mock localStorage
 const localStorageMock = (() => {
-  let store = {};
+  let store: { [key: string]: string } = {};
   return {
-    getItem: jest.fn((key) => store[key] || null),
-    setItem: jest.fn((key, value) => {
+    getItem: jest.fn((key: string) => store[key] || null),
+    setItem: jest.fn((key: string, value: string) => {
       store[key] = value.toString();
     }),
-    removeItem: jest.fn((key) => {
+    removeItem: jest.fn((key: string) => {
       delete store[key];
     }),
     clear: jest.fn(() => {
@@ -134,7 +134,7 @@ const localStorageMock = (() => {
     get length() {
       return Object.keys(store).length;
     },
-    key: jest.fn((index) => {
+    key: jest.fn((index: number) => {
       const keys = Object.keys(store);
       return keys[index] || null;
     }),
@@ -177,40 +177,36 @@ Object.defineProperty(global, 'indexedDB', {
 });
 
 // Mock IDBRequest and other IndexedDB classes
+
+// Plain object mocks for IndexedDB classes
 Object.defineProperty(global, 'IDBRequest', {
-  value: class IDBRequest {
-    constructor() {
-      this.result = null;
-      this.error = null;
-      this.onsuccess = null;
-      this.onerror = null;
-    }
-  },
+  value: () => ({
+    result: null,
+    error: null,
+    onsuccess: null,
+    onerror: null,
+  }),
   writable: true,
 });
 
 Object.defineProperty(global, 'IDBDatabase', {
-  value: class IDBDatabase {
-    constructor() {
-      this.name = '';
-      this.version = 1;
-    }
-    transaction() { return {}; }
-    createObjectStore() { return {}; }
-  },
+  value: () => ({
+    name: '',
+    version: 1,
+    transaction: () => ({}),
+    createObjectStore: () => ({}),
+  }),
   writable: true,
 });
 
 Object.defineProperty(global, 'IDBObjectStore', {
-  value: class IDBObjectStore {
-    constructor() {
-      this.name = '';
-    }
-    add() { return { onsuccess: null, onerror: null }; }
-    put() { return { onsuccess: null, onerror: null }; }
-    get() { return { onsuccess: null, onerror: null }; }
-    delete() { return { onsuccess: null, onerror: null }; }
-  },
+  value: () => ({
+    name: '',
+    add: () => ({ onsuccess: null, onerror: null }),
+    put: () => ({ onsuccess: null, onerror: null }),
+    get: () => ({ onsuccess: null, onerror: null }),
+    delete: () => ({ onsuccess: null, onerror: null }),
+  }),
   writable: true,
 });
 
@@ -287,7 +283,7 @@ afterAll(() => {
 });
 
 // Global test utilities
-global.testUtils = {
+(global as typeof global & { testUtils: unknown }).testUtils = {
   // Helper to create mock data
   createMockTransaction: (overrides = {}) => ({
     id: 'test-id',

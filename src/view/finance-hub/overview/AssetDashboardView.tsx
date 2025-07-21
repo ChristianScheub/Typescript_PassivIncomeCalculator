@@ -10,7 +10,7 @@ import { AssetDefinition } from '@/types/domains/assets/entities';
 import PortfolioHistoryCard from './PortfolioHistoryCard';
 import { AssetWithValue } from '@/types/domains/portfolio/assetWithValue';
 
-interface PortfolioSummary {
+export interface PortfolioSummary {
   totalValue: number;
   totalDayChange: number;
   totalDayChangePercent: number;

@@ -25,7 +25,8 @@ function getPortfolioHistoryWorker() {
  * Returns: { intraday, history }
  */
 export async function recalculatePortfolioHistoryAndIntraday({ assetDefinitions, portfolioPositions }: { assetDefinitions: AssetDefinition[]; portfolioPositions: PortfolioPosition[] }) {
-  return new Promise<{ intraday: PortfolioIntradayPoint[]; history: PortfolioIntradayPoint[] }>((resolve, reject) => {
+  // history is PortfolioHistoryPoint[] (not PortfolioIntradayPoint[])
+  return new Promise<{ intraday: PortfolioIntradayPoint[]; history: import('@/types/domains/portfolio/performance').PortfolioHistoryPoint[] }>((resolve, reject) => {
     const worker = getPortfolioHistoryWorker();
     worker.postMessage({
       type: 'calculateAll',
@@ -70,7 +71,7 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
 
   // Korrigierte Selektoren für Intraday-Daten
   const intradayDataObj = portfolioCache?.intradayData;
-  const portfolioIntradayData = intradayDataObj?.data || [];
+  const portfolioIntradayData = Array.isArray(intradayDataObj?.data) ? intradayDataObj.data : [];
   const portfolioIntradayStatus = intradayDataObj ? 'succeeded' : 'idle';
 
   // Use ref to prevent infinite loops - tracks if we've already attempted to load
@@ -82,7 +83,7 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
       hasAttemptedLoad.current = false;
       return;
     }
-    if (!portfolioCache?.positions || assetDefinitions.length === 0) {
+    if (!portfolioCache || !Array.isArray(portfolioCache.positions) || assetDefinitions.length === 0) {
       return;
     }
     if (portfolioIntradayData.length > 0) {
@@ -163,7 +164,8 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
   }, [
     isHydrated,
     portfolioCache?.positions?.length,
-    portfolioCache.positions,
+    portfolioCache?.positions,
+    portfolioCache, // Add missing dependency
     assetDefinitions.length,
     assetDefinitions,
     portfolioIntradayStatus,
@@ -194,20 +196,55 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
  * Now uses the worker for calculation and bulk DB persistence if data is missing.
  */
 export function usePortfolioHistoryView(timeRange?: string): Array<{ date: string; totalValue: number; change: number; changePercentage: number }> {
-  const { cache: portfolioCache } = useAppSelector(state => state.transactions);
-  const { items: assetDefinitions } = useAppSelector(state => state.assetDefinitions);
+  // --- Stable selectors and memoized dependencies ---
+  const portfolioCache = useAppSelector(state => state.transactions.cache);
+  const assetDefinitions = useAppSelector(state => state.assetDefinitions.items);
   const isHydrated = useAppSelector(state => !!state.transactions.cache);
   const dispatch = useAppDispatch();
 
-  // State for storing data directly (no Redux)
-  const [portfolioHistoryData, setPortfolioHistoryData] = useState<Array<{ date: string; totalValue: number; change: number; changePercentage: number }>>([]);
+  // Wrap allowedRanges in useMemo to prevent dependency changes
+  const allowedRanges = useMemo(() => ['1D', '5D', '1W', '1M', '3M', '1Y', 'ALL'] as const, []);
+  type AllowedRange = typeof allowedRanges[number];
+
+  // Memoize initialHistory to avoid recalculating on every render
+  const initialHistory = useMemo(() => {
+    if (
+      portfolioCache &&
+      timeRange &&
+      allowedRanges.includes(timeRange as AllowedRange) &&
+      portfolioCache.history &&
+      portfolioCache.history[timeRange as AllowedRange]
+    ) {
+      const cacheEntry = portfolioCache.history[timeRange as AllowedRange];
+      if (cacheEntry && Array.isArray(cacheEntry.data)) {
+        return cacheEntry.data.map((point: { date: string; totalValue: number; totalReturn: number; totalReturnPercentage: number }) => ({
+          date: point.date,
+          totalValue: point.totalValue,
+          change: point.totalReturn,
+          changePercentage: point.totalReturnPercentage
+        }));
+      }
+    }
+    return [];
+  }, [portfolioCache, timeRange, allowedRanges]);
+
+  // Accept both PortfolioHistoryPoint and PortfolioIntradayPoint for 1W
+  // Using any here due to complex union types - TODO: improve typing
+  const [portfolioHistoryData, setPortfolioHistoryData] = useState<any[]>(initialHistory);
   const isLoadingRef = useRef(false);
 
+  // ALWAYS call all hooks in the same order - memoize values BEFORE any conditionals
+  const positionsLength = useMemo(() => portfolioCache?.positions?.length ?? 0, [portfolioCache?.positions]);
+  const assetDefinitionsLength = useMemo(() => assetDefinitions?.length ?? 0, [assetDefinitions]);
+
+  // Defensive: Only return [] AFTER all hooks are called
+  const shouldReturnEmpty = !portfolioCache || !Array.isArray(portfolioCache.positions);
+
   useEffect(() => {
-    if (!timeRange || timeRange === '1D' || !isHydrated) {
+    if (shouldReturnEmpty || !timeRange || !isHydrated) {
       return;
     }
-    if (!portfolioCache?.positions || assetDefinitions.length === 0) {
+    if (!portfolioCache?.positions || assetDefinitionsLength === 0) {
       return;
     }
     if (isLoadingRef.current) {
@@ -216,10 +253,11 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
     isLoadingRef.current = true;
 
     async function getHistoryFromDbOrRecalculate(startDateStr: string, endDateStr: string) {
+      // Try to get PortfolioHistoryPoint[] from DB
       const dbData = await portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr);
       if (dbData.length > 0) {
         Logger.infoService(`📂 Loaded ${dbData.length} portfolio history points from IndexedDB for ${timeRange}`);
-        return dbData.map(point => ({
+        return dbData.map((point) => ({
           date: point.date,
           totalValue: point.totalValue,
           change: point.totalReturn,
@@ -227,18 +265,17 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
         }));
       } else {
         Logger.infoService(`⚠️ No portfolio history data in IndexedDB for ${timeRange}, triggering worker calculation...`);
-        // Check if portfolioCache exists before using it
         if (!portfolioCache?.positions) {
           Logger.infoService('❌ Cannot trigger worker calculation - missing portfolio positions');
           return [];
         }
-        // Nutze die generische Utility
+        // Use the generic utility, which returns intraday: PortfolioIntradayPoint[], history: PortfolioHistoryPoint[]
         const { intraday, history } = await recalculatePortfolioHistoryAndIntraday({ assetDefinitions, portfolioPositions: portfolioCache.positions });
         // Redux-Update für Intraday
         dispatch(setPortfolioIntradayData(intraday));
         dispatch(setPortfolioIntradayStatus('succeeded'));
-        // Update local state für history
-        return history.map((point: PortfolioIntradayPoint) => ({
+        // Update local state for history (PortfolioHistoryPoint[])
+        return history.map((point) => ({
           date: point.date,
           totalValue: point.totalValue,
           change: point.totalReturn,
@@ -268,6 +305,8 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
           const today = new Date();
           let daysBack;
           switch (timeRange) {
+            case '1D': daysBack = 1; break;
+            case '5D': daysBack = 5; break;
             case '1M': daysBack = 30; break;
             case '3M': daysBack = 90; break;
             case '6M': daysBack = 180; break;
@@ -301,30 +340,53 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
     };
 
     loadPortfolioHistoryData();
-  }, [timeRange, isHydrated, portfolioCache?.positions?.length, portfolioCache.positions, assetDefinitions.length, assetDefinitions, dispatch]);
+  }, [
+    timeRange,
+    isHydrated,
+    positionsLength,
+    assetDefinitionsLength,
+    assetDefinitions,
+    portfolioCache?.positions,
+    dispatch,
+    shouldReturnEmpty,
+    // Only include stable references
+  ]);
 
   // Return data based on time range with proper structure for PortfolioHistoryView
+  // For 1W, just return value as totalValue, and 0 for change fields (intraday granularity)
   const transformedData = useMemo(() => {
     if (!timeRange) {
       return [];
     }
     if (timeRange === '1W') {
-      return portfolioHistoryData.map((item) => ({
-        date: item.date,
-        totalValue: typeof item.totalValue === 'number' && !isNaN(item.totalValue) ? item.totalValue : 0,
-        change: typeof item.change === 'number' ? item.change : 0,
-        changePercentage: typeof item.changePercentage === 'number' ? item.changePercentage : 0,
-        type: item.type || 'intraday'
-      }));
+      // For 1W, portfolioHistoryData can be CombinedHistoryPoint (intraday: value, daily: value)
+      return portfolioHistoryData.map((item) => {
+        // If it has totalValue, it's a PortfolioHistoryPoint (daily)
+        if (typeof item.totalValue === 'number') {
+          return {
+            date: item.date,
+            totalValue: item.totalValue,
+            change: item.totalReturn ?? 0,
+            changePercentage: item.totalReturnPercentage ?? 0
+          };
+        }
+        // Otherwise, treat as PortfolioIntradayPoint (value only)
+        return {
+          date: item.date,
+          totalValue: typeof item.value === 'number' && !isNaN(item.value) ? item.value : 0,
+          change: 0,
+          changePercentage: 0
+        };
+      });
     }
-    const transformed = portfolioHistoryData.map((item) => ({
-      date: item.date,
-      totalValue: typeof item.totalValue === 'number' && !isNaN(item.totalValue) ? item.totalValue : 0,
-      change: typeof item.change === 'number' ? item.change : 0,
-      changePercentage: typeof item.changePercentage === 'number' ? item.changePercentage : 0
-    }));
-    return transformed;
+    // All other ranges: already mapped to correct structure
+    return portfolioHistoryData;
   }, [timeRange, portfolioHistoryData]);
+
+  // Return early only AFTER all hooks have been called
+  if (shouldReturnEmpty) {
+    return [];
+  }
 
   return transformedData;
 }
@@ -369,16 +431,16 @@ interface CombinedHistoryPoint {
 async function getCombined1WHistory(
   startDateStr: string,
   endDateStr: string,
-  portfolioHistoryService: typeof portfolioHistoryService
+  portfolioHistoryService: typeof import('@/service/infrastructure/sqlLitePortfolioHistory').default
 ): Promise<CombinedHistoryPoint[]> {
   const [intraday, daily] = await Promise.all([
     portfolioHistoryService.getPortfolioIntradayByDateRange(startDateStr, endDateStr),
     portfolioHistoryService.getPortfolioHistoryByDateRange(startDateStr, endDateStr)
   ]);
   // Map daily data by date
-  const dailyByDate: Record<string, { date: string; value: number }> = {};
-  daily.forEach((point: { date: string; value: number }) => {
-    dailyByDate[point.date] = point;
+  const dailyByDate: Record<string, { date: string; totalValue: number }> = {};
+  daily.forEach((point) => {
+    dailyByDate[point.date] = { date: point.date, totalValue: point.totalValue };
   });
   // Map intraday data by date (collect all points per day)
   const intradayByDate: Record<string, Array<{ date: string; value: number; timestamp: string }>> = {};
@@ -409,7 +471,7 @@ async function getCombined1WHistory(
     if (dailyByDate[dateStr]) {
       result.push({
         date: dateStr + 'T23:59:59',
-        value: typeof dailyByDate[dateStr].value === 'number' && !isNaN(dailyByDate[dateStr].value) ? dailyByDate[dateStr].value : 0,
+        value: typeof dailyByDate[dateStr].totalValue === 'number' && !isNaN(dailyByDate[dateStr].totalValue) ? dailyByDate[dateStr].totalValue : 0,
         transactions: [],
         type: 'daily'
       });

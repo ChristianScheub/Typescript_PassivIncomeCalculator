@@ -15,12 +15,12 @@ interface StockHistoryUpdateResult {
 
 // Message types for communication with main thread
 type WorkerRequest =
-  | { type: 'updateBatch', definitions: AssetDefinition[], period?: TimeRangePeriod }
-  | { type: 'updateSingle', definition: AssetDefinition, period?: TimeRangePeriod }
-  | { type: 'updateBatchDefault', definitions: AssetDefinition[] }
-  | { type: 'updateSingleDefault', definition: AssetDefinition }
-  | { type: 'updateBatchIntraday', definitions: AssetDefinition[], days?: number }
-  | { type: 'updateSingleIntraday', definition: AssetDefinition, days?: number };
+  | { type: 'updateBatch', definitions: AssetDefinition[], period?: TimeRangePeriod, apiKeys?: Record<string, string | undefined>, selectedProvider?: string }
+  | { type: 'updateSingle', definition: AssetDefinition, period?: TimeRangePeriod, apiKeys?: Record<string, string | undefined>, selectedProvider?: string }
+  | { type: 'updateBatchDefault', definitions: AssetDefinition[], apiKeys?: Record<string, string | undefined>, selectedProvider?: string }
+  | { type: 'updateSingleDefault', definition: AssetDefinition, apiKeys?: Record<string, string | undefined>, selectedProvider?: string }
+  | { type: 'updateBatchIntraday', definitions: AssetDefinition[], days?: number, apiKeys?: Record<string, string | undefined>, selectedProvider?: string }
+  | { type: 'updateSingleIntraday', definition: AssetDefinition, days?: number, apiKeys?: Record<string, string | undefined>, selectedProvider?: string };
 
 type WorkerResponse =
   | { type: 'batchResult', results: StockHistoryUpdateResult[] }
@@ -33,7 +33,9 @@ type WorkerResponse =
 
 async function updateSingleStockHistory(
   definition: AssetDefinition, 
-  period?: TimeRangePeriod
+  period?: TimeRangePeriod,
+  apiKeys?: Record<string, string | undefined>,
+  selectedProvider?: string
 ): Promise<StockHistoryUpdateResult> {
   try {
     if (definition.type !== 'stock' || !definition.ticker) {
@@ -44,10 +46,10 @@ async function updateSingleStockHistory(
       };
     }
 
-    // Use existing service to update single definition
+    // Use existing service to update single definition with API configuration
     const updatedDefinitions = period
-      ? await StockPriceUpdater.updateStockHistoricalDataWithPeriod([definition], period)
-      : await StockPriceUpdater.updateStockHistoricalData([definition]);
+      ? await StockPriceUpdater.updateStockHistoricalDataWithPeriod([definition], period, apiKeys, selectedProvider)
+      : await StockPriceUpdater.updateStockHistoricalData([definition], apiKeys, selectedProvider);
     
     if (updatedDefinitions.length > 0) {
       const updatedDefinition = updatedDefinitions[0];
@@ -76,7 +78,9 @@ async function updateSingleStockHistory(
 
 async function updateBatchStockHistory(
   definitions: AssetDefinition[], 
-  period?: TimeRangePeriod
+  period?: TimeRangePeriod,
+  apiKeys?: Record<string, string | undefined>,
+  selectedProvider?: string
 ): Promise<StockHistoryUpdateResult[]> {
   const results: StockHistoryUpdateResult[] = [];
   
@@ -89,7 +93,7 @@ async function updateBatchStockHistory(
 
   // Process each definition individually to ensure partial failures don't stop the batch
   for (const definition of stockDefinitions) {
-    const result = await updateSingleStockHistory(definition, period);
+    const result = await updateSingleStockHistory(definition, period, apiKeys, selectedProvider);
     results.push(result);
   }
 
@@ -98,7 +102,9 @@ async function updateBatchStockHistory(
 
 async function updateSingleStockIntraday(
   definition: AssetDefinition, 
-  days: number = 1
+  days: number = 1,
+  apiKeys?: Record<string, string | undefined>,
+  selectedProvider?: string
 ): Promise<StockHistoryUpdateResult> {
   try {
     if (definition.type !== 'stock' || !definition.ticker) {
@@ -109,8 +115,42 @@ async function updateSingleStockIntraday(
       };
     }
 
-    // Use existing stockAPIService to get intraday data
-    const intradayData = await stockAPIService.getIntradayHistory(definition.ticker, days);
+    let intradayData;
+    
+    // If API configuration is provided, create a specific API service instance
+    if (apiKeys && selectedProvider) {
+      // Use dynamic provider selection similar to StockPriceUpdater
+      const { StockAPIProvider } = await import("@/types/shared/base/enums");
+      const apiKey = apiKeys[selectedProvider.toLowerCase()];
+      
+      let stockAPI;
+      switch (selectedProvider) {
+        case StockAPIProvider.FINNHUB: {
+          const { FinnhubAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/FinnhubAPIService");
+          if (!apiKey) throw new Error('Finnhub API-Key fehlt!');
+          stockAPI = new FinnhubAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.YAHOO: {
+          const { YahooAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/YahooAPIService");
+          stockAPI = new YahooAPIService();
+          break;
+        }
+        case StockAPIProvider.ALPHA_VANTAGE: {
+          const { AlphaVantageAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/AlphaVantageAPIService");
+          if (!apiKey) throw new Error('Alpha Vantage API-Key fehlt!');
+          stockAPI = new AlphaVantageAPIService(apiKey);
+          break;
+        }
+        default:
+          throw new Error(`Unsupported provider for intraday data: ${selectedProvider}`);
+      }
+      
+      intradayData = await stockAPI.getIntradayHistory(definition.ticker, days);
+    } else {
+      // Fall back to default stockAPIService
+      intradayData = await stockAPIService.getIntradayHistory(definition.ticker, days);
+    }
     
     if (!intradayData?.entries || intradayData.entries.length === 0) {
       return {
@@ -155,7 +195,9 @@ async function updateSingleStockIntraday(
 
 async function updateBatchStockIntraday(
   definitions: AssetDefinition[], 
-  days: number = 1
+  days: number = 1,
+  apiKeys?: Record<string, string | undefined>,
+  selectedProvider?: string
 ): Promise<StockHistoryUpdateResult[]> {
   const results: StockHistoryUpdateResult[] = [];
   
@@ -166,7 +208,7 @@ async function updateBatchStockIntraday(
 
   // Process each definition individually to ensure partial failures don't stop the batch
   for (const definition of stockDefinitions) {
-    const result = await updateSingleStockIntraday(definition, days);
+    const result = await updateSingleStockIntraday(definition, days, apiKeys, selectedProvider);
     results.push(result);
   }
 
@@ -177,42 +219,42 @@ async function updateBatchStockIntraday(
 
 self.onmessage = function (e: MessageEvent<WorkerRequest>) {
   if (e.data.type === 'updateBatch') {
-    updateBatchStockHistory(e.data.definitions, e.data.period).then(results => {
+    updateBatchStockHistory(e.data.definitions, e.data.period, e.data.apiKeys, e.data.selectedProvider).then(results => {
       const response: WorkerResponse = { type: 'batchResult', results };
       self.postMessage(response);
     }).catch(error => {
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   } else if (e.data.type === 'updateSingle') {
-    updateSingleStockHistory(e.data.definition, e.data.period).then(result => {
+    updateSingleStockHistory(e.data.definition, e.data.period, e.data.apiKeys, e.data.selectedProvider).then(result => {
       const response: WorkerResponse = { type: 'singleResult', result };
       self.postMessage(response);
     }).catch(error => {
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   } else if (e.data.type === 'updateBatchDefault') {
-    updateBatchStockHistory(e.data.definitions).then(results => {
+    updateBatchStockHistory(e.data.definitions, undefined, e.data.apiKeys, e.data.selectedProvider).then(results => {
       const response: WorkerResponse = { type: 'batchResult', results };
       self.postMessage(response);
     }).catch(error => {
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   } else if (e.data.type === 'updateSingleDefault') {
-    updateSingleStockHistory(e.data.definition).then(result => {
+    updateSingleStockHistory(e.data.definition, undefined, e.data.apiKeys, e.data.selectedProvider).then(result => {
       const response: WorkerResponse = { type: 'singleResult', result };
       self.postMessage(response);
     }).catch(error => {
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   } else if (e.data.type === 'updateBatchIntraday') {
-    updateBatchStockIntraday(e.data.definitions, e.data.days).then(results => {
+    updateBatchStockIntraday(e.data.definitions, e.data.days, e.data.apiKeys, e.data.selectedProvider).then(results => {
       const response: WorkerResponse = { type: 'batchResult', results };
       self.postMessage(response);
     }).catch(error => {
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   } else if (e.data.type === 'updateSingleIntraday') {
-    updateSingleStockIntraday(e.data.definition, e.data.days).then(result => {
+    updateSingleStockIntraday(e.data.definition, e.data.days, e.data.apiKeys, e.data.selectedProvider).then(result => {
       const response: WorkerResponse = { type: 'singleResult', result };
       self.postMessage(response);
     }).catch(error => {

@@ -1,6 +1,7 @@
 // Type definitions for view component props
 import { TFunction } from 'i18next';
 import { AssetFormData, ExpenseFormData, IncomeFormData, LiabilityFormData } from '../../domains/forms/form-data';
+import type { Control } from 'react-hook-form';
 import { Asset, Expense, Income, Liability } from '../../domains/financial/entities';
 import { BaseChartData } from '../charts';
 
@@ -57,12 +58,12 @@ export interface OptionFormData {
 
 export interface CategoryManagerProps extends TranslationProps {
   categoryForm: {
-    control: unknown; // TODO: Type this properly with react-hook-form
+    control: Control<CategoryFormData>;
     handleSubmit: (callback: (data: CategoryFormData) => void) => (e?: React.BaseSyntheticEvent) => Promise<void>;
     reset: () => void;
   };
   optionForm: {
-    control: unknown; // TODO: Type this properly with react-hook-form
+    control: Control<OptionFormData>;
     handleSubmit: (callback: (data: OptionFormData) => void) => (e?: React.BaseSyntheticEvent) => Promise<void>;
     reset: () => void;
   };

@@ -34,6 +34,38 @@ const validatePartialData = (data: unknown): void => {
   });
 };
 
+// Type imports for each store
+import type { Transaction, AssetDefinition, AssetCategory, AssetCategoryOption, AssetCategoryAssignment } from '@/types/domains/assets';
+import type { Liability, Expense, Income } from '@/types/domains/financial';
+import type { ExchangeRate } from '@/types/domains/financial/calculations';
+
+// Helper: Cast item to correct type for each store
+function castItemForStore(storeName: StoreNames, item: unknown):
+  Transaction | AssetDefinition | AssetCategory | AssetCategoryOption | AssetCategoryAssignment | Liability | Expense | Income | ExchangeRate {
+  switch (storeName) {
+    case 'transactions':
+      return item as Transaction;
+    case 'assetDefinitions':
+      return item as AssetDefinition;
+    case 'assetCategories':
+      return item as AssetCategory;
+    case 'assetCategoryOptions':
+      return item as AssetCategoryOption;
+    case 'assetCategoryAssignments':
+      return item as AssetCategoryAssignment;
+    case 'liabilities':
+      return item as Liability;
+    case 'expenses':
+      return item as Expense;
+    case 'income':
+      return item as Income;
+    case 'exchangeRates':
+      return item as ExchangeRate;
+    default:
+      throw new Error(`Unsupported store: ${storeName}`);
+  }
+}
+
 // Importiert alle Stores, die im JSON als Array vorhanden sind
 const importAnyStores = async (data: ExportData): Promise<void> => {
   for (const storeName of SUPPORTED_STORES) {
@@ -41,7 +73,7 @@ const importAnyStores = async (data: ExportData): Promise<void> => {
     if (storeData && Array.isArray(storeData)) {
       Logger.infoService(`Importing ${storeData.length} ${storeName}`);
       for (const item of storeData) {
-        await dbOperations.update(storeName, item as Record<string, unknown>);
+        await dbOperations.update(storeName, castItemForStore(storeName, item));
       }
       Logger.infoService(`${storeName} import completed successfully`);
     }
@@ -59,9 +91,12 @@ export const importExportOperations = {
     }
     data.exportDate = new Date().toISOString();
     data.version = '3.1.0';
-    Logger.infoService(
-      `Exporting backup: ${stores.map(s => `${data[s]?.length || 0} ${s}`).join(', ')}`
-    );
+    // Refactored: Avoid nested template literals for export summary
+    const storeSummaries = stores.map(s => {
+      const count = Array.isArray(data[s]) ? data[s].length : 0;
+      return count + ' ' + s;
+    });
+    Logger.infoService('Exporting backup: ' + storeSummaries.join(', '));
     return JSON.stringify(data, null, 2);
   },
 

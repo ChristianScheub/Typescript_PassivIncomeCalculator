@@ -249,9 +249,9 @@ const AIChatView: React.FC<AIChatViewProps> = ({
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {suggestedQuestions.map((question, index) => (
+                {suggestedQuestions.map((question) => (
                   <button
-                    key={index}
+                    key={question}
                     onClick={() => onSuggestedQuestionClick(question)}
                     className="text-left p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 text-sm transition-colors"
                     disabled={isTyping || modelStatus !== 'loaded'}

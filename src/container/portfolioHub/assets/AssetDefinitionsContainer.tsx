@@ -1,3 +1,37 @@
+// Helper to process batch update results from worker services
+type BatchResult<T> = {
+  success: boolean;
+  updatedDefinition?: T;
+  symbol?: string;
+  error?: string;
+};
+
+/**
+ * Processes batch results from worker services, dispatches updates, logs outcomes, and returns the number of successful updates.
+ */
+async function processBatchResults<T extends { fullName?: string; ticker?: string }>(
+  results: BatchResult<T>[],
+  dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
+  updateAction: (def: T) => Promise<void | { type: string }>,
+  loggerPrefix: string
+): Promise<number> {
+  const successfulResults = results.filter(r => r.success && r.updatedDefinition);
+  for (const result of successfulResults) {
+    const updatedDefinition = result.updatedDefinition!;
+    if (updatedDefinition.fullName) {
+      await updateAction(updatedDefinition);
+      Logger.info(`${loggerPrefix} updated: ${updatedDefinition.fullName}`);
+    } else {
+      Logger.error(`${loggerPrefix} missing required fields for ${updatedDefinition.ticker}`);
+    }
+  }
+  const failedResults = results.filter(r => !r.success);
+  if (failedResults.length > 0) {
+    Logger.warn(`${loggerPrefix} ${failedResults.length} updates failed:`);
+    failedResults.forEach(r => Logger.warn(`- ${r.symbol}: ${r.error}`));
+  }
+  return successfulResults.length;
+}
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
@@ -39,13 +73,7 @@ interface AssetDefinitionsContainerProps {
 }
 
 // Type alias for asset types
-export type AssetTypeAlias =
-  | "stock"
-  | "real_estate"
-  | "bond"
-  | "cash"
-  | "crypto"
-  | "other";
+export type AssetTypeAlias = "stock" | "real_estate" | "bond" | "cash" | "crypto" | "other";
 
 // Type alias for dividend frequency
 
@@ -259,6 +287,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   };
 
   const transactionsCache = useAppSelector((state: RootState) => state.transactions?.cache);
+  const stockApiConfig = useAppSelector((state: RootState) => state.config.apis.stock);
 
   const handleUpdateStockPrices = async () => {
     await executeAsyncOperation(
@@ -273,67 +302,31 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
           Logger.info("No stock definitions found to update");
           return;
         }
-
-        // Use worker service instead of direct service call
-        const response = await marketDataWorkerService.stockPrice.updateBatch(stockDefinitions);
-        
-        if (response.type === 'error') {
-          throw new Error(response.error);
-        }
-        
+        // Get apiKeys and selectedProvider from config (moved outside async callback)
+        const { apiKeys, selectedProvider } = stockApiConfig;
+        const response = await marketDataWorkerService.stockPrice.updateBatch(stockDefinitions, apiKeys, selectedProvider);
+        if (response.type === 'error') throw new Error(response.error);
         if (response.type === 'batchResult' && response.results) {
-          const successfulResults = response.results.filter(result => result.success && result.updatedDefinition);
-          
-          if (successfulResults.length > 0) {
-            Logger.info(
-              `Dispatching price updates for ${successfulResults.length} stock definitions`
-            );
-            for (const result of successfulResults) {
-              const updatedDefinition = result.updatedDefinition!;
-              Logger.info(
-                `Updating stock price for ${updatedDefinition.ticker}: ${updatedDefinition.currentPrice}`
-              );
-              if (updatedDefinition.fullName) {
-                await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
-                  updateAssetDefinition(updatedDefinition)
-                );
-              } else {
-                Logger.error(
-                  `Missing required fields for updating ${updatedDefinition.ticker}`
-                );
-              }
-            }
-            Logger.info(
-              "Successfully updated stock prices for asset definitions"
-            );
+          const numUpdated = await processBatchResults(
+            response.results,
+            dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
+            async (def) => (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def)),
+            'Stock price'
+          );
+          if (numUpdated > 0) {
+            Logger.info(`Successfully updated stock prices for ${numUpdated} asset definitions`);
             const portfolioPositions = transactionsCache?.positions || [];
             const portfolioCacheId = transactionsCache?.id || "default";
             if (portfolioPositions.length > 0) {
               await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
-                calculatePortfolioIntradayDataDirect({
-                  portfolioCacheId,
-                  // assetDefinitions: assetDefinitions, // Remove if not expected by thunk
-                })
+                calculatePortfolioIntradayDataDirect({ portfolioCacheId })
               );
-              Logger.info(
-                "Triggered portfolio intraday aggregation after price update"
-              );
+              Logger.info("Triggered portfolio intraday aggregation after price update");
             } else {
-              Logger.warn(
-                "No portfolio positions found for intraday aggregation after price update"
-              );
+              Logger.warn("No portfolio positions found for intraday aggregation after price update");
             }
           } else {
             Logger.info("No stock definitions were updated");
-          }
-          
-          // Log any failures
-          const failedResults = response.results.filter(result => !result.success);
-          if (failedResults.length > 0) {
-            Logger.warn(`${failedResults.length} stock price updates failed:`);
-            failedResults.forEach(result => {
-              Logger.warn(`- ${result.symbol}: ${result.error}`);
-            });
           }
         }
         setIsUpdatingPrices(false);
@@ -372,52 +365,21 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
           Logger.info("No stock definitions found to update historical data");
           return;
         }
-
-        // Use worker service instead of direct service call
-        const response = await marketDataWorkerService.stockHistory.updateBatch(stockDefinitions, period);
-        
-        if (response.type === 'error') {
-          throw new Error(response.error);
-        }
-        
+        const response = await marketDataWorkerService.stockHistory.updateBatch(stockDefinitions, period, stockApiConfig.apiKeys, stockApiConfig.selectedProvider);
+        if (response.type === 'error') throw new Error(response.error);
         if (response.type === 'batchResult' && response.results) {
-          const successfulResults = response.results.filter(result => result.success && result.updatedDefinition);
-          
-          if (successfulResults.length > 0) {
-            Logger.info(
-              `Dispatching historical data updates for ${successfulResults.length} stock definitions`
-            );
-            for (const result of successfulResults) {
-              const updatedDefinition = result.updatedDefinition!;
-              if (updatedDefinition.fullName) {
-                await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
-                  updateAssetDefinition(updatedDefinition)
-                );
-              } else {
-                Logger.error(
-                  `Missing required fields for updating historical data for ${updatedDefinition.ticker}`
-                );
-              }
-            }
-            Logger.info(
-              "Successfully updated historical data for asset definitions"
-            );
+          const numUpdated = await processBatchResults(
+            response.results,
+            dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
+            async (def) => (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def)),
+            'Historical data'
+          );
+          if (numUpdated > 0) {
+            Logger.info(`Successfully updated historical data for ${numUpdated} asset definitions`);
           } else {
-            Logger.info(
-              "No historical data updates were needed for stock definitions"
-            );
-          }
-          
-          // Log any failures
-          const failedResults = response.results.filter(result => !result.success);
-          if (failedResults.length > 0) {
-            Logger.warn(`${failedResults.length} historical data updates failed:`);
-            failedResults.forEach(result => {
-              Logger.warn(`- ${result.symbol}: ${result.error}`);
-            });
+            Logger.info("No historical data updates were needed for stock definitions");
           }
         }
-
         setIsUpdatingHistoricalData(false);
       },
       () =>
@@ -442,75 +404,39 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
       "fetch all dividends",
       async () => {
         Logger.info("Starting dividend fetch for all eligible assets using worker");
-        // Filter eligible assets (stocks with dividend API enabled)
         const eligibleAssets = assetDefinitions.filter(
           (def: AssetDefinition) => def.type === "stock" && def.useDividendApi
         );
-
         if (eligibleAssets.length === 0) {
           Logger.info("No eligible assets found for dividend fetch");
           return;
         }
-
-        Logger.info(
-          `Found ${eligibleAssets.length} eligible assets for dividend update`
-        );
-
-        // Use worker service instead of direct Redux action
+        Logger.info(`Found ${eligibleAssets.length} eligible assets for dividend update`);
         const response = await marketDataWorkerService.dividend.updateBatch(
-          eligibleAssets, 
+          eligibleAssets,
           { interval: '1d', range: '2y' }
         );
-        
-        if (response.type === 'error') {
-          throw new Error(response.error);
-        }
-        
+        if (response.type === 'error') throw new Error(response.error);
         if (response.type === 'batchResult' && response.results) {
-          const successfulResults = response.results.filter(result => result.success && result.updatedDefinition);
-          
-          for (const result of successfulResults) {
-            try {
-              const updatedDefinition = result.updatedDefinition!;
-              Logger.info(`Successfully fetched dividends for ${updatedDefinition.fullName}`);
-              
-              // Ensure dividend info frequency is valid
-              if (updatedDefinition.dividendInfo) {
-                const allowedFrequencies = [
-                  "monthly",
-                  "quarterly", 
-                  "annually",
-                  "custom",
-                ] as const;
-                const rawFrequency = updatedDefinition.dividendInfo.frequency;
+          const numUpdated = await processBatchResults(
+            response.results,
+            dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
+            async (def) => {
+              if (def.dividendInfo) {
+                // Only allow valid frequencies (exclude 'none')
+                const allowedFrequencies: DividendFrequency[] = ["monthly", "quarterly", "annually", "custom"];
+                const rawFrequency = def.dividendInfo.frequency;
                 const frequency: DividendFrequency =
                   allowedFrequencies.includes(rawFrequency as DividendFrequency)
                     ? (rawFrequency as DividendFrequency)
                     : "custom";
-                updatedDefinition.dividendInfo = {
-                  ...updatedDefinition.dividendInfo,
-                  frequency,
-                };
+                def.dividendInfo = { ...def.dividendInfo, frequency };
               }
-              
-              await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
-                updateAssetDefinition(updatedDefinition)
-              );
-            } catch (error) {
-              Logger.error(`Error updating dividend data for ${result.symbol}: ${error}`);
-            }
-          }
-          
-          // Log any failures
-          const failedResults = response.results.filter(result => !result.success);
-          if (failedResults.length > 0) {
-            Logger.warn(`${failedResults.length} dividend updates failed:`);
-            failedResults.forEach(result => {
-              Logger.warn(`- ${result.symbol}: ${result.error}`);
-            });
-          }
-          
-          Logger.info(`Successfully processed dividends for ${successfulResults.length} assets`);
+              return (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def));
+            },
+            'Dividend'
+          );
+          Logger.info(`Successfully processed dividends for ${numUpdated} assets`);
         }
       },
       () =>

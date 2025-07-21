@@ -386,7 +386,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   // Handle bar click for month selection with memoized callback
   const handleBarClick = useCallback((data: RechartsClickData) => {
     // Early exit if no valid click data
-    if (!data?.activePayload?.[0]?.payload?.month) {
+    if (!(data?.activePayload?.[0]?.payload?.month)) {
       return;
     }
     

@@ -2,6 +2,7 @@ import { AppDispatch, RootState } from "@/store/index";
 import { calculateFinancialSummary, calculateAssetFocusData } from "@/store/slices/domain/transactionsSlice"; // MIGRATED: Now in consolidated cache
 import Logger from "@/service/shared/logging/Logger/logger";
 import { isFinancialSummaryAllZero } from "@/utils/isFinancialSummaryValid";
+import { FinancialSummary } from "@/types/domains/analytics/reporting";
 import { 
   fetchAssetDefinitions,
   fetchTransactions,
@@ -74,76 +75,91 @@ export class AppInitializationService {
     dispatch: AppDispatch,
     getState: () => RootState
   ): Promise<void> {
-    // Cast dispatch to ThunkDispatch for AsyncThunk actions
     const thunkDispatch = dispatch as ThunkDispatch<RootState, unknown, AnyAction>;
     let state = getState();
 
-    // Step 0: Ensure all master data is loaded
-    // Check if data is missing or if we've never attempted to load it
-    const needsTransactions = (!state.transactions.items || state.transactions.items.length === 0) && state.transactions.status === 'idle';
-    const needsAssetDefinitions = (!state.assetDefinitions.items || state.assetDefinitions.items.length === 0) && state.assetDefinitions.status === 'idle';
-    const needsLiabilities = (!state.liabilities.items || state.liabilities.items.length === 0) && state.liabilities.status === 'idle';
-    const needsExpenses = (!state.expenses.items || state.expenses.items.length === 0) && state.expenses.status === 'idle';
-    const needsIncome = (!state.income.items || state.income.items.length === 0) && state.income.status === 'idle';
+    // Helper to load data with logging and error handling
+    const loadDataIfNeeded = async (
+      needsLoad: boolean,
+      fetchAction: () => Promise<unknown>,
+      logPrefix: string,
+      getLoadedCount: (state: RootState) => number
+    ) => {
+      if (!needsLoad) return;
+      Logger.info(`${logPrefix} missing, loading from DB...`);
+      try {
+        await thunkDispatch(fetchAction()).unwrap();
+        state = getState();
+        Logger.info(`${logPrefix} loaded: ${getLoadedCount(state)}`);
+      } catch (error) {
+        Logger.warn(`${logPrefix} failed to load, continuing with empty state: ${JSON.stringify(error)}`);
+        state = getState();
+      }
+    };
 
-    if (needsTransactions) {
-      Logger.info('AppInitialization: Transactions missing, loading from DB...');
-      try {
-        await thunkDispatch(fetchTransactions()).unwrap();
-        state = getState();
-        Logger.info(`AppInitialization: Transactions loaded: ${state.transactions.items.length}`);
-      } catch (error) {
-        Logger.warn('AppInitialization: Failed to load transactions, continuing with empty state: ' + JSON.stringify(error));
-        state = getState();
-      }
-    }
-    if (needsAssetDefinitions) {
-      Logger.info('AppInitialization: Asset definitions missing, loading from DB...');
-      try {
-        await thunkDispatch(fetchAssetDefinitions()).unwrap();
-        state = getState();
-        Logger.info(`AppInitialization: Asset definitions loaded: ${state.assetDefinitions.items.length}`);
-      } catch (error) {
-        Logger.warn('AppInitialization: Failed to load asset definitions, continuing with empty state: ' + JSON.stringify(error));
-        state = getState();
-      }
-    }
-    if (needsLiabilities) {
-      Logger.info('AppInitialization: Liabilities missing, loading from DB...');
-      try {
-        await thunkDispatch(fetchLiabilities()).unwrap();
-        state = getState();
-        Logger.info(`AppInitialization: Liabilities loaded: ${state.liabilities.items.length}`);
-      } catch (error) {
-        Logger.warn('AppInitialization: Failed to load liabilities, continuing with empty state: ' + JSON.stringify(error));
-        state = getState();
-      }
-    }
-    if (needsExpenses) {
-      Logger.info('AppInitialization: Expenses missing, loading from DB...');
-      try {
-        await thunkDispatch(fetchExpenses()).unwrap();
-        state = getState();
-        Logger.info(`AppInitialization: Expenses loaded: ${state.expenses.items.length}`);
-      } catch (error) {
-        Logger.warn('AppInitialization: Failed to load expenses, continuing with empty state: ' + JSON.stringify(error));
-        state = getState();
-      }
-    }
-    if (needsIncome) {
-      Logger.info('AppInitialization: Income missing, loading from DB...');
-      try {
-        await thunkDispatch(fetchIncome()).unwrap();
-        state = getState();
-        Logger.info(`AppInitialization: Income loaded: ${state.income.items.length}`);
-      } catch (error) {
-        Logger.warn('AppInitialization: Failed to load income, continuing with empty state: ' + JSON.stringify(error));
-        state = getState();
-      }
+    // Data descriptors for each master data type
+    const dataLoaders = [
+      {
+        needsLoad: (!state.transactions.items || state.transactions.items.length === 0) && state.transactions.status === 'idle',
+        fetchAction: fetchTransactions,
+        logPrefix: 'AppInitialization: Transactions',
+        getLoadedCount: (s: RootState) => s.transactions.items?.length || 0,
+      },
+      {
+        needsLoad: (!state.assetDefinitions.items || state.assetDefinitions.items.length === 0) && state.assetDefinitions.status === 'idle',
+        fetchAction: fetchAssetDefinitions,
+        logPrefix: 'AppInitialization: Asset definitions',
+        getLoadedCount: (s: RootState) => s.assetDefinitions.items?.length || 0,
+      },
+      {
+        needsLoad: (!state.liabilities.items || state.liabilities.items.length === 0) && state.liabilities.status === 'idle',
+        fetchAction: fetchLiabilities,
+        logPrefix: 'AppInitialization: Liabilities',
+        getLoadedCount: (s: RootState) => s.liabilities.items?.length || 0,
+      },
+      {
+        needsLoad: (!state.expenses.items || state.expenses.items.length === 0) && state.expenses.status === 'idle',
+        fetchAction: fetchExpenses,
+        logPrefix: 'AppInitialization: Expenses',
+        getLoadedCount: (s: RootState) => s.expenses.items?.length || 0,
+      },
+      {
+        needsLoad: (!state.income.items || state.income.items.length === 0) && state.income.status === 'idle',
+        fetchAction: fetchIncome,
+        logPrefix: 'AppInitialization: Income',
+        getLoadedCount: (s: RootState) => s.income.items?.length || 0,
+      },
+    ];
+
+    for (const loader of dataLoaders) {
+      await loadDataIfNeeded(loader.needsLoad, loader.fetchAction, loader.logPrefix, loader.getLoadedCount);
     }
 
-    // Step 1: Check if portfolio cache needs to be computed
-    await this._ensurePortfolioCache(thunkDispatch, getState);
+    // Step 1: Ensure portfolio cache is always calculated if transactions or asset definitions exist
+    state = getState();
+    const hasTransactions = state.transactions.items && state.transactions.items.length > 0;
+    const hasAssetDefinitions = state.assetDefinitions.items && state.assetDefinitions.items.length > 0;
+    if ((hasTransactions && hasAssetDefinitions) && !state.transactions.cache) {
+      Logger.info("AppInitialization: Forcing portfolio cache calculation after master data load");
+      try {
+        const categoryData = {
+          categories: state.assetCategories.categories || [],
+          categoryOptions: state.assetCategories.categoryOptions || [],
+          categoryAssignments: state.assetCategories.categoryAssignments || [],
+        };
+        await thunkDispatch(
+          calculatePortfolioData({
+            assetDefinitions: state.assetDefinitions.items,
+            categoryData,
+          })
+        ).unwrap();
+        Logger.info("AppInitialization: Portfolio cache calculation completed (forced)");
+      } catch (error) {
+        Logger.error("AppInitialization: Forced portfolio cache calculation failed: " + JSON.stringify(error));
+      }
+    } else {
+      await this._ensurePortfolioCache(thunkDispatch, getState);
+    }
 
     // Step 2: Ensure financial summary is computed
     await this._ensureFinancialSummary(thunkDispatch, getState);
@@ -220,9 +236,24 @@ export class AppInitializationService {
     const state = getState();
     const { transactions } = state;
 
-    const hasAllZeroFinancialSummary =
-      transactions.cache?.financialSummary &&
-      isFinancialSummaryAllZero(transactions.cache.financialSummary);
+    const summary = transactions.cache?.financialSummary;
+    // Only check if all required properties exist (runtime check for legacy/partial cache)
+    const hasAllSummaryFields = summary &&
+      [
+        'netWorth',
+        'totalAssets',
+        'totalLiabilities',
+        'monthlyIncome',
+        'monthlyExpenses',
+        'monthlyLiabilityPayments',
+        'monthlyAssetIncome',
+        'passiveIncome',
+        'monthlyCashFlow',
+        'totalMonthlyIncome',
+        'totalPassiveIncome',
+        'totalMonthlyExpenses'
+      ].every(key => Object.prototype.hasOwnProperty.call(summary, key));
+    const hasAllZeroFinancialSummary = hasAllSummaryFields && isFinancialSummaryAllZero(summary as FinancialSummary);
 
     if (hasAllZeroFinancialSummary) {
       Logger.warn(

@@ -2,15 +2,18 @@
  * Specialized UI component types
  */
 
-import { UseFormSetValue, FieldErrors } from 'react-hook-form';
+
+import type { Asset } from '@/types/domains/assets';
+
+import type { FieldErrors, UseFormSetValue } from 'react-hook-form';
 
 // Generic field change handler
 export type FieldChangeHandler = (field: string, value: unknown) => void;
 
 // Basic asset information props
 export interface BasicAssetInformationProps {
-  selectedAsset: unknown; // TODO: Type this as Asset when available
-  onAssetSelect: (asset: unknown) => void; // TODO: Type this as Asset when available
+  selectedAsset: Asset;
+  onAssetSelect: (asset: Asset) => void;
   onChange: FieldChangeHandler;
   errors: FieldErrors; // Properly typed react-hook-form errors
 }

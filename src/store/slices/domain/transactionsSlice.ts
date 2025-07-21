@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction, createSelector } from '@reduxjs/toolkit';
 import { 
   Transaction as Asset
 } from '@/types/domains/assets/';
@@ -484,7 +484,12 @@ const transactionsSlice = createSlice({
     // Portfolio intraday data management actions
     setIntradayData: (state, action: PayloadAction<PortfolioIntradayPoint[]>) => {
       if (state.cache) {
-        state.cache.intradayData = action.payload;
+        // Fix: set as object with data, lastCalculated, cacheKey
+        state.cache.intradayData = {
+          data: action.payload,
+          lastCalculated: new Date().toISOString(),
+          cacheKey: `manual-${action.payload.length}`
+        };
         Logger.cache('Set portfolio intraday data in cache');
       }
     },
@@ -665,17 +670,42 @@ export const selectPortfolioTotals = (state: { transactions: TransactionsState }
 export const selectSortedTransactions = (state: { transactions: TransactionsState }) => 
   [...state.transactions.items].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-// Extended cache selectors - konsolidiert
-export const selectPortfolioHistory = (timeRange: AssetFocusTimeRange) => (state: { transactions: TransactionsState }) =>
-  state.transactions.cache?.history[timeRange];
+// Extended cache selectors - memoized with createSelector for stability
+export const selectPortfolioHistory = (timeRange: AssetFocusTimeRange) => 
+  createSelector(
+    [(state: { transactions: TransactionsState }) => state.transactions.cache?.history[timeRange]],
+    (history) => history
+  );
 
-export const selectAssetFocusData = (state: { transactions: TransactionsState }) =>
-  state.transactions.cache?.assetFocusData;
+export const selectAssetFocusData = createSelector(
+  [(state: { transactions: TransactionsState }) => state.transactions.cache?.assetFocusData],
+  (assetFocusData) => {
+    // Ensure consistent return structure
+    if (!assetFocusData) {
+      return { 
+        assetsWithValues: [], 
+        portfolioSummary: null,
+        lastCalculated: '',
+        inputHash: ''
+      };
+    }
+    
+    // Ensure assetsWithValues is always an array
+    return {
+      ...assetFocusData,
+      assetsWithValues: Array.isArray(assetFocusData.assetsWithValues) ? assetFocusData.assetsWithValues : []
+    };
+  }
+);
 
-export const selectFinancialSummary = (state: { transactions: TransactionsState }) =>
-  state.transactions.cache?.financialSummary;
+export const selectFinancialSummary = createSelector(
+  [(state: { transactions: TransactionsState }) => state.transactions.cache?.financialSummary],
+  (financialSummary) => financialSummary
+);
 
-export const selectPortfolioIntradayData = (state: { transactions: TransactionsState }) =>
-  state.transactions.cache?.intradayData;
+export const selectPortfolioIntradayData = createSelector(
+  [(state: { transactions: TransactionsState }) => state.transactions.cache?.intradayData],
+  (intradayData) => intradayData
+);
 
 export default transactionsSlice.reducer;

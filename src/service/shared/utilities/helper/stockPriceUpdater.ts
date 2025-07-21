@@ -159,10 +159,14 @@ export class StockPriceUpdater {
   /**
    * Updates historical data (30 days) for stock definitions
    * @param definitions Array of asset definitions (only stock types with tickers will be updated)
+   * @param apiKeys Optional API keys for providers
+   * @param selectedProvider Optional selected API provider
    * @returns Array of updated asset definitions with historical data
    */
   static async updateStockHistoricalData(
-    definitions: AssetDefinition[]
+    definitions: AssetDefinition[],
+    apiKeys?: Record<string, string | undefined>,
+    selectedProvider?: string
   ): Promise<AssetDefinition[]> {
     const stockDefinitionsToUpdate = definitions
       .filter(
@@ -184,8 +188,59 @@ export class StockPriceUpdater {
       `Fetching 30-day historical data for ${stockDefinitionsToUpdate.length} stock definitions with auto-update enabled`
     );
 
-    // stockAPIService ist jetzt ein Objekt, keine Factory mehr!
-    const stockAPI = stockAPIService;
+    // Dynamische API-Service-Auswahl (Worker: API-Keys und Provider werden übergeben)
+    let stockAPI: IStockAPIService = stockAPIService;
+    if (apiKeys && selectedProvider) {
+      // Use dynamic import for provider selection
+      const { StockAPIProvider } = await import("@/types/shared/base/enums");
+      const apiKey = apiKeys[selectedProvider.toLowerCase()];
+      Logger.infoService(`[StockPriceUpdater] Historical Data Provider: ${selectedProvider}, apiKeys: ${JSON.stringify(apiKeys)}, verwendeter apiKey: ${apiKey}`);
+      switch (selectedProvider) {
+        case StockAPIProvider.FINNHUB: {
+          const { FinnhubAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/FinnhubAPIService");
+          stockAPI = new FinnhubAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.YAHOO: {
+          const { YahooAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/YahooAPIService");
+          stockAPI = new YahooAPIService();
+          break;
+        }
+        case StockAPIProvider.ALPHA_VANTAGE: {
+          const { AlphaVantageAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/AlphaVantageAPIService");
+          stockAPI = new AlphaVantageAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.IEX_CLOUD: {
+          const { IEXCloudAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/IEXCloudAPIService");
+          stockAPI = new IEXCloudAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.TWELVE_DATA: {
+          const { TwelveDataAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/TwelveDataAPIService");
+          stockAPI = new TwelveDataAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.QUANDL: {
+          const { QuandlAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/QuandlAPIService");
+          stockAPI = new QuandlAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.EOD_HISTORICAL_DATA: {
+          const { EODHistoricalDataAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/EODHistoricalDataAPIService");
+          stockAPI = new EODHistoricalDataAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.POLYGON_IO: {
+          const { PolygonIOAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/PolygonIOAPIService");
+          stockAPI = new PolygonIOAPIService(apiKey);
+          break;
+        }
+        default:
+          throw new Error('Kein unterstützter Stock API Provider ausgewählt!');
+      }
+    }
+    
     const updatedDefinitions: AssetDefinition[] = [];
 
     for (const definition of stockDefinitionsToUpdate) {
@@ -245,11 +300,15 @@ export class StockPriceUpdater {
    * Updates historical data for stock definitions with specific time period
    * @param definitions Array of asset definitions (only stock types with tickers will be updated)
    * @param period Time period for historical data (e.g., "1d", "1mo", "1y", etc.)
+   * @param apiKeys Optional API keys for providers
+   * @param selectedProvider Optional selected API provider
    * @returns Array of updated asset definitions with historical data
    */
   static async updateStockHistoricalDataWithPeriod(
     definitions: AssetDefinition[],
-    period: TimeRangePeriod
+    period: TimeRangePeriod,
+    apiKeys?: Record<string, string | undefined>,
+    selectedProvider?: string
   ): Promise<AssetDefinition[]> {
     const stockDefinitionsToUpdate = definitions.filter(
       (definition) => definition.type === "stock" && definition.ticker
@@ -269,8 +328,59 @@ export class StockPriceUpdater {
     // Fehlerhafte Ticker sammeln
     const failedTickers: { ticker: string; name: string }[] = [];
     const updatedDefinitions: AssetDefinition[] = [];
-    // stockAPIService ist jetzt ein Objekt, keine Factory mehr!
-    const stockAPI = stockAPIService;
+    
+    // Dynamische API-Service-Auswahl (Worker: API-Keys und Provider werden übergeben)
+    let stockAPI: IStockAPIService = stockAPIService;
+    if (apiKeys && selectedProvider) {
+      // Use dynamic import for provider selection
+      const { StockAPIProvider } = await import("@/types/shared/base/enums");
+      const apiKey = apiKeys[selectedProvider.toLowerCase()];
+      Logger.infoService(`[StockPriceUpdater] Historical Data with Period Provider: ${selectedProvider}, apiKeys: ${JSON.stringify(apiKeys)}, verwendeter apiKey: ${apiKey}`);
+      switch (selectedProvider) {
+        case StockAPIProvider.FINNHUB: {
+          const { FinnhubAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/FinnhubAPIService");
+          stockAPI = new FinnhubAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.YAHOO: {
+          const { YahooAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/YahooAPIService");
+          stockAPI = new YahooAPIService();
+          break;
+        }
+        case StockAPIProvider.ALPHA_VANTAGE: {
+          const { AlphaVantageAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/AlphaVantageAPIService");
+          stockAPI = new AlphaVantageAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.IEX_CLOUD: {
+          const { IEXCloudAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/IEXCloudAPIService");
+          stockAPI = new IEXCloudAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.TWELVE_DATA: {
+          const { TwelveDataAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/TwelveDataAPIService");
+          stockAPI = new TwelveDataAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.QUANDL: {
+          const { QuandlAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/QuandlAPIService");
+          stockAPI = new QuandlAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.EOD_HISTORICAL_DATA: {
+          const { EODHistoricalDataAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/EODHistoricalDataAPIService");
+          stockAPI = new EODHistoricalDataAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.POLYGON_IO: {
+          const { PolygonIOAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/PolygonIOAPIService");
+          stockAPI = new PolygonIOAPIService(apiKey);
+          break;
+        }
+        default:
+          throw new Error('Kein unterstützter Stock API Provider ausgewählt!');
+      }
+    }
 
     for (const definition of stockDefinitionsToUpdate) {
       try {

@@ -1,8 +1,129 @@
+// Helper function to find the last available price for an asset at a given timestamp
+function findLastAvailablePrice(
+  assetDefinition: AssetDefinition,
+  targetTimestamp: string,
+  assetDataMap: Record<string, Record<string, number>>
+): number | null {
+  const ticker = assetDefinition.ticker || assetDefinition.id;
+  const assetTimestampMap = assetDataMap[ticker];
+  if (!assetTimestampMap) return null;
+  if (assetTimestampMap[targetTimestamp]) {
+    return assetTimestampMap[targetTimestamp];
+  }
+  let latestPrice: number | null = null;
+  let latestTimestamp: Date | null = null;
+  const targetDate = new Date(targetTimestamp);
+  Object.entries(assetTimestampMap).forEach(([timestamp, price]) => {
+    const entryDate = new Date(timestamp);
+    if (entryDate <= targetDate) {
+      if (!latestTimestamp || entryDate > latestTimestamp) {
+        latestTimestamp = entryDate;
+        latestPrice = price;
+      }
+    }
+  });
+  if (latestPrice !== null) return latestPrice;
+  if (assetDefinition.priceHistory) {
+    const targetDateStr = targetTimestamp.split('T')[0];
+    const sortedHistory = assetDefinition.priceHistory
+      .filter((entry: PriceHistoryEntry) => !entry.date.includes('T'))
+      .sort((a: PriceHistoryEntry, b: PriceHistoryEntry) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    for (const entry of sortedHistory) {
+      if (entry.date <= targetDateStr) {
+        return entry.price;
+      }
+    }
+  }
+  return null;
+}
+
+// Main calculation logic extracted for clarity and reduced nesting
+function calculatePortfolioIntradayData(
+  assetDefinitions: AssetDefinition[],
+  portfolioCache: ConsolidatedPortfolioCache | undefined,
+  isHydrated: boolean,
+  cachedData: Array<{ date: string; value: number; timestamp: string }>,
+  assetDefinitionHash: string,
+  lastCalculationHash: string
+): Array<{ date: string; value: number; timestamp: string }> {
+  if (!isHydrated || !portfolioCache?.positions || portfolioCache.positions.length === 0 || assetDefinitions.length === 0) {
+    Logger.infoService('📂 Using cached portfolio data (no assets or portfolio available)');
+    return cachedData;
+  }
+  if (assetDefinitionHash === lastCalculationHash && cachedData.length > 0) {
+    Logger.infoService('📂 Using cached portfolio data (no changes detected)');
+    return cachedData;
+  }
+  Logger.infoService('🔄 Calculating portfolio intraday data from asset definitions...');
+  Logger.infoService(`Portfolio positions: ${portfolioCache.positions.length}`);
+  Logger.infoService(`Asset definitions: ${assetDefinitions.length}`);
+  const today = new Date();
+  const datesRange: string[] = [];
+  for (let i = 0; i < 5; i++) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - i);
+    datesRange.push(date.toISOString().split('T')[0]);
+  }
+  Logger.infoService(`Date range: ${datesRange.join(', ')}`);
+  const allTimestamps = new Set<string>();
+  const assetDataMap: Record<string, Record<string, number>> = {};
+  assetDefinitions.forEach((definition: AssetDefinition) => {
+    if (!definition.priceHistory || definition.priceHistory.length === 0) {
+      Logger.infoService(`❌ No price history for asset: ${definition.ticker || definition.id}`);
+      return;
+    }
+    const ticker = definition.ticker || definition.id;
+    assetDataMap[ticker] = {};
+    const intradayEntries = definition.priceHistory.filter((entry: PriceHistoryEntry) => {
+      const entryDate = entry.date.split('T')[0];
+      const hasTime = entry.date.includes('T') && entry.date.length > 10;
+      const isInRange = datesRange.includes(entryDate);
+      return isInRange && hasTime;
+    });
+    Logger.infoService(`Asset ${ticker}: ${intradayEntries.length} intraday entries of ${definition.priceHistory.length} total`);
+    intradayEntries.forEach((entry: PriceHistoryEntry) => {
+      allTimestamps.add(entry.date);
+      assetDataMap[ticker][entry.date] = entry.price;
+    });
+  });
+  const portfolioData: Array<{ date: string; value: number; timestamp: string }> = [];
+  allTimestamps.forEach(timestamp => {
+    let portfolioValue = 0;
+    let assetsWithPrices = 0;
+    const debugInfo: string[] = [];
+    portfolioCache.positions.forEach((position: PortfolioPosition) => {
+      const definition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
+      if (!definition) {
+        debugInfo.push(`No definition for position with ID: ${position.assetDefinitionId}`);
+        return;
+      }
+      const price = findLastAvailablePrice(definition, timestamp, assetDataMap);
+      if (price !== null && !isNaN(price) && !isNaN(position.totalQuantity)) {
+        const assetValue = price * position.totalQuantity;
+        portfolioValue += assetValue;
+        assetsWithPrices++;
+        debugInfo.push(`${definition.ticker || definition.id}: ${position.totalQuantity} × ${price} = ${assetValue}`);
+      } else {
+        debugInfo.push(`${definition.ticker || definition.id}: NO PRICE (price=${price}, qty=${position.totalQuantity})`);
+      }
+    });
+    if (assetsWithPrices > 0 && !isNaN(portfolioValue) && portfolioValue > 0) {
+      const date = timestamp.split('T')[0];
+      portfolioData.push({ date, value: portfolioValue, timestamp });
+    } else {
+      Logger.infoService(`❌ Skipping timestamp ${timestamp}: assetsWithPrices=${assetsWithPrices}, portfolioValue=${portfolioValue}. Debug: ${debugInfo.slice(0, 3).join('; ')}`);
+    }
+  });
+  portfolioData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  Logger.infoService(`✅ Calculated ${portfolioData.length} portfolio intraday points from ${allTimestamps.size} timestamps`);
+  return portfolioData;
+}
 import { useMemo, useEffect, useState, useCallback } from 'react';
 import { useAppSelector } from './redux';
 import { PriceHistoryEntry } from '@/types/domains/assets';
 import { AssetDefinition } from '@/types/domains/assets/entities';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
+import { ConsolidatedPortfolioCache } from '@/store/slices/domain/transactionsSlice';
 import portfolioHistoryService, { 
   PortfolioIntradayPoint 
 } from '@/service/infrastructure/sqlLitePortfolioHistory';
@@ -78,161 +199,22 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
     loadCachedPortfolioData();
   }, [isHydrated]);
 
-  // Calculate portfolio values directly from asset definitions
-  const portfolioIntradayData = useMemo(() => {
-    if (!isHydrated || !portfolioCache?.positions || portfolioCache.positions.length === 0 || assetDefinitions.length === 0) {
-      // Return cached data if fresh calculation not possible
-      Logger.infoService('📂 Using cached portfolio data (no assets or portfolio available)');
-      return cachedData;
-    }
-
-    // Check if we need to recalculate
-    if (assetDefinitionHash === lastCalculationHash && cachedData.length > 0) {
-      Logger.infoService('📂 Using cached portfolio data (no changes detected)');
-      return cachedData;
-    }
-
-    Logger.infoService('🔄 Calculating portfolio intraday data from asset definitions...');
-    Logger.infoService(`Portfolio positions: ${portfolioCache.positions.length}`);
-    Logger.infoService(`Asset definitions: ${assetDefinitions.length}`);
-
-    // Get last 5 days
-    const today = new Date();
-    const datesRange: string[] = [];
-    for (let i = 0; i < 5; i++) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
-      datesRange.push(date.toISOString().split('T')[0]);
-    }
-
-    Logger.infoService(`Date range: ${datesRange.join(', ')}`);
-
-    // Collect all intraday timestamps from all assets
-    const allTimestamps = new Set<string>();
-    const assetDataMap: Record<string, Record<string, number>> = {};
-
-    assetDefinitions.forEach((definition: AssetDefinition) => {
-      if (!definition.priceHistory || definition.priceHistory.length === 0) {
-        Logger.infoService(`❌ No price history for asset: ${definition.ticker || definition.id}`);
-        return;
-      }
-
-      const ticker = definition.ticker || definition.id;
-      assetDataMap[ticker] = {};
-
-      // Filter for intraday entries in the last 5 days
-      const intradayEntries = definition.priceHistory.filter((entry: PriceHistoryEntry) => {
-        const entryDate = entry.date.split('T')[0];
-        const hasTime = entry.date.includes('T') && entry.date.length > 10;
-        const isInRange = datesRange.includes(entryDate);
-        return isInRange && hasTime;
-      });
-
-      Logger.infoService(`Asset ${ticker}: ${intradayEntries.length} intraday entries of ${definition.priceHistory.length} total`);
-
-      intradayEntries.forEach((entry: PriceHistoryEntry) => {
-        allTimestamps.add(entry.date);
-        assetDataMap[ticker][entry.date] = entry.price;
-      });
-    });
-
-    // Helper function to find the last available price
-    const findLastAvailablePrice = (assetDefinition: AssetDefinition, targetTimestamp: string): number | null => {
-      const ticker = assetDefinition.ticker || assetDefinition.id;
-      const assetTimestampMap = assetDataMap[ticker];
-      
-      if (!assetTimestampMap) return null;
-
-      // Check exact match first
-      if (assetTimestampMap[targetTimestamp]) {
-        return assetTimestampMap[targetTimestamp];
-      }
-
-      // Find most recent price before target timestamp
-      let latestPrice: number | null = null;
-      let latestTimestamp: Date | null = null;
-      const targetDate = new Date(targetTimestamp);
-
-      Object.entries(assetTimestampMap).forEach(([timestamp, price]) => {
-        const entryDate = new Date(timestamp);
-        if (entryDate <= targetDate) {
-          if (!latestTimestamp || entryDate > latestTimestamp) {
-            latestTimestamp = entryDate;
-            latestPrice = price;
-          }
-        }
-      });
-
-      if (latestPrice !== null) return latestPrice;
-
-      // Fallback to daily price history
-      if (assetDefinition.priceHistory) {
-        const targetDateStr = targetTimestamp.split('T')[0];
-        const sortedHistory = assetDefinition.priceHistory
-          .filter((entry: PriceHistoryEntry) => !entry.date.includes('T'))
-          .sort((a: PriceHistoryEntry, b: PriceHistoryEntry) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-        for (const entry of sortedHistory) {
-          if (entry.date <= targetDateStr) {
-            return entry.price;
-          }
-        }
-      }
-
-      return null;
-    };
-
-    // Calculate portfolio value for each timestamp
-    const portfolioData: Array<{ date: string; value: number; timestamp: string }> = [];
-
-    allTimestamps.forEach(timestamp => {
-      let portfolioValue = 0;
-      let assetsWithPrices = 0;
-      const debugInfo: string[] = [];
-
-      portfolioCache.positions.forEach((position: PortfolioPosition) => {
-        const definition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
-        if (!definition) {
-          debugInfo.push(`No definition for position with ID: ${position.assetDefinitionId}`);
-          return;
-        }
-
-        const price = findLastAvailablePrice(definition, timestamp);
-        if (price !== null && !isNaN(price) && !isNaN(position.quantity)) {
-          const assetValue = price * position.quantity;
-          portfolioValue += assetValue;
-          assetsWithPrices++;
-          debugInfo.push(`${definition.ticker || definition.id}: ${position.quantity} × ${price} = ${assetValue}`);
-        } else {
-          debugInfo.push(`${definition.ticker || definition.id}: NO PRICE (price=${price}, qty=${position.quantity})`);
-        }
-      });
-
-      // Only include if we have prices for at least some assets and portfolio value is valid
-      if (assetsWithPrices > 0 && !isNaN(portfolioValue) && portfolioValue > 0) {
-        const date = timestamp.split('T')[0];
-        portfolioData.push({
-          date,
-          value: portfolioValue,
-          timestamp
-        });
-      } else {
-        Logger.infoService(`❌ Skipping timestamp ${timestamp}: assetsWithPrices=${assetsWithPrices}, portfolioValue=${portfolioValue}. Debug: ${debugInfo.slice(0, 3).join('; ')}`);
-      }
-    });
-
-    // Sort by timestamp
-    portfolioData.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-
-    Logger.infoService(`✅ Calculated ${portfolioData.length} portfolio intraday points from ${allTimestamps.size} timestamps`);
-
-    return portfolioData;
-  }, [portfolioCache, assetDefinitions, isHydrated, cachedData, assetDefinitionHash, lastCalculationHash]);
+  // Calculate portfolio values directly from asset definitions (max 4 levels deep)
+  const portfolioIntradayData = useMemo(() =>
+    calculatePortfolioIntradayData(
+      assetDefinitions,
+      portfolioCache,
+      isHydrated,
+      cachedData,
+      assetDefinitionHash,
+      lastCalculationHash
+    ),
+    [portfolioCache, assetDefinitions, isHydrated, cachedData, assetDefinitionHash, lastCalculationHash]
+  );
 
   // Helper function to calculate daily aggregates from intraday data
   const calculateDailyAggregates = useCallback((intradayData: Array<{ date: string; value: number; timestamp: string }>) => {
     const dailyMap = new Map<string, { values: number[]; date: string }>();
-    
     // Group by date
     intradayData.forEach(point => {
       if (!dailyMap.has(point.date)) {
@@ -240,20 +222,18 @@ export function useAutoUpdatingPortfolioHistory(): Array<{ date: string; value: 
       }
       dailyMap.get(point.date)!.values.push(point.value);
     });
-    
-    // Calculate daily aggregates
+    // Calculate daily aggregates as PortfolioHistoryPoint
     return Array.from(dailyMap.values()).map(dayData => {
       const values = dayData.values;
       const dailyValue = values[values.length - 1]; // Use last value of the day
-      
-      // Estimate total invested (this could be enhanced with actual transaction data)
       const totalInvested = dailyValue * 0.85; // Simple approximation
-      
       return {
         date: dayData.date,
-        value: dailyValue,
+        totalValue: dailyValue,
         totalInvested,
-        timestamp: new Date(`${dayData.date}T23:59:59`).toISOString()
+        totalReturn: dailyValue - totalInvested,
+        totalReturnPercentage: totalInvested > 0 ? ((dailyValue - totalInvested) / totalInvested) * 100 : 0,
+        positions: [] // No per-asset breakdown in this aggregate
       };
     }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, []);

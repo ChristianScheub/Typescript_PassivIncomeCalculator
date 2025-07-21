@@ -28,11 +28,13 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
 }) => {
   const allAssets = useAppSelector(state => state.transactions.items);
   
-  if (!asset || !assetDefinition || !isOpen) return null;
+  if (!assetDefinition || !isOpen) return null;
 
   // Find all transactions for the same asset definition ID
+  // Use assetDefinition.id if asset is null, otherwise use asset.assetDefinitionId
+  const assetDefId = asset?.assetDefinitionId || assetDefinition.id;
   const relatedTransactions = allAssets.filter((a: Asset) => 
-    a.assetDefinitionId === asset.assetDefinitionId
+    a.assetDefinitionId === assetDefId
   );
 
   // Calculate aggregated values from all transactions (considering buy/sell)
@@ -90,17 +92,17 @@ const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
   const purchaseDates = relatedTransactions.map((a: Asset) => a.purchaseDate).filter(Boolean);
   const firstPurchaseDate = purchaseDates.length > 0 ? 
     new Date(Math.min(...purchaseDates.map((d: string) => new Date(d).getTime()))).toISOString() : 
-    asset.purchaseDate;
+    asset?.purchaseDate || new Date().toISOString();
   const lastPurchaseDate = purchaseDates.length > 0 ? 
     new Date(Math.max(...purchaseDates.map((d: string) => new Date(d).getTime()))).toISOString() : 
-    asset.purchaseDate;
+    asset?.purchaseDate || new Date().toISOString();
 
   // Convert Asset and AssetDefinition to PortfolioPosition format
   // that's expected by the AssetDetailView
   const portfolioPosition: PortfolioPosition = {
-    id: asset.id,
+    id: asset?.id || assetDefinition.id || 'unknown',
     name: assetDefinition.name || assetDefinition.fullName,
-    type: asset.type,
+    type: asset?.type || 'stock',
     ticker: assetDefinition.ticker || '',
     totalQuantity: totalQuantity,
     totalInvestment: totalInvestment,

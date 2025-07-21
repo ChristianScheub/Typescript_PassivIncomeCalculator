@@ -27,9 +27,8 @@ if (persistedState) {
 }
 
 // Debug: Log config after hydration
-if (persistedState && persistedState.config && persistedState.config.dashboard) {
-   
-  console.info('[Hydration] Dashboard assetFocus nach Laden:', persistedState.config.dashboard.assetFocus);
+if (persistedState?.config?.dashboard) {
+  console.info('[Hydration] Dashboard assetFocus nach Laden:', persistedState.config.dashboard?.assetFocus);
 }
 
 // Setup state persistence with throttling
