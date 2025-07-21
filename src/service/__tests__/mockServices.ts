@@ -155,14 +155,81 @@ export const mockFormatService = {
 };
 
 export const mockStockAPIService = {
-  getCurrentStockPrice: async (symbol: string) => Promise.resolve({
-    symbol,
-    price: 100,
-    change: 1,
-    changePercent: 1,
-    timestamp: new Date(),
-  }),
-  getHistory: async (symbol: string, start: string, end: string) => Promise.resolve([]),
-  getHistory30Days: async (symbol: string) => Promise.resolve([]),
-  getIntradayHistory: async (symbol: string) => Promise.resolve([]),
+  getCurrentStockPrice: async (symbol: string) => {
+    if (symbol === 'AAPL') {
+      return {
+        symbol: 'AAPL',
+        price: 150.25,
+        change: 2.50,
+        changePercent: 1.69,
+        timestamp: new Date(),
+      };
+    } else if (symbol === 'BRK.B') {
+      return {
+        symbol: 'BRK.B',
+        price: 300.50,
+        change: -1.25,
+        changePercent: -0.41,
+        timestamp: new Date(),
+      };
+    } else if (symbol === 'MSFT') {
+      return {
+        symbol: 'MSFT',
+        price: 350.75,
+        change: 5.25,
+        changePercent: 1.52,
+        timestamp: new Date(),
+      };
+    }
+    return {
+      symbol,
+      price: 100,
+      change: 1,
+      changePercent: 1,
+      timestamp: new Date(),
+    };
+  },
+  getHistory: async (symbol: string, start: string, end: string) => [
+    {
+      date: '2023-01-01',
+      open: 130.28,
+      high: 133.41,
+      low: 129.89,
+      close: 131.86,
+      volume: 70790813,
+    },
+    {
+      date: '2023-01-02',
+      open: 131.99,
+      high: 132.41,
+      low: 125.70,
+      close: 126.04,
+      volume: 63896155,
+    },
+  ],
+  getHistory30Days: async (symbol: string) => Array.from({ length: 30 }, (_, i) => ({
+    date: `2023-12-${String(i + 1).padStart(2, '0')}`,
+    open: 150 + Math.random() * 10,
+    high: 155 + Math.random() * 10,
+    low: 145 + Math.random() * 10,
+    close: 150 + Math.random() * 10,
+    volume: 50000000 + Math.random() * 20000000,
+  })),
+  getIntradayHistory: async (symbol: string) => [
+    {
+      time: '09:30',
+      price: 150.25,
+      volume: 1250000,
+    },
+    {
+      time: '09:31',
+      price: 150.50,
+      volume: 980000,
+    },
+    {
+      time: '09:32',
+      price: 150.75,
+      volume: 1100000,
+    },
+  ],
 };
