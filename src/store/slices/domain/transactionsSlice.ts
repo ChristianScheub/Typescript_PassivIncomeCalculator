@@ -175,6 +175,18 @@ export const calculatePortfolioData = createAsyncThunk(
     
     // InputHash für Forecast-Trigger berechnen
     const inputHash = generatePortfolioInputHash(assets, assetDefinitions);
+    Logger.infoRedux('[PortfolioCache] Neuer inputHash berechnet: ' + inputHash + '\nAssets: ' + JSON.stringify(assets.map(a => ({
+      id: a.id,
+      quantity: a.purchaseQuantity || (a as unknown as { currentQuantity: number }).currentQuantity,
+      transactionType: a.transactionType,
+      assetDefinitionId: a.assetDefinitionId,
+      cachedDividends: a.cachedDividends
+    }))) + '\nAssetDefinitions: ' + JSON.stringify(assetDefinitions.map(d => ({
+      id: d.id,
+      type: d.type,
+      isin: d.isin,
+      wkn: d.wkn
+    }))));
     
     // Create the consolidated portfolio cache
     const portfolioCache: ConsolidatedPortfolioCache = {
@@ -325,11 +337,11 @@ export const calculateFinancialSummary = createAsyncThunk(
     };
     
     const inputHash = simpleHash([
-      ...assets.map((a: Asset) => ({ id: a.id, updatedAt: a.updatedAt })),
-      ...assetDefinitions.map((a: AssetDefinition) => ({ id: a.id, updatedAt: a.updatedAt })),
-      ...payload.liabilities.map((l: Liability) => ({ id: l.id, updatedAt: l.updatedAt })),
-      ...payload.expenses.map((e: Expense) => ({ id: e.id, updatedAt: e.updatedAt })),
-      ...payload.income.map((i: Income) => ({ id: i.id, updatedAt: i.updatedAt }))
+      ...assets.map((a: Asset) => ({ id: a.id })),
+      ...assetDefinitions.map((a: AssetDefinition) => ({ id: a.id })),
+      ...payload.liabilities.map((l: Liability) => ({ id: l.id })),
+      ...payload.expenses.map((e: Expense) => ({ id: e.id })),
+      ...payload.income.map((i: Income) => ({ id: i.id }))
     ]);
     
     // Check if we have valid cached data
@@ -428,6 +440,7 @@ const transactionsSlice = createSlice({
     setPortfolioCache: (state, action: PayloadAction<{ cache: ConsolidatedPortfolioCache; timestamp: string }>) => {
       state.cache = action.payload.cache;
       state.lastCalculated = action.payload.timestamp;
+      Logger.infoRedux(`[transactionsSlice] setPortfolioCache: inputHash=${action.payload.cache.inputHash}`);
     },
     updateAssetCache: (state, action: PayloadAction<{ assetId: string; cachedDividends: CachedDividends }>) => {
       const { assetId, cachedDividends } = action.payload;
@@ -567,9 +580,14 @@ const transactionsSlice = createSlice({
       .addCase(calculatePortfolioData.pending, standardReducerPatterns.pending)
       .addCase(calculatePortfolioData.fulfilled, (state, action) => {
         standardReducerPatterns.fulfilled(state);
-        state.cache = action.payload;
-        state.lastCalculated = action.payload.lastCalculated;
-        Logger.infoRedux(logger.cacheUpdate('portfolio calculation'));
+        // Nur setzen, wenn sich der inputHash wirklich geändert hat
+        if (state.cache?.inputHash !== action.payload.inputHash) {
+          state.cache = action.payload;
+          state.lastCalculated = action.payload.lastCalculated;
+          Logger.infoRedux(logger.cacheUpdate('portfolio calculation'));
+        } else {
+          Logger.infoRedux('[transactionsSlice] calculatePortfolioData.fulfilled: inputHash unverändert, Cache bleibt gleich.');
+        }
       })
       .addCase(calculatePortfolioData.rejected, (state, action) => {
         const errorMsg = action.error.message || 'Failed to calculate portfolio data';

@@ -8,8 +8,8 @@
 
 import { execSync } from 'child_process';
 
-const MAX_LINT_ERRORS = 20;
-const MAX_LINT_WARNINGS = 5;
+const MAX_LINT_ERRORS = 0;
+const MAX_LINT_WARNINGS = 0;
 
 // Run ESLint and capture output regardless of exit code
 let output = '';

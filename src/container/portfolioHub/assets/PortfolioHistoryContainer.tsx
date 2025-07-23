@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePortfolioHistoryView } from '@/hooks/usePortfolioHistoryView';
-import { PortfolioHistoryView } from '@/view/portfolio-hub/PortfolioHistoryView';
+import { PortfolioHistoryView } from '@/view/portfolio-hub/assets/PortfolioHistoryView';
 import { ViewHeader } from '@/ui/shared/ViewHeader';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 import Logger from '@/service/shared/logging/Logger/logger';

@@ -6,23 +6,28 @@
 import { AssetDefinition } from '@/types/domains/assets';
 import { TimeRangePeriod } from '@/types/shared/time';
 
+// Import workers using Vite's worker syntax
+import StockPriceWorker from '@/workers/stockPriceUpdateWorker.ts?worker';
+import StockHistoryWorker from '@/workers/stockHistoryUpdateWorker.ts?worker';
+import DividendWorker from '@/workers/dividendUpdateWorker.ts?worker';
+
 // Union type alias for worker response types
 type WorkerResponseType = 'batchResult' | 'singleResult' | 'error';
 
 // Worker wrapper class for type-safe communication
 export class WorkerService<RequestType, ResponseType> {
   private worker: Worker | null = null;
-  private readonly workerUrl: string;
+  private readonly createWorker: () => Worker;
 
-  constructor(workerUrl: string) {
-    this.workerUrl = workerUrl;
+  constructor(createWorker: () => Worker) {
+    this.createWorker = createWorker;
   }
 
   private initWorker(): Promise<Worker> {
     return new Promise((resolve, reject) => {
       try {
         if (!this.worker) {
-          this.worker = new Worker(this.workerUrl, { type: 'module' });
+          this.worker = this.createWorker();
         }
         resolve(this.worker);
       } catch (error) {
@@ -92,7 +97,7 @@ export class StockPriceWorkerService {
 
   constructor() {
     this.workerService = new WorkerService<StockPriceUpdateRequest, StockPriceUpdateResponse>(
-      '/src/workers/stockPriceUpdateWorker.ts'
+      () => new StockPriceWorker()
     );
   }
 
@@ -154,7 +159,7 @@ export class StockHistoryWorkerService {
 
   constructor() {
     this.workerService = new WorkerService<StockHistoryUpdateRequest, StockHistoryUpdateResponse>(
-      '/src/workers/stockHistoryUpdateWorker.ts'
+      () => new StockHistoryWorker()
     );
   }
 
@@ -238,7 +243,7 @@ export class DividendWorkerService {
 
   constructor() {
     this.workerService = new WorkerService<DividendUpdateRequest, DividendUpdateResponse>(
-      '/src/workers/dividendUpdateWorker.ts'
+      () => new DividendWorker()
     );
   }
 

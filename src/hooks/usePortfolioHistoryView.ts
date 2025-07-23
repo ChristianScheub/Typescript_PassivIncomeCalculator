@@ -197,7 +197,7 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
  */
 export function usePortfolioHistoryView(timeRange?: string): Array<{ date: string; totalValue: number; change: number; changePercentage: number }> {
   // --- Stable selectors and memoized dependencies ---
-  const portfolioCache = useAppSelector(state => state.transactions.cache);
+  const portfolioCache = useAppSelector((state: import('@/store').RootState) => state.transactions.cache);
   const assetDefinitions = useAppSelector(state => state.assetDefinitions.items);
   const isHydrated = useAppSelector(state => !!state.transactions.cache);
   const dispatch = useAppDispatch();
@@ -228,9 +228,9 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
     return [];
   }, [portfolioCache, timeRange, allowedRanges]);
 
-  // Accept both PortfolioHistoryPoint and PortfolioIntradayPoint for 1W
-  // Using any here due to complex union types - TODO: improve typing
-  const [portfolioHistoryData, setPortfolioHistoryData] = useState<any[]>(initialHistory);
+  // State holds the final mapped structure for PortfolioHistoryView
+  type PortfolioHistoryViewPoint = { date: string; totalValue: number; change: number; changePercentage: number };
+  const [portfolioHistoryData, setPortfolioHistoryData] = useState<PortfolioHistoryViewPoint[]>(initialHistory);
   const isLoadingRef = useRef(false);
 
   // ALWAYS call all hooks in the same order - memoize values BEFORE any conditionals
@@ -295,7 +295,32 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
             const startDateStr = startDate.toISOString().split('T')[0];
             const endDateStr = today.toISOString().split('T')[0];
             const result = await getCombined1WHistory(startDateStr, endDateStr, portfolioHistoryService);
-            setPortfolioHistoryData(result);
+            // Map CombinedHistoryPoint[] to PortfolioHistoryViewPoint[]
+            setPortfolioHistoryData(result.map(item => {
+              // If item has a 'value' property (intraday/daily), use it; else, fallback to totalValue
+              if ('value' in item && typeof item.value === 'number' && !isNaN(item.value)) {
+                return {
+                  date: item.date,
+                  totalValue: item.value,
+                  change: 0,
+                  changePercentage: 0
+                };
+              } else if ('totalValue' in item && typeof item.totalValue === 'number' && !isNaN(item.totalValue)) {
+                return {
+                  date: item.date,
+                  totalValue: item.totalValue,
+                  change: 0,
+                  changePercentage: 0
+                };
+              } else {
+                return {
+                  date: item.date,
+                  totalValue: 0,
+                  change: 0,
+                  changePercentage: 0
+                };
+              }
+            }));
           } catch (error) {
             Logger.error('Error in 1W history: ' + (error instanceof Error ? error.message : String(error)));
             setPortfolioHistoryData([]);
@@ -358,28 +383,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
     if (!timeRange) {
       return [];
     }
-    if (timeRange === '1W') {
-      // For 1W, portfolioHistoryData can be CombinedHistoryPoint (intraday: value, daily: value)
-      return portfolioHistoryData.map((item) => {
-        // If it has totalValue, it's a PortfolioHistoryPoint (daily)
-        if (typeof item.totalValue === 'number') {
-          return {
-            date: item.date,
-            totalValue: item.totalValue,
-            change: item.totalReturn ?? 0,
-            changePercentage: item.totalReturnPercentage ?? 0
-          };
-        }
-        // Otherwise, treat as PortfolioIntradayPoint (value only)
-        return {
-          date: item.date,
-          totalValue: typeof item.value === 'number' && !isNaN(item.value) ? item.value : 0,
-          change: 0,
-          changePercentage: 0
-        };
-      });
-    }
-    // All other ranges: already mapped to correct structure
+    // All ranges: already mapped to correct structure
     return portfolioHistoryData;
   }, [timeRange, portfolioHistoryData]);
 

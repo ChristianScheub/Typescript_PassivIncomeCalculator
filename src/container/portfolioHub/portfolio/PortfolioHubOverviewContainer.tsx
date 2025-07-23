@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useAppSelector } from '@/hooks/redux';
-import PortfolioOverviewView from '@/view/portfolio-hub/PortfolioOverviewView';
+import PortfolioOverviewView from '@/view/portfolio-hub/PortfolioHubOverviewView';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import { getAssetAllocationFromCache } from '@/utils/portfolioCacheHelpers';
 import Logger from '@/service/shared/logging/Logger/logger';

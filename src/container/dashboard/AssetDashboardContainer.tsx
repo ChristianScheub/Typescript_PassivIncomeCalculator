@@ -253,7 +253,12 @@ const AssetFocusDashboardContainer: React.FC = () => {
 
   // Get data from hooks
   const assetFocusDataResult = assetFocusData.data || { assetsWithValues: [], portfolioSummary: null };
-  const { assetsWithValues, portfolioSummary } = assetFocusDataResult;
+  // Sort assetsWithValues by totalValue descending before passing to view
+  const { portfolioSummary } = assetFocusDataResult;
+  // AssetWithValue uses 'value' as the total value field
+  const sortedAssetsWithValues = Array.isArray(assetFocusDataResult.assetsWithValues)
+    ? [...assetFocusDataResult.assetsWithValues].sort((a, b) => (b.value ?? 0) - (a.value ?? 0))
+    : [];
 
   // Navigation handlers
   const handleNavigateToForecast = useCallback(() => {
@@ -388,7 +393,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
     <>
       <AssetDashboardView
         portfolioHistory={enhancedPortfolioHistory}
-        assetsWithValues={assetsWithValues}
+        assetsWithValues={sortedAssetsWithValues}
         portfolioSummary={portfolioSummary as PortfolioSummary}
         selectedTimeRange={reduxState.assetFocus.timeRange}
         onTimeRangeChange={handleTimeRangeChange}

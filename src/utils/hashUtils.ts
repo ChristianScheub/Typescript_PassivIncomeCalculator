@@ -30,13 +30,15 @@ export const simpleHash = (obj: Record<string, unknown> | unknown[]): string => 
  * @returns Hash string
  */
 export const generateAssetHash = (assets: Transaction[]): string => {
-  const relevantData = assets.map(a => ({
-    id: a.id,
-    quantity: a.purchaseQuantity || (a as unknown as { currentQuantity: number }).currentQuantity,
-    price: a.purchasePrice || (a as unknown as { currentPrice: number }).currentPrice,
-    updatedAt: a.updatedAt
-  }));
-  
+  const relevantData = assets.map(a => {
+    // explizit nur die stabilen Felder extrahieren
+    return {
+      id: a.id,
+      quantity: a.purchaseQuantity || (a as unknown as { currentQuantity: number }).currentQuantity,
+      transactionType: a.transactionType,
+      assetDefinitionId: a.assetDefinitionId
+    };
+  });
   return simpleHash(relevantData);
 };
 
@@ -48,11 +50,11 @@ export const generateAssetHash = (assets: Transaction[]): string => {
 export const generateDefinitionHash = (definitions: AssetDefinition[]): string => {
   const relevantData = definitions.map(d => ({
     id: d.id,
-    dividendInfo: d.dividendInfo,
-    currentPrice: d.currentPrice,
-    updatedAt: d.updatedAt
+    type: d.type,
+    isin: d.isin,
+    wkn: d.wkn
+    // Nur stabile, statische Felder!
   }));
-  
   return simpleHash(relevantData);
 };
 

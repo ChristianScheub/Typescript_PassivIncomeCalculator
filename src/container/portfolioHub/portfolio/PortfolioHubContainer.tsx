@@ -8,7 +8,7 @@ import ExpensesContainer from '../finance/ExpensesContainer';
 import recentActivityService from '@/service/domain/analytics/reporting/recentActivityService';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
 import Logger from '@/service/shared/logging/Logger/logger';
-import PortfolioOverviewContainer from './PortfolioOverviewContainer';
+import PortfolioOverviewContainer from './PortfolioHubOverviewContainer';
 import { PortfolioCategory, PortfolioSubCategory } from "@/types/domains/analytics/reporting";
 
 
@@ -60,9 +60,9 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
   // Portfolio summary for hub context
   const portfolioSummary = useMemo(() => {
     const totalAssetValue = portfolioCache?.totals?.totalValue || 0;
-    const monthlyIncome = portfolioCache?.totals?.monthlyIncome || 0;
+    // monthlyIncome soll nur explizite Einkommen (income-Liste) enthalten, keine Asset-Einkommen
+    const monthlyIncome = calculatorService.calculateTotalMonthlyIncome(income);
     
-    // Standard calculations for non-cached data
     const totalLiabilities = liabilities.reduce((sum: number, liability: { currentBalance: number }) => sum + (liability.currentBalance || 0), 0);
     const netWorth = totalAssetValue - totalLiabilities;
     const monthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
@@ -82,7 +82,7 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
       incomeSourcesCount: income.length,
       expenseCategoriesCount: new Set(expenses.map((e: { category: string }) => e.category)).size
     };
-  }, [portfolioCache, assets.length, liabilities, income.length, expenses]);
+  }, [portfolioCache, assets.length, liabilities, income, expenses]);
 
   // Navigation handlers
   const handleCategoryChange = (category: PortfolioCategory, subCategory?: PortfolioSubCategory) => {
