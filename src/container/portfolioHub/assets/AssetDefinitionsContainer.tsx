@@ -11,7 +11,7 @@ type BatchResult<T> = {
  */
 async function processBatchResults<T extends { fullName?: string; ticker?: string }>(
   results: BatchResult<T>[],
-  dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
+  _dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
   updateAction: (def: T) => Promise<void | { type: string }>,
   loggerPrefix: string
 ): Promise<number> {
@@ -60,6 +60,7 @@ import { deepCleanObject } from "@/utils/deepCleanObject";
 import { executeAsyncOperation } from "@/utils/containerUtils";
 import { showSuccessSnackbar } from "@/store/slices/ui";
 import { marketDataWorkerService } from "@/service/shared/workers/marketDataWorkerService";
+import { batchAssetUpdateService } from "@/service/domain/assets/market-data/batchAssetUpdateService";
 
 // Type for the asset definition data when creating
 // type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
@@ -67,7 +68,7 @@ import { PriceEntry } from "@/ui/portfolioHub/dialog/AddPriceEntryDialog";
 import { addPriceToHistory } from "@/utils/priceHistoryUtils";
 import { calculatePortfolioIntradayDataDirect } from "@/store/slices/cache";
 import { DividendFrequency } from "@/types/shared";
-import { PriceSource } from "@/types/shared/base/enums";
+
 
 interface AssetDefinitionsContainerProps {
   onBack?: () => void;
@@ -141,6 +142,24 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
         );
       }
     }
+  };
+
+  const updateBatchDividendsMainThread = async (
+    definitions: AssetDefinition[],
+    options = { interval: '1d', range: '2y' }
+  ): Promise<
+    | { type: 'batchResult'; results: BatchResult<AssetDefinition>[] }
+    | { type: 'error'; error: string }
+  > => {
+    const result = await batchAssetUpdateService.updateBatchDividends(definitions, options);
+    // Defensive: filter out undefined/null from results
+    if (result && result.type === 'batchResult' && Array.isArray(result.results)) {
+      return { type: 'batchResult', results: result.results.filter(Boolean) };
+    }
+    if (result && (result as { type: string }).type === 'error') {
+      return result;
+    }
+    return { type: 'error', error: 'Unknown error in batchAssetUpdateService' };
   };
 
   const addDefinition = async (
@@ -329,14 +348,15 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
           const { apiKeys, selectedProvider } = stockApiConfig;
           response = await marketDataWorkerService.stockPrice.updateBatch(stockDefinitions, apiKeys, selectedProvider);
         }
-        if ('error' in response && response.type === 'error') {
+        if (response && response.type === 'error') {
           // Type guard for error property
-          const errMsg = typeof response.error === 'string' ? response.error : 'Unknown error';
+          const errMsg = typeof (response as { error?: string }).error === 'string' ? (response as { error?: string }).error : 'Unknown error';
           throw new Error(errMsg);
         }
-        if (response.type === 'batchResult' && response.results) {
+        if (response && response.type === 'batchResult' && response.results) {
+          const filteredResults = response.results.filter(Boolean) as BatchResult<AssetDefinition>[];
           const numUpdated = await processBatchResults(
-            response.results,
+            filteredResults,
             dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
             async (def) => (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def)),
             'Stock price'
@@ -377,29 +397,11 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   };
 
 
-  // Helper for main-thread Yahoo batch history update
+
+  // Helper for main-thread Yahoo batch history update (jetzt über batchAssetUpdateService)
   const updateBatchHistoryYahoo = async (definitions: AssetDefinition[], period?: TimeRangePeriod) => {
-    const { YahooAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/YahooAPIService");
-    const service = new YahooAPIService();
-    // Default to 30 days if no period
-    const days = period && typeof period === 'number' ? period : 30;
-    // Only process definitions with a valid ticker
-    const validDefs = definitions.filter(def => typeof def.ticker === 'string' && def.ticker);
-    const results = await Promise.all(validDefs.map(async (def) => {
-      try {
-        const history = await service.getHistory(def.ticker! as string, days);
-        // Convert StockHistoryEntry[] to PriceHistoryEntry[] if needed (ensure 'price' field)
-        const priceHistory = history.entries.map(e => ({
-          date: e.date,
-          price: e.close, // Use close as price
-          source: 'api' as PriceSource,
-        }));
-        return { success: true, updatedDefinition: { ...def, priceHistory }, symbol: def.ticker };
-      } catch (error) {
-        return { success: false, symbol: def.ticker, error: error instanceof Error ? error.message : String(error) };
-      }
-    }));
-    return { type: 'batchResult', results };
+    // Delegiere an zentrale Service-Methode
+    return batchAssetUpdateService.updateBatchHistoryData(definitions, period);
   };
 
   const handleUpdateHistoricalData = async (period?: TimeRangePeriod) => {
@@ -425,14 +427,15 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
         } else {
           response = await marketDataWorkerService.stockHistory.updateBatch(stockDefinitions, period, stockApiConfig.apiKeys, stockApiConfig.selectedProvider);
         }
-        if ('error' in response && response.type === 'error') {
+        if (response && response.type === 'error') {
           // Type guard for error property
-          const errMsg = typeof response.error === 'string' ? response.error : 'Unknown error';
+          const errMsg = typeof (response as { error?: string }).error === 'string' ? (response as { error?: string }).error : 'Unknown error';
           throw new Error(errMsg);
         }
-        if (response.type === 'batchResult' && response.results) {
+        if (response && response.type === 'batchResult' && response.results) {
+          const filteredResults = response.results.filter(Boolean) as BatchResult<AssetDefinition>[];
           const numUpdated = await processBatchResults(
-            response.results,
+            filteredResults,
             dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
             async (def) => (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def)),
             'Historical data'
@@ -463,69 +466,17 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   };
 
 
-  // Helper for main-thread batch dividend update using dividendApiService (like in dividendUpdateWorker)
-  const updateBatchDividendsMainThread = async (definitions: AssetDefinition[], options = { interval: '1d', range: '2y' }) => {
-    const { dividendApiService } = await import("@/service/domain/assets/market-data/dividendAPIService");
-    // Only process definitions with a valid ticker
-    const validDefs = definitions.filter(def => typeof def.ticker === 'string' && def.ticker);
-    const results = await Promise.all(validDefs.map(async (def) => {
-      try {
-        const result = await dividendApiService.fetchDividends(def.ticker!, options);
-        // Use the same parse logic as the worker (parseDividendHistoryFromApiResult)
-        const { parseDividendHistoryFromApiResult } = await import("@/utils/parseDividendHistoryFromApiResult");
-        const currency = def.currency || undefined;
-        type RawDividend = { amount: number; date?: number; lastDividendDate?: string; frequency?: DividendFrequency };
-        type DividendEntry = { date: string; amount: number; source: 'api' | 'manual'; currency?: string };
-        const rawDividends: RawDividend[] = Array.isArray(result?.dividends) ? result.dividends : [];
-        const parsedDividends: DividendEntry[] = rawDividends
-          .filter((div) => div.amount != null && (div.date || div.lastDividendDate))
-          .map((div) => {
-            let dividendDate = '';
-            if (div.lastDividendDate) {
-              dividendDate = new Date(div.lastDividendDate).toISOString();
-            } else if (div.date) {
-              dividendDate = new Date(div.date * 1000).toISOString();
-            }
-            return {
-              date: dividendDate,
-              amount: div.amount,
-              source: 'api' as const,
-              currency,
-            };
-          })
-          .filter((entry) => !!entry.date && entry.amount != null);
-        const dividendHistory: DividendEntry[] = rawDividends.length > 0 ? parsedDividends : parseDividendHistoryFromApiResult(result, currency);
-        dividendHistory.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        // Frequency logic (like worker)
-        let frequency: DividendFrequency | undefined;
-        if (dividendHistory.length > 0 && Array.isArray(result.dividends) && result.dividends[0]?.frequency) {
-          frequency = result.dividends[0].frequency;
-        }
-        const last = dividendHistory.length > 0 ? dividendHistory[dividendHistory.length - 1] : undefined;
-        const updatedDefinition: AssetDefinition = {
-          ...def,
-          dividendInfo: last
-            ? {
-                amount: last.amount,
-                frequency: frequency || 'quarterly',
-                lastDividendDate: last.date,
-              }
-            : undefined,
-          dividendHistory,
-        };
-        return { success: true, updatedDefinition, symbol: def.ticker };
-      } catch (error) {
-        return { success: false, symbol: def.ticker, error: error instanceof Error ? error.message : String(error) };
-      }
-    }));
-    return { type: 'batchResult', results };
-  };
+
+
+  // Helper for main-thread batch dividend update via batchAssetUpdateService (single source of truth)
+  // Only one definition allowed!
+  // Already defined above, so remove this duplicate.
 
   const handleFetchAllDividends = async () => {
     await executeAsyncOperation(
       "fetch all dividends",
       async () => {
-        Logger.info("Starting dividend fetch for all eligible assets using main thread (dividendApiService)");
+        Logger.info("Starting dividend fetch for all eligible assets using main thread (batchAssetUpdateService)");
         const eligibleAssets = assetDefinitions.filter(
           (def: AssetDefinition) => def.type === "stock" && def.useDividendApi
         );
@@ -535,17 +486,17 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
         }
         Logger.info(`Found ${eligibleAssets.length} eligible assets for dividend update`);
         const response = await updateBatchDividendsMainThread(eligibleAssets, { interval: '1d', range: '2y' });
-        if ('error' in response && response.type === 'error') {
+        if (response.type === 'error') {
           const errMsg = typeof response.error === 'string' ? response.error : 'Unknown error';
           throw new Error(errMsg);
         }
-        if (response.type === 'batchResult' && response.results) {
-          const numUpdated = await processBatchResults(
-            response.results,
+        if (response.type === 'batchResult' && Array.isArray(response.results)) {
+          const batchResults: BatchResult<AssetDefinition>[] = response.results.filter(Boolean);
+          const numUpdated = await processBatchResults<AssetDefinition>(
+            batchResults,
             dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
-            async (def) => {
+            async (def: AssetDefinition) => {
               if (def.dividendInfo) {
-                // Only allow valid frequencies (exclude 'none')
                 const allowedFrequencies: DividendFrequency[] = ["monthly", "quarterly", "annually", "custom"];
                 const rawFrequency = def.dividendInfo.frequency;
                 const frequency: DividendFrequency =
