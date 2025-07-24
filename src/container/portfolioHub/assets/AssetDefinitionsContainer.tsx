@@ -5,33 +5,6 @@ type BatchResult<T> = {
   symbol?: string;
   error?: string;
 };
-
-/**
- * Processes batch results from worker services, dispatches updates, logs outcomes, and returns the number of successful updates.
- */
-async function processBatchResults<T extends { fullName?: string; ticker?: string }>(
-  results: BatchResult<T>[],
-  _dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
-  updateAction: (def: T) => Promise<void | { type: string }>,
-  loggerPrefix: string
-): Promise<number> {
-  const successfulResults = results.filter(r => r.success && r.updatedDefinition);
-  for (const result of successfulResults) {
-    const updatedDefinition = result.updatedDefinition!;
-    if (updatedDefinition.fullName) {
-      await updateAction(updatedDefinition);
-      Logger.info(`${loggerPrefix} updated: ${updatedDefinition.fullName}`);
-    } else {
-      Logger.error(`${loggerPrefix} missing required fields for ${updatedDefinition.ticker}`);
-    }
-  }
-  const failedResults = results.filter(r => !r.success);
-  if (failedResults.length > 0) {
-    Logger.warn(`${loggerPrefix} ${failedResults.length} updates failed:`);
-    failedResults.forEach(r => Logger.warn(`- ${r.symbol}: ${r.error}`));
-  }
-  return successfulResults.length;
-}
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
@@ -310,22 +283,37 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   const stockApiConfig = useAppSelector((state: RootState) => state.config.apis.stock);
 
 
-  // Helper for main-thread Yahoo batch price update
-  const updateBatchPriceYahoo = async (definitions: AssetDefinition[]) => {
-    const { YahooAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/YahooAPIService");
-    const service = new YahooAPIService();
-    // Only process definitions with a valid ticker
-    const validDefs = definitions.filter(def => typeof def.ticker === 'string' && def.ticker);
-    const results = await Promise.all(validDefs.map(async (def) => {
-      try {
-        const price = await service.getCurrentStockPrice(def.ticker!);
-        return { success: true, updatedDefinition: { ...def, currentPrice: price.price, lastPriceUpdate: new Date().toISOString() }, symbol: def.ticker };
-      } catch (error) {
-        return { success: false, symbol: def.ticker, error: error instanceof Error ? error.message : String(error) };
-      }
-    }));
-    return { type: 'batchResult', results };
+  // Provider-agnostische Batch-Methode für aktuelle Aktienpreise
+  const updateBatchCurrentPrices = async (definitions: AssetDefinition[]) => {
+    return batchAssetUpdateService.updateBatchCurrentPrices(definitions);
   };
+
+  /**
+ * Processes batch results from worker services, dispatches updates, logs outcomes, and returns the number of successful updates.
+ */
+async function processBatchResults<T extends { fullName?: string; ticker?: string }>(
+  results: BatchResult<T>[],
+  _dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
+  updateAction: (def: T) => Promise<void | { type: string }>,
+  loggerPrefix: string
+): Promise<number> {
+  const successfulResults = results.filter(r => r.success && r.updatedDefinition);
+  for (const result of successfulResults) {
+    const updatedDefinition = result.updatedDefinition!;
+    if (updatedDefinition.fullName) {
+      await updateAction(updatedDefinition);
+      Logger.info(`${loggerPrefix} updated: ${updatedDefinition.fullName}`);
+    } else {
+      Logger.error(`${loggerPrefix} missing required fields for ${updatedDefinition.ticker}`);
+    }
+  }
+  const failedResults = results.filter(r => !r.success);
+  if (failedResults.length > 0) {
+    Logger.warn(`${loggerPrefix} ${failedResults.length} updates failed:`);
+    failedResults.forEach(r => Logger.warn(`- ${r.symbol}: ${r.error}`));
+  }
+  return successfulResults.length;
+}
 
   const handleUpdateStockPrices = async () => {
     await executeAsyncOperation(
@@ -342,7 +330,7 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
         }
         let response;
         if (stockApiConfig.selectedProvider === 'yahoo') {
-          response = await updateBatchPriceYahoo(stockDefinitions);
+          response = await updateBatchCurrentPrices(stockDefinitions);
         } else {
           // Get apiKeys and selectedProvider from config (moved outside async callback)
           const { apiKeys, selectedProvider } = stockApiConfig;

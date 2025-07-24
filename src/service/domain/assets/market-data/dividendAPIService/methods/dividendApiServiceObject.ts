@@ -6,7 +6,7 @@ export async function fetchDividends(
   ticker: string,
   opts?: { interval?: string; range?: string }
 ): Promise<{ dividends: DividendData[] }> {
-  const state: RootState = store.getState();
+  const state = store.getState() as RootState;
   // Use apiConfig.selectedDiviProvider and apiConfig.dividendApiKey for dividend provider selection
   const provider = (state.config?.apis?.dividend?.selectedProvider || 'yahoo') as DividendApiProvider;
   const apiKey = state.config?.apis?.dividend?.apiKeys?.[provider] || '';

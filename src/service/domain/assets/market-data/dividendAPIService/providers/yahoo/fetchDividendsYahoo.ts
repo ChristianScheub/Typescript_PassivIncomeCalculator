@@ -37,15 +37,16 @@ export async function fetchDividendsYahoo(ticker: string, opts?: { interval?: st
   // Extrahiere Dividenden aus dem Yahoo-Response
   const result = data?.chart?.result?.[0];
   const events = result?.events?.dividends || {};
-  const dividendArray = Object.values(events);
+  // Ensure correct typing for dividendArray
+  const dividendArray: YahooDividendItem[] = Object.values(events) as YahooDividendItem[];
 
-  // Sortiere nach Datum (falls gewünscht)
-  dividendArray.sort((a: YahooDividendItem, b: YahooDividendItem) => (a.date ?? 0) - (b.date ?? 0));
+  // Sort by date
+  dividendArray.sort((a, b) => (a.date ?? 0) - (b.date ?? 0));
 
-  const frequency = detectDividendFrequency(dividendArray as { date?: number }[]);
+  const frequency = detectDividendFrequency(dividendArray);
 
-  // Mapping zu DividendData[]
-  const dividends: DividendData[] = dividendArray.map((item: YahooDividendItem) => ({
+  // Map to DividendData[]
+  const dividends: DividendData[] = dividendArray.map((item) => ({
     amount: item.amount,
     frequency,
     lastDividendDate: item.date ? new Date(item.date * 1000).toISOString().slice(0, 10) : undefined,
