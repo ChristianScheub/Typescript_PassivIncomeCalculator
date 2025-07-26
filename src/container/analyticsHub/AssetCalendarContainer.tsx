@@ -260,21 +260,17 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
     });
   }, [filteredPositions, assetDefinitions]);
   
-  // Hilfsfunktion: Gibt true zurück, wenn für diesen Monat/Jahr KEIN Eintrag in der History existiert
-  function isMonthMissingInHistory(dividendHistory: DividendHistoryEntry[] | undefined, month: number, year: number): boolean {
-    // Nur Einträge mit amount > 0 zählen als "existierend"
-    return !dividendHistory?.some((entry: DividendHistoryEntry) => {
-      const d = new Date(entry.date);
-      return d.getMonth() + 1 === month && d.getFullYear() === year && (entry.amount ?? 0) > 0;
-    });
-  }
-
-  // Hilfsfunktion: Gibt alle forecast-Einträge für einen Monat/Jahr zurück, die noch nicht in der echten History sind
+  // Hilfsfunktion: Gibt alle forecast-Einträge für einen Monat/Jahr zurück
   const getForecastForMonth = useCallback((assetDefinition: AssetDefinition, month: number, year: number): DividendHistoryEntry[] => {
     if (!assetDefinition?.dividendForecast3Y || !Array.isArray(assetDefinition.dividendForecast3Y)) return [];
+    
     return assetDefinition.dividendForecast3Y.filter((entry: DividendHistoryEntry) => {
       const d = new Date(entry.date);
-      return d.getMonth() + 1 === month && d.getFullYear() === year && isMonthMissingInHistory(assetDefinition.dividendHistory, month, year);
+      const entryMonth = d.getMonth() + 1;
+      const entryYear = d.getFullYear();
+      
+      // Gebe alle Forecast-Einträge für den gewünschten Monat/Jahr zurück
+      return entryMonth === month && entryYear === year;
     });
   }, []);
 
@@ -316,25 +312,34 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
         // Get asset definition for forecast calculations
         const assetDefinition = assetDefinitions.find((def: AssetDefinition) => def.id === position.assetDefinitionId);
         
-        // --- Forecast-Integration: Nur für Aktien mit dividendHistory & Forecast ---
+        // --- Forecast-Integration: Für Aktien mit Forecast-Daten ---
         if (
           assetDefinition?.type === 'stock' &&
-          Array.isArray(assetDefinition.dividendHistory) &&
-          assetDefinition.dividendHistory.length > 0 &&
-          Array.isArray(assetDefinition.dividendForecast3Y)
+          Array.isArray(assetDefinition.dividendForecast3Y) &&
+          assetDefinition.dividendForecast3Y.length > 0
         ) {
           const forecastEntries = getForecastForMonth(assetDefinition, month, selectedYear);
           if (forecastEntries.length > 0 && quantity > 0) {
-            const hasRealDividend = assetDefinition.dividendHistory.some((entry: DividendHistoryEntry) => {
+            // Prüfe ob es bereits einen echten Dividendeneintrag für GENAU diesen Monat/Jahr gibt
+            const hasRealDividendThisMonth = assetDefinition.dividendHistory?.some((entry: DividendHistoryEntry) => {
               const d = new Date(entry.date);
               return d.getMonth() + 1 === month && d.getFullYear() === selectedYear && (entry.amount ?? 0) > 0;
-            });
-            if (!hasRealDividend) {
+            }) || false;
+            
+            // Forecast nur hinzufügen, wenn KEIN echter Dividendeneintrag für diesen Monat existiert
+            if (!hasRealDividendThisMonth) {
               const forecastSum = forecastEntries.reduce((sum, entry) => sum + (entry.amount || 0), 0) * quantity;
-              income += forecastSum;
-              isForecast = true;
-              forecastShare = forecastSum / income;
-              totalForecast += forecastSum;
+              
+              if (forecastSum > 0) {
+                income += forecastSum;
+                isForecast = true;
+                forecastShare = forecastSum / income;
+                totalForecast += forecastSum;
+                
+                Logger.cache(`Forecast hinzugefügt für ${position.name} (${selectedYear}-${month}): ${forecastSum} (${forecastEntries.length} Einträge)`);
+              }
+            } else {
+              Logger.cache(`Forecast übersprungen für ${position.name} (${selectedYear}-${month}): Echter Dividendeneintrag vorhanden`);
             }
           }
         }

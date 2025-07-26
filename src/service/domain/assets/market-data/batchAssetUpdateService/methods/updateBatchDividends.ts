@@ -43,7 +43,7 @@ export async function updateBatchDividends(
   definitions: AssetDefinition[],
   options = { interval: '1d', range: '2y' }
 ): Promise<{ type: 'batchResult'; results: BatchResult<AssetDefinition>[] }> {
-  const results: BatchResult<AssetDefinition>[] = await Promise.all(
+  const results: BatchResult<AssetDefinition>[] = await Promise.allSettled(
     definitions.filter((def: AssetDefinition) => typeof def.ticker === 'string' && def.ticker).map(async (def: AssetDefinition): Promise<BatchResult<AssetDefinition>> => {
       try {
         const result = await dividendApiService.fetchDividends(def.ticker!, options);
@@ -93,6 +93,20 @@ export async function updateBatchDividends(
         return { success: false, symbol: def.ticker, error: error instanceof Error ? error.message : String(error) };
       }
     })
-  );
+  ).then(settledResults => {
+    // Extrahiere erfolgreiche und fehlgeschlagene Ergebnisse aus Promise.allSettled
+    return settledResults.map(settledResult => {
+      if (settledResult.status === 'fulfilled') {
+        return settledResult.value;
+      } else {
+        // Falls die Promise selbst fehlschlägt (nicht nur die API), erstelle einen Fehler-Eintrag
+        return { 
+          success: false, 
+          symbol: 'unknown', 
+          error: settledResult.reason instanceof Error ? settledResult.reason.message : String(settledResult.reason) 
+        };
+      }
+    });
+  });
   return { type: 'batchResult', results };
 }
