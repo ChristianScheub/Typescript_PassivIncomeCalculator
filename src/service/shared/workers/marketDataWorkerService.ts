@@ -217,6 +217,8 @@ interface DividendUpdateRequest {
     interval?: string;
     range?: string;
   };
+  apiKeys: Record<string, string | undefined>;
+  selectedProvider: string;
 }
 
 interface DividendUpdateResponse {
@@ -247,19 +249,23 @@ export class DividendWorkerService {
     );
   }
 
-  async updateBatch(definitions: AssetDefinition[], options?: { interval?: string; range?: string }): Promise<DividendUpdateResponse> {
+  async updateBatch(definitions: AssetDefinition[], options?: { interval?: string; range?: string }, apiKeys?: Record<string, string | undefined>, selectedProvider?: string): Promise<DividendUpdateResponse> {
     return this.workerService.sendMessage({
       type: 'updateBatch',
       definitions,
-      options
+      options,
+      apiKeys: apiKeys || {},
+      selectedProvider: selectedProvider || 'yahoo'
     });
   }
 
-  async updateSingle(definition: AssetDefinition, options?: { interval?: string; range?: string }): Promise<DividendUpdateResponse> {
+  async updateSingle(definition: AssetDefinition, options?: { interval?: string; range?: string }, apiKeys?: Record<string, string | undefined>, selectedProvider?: string): Promise<DividendUpdateResponse> {
     return this.workerService.sendMessage({
       type: 'updateSingle',
       definition,
-      options
+      options,
+      apiKeys: apiKeys || {},
+      selectedProvider: selectedProvider || 'yahoo'
     });
   }
 
