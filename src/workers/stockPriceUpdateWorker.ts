@@ -1,5 +1,4 @@
 import { AssetDefinition } from '@/types/domains/assets';
-import { batchAssetUpdateService } from '@/service/domain/assets/market-data/batchAssetUpdateService';
 
 // Result for individual stock price update
 interface StockPriceUpdateResult {
@@ -21,49 +20,58 @@ type WorkerResponse =
   | { type: 'error', error: string };
 
 // --- Update Functions ---
-// Nutzt die zentrale batchAssetUpdateService.updateBatchCurrentPrices Methode (provider-agnostisch)
+// Nutzt StockPriceUpdater direkt mit API-Keys und Provider (Worker-kompatibel)
 
-async function updateBatchStockPrices(definitions: AssetDefinition[]): Promise<StockPriceUpdateResult[]> {
-  // Nur gültige Aktien mit Ticker und autoUpdatePrice=true
-  const stockDefinitions = definitions.filter(def => def.type === 'stock' && def.ticker && def.autoUpdatePrice === true);
-  const response = await batchAssetUpdateService.updateBatchCurrentPrices(stockDefinitions);
-  if (response && response.type === 'batchResult' && Array.isArray(response.results)) {
-    return response.results.map((r) => ({
-      symbol: r.symbol ?? '',
-      success: r.success,
-      updatedDefinition: r.updatedDefinition,
-      error: r.error
+async function updateBatchStockPrices(definitions: AssetDefinition[], apiKeys: Record<string, string | undefined>, selectedProvider: string): Promise<StockPriceUpdateResult[]> {
+  try {
+    // Import StockPriceUpdater dynamisch im Worker
+    const { StockPriceUpdater } = await import('@/service/shared/utilities/helper/stockPriceUpdater');
+    const updatedDefinitions = await StockPriceUpdater.updateStockPrices(definitions, apiKeys, selectedProvider);
+    
+    return updatedDefinitions.map((def) => ({
+      symbol: def.ticker ?? '',
+      success: true,
+      updatedDefinition: def,
+      error: undefined
     }));
+  } catch (error) {
+    return [{ symbol: '', success: false, error: error instanceof Error ? error.message : String(error) }];
   }
-  return [{ symbol: '', success: false, error: 'batchAssetUpdateService.updateBatchCurrentPrices failed' }];
 }
 
-async function updateSingleStockPrice(definition: AssetDefinition): Promise<StockPriceUpdateResult> {
-  const response = await batchAssetUpdateService.updateBatchCurrentPrices([definition]);
-  if (response && response.type === 'batchResult' && Array.isArray(response.results) && response.results.length > 0) {
-    const r = response.results[0];
-    return {
-      symbol: r.symbol ?? '',
-      success: r.success,
-      updatedDefinition: r.updatedDefinition,
-      error: r.error
-    };
+async function updateSingleStockPrice(definition: AssetDefinition, apiKeys: Record<string, string | undefined>, selectedProvider: string): Promise<StockPriceUpdateResult> {
+  try {
+    // Import StockPriceUpdater dynamisch im Worker
+    const { StockPriceUpdater } = await import('@/service/shared/utilities/helper/stockPriceUpdater');
+    const updatedDefinitions = await StockPriceUpdater.updateStockPrices([definition], apiKeys, selectedProvider);
+    
+    if (updatedDefinitions.length > 0) {
+      const updatedDef = updatedDefinitions[0];
+      return {
+        symbol: updatedDef.ticker ?? '',
+        success: true,
+        updatedDefinition: updatedDef,
+        error: undefined
+      };
+    }
+    return { symbol: definition.ticker || definition.name || 'unknown', success: false, error: 'No definitions were updated' };
+  } catch (error) {
+    return { symbol: definition.ticker || definition.name || 'unknown', success: false, error: error instanceof Error ? error.message : String(error) };
   }
-  return { symbol: definition.ticker || definition.name || 'unknown', success: false, error: 'batchAssetUpdateService.updateBatchCurrentPrices failed' };
 }
 
 // --- Worker Event Handling ---
 
 self.onmessage = function (e: MessageEvent<WorkerRequest>) {
   if (e.data.type === 'updateBatch') {
-    updateBatchStockPrices(e.data.definitions).then(results => {
+    updateBatchStockPrices(e.data.definitions, e.data.apiKeys, e.data.selectedProvider).then(results => {
       const response: WorkerResponse = { type: 'batchResult', results };
       self.postMessage(response);
     }).catch(error => {
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   } else if (e.data.type === 'updateSingle') {
-    updateSingleStockPrice(e.data.definition).then(result => {
+    updateSingleStockPrice(e.data.definition, e.data.apiKeys, e.data.selectedProvider).then(result => {
       const response: WorkerResponse = { type: 'singleResult', result };
       self.postMessage(response);
     }).catch(error => {
