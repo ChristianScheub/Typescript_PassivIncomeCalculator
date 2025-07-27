@@ -108,7 +108,7 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
         ...cleanedData,
         // Store only the reference ID, not the full object
         assetDefinitionId: selectedDefinition.id,
-        name: `${data.transactionType.toUpperCase()} ${selectedDefinition.fullName}`,
+        name: `${data.transactionType.toUpperCase()} ${selectedDefinition.fullName ?? selectedDefinition.ticker ?? t('assets.unnamedAsset')}`,
         transactionType: data.transactionType,
         // Asset transaction specific fields
         type: selectedDefinition.type,
@@ -204,8 +204,8 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
 
   // Filter asset definitions based on search
   const filteredDefinitions = assetDefinitions.filter((def: AssetDefinition) => 
-    def.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    def.ticker?.toLowerCase().includes(searchQuery.toLowerCase())
+    (def.fullName?.toLowerCase() ?? '').includes(searchQuery.toLowerCase()) ||
+    (def.ticker?.toLowerCase() ?? '').includes(searchQuery.toLowerCase())
   );
 
   // Calculate total value based on transaction type
@@ -223,7 +223,8 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
     if (definition) {
       setSelectedDefinition(definition);
       setValue('assetDefinitionId', definitionId);
-      setValue('name', definition.fullName + (definition.ticker ? ` (${definition.ticker})` : ''));
+      const name = (definition.fullName ?? definition.ticker ?? t('assets.unnamedAsset')) + (definition.ticker ? ` (${definition.ticker})` : '');
+      setValue('name', name);
       setValue('type', definition.type); // Set the type field
     }
   };
@@ -300,9 +301,10 @@ export const AssetTransactionForm: React.FC<AssetTransactionFormProps> = ({
                   { value: '', label: t('assets.selectAssetOption') },
                   ...filteredDefinitions.map((definition: AssetDefinition) => {
                     const tickerPart = definition.ticker ? ` (${definition.ticker})` : '';
+                    const label = `${definition.fullName ?? definition.ticker ?? t('assets.unnamedAsset')}${tickerPart}`;
                     return {
                       value: definition.id,
-                      label: `${definition.fullName}${tickerPart}`
+                      label
                     };
                   })
                 ]}
