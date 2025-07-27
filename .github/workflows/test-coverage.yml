@@ -28,6 +28,9 @@ jobs:
           npm install
         fi
       
+    - name: Run prebuild checks
+      run: node scripts/prebuild-checks.js
+
     - name: Run linting
       run: npm run check-lint
       
