@@ -35,7 +35,7 @@ const BarChartExpenseCoverage: React.FC<BarChartExpenseCoverageProps> = ({
                 {t('forecast.expenseCoverage')}
               </text>
               <XAxis 
-                dataKey="month" 
+                dataKey="date" 
                 tickFormatter={(value) => new Date(value).toLocaleString('default', { month: 'short' })}
                 height={40}
               />

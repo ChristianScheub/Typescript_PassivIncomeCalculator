@@ -18,6 +18,10 @@ interface RawProjectionData {
   incomeTotal?: number;
   expenseTotal?: number;
   liabilityTotal?: number;
+  liabilityPayments?: number;
+  assetIncome?: number;
+  activeIncome?: number;
+  passiveIncomeCoverage?: number;
   assetIncomeBreakdown?: {
     dividends?: number;
     bonds?: number;
@@ -45,6 +49,11 @@ function mapCalculatorToMonthlyProjection(
       totalLiabilities: p.liabilityPayments ?? 0,
       netCashFlow: p.netCashFlow ?? 0,
       cumulativeCashFlow,
+      // Chart-specific fields for cash flow projection
+      activeIncome: p.activeIncome ?? 0,
+      assetIncome: p.assetIncome ?? 0,
+      expenseTotal: p.expenseTotal ?? 0,
+      liabilityPayments: p.liabilityPayments ?? 0,
       assetIncomeBreakdown: {
         dividends: p.assetIncome ?? 0,
         bonds: 0,
@@ -55,7 +64,7 @@ function mapCalculatorToMonthlyProjection(
       },
       expenseBreakdown: {},
       liabilityBreakdown: {},
-      date: p.month ?? new Date().toISOString(),
+      date: p.month ? p.month.toString() : new Date().toISOString(),
       passiveIncomeCoverage: p.passiveIncomeCoverage ?? 0, // Pass through from calculator
     };
   });

@@ -107,7 +107,7 @@ const BarChartNetCashFlow: React.FC<BarChartNetCashFlowProps> = ({
                 {t('forecast.netCashFlow')}
               </text>
               <XAxis 
-                dataKey="month" 
+                dataKey="date" 
                 tickFormatter={(value) => new Date(value).toLocaleString('default', { month: 'short' })}
                 height={40}
               />

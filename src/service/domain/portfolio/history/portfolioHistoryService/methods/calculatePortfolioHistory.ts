@@ -22,6 +22,9 @@ function calculatePortfolioHistory(
   Logger.infoService(`Processing ${allDates.length} unique dates`);
 
   const historyPoints: PortfolioHistoryPoint[] = [];
+  
+  // Track last known prices for each asset definition to handle missing price data
+  const lastKnownPrices = new Map<string, number>();
 
   // Process each date to calculate portfolio value
   for (const date of allDates) {
@@ -64,7 +67,21 @@ function calculatePortfolioHistory(
 
       if (totalQuantity > 0) {
         // Get historical price for this date
-        const price = getHistoricalPrice(assetDefinition, normalizedDate);
+        let price = getHistoricalPrice(assetDefinition, normalizedDate);
+        
+        // If no price is available or price is 0/invalid, use last known price
+        if (price === null || !isFinite(price) || price <= 0) {
+          const lastKnownPrice = lastKnownPrices.get(definitionId);
+          if (lastKnownPrice !== undefined) {
+            price = lastKnownPrice;
+            Logger.infoService(
+              `Using last known price for ${assetDefinition.ticker || assetDefinition.fullName} on ${normalizedDate}: €${price.toFixed(2)}`
+            );
+          }
+        } else {
+          // Update last known price if we have a valid price
+          lastKnownPrices.set(definitionId, price);
+        }
         
         if (price !== null && isFinite(price) && price > 0) {
           const positionValue = totalQuantity * price;

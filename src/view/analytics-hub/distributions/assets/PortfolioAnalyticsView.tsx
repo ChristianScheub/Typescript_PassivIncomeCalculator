@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import PortfolioDistributionView from './PortfolioDistributionView';
 import IncomeDistributionView from './IncomeDistributionView';
-import CustomAnalyticsView from './CustomAnalyticsView';
+import CustomAnalyticsContainer from '@/container/analyticsHub/CustomAnalyticsContainer';
 import { TabSelector, ViewHeader, AssetTypeFilterCard } from '@ui/shared';
 import { AllocationData } from '@/types/domains/analytics/calculations';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
@@ -69,7 +69,7 @@ const PortfolioAnalyticsView: React.FC<PortfolioAnalyticsViewProps> = ({
           />
         );
       case 'custom':
-        return <CustomAnalyticsView filteredPositions={safeArray(portfolioPositions)} />;
+        return <CustomAnalyticsContainer filteredPositions={safeArray(portfolioPositions)} />;
       default:
         return null;
     }

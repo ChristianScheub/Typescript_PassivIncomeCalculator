@@ -12,6 +12,11 @@ export interface MonthlyProjection {
   totalLiabilities: number;
   netCashFlow: number;
   cumulativeCashFlow: number;
+  // Chart-specific fields for cash flow projection
+  activeIncome: number;
+  assetIncome: number;
+  expenseTotal: number;
+  liabilityPayments: number;
   assetIncomeBreakdown: {
     dividends: number;
     bonds: number;
