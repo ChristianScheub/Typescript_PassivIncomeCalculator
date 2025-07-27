@@ -310,24 +310,12 @@ const SettingsContainer: React.FC = () => {
     }
   };
 
-  const [, forceUpdate] = useState({});
 
   const handleDashboardModeChange = (mode: string) => {
     Logger.info(`Dashboard mode changed to ${mode}`);
-    
-    // Log current state before dispatch
-    Logger.info(`[Settings] Current mode before dispatch: ${dashboardMode}`);
-    
-    // Dispatch the Redux action to update the store
     if (mode === 'assetFocus' || mode === 'smartSummary') {
       dispatch(setAssetFocusMode(mode as 'assetFocus' | 'smartSummary'));
       Logger.info(`Redux action dispatched: setAssetFocusMode(${mode})`);
-      
-      // Force component re-render
-      setTimeout(() => {
-        forceUpdate({});
-        Logger.info(`[Settings] Mode after dispatch (next tick): ${dashboardMode}`);
-      }, 0);
     } else {
       Logger.warn(`Invalid dashboard mode: ${mode}`);
     }

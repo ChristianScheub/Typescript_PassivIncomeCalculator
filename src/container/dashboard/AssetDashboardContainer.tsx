@@ -89,11 +89,11 @@ const AssetFocusDashboardContainer: React.FC = () => {
     const hasData = liabilitiesLength > 0 || expensesLength > 0 || incomeLength > 0;
     
     // Use DIRECT Redux data instead of hook data
-    const hasValidFinancialSummary = reduxState.financialSummary && 
-      (reduxState.financialSummary.totalAssets > 0 || 
-       reduxState.financialSummary.monthlyIncome > 0 || 
-       reduxState.financialSummary.monthlyExpenses > 0 ||
-       reduxState.financialSummary.totalLiabilities > 0);
+    const hasValidFinancialSummary =
+      (reduxState.financialSummary?.totalAssets ?? 0) > 0 ||
+      (reduxState.financialSummary?.monthlyIncome ?? 0) > 0 ||
+      (reduxState.financialSummary?.monthlyExpenses ?? 0) > 0 ||
+      (reduxState.financialSummary?.totalLiabilities ?? 0) > 0;
 
     if (hasData && !hasValidFinancialSummary) {
       Logger.info('AssetDashboardContainer: Financial summary missing or all zero, triggering calculation');
@@ -120,9 +120,8 @@ const AssetFocusDashboardContainer: React.FC = () => {
     const hasAssets = assetsLength > 0 || assetDefinitionsLength > 0;
     
     // Use DIRECT Redux data instead of hook data
-    const hasValidAssetFocusData = reduxState.assetFocusCache && 
-      reduxState.assetFocusCache.assetsWithValues && 
-      reduxState.assetFocusCache.assetsWithValues.length > 0;
+    const hasValidAssetFocusData =
+      (reduxState.assetFocusCache?.assetsWithValues?.length ?? 0) > 0;
 
     if (hasAssets && !hasValidAssetFocusData) {
       Logger.info('AssetDashboardContainer: Asset focus data missing or empty, triggering calculation');

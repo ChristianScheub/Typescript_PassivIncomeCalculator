@@ -11,7 +11,7 @@ import {
   fetchExpenses,
   fetchIncome
 } from '@/store/slices/domain';
-import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { AnyAction, ThunkDispatch, ThunkAction } from '@reduxjs/toolkit';
 
 /**
  * Central initialization logic for the application
@@ -81,14 +81,14 @@ export class AppInitializationService {
     // Helper to load data with logging and error handling
     const loadDataIfNeeded = async (
       needsLoad: boolean,
-      fetchAction: () => Promise<unknown>,
+      fetchAction: () => ThunkAction<unknown, RootState, unknown, AnyAction>,
       logPrefix: string,
       getLoadedCount: (state: RootState) => number
     ) => {
       if (!needsLoad) return;
       Logger.info(`${logPrefix} missing, loading from DB...`);
       try {
-        await thunkDispatch(fetchAction()).unwrap();
+        await (thunkDispatch(fetchAction() as ThunkAction<unknown, RootState, unknown, AnyAction>) as { unwrap: () => Promise<unknown> }).unwrap();
         state = getState();
         Logger.info(`${logPrefix} loaded: ${getLoadedCount(state)}`);
       } catch (error) {
@@ -101,31 +101,31 @@ export class AppInitializationService {
     const dataLoaders = [
       {
         needsLoad: (!state.transactions.items || state.transactions.items.length === 0) && state.transactions.status === 'idle',
-        fetchAction: fetchTransactions,
+        fetchAction: () => fetchTransactions(),
         logPrefix: 'AppInitialization: Transactions',
         getLoadedCount: (s: RootState) => s.transactions.items?.length || 0,
       },
       {
         needsLoad: (!state.assetDefinitions.items || state.assetDefinitions.items.length === 0) && state.assetDefinitions.status === 'idle',
-        fetchAction: fetchAssetDefinitions,
+        fetchAction: () => fetchAssetDefinitions(),
         logPrefix: 'AppInitialization: Asset definitions',
         getLoadedCount: (s: RootState) => s.assetDefinitions.items?.length || 0,
       },
       {
         needsLoad: (!state.liabilities.items || state.liabilities.items.length === 0) && state.liabilities.status === 'idle',
-        fetchAction: fetchLiabilities,
+        fetchAction: () => fetchLiabilities(),
         logPrefix: 'AppInitialization: Liabilities',
         getLoadedCount: (s: RootState) => s.liabilities.items?.length || 0,
       },
       {
         needsLoad: (!state.expenses.items || state.expenses.items.length === 0) && state.expenses.status === 'idle',
-        fetchAction: fetchExpenses,
+        fetchAction: () => fetchExpenses(),
         logPrefix: 'AppInitialization: Expenses',
         getLoadedCount: (s: RootState) => s.expenses.items?.length || 0,
       },
       {
         needsLoad: (!state.income.items || state.income.items.length === 0) && state.income.status === 'idle',
-        fetchAction: fetchIncome,
+        fetchAction: () => fetchIncome(),
         logPrefix: 'AppInitialization: Income',
         getLoadedCount: (s: RootState) => s.income.items?.length || 0,
       },
@@ -252,8 +252,8 @@ export class AppInitializationService {
         'totalMonthlyIncome',
         'totalPassiveIncome',
         'totalMonthlyExpenses'
-      ].every(key => Object.prototype.hasOwnProperty.call(summary, key));
-    const hasAllZeroFinancialSummary = hasAllSummaryFields && isFinancialSummaryAllZero(summary as FinancialSummary);
+      ].every(key => Object.hasOwn(summary, key));
+    const hasAllZeroFinancialSummary = hasAllSummaryFields && isFinancialSummaryAllZero(summary as unknown as FinancialSummary);
 
     if (hasAllZeroFinancialSummary) {
       Logger.warn(

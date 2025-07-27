@@ -71,7 +71,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
 
   // Ensure portfolio cache is available
   useEffect(() => {
-    if ((!portfolioCache || !portfolioCache.positions || portfolioCache.positions.length === 0) && assets.length > 0 && assetDefinitions.length > 0) {
+    if ((portfolioCache?.positions?.length ?? 0) === 0 && assets.length > 0 && assetDefinitions.length > 0) {
       Logger.info('Portfolio cache invalid, recalculating for asset calendar');
       (dispatch as ThunkDispatch<StoreState, unknown, AnyAction>)(calculatePortfolioData({ 
         assetDefinitions, 

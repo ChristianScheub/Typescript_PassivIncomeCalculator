@@ -1,3 +1,7 @@
+// Type alias for batch dividends result
+type BatchDividendsResult =
+  | { type: 'batchResult'; results: BatchResult<AssetDefinition>[] }
+  | { type: 'error'; error: string };
 // Helper to process batch update results from worker services
 type BatchResult<T> = {
   success: boolean;
@@ -37,6 +41,7 @@ import { batchAssetUpdateService } from "@/service/domain/assets/market-data/bat
 
 // Type for the asset definition data when creating
 // type CreateAssetDefinitionData = Omit<AssetDefinition, "id" | "createdAt" | "updatedAt" | "name"> & { name?: string };
+
 import { PriceEntry } from "@/ui/portfolioHub/dialog/AddPriceEntryDialog";
 import { addPriceToHistory } from "@/utils/priceHistoryUtils";
 import { calculatePortfolioIntradayDataDirect } from "@/store/slices/cache";
@@ -120,10 +125,8 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   const updateBatchDividendsMainThread = async (
     definitions: AssetDefinition[],
     options = { interval: '1d', range: '2y' }
-  ): Promise<
-    | { type: 'batchResult'; results: BatchResult<AssetDefinition>[] }
-    | { type: 'error'; error: string }
-  > => {
+  ): Promise<BatchDividendsResult> => {
+
     const result = await batchAssetUpdateService.updateBatchDividends(definitions, options);
     // Defensive: filter out undefined/null from results
     if (result && result.type === 'batchResult' && Array.isArray(result.results)) {
@@ -315,6 +318,52 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
   return successfulResults.length;
 }
 
+  // Helper: fetch stock price update response
+  const fetchStockPriceUpdateResponse = async (stockDefinitions: AssetDefinition[]) => {
+    if (stockApiConfig.selectedProvider === 'yahoo') {
+      return updateBatchCurrentPrices(stockDefinitions);
+    } else {
+      const { apiKeys, selectedProvider } = stockApiConfig;
+      return marketDataWorkerService.stockPrice.updateBatch(stockDefinitions, apiKeys, selectedProvider);
+    }
+  };
+
+  // Helper: handle stock price update response
+  // Accept unknown, use type guards inside for flexibility
+  const handleStockPriceUpdateResponse = async (response: unknown) => {
+    if (typeof response === 'object' && response !== null) {
+      const r = response as { type?: string; error?: string; results?: BatchResult<AssetDefinition>[] };
+      if (r.type === 'error') {
+        const errMsg = typeof r.error === 'string' ? r.error : 'Unknown error';
+        throw new Error(errMsg);
+      }
+      if (r.type === 'batchResult' && Array.isArray(r.results)) {
+        const filteredResults = r.results.filter(Boolean) as BatchResult<AssetDefinition>[];
+        const numUpdated = await processBatchResults(
+          filteredResults,
+          dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
+          async (def) => (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def)),
+          'Stock price'
+        );
+        if (numUpdated > 0) {
+          Logger.info(`Successfully updated stock prices for ${numUpdated} asset definitions`);
+          const portfolioPositions = transactionsCache?.positions || [];
+          const portfolioCacheId = transactionsCache?.id || "default";
+          if (portfolioPositions.length > 0) {
+            await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+              calculatePortfolioIntradayDataDirect({ portfolioCacheId })
+            );
+            Logger.info("Triggered portfolio intraday aggregation after price update");
+          } else {
+            Logger.warn("No portfolio positions found for intraday aggregation after price update");
+          }
+        } else {
+          Logger.info("No stock definitions were updated");
+        }
+      }
+    }
+  };
+
   const handleUpdateStockPrices = async () => {
     await executeAsyncOperation(
       "update stock prices",
@@ -326,45 +375,11 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
         );
         if (stockDefinitions.length === 0) {
           Logger.info("No stock definitions found to update");
+          setIsUpdatingPrices(false);
           return;
         }
-        let response;
-        if (stockApiConfig.selectedProvider === 'yahoo') {
-          response = await updateBatchCurrentPrices(stockDefinitions);
-        } else {
-          // Get apiKeys and selectedProvider from config (moved outside async callback)
-          const { apiKeys, selectedProvider } = stockApiConfig;
-          response = await marketDataWorkerService.stockPrice.updateBatch(stockDefinitions, apiKeys, selectedProvider);
-        }
-        if (response && response.type === 'error') {
-          // Type guard for error property
-          const errMsg = typeof (response as { error?: string }).error === 'string' ? (response as { error?: string }).error : 'Unknown error';
-          throw new Error(errMsg);
-        }
-        if (response && response.type === 'batchResult' && response.results) {
-          const filteredResults = response.results.filter(Boolean) as BatchResult<AssetDefinition>[];
-          const numUpdated = await processBatchResults(
-            filteredResults,
-            dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
-            async (def) => (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def)),
-            'Stock price'
-          );
-          if (numUpdated > 0) {
-            Logger.info(`Successfully updated stock prices for ${numUpdated} asset definitions`);
-            const portfolioPositions = transactionsCache?.positions || [];
-            const portfolioCacheId = transactionsCache?.id || "default";
-            if (portfolioPositions.length > 0) {
-              await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
-                calculatePortfolioIntradayDataDirect({ portfolioCacheId })
-              );
-              Logger.info("Triggered portfolio intraday aggregation after price update");
-            } else {
-              Logger.warn("No portfolio positions found for intraday aggregation after price update");
-            }
-          } else {
-            Logger.info("No stock definitions were updated");
-          }
-        }
+        const response = await fetchStockPriceUpdateResponse(stockDefinitions);
+        await handleStockPriceUpdateResponse(response);
         setIsUpdatingPrices(false);
       },
       () =>
