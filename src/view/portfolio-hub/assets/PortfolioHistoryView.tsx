@@ -2,15 +2,16 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import { PortfolioChart } from '@/ui/portfolioHub/PortfolioChart';
-import { TimeRangeChart, PortfolioChartDataPoint } from '@/types/shared/charts/timeRange';
+import { PortfolioChartDataPoint } from '@/types/shared/charts/timeRange';
+import { AssetFocusTimeRange } from '@/types/shared/analytics';
 
 interface PortfolioHistoryViewProps {
   historyData: PortfolioHistoryPoint[];
   totalInvestment: number;
   currentValue: number;
   isLoading?: boolean;
-  timeRange: TimeRangeChart;
-  onTimeRangeChange: (range: TimeRangeChart) => void;
+  timeRange: AssetFocusTimeRange;
+  onTimeRangeChange: (range: AssetFocusTimeRange) => void;
 }
 
 export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
@@ -53,7 +54,7 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
   }, [historyData]);
 
   // Time range change handler
-  const handleTimeRangeChange = (range: TimeRangeChart) => {
+  const handleTimeRangeChange = (range: AssetFocusTimeRange) => {
     onTimeRangeChange(range);
   };
 

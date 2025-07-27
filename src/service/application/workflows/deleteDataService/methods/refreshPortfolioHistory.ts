@@ -4,7 +4,7 @@ import {
     calculateAssetFocusData,
     calculateFinancialSummary
 } from '@/store/slices/domain/transactionsSlice'; // MIGRATED: Now in consolidated cache
-import { AssetFocusTimeRange } from '@/types/shared/analytics';
+import { DEFAULT_TIME_RANGE_FILTERS } from '@/types/shared/charts/timeRange';
 import Logger from "@/service/shared/logging/Logger/logger";
 import type { ThunkDispatch, AnyAction } from '@reduxjs/toolkit';
 import type { RootState } from '@/store';
@@ -33,7 +33,7 @@ export async function refreshPortfolioHistory(): Promise<void> {
         await clearPortfolioHistory();
 
         // Step 2: Define time ranges for recalculation
-        const timeRanges: AssetFocusTimeRange[] = ['1D', '1W', '1M', '3M', '1Y', 'ALL'];
+        const timeRanges = DEFAULT_TIME_RANGE_FILTERS.map(filter => filter.key);
 
         // Step 3: Recalculate portfolio history for all time ranges
         Logger.infoService("Recalculating portfolio history for all time ranges");
@@ -44,7 +44,7 @@ export async function refreshPortfolioHistory(): Promise<void> {
 
         // Step 4: Recalculate other calculated data
         Logger.infoService("Recalculating calculated data");
-        const state = store.getState();
+        const state = store.getState() as RootState;
         await Promise.all([
             thunkDispatch(calculateFinancialSummary({
                 liabilities: state.liabilities.items,

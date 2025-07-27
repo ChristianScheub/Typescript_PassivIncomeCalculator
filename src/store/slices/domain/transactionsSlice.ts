@@ -253,10 +253,10 @@ export const calculatePortfolioHistory = createAsyncThunk(
     let startDate: Date;
     
     switch (timeRange) {
-      case '1D':
+      case '1T':
         startDate = new Date(now.getTime() - 24 * 60 * 60 * 1000);
         break;
-      case '1W':
+      case '5D':
         startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
         break;
       case '1M':
@@ -268,7 +268,7 @@ export const calculatePortfolioHistory = createAsyncThunk(
       case '1Y':
         startDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
         break;
-      case 'ALL':
+      case 'Max':
       default:
         return {
           timeRange,

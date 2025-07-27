@@ -15,6 +15,17 @@
       "december": "Dezember"
     }
   },
+    "chart": {
+    "timeRange": {
+      "1D": "1T",
+      "5D": "5T",
+      "1M": "1M",
+      "3M": "3M",
+      "6M": "6M",
+      "1Y": "1Y",
+      "max": "ALL"
+    }
+  },
   "dashboard": {
     "monthlyOverview": "Monatliche Übersicht",
     "income": "Einkommen",

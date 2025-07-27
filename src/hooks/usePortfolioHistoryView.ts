@@ -8,6 +8,8 @@ import {
   setPortfolioIntradayStatus,
   setPortfolioIntradayError
 } from '@/store/slices/cache';
+import { DEFAULT_TIME_RANGE_FILTERS, getTimeRangeDays } from '@/types/shared/charts/timeRange';
+import { AssetFocusTimeRange } from '@/types/shared/analytics';
 import Logger from '@/service/shared/logging/Logger/logger';
 import PortfolioHistoryWorker from '../workers/portfolioHistoryWorker.ts?worker';
 
@@ -189,7 +191,7 @@ export function usePortfolioIntradayView(): Array<{ date: string; value: number;
 
 /**
  * Hook for accessing portfolio history data (daily snapshots) with time range support
- * Supports different time ranges: 1D, 1W, 1M, 3M, 6M, 1Y, All
+ * Supports different time ranges: 1D, 5D, 1M, 3M, 6M, 1Y, All
  * Returns data in the format expected by PortfolioHistoryView
  * Data is loaded directly from IndexedDB (no Redux cache)
  *
@@ -203,7 +205,8 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
   const dispatch = useAppDispatch();
 
   // Wrap allowedRanges in useMemo to prevent dependency changes
-  const allowedRanges = useMemo(() => ['1D', '5D', '1W', '1M', '3M', '1Y', 'ALL'] as const, []);
+  // Verwende zentrale TimeRangeChart-Keys (wie in DEFAULT_TIME_RANGE_FILTERS)
+  const allowedRanges = useMemo(() => DEFAULT_TIME_RANGE_FILTERS.map(filter => filter.key), []);
   type AllowedRange = typeof allowedRanges[number];
 
   // Memoize initialHistory to avoid recalculating on every render
@@ -286,7 +289,7 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
 
     const loadPortfolioHistoryData = async () => {
       try {
-        if (timeRange === '1W') {
+        if (timeRange === '5D') {
           try {
             const today = new Date();
             const days = 7;
@@ -322,34 +325,31 @@ export function usePortfolioHistoryView(timeRange?: string): Array<{ date: strin
               }
             }));
           } catch (error) {
-            Logger.error('Error in 1W history: ' + (error instanceof Error ? error.message : String(error)));
+            Logger.error('Error in 5D history: ' + (error instanceof Error ? error.message : String(error)));
             setPortfolioHistoryData([]);
           }
         } else {
           Logger.infoService(`📂 Loading portfolio history data from IndexedDB for timeRange: ${timeRange}...`);
           const today = new Date();
-          let daysBack;
-          switch (timeRange) {
-            case '1D': daysBack = 1; break;
-            case '5D': daysBack = 5; break;
-            case '1M': daysBack = 30; break;
-            case '3M': daysBack = 90; break;
-            case '6M': daysBack = 180; break;
-            case '1Y': case '1J': daysBack = 365; break;
-            case 'ALL': case 'All': case 'Max': {
-              const dbData = await portfolioHistoryService.getAll('portfolioHistory');
-              Logger.infoService(`📂 Loaded ${dbData.length} ALL portfolio history points from DB (full range)`);
-              setPortfolioHistoryData(dbData.map(point => ({
-                date: point.date,
-                totalValue: point.totalValue,
-                change: point.totalReturn,
-                changePercentage: point.totalReturnPercentage
-              })));
-              isLoadingRef.current = false;
-              return;
-            }
-            default: daysBack = 30;
+          
+          // Verwende die zentrale Utility-Funktion
+          const daysBack = getTimeRangeDays(timeRange as AssetFocusTimeRange);
+          
+          // Spezialbehandlung für 'Max' (alle Daten)
+          if (daysBack === -1) {
+            const dbData = await portfolioHistoryService.getAll('portfolioHistory');
+            Logger.infoService(`📂 Loaded ${dbData.length} ALL portfolio history points from DB (full range)`);
+            setPortfolioHistoryData(dbData.map(point => ({
+              date: point.date,
+              totalValue: point.totalValue,
+              change: point.totalReturn,
+              changePercentage: point.totalReturnPercentage
+            })));
+            isLoadingRef.current = false;
+            return;
           }
+          
+          // Für alle anderen Zeiträume: Berechne Datumsbereich
           const startDate = new Date(today);
           startDate.setDate(today.getDate() - daysBack);
           const startDateStr = startDate.toISOString().split('T')[0];

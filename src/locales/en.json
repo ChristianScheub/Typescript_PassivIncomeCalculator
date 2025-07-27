@@ -1,4 +1,15 @@
 {
+  "chart": {
+    "timeRange": {
+      "1D": "1D",
+      "5D": "5D",
+      "1M": "1M",
+      "3M": "3M",
+      "6M": "6M",
+      "1Y": "1Y",
+      "max": "Max"
+    }
+  },
   "assetDefinitions": {
     "title": "Asset Definitions",
     "subtitle": "Manage your asset master data and definitions",

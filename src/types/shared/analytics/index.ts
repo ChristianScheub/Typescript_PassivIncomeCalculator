@@ -96,4 +96,4 @@ export type GroupBy = 'assetType' | 'sector' | 'country' | 'category' | 'categor
 
 // Dashboard types
 export type DashboardMode = 'smartSummary' | 'assetFocus';
-export type AssetFocusTimeRange = '1D' | '5D' | '1W' | '1M' | '3M' | '1Y' | 'ALL';
+export type AssetFocusTimeRange = '1T' | '5D' | '1M' | '3M' | '6M' | '1Y' | 'Max';

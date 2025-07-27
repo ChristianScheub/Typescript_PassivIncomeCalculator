@@ -6,14 +6,14 @@ import { formatService } from '@/service';
 import { ChartEmptyState } from '@/ui/shared';
 import { TabButton, TabGroup } from '@/ui/portfolioHub/TabButton';
 import { ChartTooltip } from '@/ui/analyticsHub/charts/ChartTooltips';
-import { 
-  TimeRangeChart, 
+import {
   TimeRangeChartFilter, 
   PortfolioChartDataPoint, 
   ChartConfig,
   DEFAULT_TIME_RANGE_FILTERS
 } from '@/types/shared/charts/timeRange';
 import { PortfolioPerformanceMetrics } from '@/types/domains/portfolio/performance';
+import { AssetFocusTimeRange } from '@/types/shared/analytics';
 
 /**
  * Props for the generic PortfolioChart component
@@ -40,9 +40,9 @@ export interface PortfolioChartProps {
   showLegend?: boolean;
   
   /** Time range filter */
-  timeRange?: TimeRangeChart;
+  timeRange?: AssetFocusTimeRange;
   availableTimeRanges?: TimeRangeChartFilter[];
-  onTimeRangeChange?: (range: TimeRangeChart) => void;
+  onTimeRangeChange?: (range: AssetFocusTimeRange) => void;
   
   /** Chart customization */
   title?: string;
@@ -232,7 +232,7 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
               isActive={timeRange === filter.key}
               onClick={() => onTimeRangeChange(filter.key)}
             >
-              {filter.label}
+              {t(filter.label)}
             </TabButton>
           ))}
         </TabGroup>

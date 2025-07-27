@@ -5,6 +5,7 @@ import { PortfolioHistoryView } from '@/view/portfolio-hub/assets/PortfolioHisto
 import { ViewHeader } from '@/ui/shared/ViewHeader';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 import Logger from '@/service/shared/logging/Logger/logger';
+import { AssetFocusTimeRange } from '@/types/shared/analytics';
 
 interface PortfolioHistoryContainerProps {
   totalInvestment: number;
@@ -21,7 +22,7 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
   const isDesktop = useDeviceCheck();
   
   // Zeitbereich-Filter im Container halten
-  const [selectedTimeRange, setSelectedTimeRange] = useState<'1T' | '1W' | '1M' | '3M' | '6M' | '1J' | 'Max'>('1M');
+  const [selectedTimeRange, setSelectedTimeRange] = useState<AssetFocusTimeRange>('1M');
 
   // usePortfolioHistoryView mit aktuellem Zeitbereich aufrufen
   const portfolioHistoryData = usePortfolioHistoryView(selectedTimeRange);

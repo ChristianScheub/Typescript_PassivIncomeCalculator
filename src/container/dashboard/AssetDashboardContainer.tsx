@@ -150,10 +150,10 @@ const AssetFocusDashboardContainer: React.FC = () => {
     
     Logger.info(`AssetFocusDashboardContainer enhancedPortfolioHistory: timeRange=${reduxState.assetFocus.timeRange}, baseData=${safeBaseData.length}, newSystemData=${newSystemData.length}, intradayData=${intradayData.length}`);
 
-    // Für kurze Zeiträume (1D, 5D): Verwende neue System-Daten falls verfügbar, sonst Intraday
-    if (reduxState.assetFocus.timeRange === '1D' || reduxState.assetFocus.timeRange === '5D') {
-      // Priorität 1: Intraday-Daten falls vorhanden (nur für 1D)
-      if (reduxState.assetFocus.timeRange === '1D' && intradayData.length > 0) {
+    // Für kurze Zeiträume (1T): Verwende neue System-Daten falls verfügbar, sonst Intraday
+    if (reduxState.assetFocus.timeRange === '1T') {
+      // Priorität 1: Intraday-Daten falls vorhanden (nur für 1T)
+      if (reduxState.assetFocus.timeRange === '1T' && intradayData.length > 0) {
         // Filter intraday data based on timeRange
         let filteredIntradayData = intradayData;
         if (intradayData.length > 0) {
@@ -172,7 +172,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
             new Date(point.timestamp) >= twentyFourHoursBack
           );
           
-          Logger.info(`1D: Showing last 24h of available intraday data from ${mostRecentTimestamp.toISOString()}: ${filteredIntradayData.length} points from ${intradayData.length} total`);
+          Logger.info(`1T: Showing last 24h of available intraday data from ${mostRecentTimestamp.toISOString()}: ${filteredIntradayData.length} points from ${intradayData.length} total`);
         }
         
         // Convert filtered intraday data to portfolio history format
@@ -213,9 +213,9 @@ const AssetFocusDashboardContainer: React.FC = () => {
       return safeBaseData;
     }
 
-    // Für 1W: Zeige ALLE kombinierten Datenpunkte (intraday + daily, mit type-Flag)
-    if (reduxState.assetFocus.timeRange === '1W' && newSystemData.length > 0) {
-      Logger.info(`Using combined 1W history from usePortfolioHistoryView: ${newSystemData.length} points`);
+    // Für 5D: Zeige ALLE kombinierten Datenpunkte (intraday + daily, mit type-Flag)
+    if (reduxState.assetFocus.timeRange === '5D' && newSystemData.length > 0) {
+      Logger.info(`Using combined 5D history from usePortfolioHistoryView: ${newSystemData.length} points`);
       // Sortiere alle Punkte nach Datum/Zeit
       const sorted = [...newSystemData].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
       // Map to PortfolioHistoryPoint structure
@@ -230,7 +230,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
     }
 
     // Für längere Zeiträume wie gehabt
-    if ((reduxState.assetFocus.timeRange === '1M' || reduxState.assetFocus.timeRange === '3M' || reduxState.assetFocus.timeRange === '1Y' || reduxState.assetFocus.timeRange === 'ALL') && newSystemData.length > 0) {
+    if ((reduxState.assetFocus.timeRange === '1M' || reduxState.assetFocus.timeRange === '3M' || reduxState.assetFocus.timeRange === '6M' || reduxState.assetFocus.timeRange === '1Y' || reduxState.assetFocus.timeRange === 'Max') && newSystemData.length > 0) {
       Logger.info(`Using new portfolio history system for ${reduxState.assetFocus.timeRange}: ${newSystemData.length} points`);
       return newSystemData.map(point => ({
         date: point.date,
@@ -272,7 +272,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
   // Asset detail modal handlers
   const handleAssetClick = useCallback((assetDefinition: AssetDefinition) => {
     // Find any asset transaction that matches this asset definition
-    const matchingAsset = reduxState.assets.find(asset => 
+    const matchingAsset = reduxState.assets.find((asset: Asset) => 
       asset.assetDefinitionId === assetDefinition.id
     );
     
@@ -407,7 +407,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
         totalLiabilities={financialSummary.data?.totalLiabilities || 0}
         isApiEnabled={reduxState.isApiEnabled}
         onUpdateIntradayHistory={handleUpdateIntradayHistory}
-        isIntradayView={((reduxState.assetFocus.timeRange === '1D' || reduxState.assetFocus.timeRange === '1W') && intradayData.length > 0)}
+        isIntradayView={((reduxState.assetFocus.timeRange === '1T' || reduxState.assetFocus.timeRange === '5D') && intradayData.length > 0)}
       />
       {/* Asset Detail Modal */}
       <AssetDetailModal

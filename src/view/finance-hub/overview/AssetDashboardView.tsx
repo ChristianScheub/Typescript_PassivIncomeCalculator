@@ -5,6 +5,7 @@ import { Button, ButtonGroup, IconButton } from '@ui/shared';
 import { History } from 'lucide-react';
 import { AssetPositionsList } from '@ui/portfolioHub';
 import { AssetFocusTimeRange } from '@/types/shared/analytics';
+import { DEFAULT_TIME_RANGE_FILTERS } from '@/types/shared/charts/timeRange';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import { AssetDefinition } from '@/types/domains/assets/entities';
 import PortfolioHistoryCard from './PortfolioHistoryCard';
@@ -55,14 +56,11 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const timeRangeOptions: { value: AssetFocusTimeRange; label: string }[] = [
-    { value: '1D', label: '1T' },
-    { value: '1W', label: '1W' },
-    { value: '1M', label: '1M' },
-    { value: '3M', label: '3M' },
-    { value: '1Y', label: '1J' },
-    { value: 'ALL', label: t('common.all') || 'Alle' }
-  ];
+  const timeRangeOptions: { value: AssetFocusTimeRange; label: string }[] = 
+    DEFAULT_TIME_RANGE_FILTERS.map(filter => ({
+      value: filter.key as AssetFocusTimeRange,
+      label: t(filter.label)
+    }));
 
   return (
     <PullToRefresh
