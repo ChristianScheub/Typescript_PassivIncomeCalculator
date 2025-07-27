@@ -3,15 +3,16 @@ import { useTranslation } from "react-i18next";
 import { OptionalSection } from "../StandardFormWrapper";
 import { UseFormSetValue, FieldValues } from "react-hook-form";
 import { SectorAllocation } from "@/types/domains/portfolio/allocations";
+import { AssetFormData } from "@/types/domains/forms/form-data";
 
-interface SectorSectionProps<T extends FieldValues = FieldValues> {
+interface SectorSectionProps<T extends FieldValues = AssetFormData> {
   setValue: UseFormSetValue<T>;
   sectors: SectorAllocation[];
   setSectors: (sectors: SectorAllocation[]) => void;
   updateSector: (index: number, field: "sector" | "percentage", value: string | number) => void;
 }
 
-export const SectorSection: React.FC<SectorSectionProps<any>> = ({
+export const SectorSection: React.FC<SectorSectionProps<AssetFormData>> = ({
   setValue,
   sectors,
   setSectors,

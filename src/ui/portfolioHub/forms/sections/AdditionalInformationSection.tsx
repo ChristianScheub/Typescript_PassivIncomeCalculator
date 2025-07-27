@@ -3,14 +3,15 @@ import { useTranslation } from "react-i18next";
 import { FormGrid, StandardFormField } from "../FormGrid";
 import { AssetType } from "@/types/shared/";
 import { UseFormSetValue, UseFormWatch, FieldValues } from "react-hook-form";
+import { AssetFormData } from "@/types/domains/forms/form-data";
 
-interface AdditionalInformationSectionProps<T extends FieldValues = FieldValues> {
+interface AdditionalInformationSectionProps<T extends FieldValues = AssetFormData> {
   watch: UseFormWatch<T>;
   setValue: UseFormSetValue<T>;
   selectedType: AssetType;
 }
 
-export const AdditionalInformationSection: React.FC<AdditionalInformationSectionProps<any>> = ({
+export const AdditionalInformationSection: React.FC<AdditionalInformationSectionProps<AssetFormData>> = ({
   watch,
   setValue,
   selectedType,
