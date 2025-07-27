@@ -528,9 +528,9 @@ export const AssetDefinitionForm: React.FC<AssetDefinitionFormProps> = ({
   };
 
   const handleFormSubmit = (data: AssetFormData) => {
-    const definitionData = { ...data, fullName: data.name, type: data.type as AssetType, useDividendApi: data.useDividendApi ?? false };
+    // Ensure name is always set from fullName
+    const definitionData = { ...data, name: data.fullName, fullName: data.fullName, type: data.type as AssetType, useDividendApi: data.useDividendApi ?? false };
 
-    // If needed, transform AssetFormData to AssetDefinitionFormData shape here
     // Get existing definition if editing to preserve price history
     const existingDefinition = editingDefinition || null;
 

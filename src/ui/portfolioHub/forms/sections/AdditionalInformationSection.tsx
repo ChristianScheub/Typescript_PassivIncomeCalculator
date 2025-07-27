@@ -4,13 +4,13 @@ import { FormGrid, StandardFormField } from "../FormGrid";
 import { AssetType } from "@/types/shared/";
 import { UseFormSetValue, UseFormWatch, FieldValues } from "react-hook-form";
 
-interface AdditionalInformationSectionProps {
-  watch: UseFormWatch<FieldValues>;
-  setValue: UseFormSetValue<FieldValues>;
+interface AdditionalInformationSectionProps<T extends FieldValues = FieldValues> {
+  watch: UseFormWatch<T>;
+  setValue: UseFormSetValue<T>;
   selectedType: AssetType;
 }
 
-export const AdditionalInformationSection: React.FC<AdditionalInformationSectionProps> = ({
+export const AdditionalInformationSection: React.FC<AdditionalInformationSectionProps<any>> = ({
   watch,
   setValue,
   selectedType,

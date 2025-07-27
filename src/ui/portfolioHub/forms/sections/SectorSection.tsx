@@ -4,14 +4,14 @@ import { OptionalSection } from "../StandardFormWrapper";
 import { UseFormSetValue, FieldValues } from "react-hook-form";
 import { SectorAllocation } from "@/types/domains/portfolio/allocations";
 
-interface SectorSectionProps {
-  setValue: UseFormSetValue<FieldValues>;
+interface SectorSectionProps<T extends FieldValues = FieldValues> {
+  setValue: UseFormSetValue<T>;
   sectors: SectorAllocation[];
   setSectors: (sectors: SectorAllocation[]) => void;
   updateSector: (index: number, field: "sector" | "percentage", value: string | number) => void;
 }
 
-export const SectorSection: React.FC<SectorSectionProps> = ({
+export const SectorSection: React.FC<SectorSectionProps<any>> = ({
   setValue,
   sectors,
   setSectors,
