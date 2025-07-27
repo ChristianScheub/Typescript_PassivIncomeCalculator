@@ -5,7 +5,8 @@ import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { 
   selectFinancialSummary,
   calculateFinancialSummary
-} from '@/store/slices/domain/transactionsSlice'; // MIGRATED: Now using consolidated cache
+} from '@/store/slices/domain/transactionsSlice';
+import { usePortfolioHistoryView } from '../../hooks/usePortfolioHistoryView';
 import DashboardView from '@/view/finance-hub/overview/DashboardView';
 import ErrorBoundary from '@/ui/shared/ErrorBoundary';
 import AssetFocusDashboardContainer from './AssetDashboardContainer';
@@ -36,6 +37,9 @@ const DashboardContainer: React.FC = () => {
   const liabilities = useAppSelector((state) => state.liabilities.items);
   const expenses = useAppSelector((state) => state.expenses.items);
   const income = useAppSelector((state) => state.income.items);
+
+  // Get portfolio history data for dashboard chart (default to ALL timeRange for dashboard)
+  const portfolioHistoryData = usePortfolioHistoryView('ALL');
 
   // Extract core financial data (remove cache metadata)
   const financialSummary = useMemo(() => {
@@ -201,6 +205,7 @@ const DashboardContainer: React.FC = () => {
         navigationHandlers={navigationHandlers}
         onRefresh={handleRefresh}
         isRefreshing={isRefreshing}
+        portfolioHistory={portfolioHistoryData}
       />
     </ErrorBoundary>
   );

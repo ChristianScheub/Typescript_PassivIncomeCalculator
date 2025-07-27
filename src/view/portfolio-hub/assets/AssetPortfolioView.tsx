@@ -1,15 +1,15 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { PortfolioPosition } from '@/types/domains/portfolio/position';
-import { formatService } from '../../service';
+import { formatService } from '@/service';
 
-interface PortfolioViewProps {
+interface AssetPortfolioViewProps {
   portfolioAssets: PortfolioPosition[];
   getAssetTypeLabel: (type: string) => string;
   onAssetClick: (asset: PortfolioPosition) => void;
 }
 
-export const PortfolioView: React.FC<PortfolioViewProps> = ({
+export const AssetPortfolioView: React.FC<AssetPortfolioViewProps> = ({
   portfolioAssets,
   getAssetTypeLabel,
   onAssetClick

@@ -59,6 +59,12 @@ interface DashboardViewProps {
   navigationHandlers: NavigationHandlers;
   onRefresh: () => Promise<void>;
   isRefreshing: boolean;
+  portfolioHistory?: Array<{
+    date: string;
+    totalValue: number;
+    change: number;
+    changePercentage: number;
+  }>;
 }
 
 const DashboardView: React.FC<DashboardViewProps> = ({
@@ -70,6 +76,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   navigationHandlers,
   onRefresh,
   isRefreshing,
+  portfolioHistory = []
 }) => {
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
@@ -170,8 +177,17 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           icon={<BarChart3 className="h-5 w-5 text-indigo-500" />}
           defaultExpanded={false}
         >
-          <PortfolioHistoryCard history={[]} />
-          {/* Portfolio history data is generated from user positions */}
+          <PortfolioHistoryCard 
+            history={portfolioHistory.map((point, index) => ({
+              date: point.date,
+              value: point.totalValue,
+              change: index > 0 ? point.totalValue - portfolioHistory[index - 1].totalValue : 0,
+              changePercentage: index > 0 && portfolioHistory[index - 1].totalValue > 0 
+                ? ((point.totalValue - portfolioHistory[index - 1].totalValue) / portfolioHistory[index - 1].totalValue) * 100 
+                : 0
+            }))}
+          />
+          {/* Portfolio history data is now loaded from portfolio history hook */}
         </CollapsibleSection>
 
         {/* Alerts & Recommendations */}

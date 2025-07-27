@@ -2,12 +2,10 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import {
   TrendingUp,
-  TrendingDown,
   Wallet,
   Landmark,
   CreditCard,
   ReceiptText,
-  BarChart3,
   ArrowRight,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../ui/shared/Card";
@@ -33,16 +31,8 @@ interface PortfolioSummary {
   expenseCategoriesCount: number;
 }
 
-interface HealthIndicators {
-  netWorthTrend: "positive" | "negative";
-  debtToAssetRatio: number;
-  cashFlowHealth: "positive" | "negative" | "neutral";
-  diversificationScore: number;
-}
-
 interface PortfolioOverviewViewProps {
   portfolioSummary: PortfolioSummary;
-  healthIndicators: HealthIndicators;
   onCategoryChange: (
     category: PortfolioCategory,
     subCategory?: PortfolioSubCategory
@@ -51,7 +41,6 @@ interface PortfolioOverviewViewProps {
 
 const PortfolioOverviewView: React.FC<PortfolioOverviewViewProps> = ({
   portfolioSummary,
-  healthIndicators,
   onCategoryChange,
 }) => {
   const { t } = useTranslation();
@@ -97,16 +86,7 @@ const PortfolioOverviewView: React.FC<PortfolioOverviewViewProps> = ({
                   {formatService.formatCurrency(netWorth)}
                 </p>
                 <div className="flex items-center justify-center md:justify-start mt-2">
-                  {healthIndicators.netWorthTrend === "positive" ? (
-                    <TrendingUp className="w-4 h-4 mr-1" />
-                  ) : (
-                    <TrendingDown className="w-4 h-4 mr-1" />
-                  )}
-                  <span className="text-sm">
-                    {healthIndicators.netWorthTrend === "positive"
-                      ? t("portfolio.trending.up", "Trending Up")
-                      : t("portfolio.trending.down", "Trending Down")}
-                  </span>
+                  <TrendingUp className="w-4 h-4 mr-1" />
                 </div>
               </div>
 
@@ -362,53 +342,6 @@ const PortfolioOverviewView: React.FC<PortfolioOverviewViewProps> = ({
             </CardContent>
           </Card>
 
-          {/* Portfolio Analytics */}
-          <Card
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => onCategoryChange("assets", "portfolio")}
-          >
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center text-lg">
-                <BarChart3 className="w-5 h-5 mr-2 text-indigo-500" />
-                {t("portfolio.categories.analytics", "Portfolio Analytics")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {t("portfolio.diversification", "Diversification")}
-                  </span>
-                  <span className="font-semibold">
-                    {healthIndicators.diversificationScore}%
-                  </span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {t("portfolio.debtRatio", "Debt Ratio")}
-                  </span>
-                  <span className="font-semibold">
-                    {healthIndicators.debtToAssetRatio.toFixed(1)}%
-                  </span>
-                </div>
-                <div className="flex items-center justify-between pt-2">
-                  <div className="flex space-x-2">
-                    <Button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onCategoryChange("assets", "portfolio");
-                      }}
-                      variant="secondary"
-                      size="sm"
-                    >
-                      {t("portfolio.analyze", "Analyze")}
-                    </Button>
-                  </div>
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
         </div>
 
         {/* Recent Activity */}

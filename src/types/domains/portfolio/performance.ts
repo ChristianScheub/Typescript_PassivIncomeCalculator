@@ -15,6 +15,14 @@ export interface PerformanceMetrics {
   averageLoss: number;
 }
 
+// Chart-specific performance metrics
+export interface PortfolioPerformanceMetrics {
+  totalReturn: number;
+  totalReturnPercentage: number;
+  peakValue: number;
+  lowestValue: number;
+}
+
 // Chart data structures
 export interface ChartDataPoint {
   date: string;

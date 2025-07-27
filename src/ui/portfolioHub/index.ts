@@ -8,6 +8,7 @@ export { DesktopAssetSummaryCards } from './DesktopAssetSummaryCards';
 export { DividendHistoryView } from './DividendHistoryView';
 export { HeaderButtonGroup } from './HeaderButtonGroup';
 export { MobileAssetSummaryCard } from './MobileAssetSummaryCard';
+export { PortfolioChart } from './PortfolioChart';
 export { PortfolioRecentActivities } from './PortfolioRecentActivities';
 export { PriceChart } from './PriceChart';
 export { PriceHistoryView } from './PriceHistoryView';
