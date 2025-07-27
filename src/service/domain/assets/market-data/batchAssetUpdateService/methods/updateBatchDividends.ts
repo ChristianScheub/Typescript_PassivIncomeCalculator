@@ -2,6 +2,7 @@ import type { AssetDefinition } from '@/types/domains/assets/entities';
 import type { BatchResult } from '@/types/shared/batch';
 import { DividendFrequency } from '@/types/shared';
 import { dividendApiService } from '@/service/domain/assets/market-data/dividendAPIService';
+import type { ApiConfig } from '@/types/shared/apiConfig';
 
 // Typen für interne Verarbeitung
 export type RawDividend = { amount: number; date?: number; lastDividendDate?: string; frequency?: DividendFrequency };
@@ -41,12 +42,35 @@ function calculateDividendGrowthPast3Y(dividendHistory: DividendEntry[]): number
 
 export async function updateBatchDividends(
   definitions: AssetDefinition[],
-  options = { interval: '1d', range: '2y' }
+  options = { interval: '1d', range: '2y' },
+  apiConfig?: ApiConfig
 ): Promise<{ type: 'batchResult'; results: BatchResult<AssetDefinition>[] }> {
   const results: BatchResult<AssetDefinition>[] = await Promise.allSettled(
     definitions.filter((def: AssetDefinition) => typeof def.ticker === 'string' && def.ticker).map(async (def: AssetDefinition): Promise<BatchResult<AssetDefinition>> => {
       try {
-        const result = await dividendApiService.fetchDividends(def.ticker!, options);
+        let result;
+        
+        if (apiConfig) {
+          // Worker mode: Use direct API provider access
+          const { dividendProviders } = await import('@/service/domain/assets/market-data/dividendAPIService/methods/dividendProviders');
+          const provider = apiConfig.selectedProvider === 'finnhub' ? 'finnhub' : 'yahoo';
+          const apiKey = apiConfig.apiKeys[provider] || '';
+          const providerFn = dividendProviders[provider];
+          
+          if (!providerFn) {
+            throw new Error(`No provider implementation for ${provider}`);
+          }
+          
+          result = await providerFn(def.ticker!, {
+            apiKey,
+            interval: options.interval,
+            range: options.range
+          });
+        } else {
+          // Main thread mode: Use configured service
+          result = await dividendApiService.fetchDividends(def.ticker!, options);
+        }
+        
         const { parseDividendHistoryFromApiResult } = await import('@/utils/parseDividendHistoryFromApiResult');
         const currency = def.currency || undefined;
         const rawDividends: RawDividend[] = Array.isArray(result?.dividends) ? result.dividends : [];

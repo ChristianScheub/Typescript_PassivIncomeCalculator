@@ -1,6 +1,7 @@
 import { AssetDefinition } from '@/types/domains/assets';
 import { TimeRangePeriod } from '@/types/shared/time';
 import { addIntradayPriceHistory } from '@/utils/priceHistoryUtils';
+import { batchAssetUpdateService } from '@/service/domain/assets/market-data/batchAssetUpdateService';
 
 // Result for individual stock history update
 interface StockHistoryUpdateResult {
@@ -26,7 +27,7 @@ type WorkerResponse =
   | { type: 'error', error: string };
 
 // --- Update Functions ---
-// Nutzt StockPriceUpdater direkt mit API-Keys und Provider (Worker-kompatibel)
+// Uses centralized batchAssetUpdateService with API configuration for main history updates
 
 async function updateBatchStockHistory(
   definitions: AssetDefinition[],
@@ -35,20 +36,31 @@ async function updateBatchStockHistory(
   selectedProvider: string
 ): Promise<StockHistoryUpdateResult[]> {
   try {
-    // Import StockPriceUpdater dynamisch im Worker
-    const { StockPriceUpdater } = await import('@/service/shared/utilities/helper/stockPriceUpdater');
+    // Use centralized batch method with API config
+    const batchResult = await batchAssetUpdateService.updateBatchHistoryData(
+      definitions,
+      period,
+      { apiKeys, selectedProvider }
+    );
     
-    const updatedDefinitions = period 
-      ? await StockPriceUpdater.updateStockHistoricalDataWithPeriod(definitions, period, apiKeys, selectedProvider)
-      : await StockPriceUpdater.updateStockHistoricalData(definitions, apiKeys, selectedProvider);
-    
-    return updatedDefinitions.map((def) => ({
-      symbol: def.ticker ?? '',
-      success: true,
-      updatedDefinition: def,
-      entriesCount: def.priceHistory?.length,
-      error: undefined
-    }));
+    // Convert BatchResult to StockHistoryUpdateResult format
+    return batchResult.results.map(result => {
+      if (result.success && result.updatedDefinition) {
+        return {
+          symbol: result.symbol!,
+          success: true,
+          updatedDefinition: result.updatedDefinition,
+          entriesCount: result.updatedDefinition.priceHistory?.length,
+          error: undefined
+        };
+      } else {
+        return {
+          symbol: result.symbol!,
+          success: false,
+          error: result.error
+        };
+      }
+    });
   } catch (error) {
     return [{ symbol: '', success: false, error: error instanceof Error ? error.message : String(error) }];
   }

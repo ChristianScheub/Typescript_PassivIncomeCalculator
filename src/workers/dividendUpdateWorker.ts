@@ -1,4 +1,5 @@
 import { AssetDefinition } from '@/types/domains/assets';
+import { batchAssetUpdateService } from '@/service/domain/assets/market-data/batchAssetUpdateService';
 
 // Result for individual dividend update
 interface DividendUpdateResult {
@@ -20,7 +21,7 @@ type WorkerResponse =
   | { type: 'error', error: string };
 
 // --- Update Functions ---
-// Nutzt Dividenden-APIs direkt mit API-Keys und Provider (Worker-kompatibel)
+// Uses centralized batchAssetUpdateService with API configuration
 
 async function updateBatchDividends(
   definitions: AssetDefinition[],
@@ -29,101 +30,30 @@ async function updateBatchDividends(
   selectedProvider: string
 ): Promise<DividendUpdateResult[]> {
   try {
-    // Import dividend providers directly (Worker-kompatibel, ohne Redux)
-    const { dividendProviders } = await import('@/service/domain/assets/market-data/dividendAPIService/methods/dividendProviders');
-    
-    // Filter only definitions with tickers
-    const stockDefinitions = definitions.filter(def => 
-      def.type === 'stock' && def.ticker
+    // Use centralized batch method with API config
+    const batchResult = await batchAssetUpdateService.updateBatchDividends(
+      definitions,
+      options,
+      { apiKeys, selectedProvider }
     );
     
-    // Verwende Promise.allSettled statt for-Schleife, um sicherzustellen, dass alle Requests verarbeitet werden
-    const settledResults = await Promise.allSettled(
-      stockDefinitions.map(async (definition): Promise<DividendUpdateResult> => {
-        try {
-          // Get provider and API key
-          const provider = selectedProvider === 'finnhub' ? 'finnhub' : 'yahoo';
-          const apiKey = apiKeys[provider] || '';
-          
-          // Get provider function
-          const providerFn = dividendProviders[provider];
-          if (!providerFn) {
-            return {
-              symbol: definition.ticker!,
-              success: false,
-              error: `No provider implementation for ${provider}`
-            };
-          }
-          
-          // Fetch dividends using provider
-          const response = await providerFn(definition.ticker!, {
-            apiKey,
-            interval: options.interval,
-            range: options.range
-          });
-          
-          if (response?.dividends && Array.isArray(response.dividends)) {
-            // Parse dividends to internal format
-            const dividendHistory = response.dividends.map((div: { date?: string; lastDividendDate?: string; amount?: number }) => ({
-              date: div.date || div.lastDividendDate || new Date().toISOString(),
-              amount: div.amount || 0,
-              source: 'api' as const,
-              currency: definition.currency || 'USD'
-            })).filter((entry: { amount: number }) => entry.amount > 0);
-            
-            // Calculate additional dividend info
-            const lastDividend = dividendHistory.length > 0 ? dividendHistory[dividendHistory.length - 1] : undefined;
-            
-            const updatedDefinition = {
-              ...definition,
-              dividendHistory,
-              dividendInfo: lastDividend ? {
-                amount: lastDividend.amount,
-                frequency: 'quarterly' as const,
-                lastDividendDate: lastDividend.date,
-                paymentMonths: []
-              } : undefined,
-              updatedAt: new Date().toISOString()
-            };
-            
-            return {
-              symbol: definition.ticker!,
-              success: true,
-              updatedDefinition,
-              dividendCount: dividendHistory.length
-            };
-          } else {
-            return {
-              symbol: definition.ticker!,
-              success: false,
-              error: 'No dividend data received from API'
-            };
-          }
-        } catch (error) {
-          return {
-            symbol: definition.ticker!,
-            success: false,
-            error: error instanceof Error ? error.message : String(error)
-          };
-        }
-      })
-    );
-    
-    // Extrahiere Ergebnisse aus Promise.allSettled
-    const results: DividendUpdateResult[] = settledResults.map(settledResult => {
-      if (settledResult.status === 'fulfilled') {
-        return settledResult.value;
-      } else {
-        // Falls die Promise selbst fehlschlägt, erstelle einen Fehler-Eintrag
+    // Convert BatchResult to DividendUpdateResult format
+    return batchResult.results.map(result => {
+      if (result.success && result.updatedDefinition) {
         return {
-          symbol: 'unknown',
+          symbol: result.symbol!,
+          success: true,
+          updatedDefinition: result.updatedDefinition,
+          dividendCount: result.updatedDefinition.dividendHistory?.length || 0
+        };
+      } else {
+        return {
+          symbol: result.symbol!,
           success: false,
-          error: settledResult.reason instanceof Error ? settledResult.reason.message : String(settledResult.reason)
+          error: result.error
         };
       }
     });
-    
-    return results;
   } catch (error) {
     return [{ symbol: '', success: false, error: error instanceof Error ? error.message : String(error) }];
   }
