@@ -1,4 +1,5 @@
 import { AssetDefinition } from '@/types/domains/assets';
+import { batchAssetUpdateService } from '@/service/domain/assets/market-data/batchAssetUpdateService';
 
 // Result for individual stock price update
 interface StockPriceUpdateResult {
@@ -20,20 +21,33 @@ type WorkerResponse =
   | { type: 'error', error: string };
 
 // --- Update Functions ---
-// Nutzt StockPriceUpdater direkt mit API-Keys und Provider (Worker-kompatibel)
+// Uses centralized batchAssetUpdateService with API configuration
 
 async function updateBatchStockPrices(definitions: AssetDefinition[], apiKeys: Record<string, string | undefined>, selectedProvider: string): Promise<StockPriceUpdateResult[]> {
   try {
-    // Import StockPriceUpdater dynamisch im Worker
-    const { StockPriceUpdater } = await import('@/service/shared/utilities/helper/stockPriceUpdater');
-    const updatedDefinitions = await StockPriceUpdater.updateStockPrices(definitions, apiKeys, selectedProvider);
+    // Use centralized batch method with API config
+    const batchResult = await batchAssetUpdateService.updateBatchCurrentPrices(
+      definitions,
+      { apiKeys, selectedProvider }
+    );
     
-    return updatedDefinitions.map((def) => ({
-      symbol: def.ticker ?? '',
-      success: true,
-      updatedDefinition: def,
-      error: undefined
-    }));
+    // Convert BatchResult to StockPriceUpdateResult format
+    return batchResult.results.map(result => {
+      if (result.success && result.updatedDefinition) {
+        return {
+          symbol: result.symbol!,
+          success: true,
+          updatedDefinition: result.updatedDefinition,
+          error: undefined
+        };
+      } else {
+        return {
+          symbol: result.symbol!,
+          success: false,
+          error: result.error
+        };
+      }
+    });
   } catch (error) {
     return [{ symbol: '', success: false, error: error instanceof Error ? error.message : String(error) }];
   }
@@ -41,20 +55,8 @@ async function updateBatchStockPrices(definitions: AssetDefinition[], apiKeys: R
 
 async function updateSingleStockPrice(definition: AssetDefinition, apiKeys: Record<string, string | undefined>, selectedProvider: string): Promise<StockPriceUpdateResult> {
   try {
-    // Import StockPriceUpdater dynamisch im Worker
-    const { StockPriceUpdater } = await import('@/service/shared/utilities/helper/stockPriceUpdater');
-    const updatedDefinitions = await StockPriceUpdater.updateStockPrices([definition], apiKeys, selectedProvider);
-    
-    if (updatedDefinitions.length > 0) {
-      const updatedDef = updatedDefinitions[0];
-      return {
-        symbol: updatedDef.ticker ?? '',
-        success: true,
-        updatedDefinition: updatedDef,
-        error: undefined
-      };
-    }
-    return { symbol: definition.ticker || definition.name || 'unknown', success: false, error: 'No definitions were updated' };
+    const results = await updateBatchStockPrices([definition], apiKeys, selectedProvider);
+    return results[0] || { symbol: definition.ticker || definition.name || 'unknown', success: false, error: 'No result' };
   } catch (error) {
     return { symbol: definition.ticker || definition.name || 'unknown', success: false, error: error instanceof Error ? error.message : String(error) };
   }
