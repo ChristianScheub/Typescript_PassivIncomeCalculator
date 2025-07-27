@@ -9,8 +9,8 @@ import { Plus,Landmark } from "lucide-react";
 import formatService from "@service/infrastructure/formatService";
 import { Liability } from '@/types/domains/financial';
 import { LoadingSpinner, MotivationalEmptyState } from "@/ui/shared";
-import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
-import { MaterialLiabilityForm } from '@/container/portfolioHub/forms/MaterialLiabilityForm';
+import PortfolioHubRecommendations from "../../../ui/portfolioHub/PortfolioHubRecommendations";
+import { MaterialLiabilityForm } from '@/container/portfolioHub/forms/MaterialLiabilityFormContainer';
 
 interface LiabilitiesViewProps {
   liabilities: Liability[];

@@ -3,7 +3,7 @@ import { IconButton, FloatingBtn, ButtonAlignment } from '@ui/shared';
 import { Plus, Trash2, Edit3 } from 'lucide-react';
 import { GenericPieChart } from '@/ui/portfolioHub';
 import { CustomAnalyticsConfig } from '@/types/domains/analytics/charts';
-import { ConfigPanel, TempChartConfig } from './CustomAnalyticsConfigPanel';
+import { ConfigPanel, TempChartConfig } from '../../../../ui/analyticsHub/assets/CustomAnalyticsConfigPanel';
 import { TFunction } from 'i18next';
 
 // ChartDataItem und alle Typen werden im Container definiert und als Props übergeben

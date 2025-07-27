@@ -14,7 +14,7 @@ import { ViewHeader } from "../../ui/shared/ViewHeader";
 import { PortfolioRecentActivities } from "../../ui/portfolioHub/PortfolioRecentActivities";
 import formatService from "@service/infrastructure/formatService";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
-import PortfolioHubRecommendations from "./hub/PortfolioHubRecommendations";
+import PortfolioHubRecommendations from "../../ui/portfolioHub/PortfolioHubRecommendations";
 import { PortfolioCategory, PortfolioSubCategory } from "../../types/domains/analytics/reporting";
 
 interface PortfolioSummary {

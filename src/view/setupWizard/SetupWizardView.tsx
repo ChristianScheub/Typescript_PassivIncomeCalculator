@@ -6,12 +6,12 @@ import { WizardStep } from '@/types/shared/base/enums';
 import type { AssetDefinition } from '@/types/domains/assets';
 
 // Step Components
-import WelcomeStep from './steps/WelcomeStep';
-import AssetDefinitionsStep from './steps/AssetDefinitionsStep';
-import TransactionsStep from './steps/TransactionsStep';
-import LiabilitiesStep from './steps/LiabilitiesStep';
-import IncomeStep from './steps/IncomeStep';
-import CompletionStep from './steps/CompletionStep';
+import WelcomeStep from './steps/WelcomeStepView';
+import AssetDefinitionsStep from './steps/AssetDefinitionsStepView';
+import TransactionsStep from './steps/TransactionsStepView';
+import LiabilitiesStep from './steps/LiabilitiesStepView';
+import IncomeStep from './steps/IncomeStepView';
+import CompletionStep from './steps/CompletionStepView';
 
 interface SetupWizardViewProps {
   currentStep: WizardStep;

@@ -4,7 +4,7 @@ import { Asset } from "@/types/domains/assets/entities";
 import { AssetFormData } from "@/types/domains/forms/form-data";
 import { TranslationProps } from "@/types/shared/ui/view-props";
 import { PortfolioPosition } from "@/types/domains/portfolio/position";
-import { AssetTransactionForm } from "../forms/AssetTransactionForm";
+import { AssetTransactionForm } from "../forms/AssetTransactionFormView";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
 import { MobileAssetSummaryCard } from "@/ui/portfolioHub/MobileAssetSummaryCard";
 import { DesktopAssetSummaryCards } from "@/ui/portfolioHub/DesktopAssetSummaryCards";
@@ -19,8 +19,8 @@ import {
   Tag,
   Plus
 } from "lucide-react";
-import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
-import { AssetsList } from "./AssetsViewList";
+import PortfolioHubRecommendations from "../../../ui/portfolioHub/PortfolioHubRecommendations";
+import { AssetsList } from "../../../ui/portfolioHub/assetList/AssetsViewList";
 
 export interface PortfolioData {
   positions: PortfolioPosition[];

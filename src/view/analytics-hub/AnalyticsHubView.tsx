@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ViewHeader } from '@ui/shared';
 import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
 import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analyticsHub/AnalyticsHubContainer';
-import AnalyticsOverviewSection from './hub/AnalyticsOverviewSection';
-import AnalyticsCategoriesSection from './hub/AnalyticsCategoriesSection';
+import AnalyticsOverviewSection from '../../ui/analyticsHub/hub/AnalyticsOverviewSection';
+import AnalyticsCategoriesSection from '../../ui/analyticsHub/hub/AnalyticsCategoriesSection';
 import type { AIAnalyticsCategory } from '@/types/domains/analytics/ai';
 
 interface AnalyticsHubViewProps {

@@ -1,12 +1,12 @@
 import { Asset } from "@/types/domains/assets";
 import { TranslationProps } from "@/types/shared/ui/view-props";
-import { PortfolioData } from "./AssetsView";
+import { PortfolioData } from "../../../view/portfolio-hub/assets/AssetsView";
 import { SwipeableCard } from "@/ui/portfolioHub/common/SwipeableCard";
-import { EmptyStateView } from "./EmptyStateAssetView";
+import { EmptyStateView } from "../../../view/portfolio-hub/assets/EmptyStateAssetView";
 import { Card, CardContent } from "@/ui/shared/Card";
 import { formatService } from "@/service";
 import { PortfolioPosition } from "@/types/domains/portfolio/position";
-import { AssetPortfolioView } from "./AssetPortfolioView";
+import { AssetPortfolioView } from "../../../view/portfolio-hub/assets/AssetPortfolioView";
 
 // Helper component for assets list
 export const AssetsList: React.FC<{

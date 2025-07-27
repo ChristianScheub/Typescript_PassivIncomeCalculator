@@ -8,8 +8,8 @@ import { SwipeableCard } from "@/ui/portfolioHub/common/SwipeableCard";
 import { Plus,CreditCard } from "lucide-react";
 import formatService from "@service/infrastructure/formatService";
 import { Income } from '@/types/domains/financial';
-import PortfolioHubRecommendations from "../hub/PortfolioHubRecommendations";
-import { MaterialIncomeForm } from "@/container/portfolioHub/forms/MaterialIncomeForm";
+import PortfolioHubRecommendations from "../../../ui/portfolioHub/PortfolioHubRecommendations";
+import { MaterialIncomeForm } from "@/container/portfolioHub/forms/MaterialIncomeFormContainer";
 import { LoadingSpinner, MotivationalEmptyState } from "@/ui/shared";
 
 interface IncomeViewProps {

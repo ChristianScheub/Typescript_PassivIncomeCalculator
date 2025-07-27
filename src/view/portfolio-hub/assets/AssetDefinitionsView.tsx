@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { AssetDefinition } from "../../../types/domains/assets";
 import { AssetCategoryAssignment } from "../../../types/domains/assets/categories";
 import { CreateAssetDefinitionData } from "../../../types/domains/assets/create-asset-definition-data";
-import { AssetDefinitionForm } from "../forms/AssetDefinitionForm";
+import { AssetDefinitionForm } from "../forms/AssetDefinitionFormView";
 import FloatingBtn, { ButtonAlignment } from "../../../ui/shared/floatingBtn";
 import { ViewHeader } from "../../../ui/shared/ViewHeader";
 import { Plus, Wallet, RefreshCw, History, DollarSign } from "lucide-react";

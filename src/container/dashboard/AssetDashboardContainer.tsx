@@ -8,7 +8,7 @@ import { updateAssetDefinition } from '@/store/slices/domain';
 import { setAssetFocusTimeRange } from '@/store/slices/configSlice';
 import { calculateFinancialSummary, calculateAssetFocusData } from '@/store/slices/domain/transactionsSlice';
 import AssetDashboardView, { PortfolioSummary } from '@/view/finance-hub/overview/AssetDashboardView';
-import AssetDetailModal from '@/view/finance-hub/overview/AssetDetailModal';
+import AssetDetailModal from '@/view/finance-hub/overview/AssetDetailModalView';
 import { Asset, AssetDefinition } from '@/types/domains/assets/entities';
 import { useAsyncOperation } from '../../utils/containerUtils';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';

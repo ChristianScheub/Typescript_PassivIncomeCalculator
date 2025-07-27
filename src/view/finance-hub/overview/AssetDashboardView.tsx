@@ -8,7 +8,7 @@ import { AssetFocusTimeRange } from '@/types/shared/analytics';
 import { DEFAULT_TIME_RANGE_FILTERS } from '@/types/shared/charts/timeRange';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import { AssetDefinition } from '@/types/domains/assets/entities';
-import PortfolioHistoryCard from './PortfolioHistoryCard';
+import PortfolioHistoryCard from '../../../ui/startHub/PortfolioHistoryCard';
 import { AssetWithValue } from '@/types/domains/portfolio/assetWithValue';
 
 export interface PortfolioSummary {

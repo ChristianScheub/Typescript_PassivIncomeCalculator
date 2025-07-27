@@ -18,7 +18,7 @@ import {
 } from '@/types/domains/analytics/calculations';
 import { PieChartData } from '@/types/shared/charts';
 import { CustomAnalyticsConfig } from '@/types/domains/analytics/charts';
-import { TempChartConfig } from '@/view/analytics-hub/distributions/assets/CustomAnalyticsConfigPanel';
+import { TempChartConfig } from '@/ui/analyticsHub/assets/CustomAnalyticsConfigPanel';
 import CustomAnalyticsView from '@/view/analytics-hub/distributions/assets/CustomAnalyticsView';
 
 interface ChartDataItem extends PieChartData {

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run prebuild && tsc && vite build",
-    "prebuild": "npm run check-lint && npm run test",
+    "prebuild": "node scripts/prebuild-checks.mjs && npm run check-lint && npm run test",
     "lint": "eslint .",
     "check-lint": "node scripts/check-lint.js",
     "test": "jest",

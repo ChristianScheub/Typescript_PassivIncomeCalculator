@@ -8,8 +8,8 @@ import {
   BarChart3,
 } from "lucide-react";
 import { TotalExpenseCoverage } from "@ui/portfolioHub";
-import PortfolioHistoryCard from "./PortfolioHistoryCard";
-import MonthlyBreakdownCard from "./MonthlyBreakdownCard";
+import PortfolioHistoryCard from "../../../ui/startHub/PortfolioHistoryCard";
+import MonthlyBreakdownCard from "../../../ui/startHub/MonthlyBreakdownCard";
 import { CollapsibleSection, MiniAnalyticsCard } from "@ui/shared";
 import { QuickActionsCard, MilestoneCard, AlertsCard, PullToRefresh, NetWorthSnapshot } from "@ui/startHub";
 import { FinancialSummary, UIAlert } from "@/types/domains/analytics/reporting";

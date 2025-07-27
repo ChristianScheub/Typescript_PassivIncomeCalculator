@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppSelector, useAppDispatch } from '@/hooks/redux';
-import { AISettingsSection } from '@/view/settings/general/AISettingsSection';
+import { AISettingsSection } from '@/ui/settings/AISettingsSection';
 import { setAIEnabled } from '@/store/slices/configSlice';
 
 /**
