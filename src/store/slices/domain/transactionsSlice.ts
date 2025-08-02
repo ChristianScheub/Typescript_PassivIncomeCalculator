@@ -599,11 +599,33 @@ const transactionsSlice = createSlice({
       .addCase(calculatePortfolioHistory.pending, standardReducerPatterns.pending)
       .addCase(calculatePortfolioHistory.fulfilled, (state, action) => {
         standardReducerPatterns.fulfilled(state);
-        if (state.cache) {
-          const { timeRange, data, lastCalculated, inputHash } = action.payload;
-          state.cache.history[timeRange] = { data, lastCalculated, inputHash };
-          Logger.infoRedux(logger.cacheUpdate(`portfolio history for ${timeRange}`));
+        // Initialize cache if it doesn't exist
+        if (!state.cache) {
+          state.cache = {
+            positions: [],
+            totals: {
+              totalValue: 0,
+              totalInvestment: 0,
+              totalReturn: 0,
+              totalReturnPercentage: 0,
+              monthlyIncome: 0,
+              annualIncome: 0,
+              positionCount: 0,
+              transactionCount: 0
+            },
+            lastCalculated: new Date().toISOString(),
+            confidence: 0,
+            inputHash: '',
+            history: {},
+            assetFocusData: null,
+            financialSummary: null,
+            intradayData: null,
+            cacheValidityDuration: 7 * 24 * 60 * 60 * 1000
+          };
         }
+        const { timeRange, data, lastCalculated, inputHash } = action.payload;
+        state.cache.history[timeRange] = { data, lastCalculated, inputHash };
+        Logger.infoRedux(logger.cacheUpdate(`portfolio history for ${timeRange}`));
       })
       .addCase(calculatePortfolioHistory.rejected, (state, action) => {
         const errorMsg = action.error.message || 'Failed to calculate portfolio history';
@@ -615,10 +637,32 @@ const transactionsSlice = createSlice({
       .addCase(calculateAssetFocusData.pending, standardReducerPatterns.pending)
       .addCase(calculateAssetFocusData.fulfilled, (state, action) => {
         standardReducerPatterns.fulfilled(state);
-        if (state.cache) {
-          state.cache.assetFocusData = action.payload;
-          Logger.infoRedux(logger.cacheUpdate('asset focus data'));
+        // Initialize cache if it doesn't exist
+        if (!state.cache) {
+          state.cache = {
+            positions: [],
+            totals: {
+              totalValue: 0,
+              totalInvestment: 0,
+              totalReturn: 0,
+              totalReturnPercentage: 0,
+              monthlyIncome: 0,
+              annualIncome: 0,
+              positionCount: 0,
+              transactionCount: 0
+            },
+            lastCalculated: new Date().toISOString(),
+            confidence: 0,
+            inputHash: '',
+            history: {},
+            assetFocusData: null,
+            financialSummary: null,
+            intradayData: null,
+            cacheValidityDuration: 7 * 24 * 60 * 60 * 1000
+          };
         }
+        state.cache.assetFocusData = action.payload;
+        Logger.infoRedux(logger.cacheUpdate('asset focus data'));
       })
       .addCase(calculateAssetFocusData.rejected, (state, action) => {
         const errorMsg = action.error.message || 'Failed to calculate asset focus data';
@@ -630,10 +674,32 @@ const transactionsSlice = createSlice({
       .addCase(calculateFinancialSummary.pending, standardReducerPatterns.pending)
       .addCase(calculateFinancialSummary.fulfilled, (state, action) => {
         standardReducerPatterns.fulfilled(state);
-        if (state.cache) {
-          state.cache.financialSummary = action.payload;
-          Logger.infoRedux(logger.cacheUpdate('financial summary'));
+        // Initialize cache if it doesn't exist
+        if (!state.cache) {
+          state.cache = {
+            positions: [],
+            totals: {
+              totalValue: 0,
+              totalInvestment: 0,
+              totalReturn: 0,
+              totalReturnPercentage: 0,
+              monthlyIncome: 0,
+              annualIncome: 0,
+              positionCount: 0,
+              transactionCount: 0
+            },
+            lastCalculated: new Date().toISOString(),
+            confidence: 0,
+            inputHash: '',
+            history: {},
+            assetFocusData: null,
+            financialSummary: null,
+            intradayData: null,
+            cacheValidityDuration: 7 * 24 * 60 * 60 * 1000
+          };
         }
+        state.cache.financialSummary = action.payload;
+        Logger.infoRedux(logger.cacheUpdate('financial summary'));
       })
       .addCase(calculateFinancialSummary.rejected, (state, action) => {
         const errorMsg = action.error.message || 'Failed to calculate financial summary';
@@ -645,10 +711,32 @@ const transactionsSlice = createSlice({
       .addCase(calculatePortfolioIntradayData.pending, standardReducerPatterns.pending)
       .addCase(calculatePortfolioIntradayData.fulfilled, (state, action) => {
         standardReducerPatterns.fulfilled(state);
-        if (state.cache) {
-          state.cache.intradayData = action.payload;
-          Logger.infoRedux(logger.cacheUpdate('portfolio intraday data'));
+        // Initialize cache if it doesn't exist
+        if (!state.cache) {
+          state.cache = {
+            positions: [],
+            totals: {
+              totalValue: 0,
+              totalInvestment: 0,
+              totalReturn: 0,
+              totalReturnPercentage: 0,
+              monthlyIncome: 0,
+              annualIncome: 0,
+              positionCount: 0,
+              transactionCount: 0
+            },
+            lastCalculated: new Date().toISOString(),
+            confidence: 0,
+            inputHash: '',
+            history: {},
+            assetFocusData: null,
+            financialSummary: null,
+            intradayData: null,
+            cacheValidityDuration: 7 * 24 * 60 * 60 * 1000
+          };
         }
+        state.cache.intradayData = action.payload;
+        Logger.infoRedux(logger.cacheUpdate('portfolio intraday data'));
       })
       .addCase(calculatePortfolioIntradayData.rejected, (state, action) => {
         const errorMsg = action.error.message || 'Failed to calculate portfolio intraday data';

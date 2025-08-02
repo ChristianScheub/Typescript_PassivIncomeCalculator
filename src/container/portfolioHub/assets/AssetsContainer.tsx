@@ -11,7 +11,8 @@ import {
 } from '@/store/slices/domain';
 import { AssetsView } from '@/view/portfolio-hub/assets/AssetsView';
 import { Asset } from '@/types/domains/assets';
-import { Asset as TransactionAsset } from '@/types/domains/financial/entities';
+import { AssetType } from '@/types/shared/base/enums';
+import { AssetFormData } from '@/types/domains/forms/form-data';
 import { useTranslation } from 'react-i18next';
 import Logger from '@/service/shared/logging/Logger/logger';
 import calculatorService from '@/service/domain/financial/calculations/compositeCalculatorService';
@@ -120,14 +121,23 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     };
   }, [portfolioCache, portfolioTotals, assets.length, assetDefinitions.length]);
 
-  const handleAddAsset = (data: Omit<TransactionAsset, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const handleAddAsset = (data: AssetFormData) => {
     console.log('AssetsContainer: handleAddAsset called with data:', data);
     Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
     
-    // Ensure transactionType is set, default to 'buy'
-    const transactionData = {
-      ...data,
-      transactionType: data.transactionType || 'buy'
+    // Transform AssetFormData to match Redux Transaction type requirements
+    const transactionData: Omit<Asset, 'id' | 'createdAt' | 'updatedAt'> = {
+      name: data.name,
+      type: data.type as AssetType, // Cast string to AssetType
+      value: data.value,
+      assetDefinitionId: data.assetDefinitionId,
+      // Don't include the full assetDefinition object, only the ID reference
+      transactionType: data.transactionType || 'buy',
+      purchaseDate: data.purchaseDate,
+      purchasePrice: data.purchasePrice,
+      purchaseQuantity: data.purchaseQuantity || 1, // Provide default value
+      transactionCosts: data.transactionCosts,
+      notes: data.notes
     };
     
     console.log('AssetsContainer: Final transaction data:', transactionData);
@@ -140,7 +150,7 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   };
 
   // Helper: Calculate stock value and differences
-  function updateStockValueFields(data: Partial<TransactionAsset>) {
+  function updateStockValueFields(data: Partial<Asset>) {
     if (data.type === 'stock' && data.purchaseQuantity && data.purchasePrice) {
       // Note: currentPrice is now stored in AssetDefinition, not in transaction
       // This function only calculates purchase-related values for transactions
@@ -152,22 +162,35 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
     }
   }
 
-  const handleUpdateAsset = (data: Partial<TransactionAsset>) => {
+  const handleUpdateAsset = (data: AssetFormData) => {
     if (!editingAsset) return;
     
     Logger.info('Updating asset transaction' + " - " + JSON.stringify({ id: editingAsset.id, data }));
     
-    // Ensure transactionType is preserved, default to 'buy'
-    const transactionData = {
-      ...data,
-      transactionType: data.transactionType || editingAsset.transactionType || 'buy'
+    // Transform AssetFormData to match Redux Asset type requirements
+    const updatedAsset: Asset = {
+      ...editingAsset, // Start with existing asset data
+      name: data.name,
+      type: data.type as AssetType, // Cast string to AssetType
+      value: data.value,
+      assetDefinitionId: data.assetDefinitionId,
+      transactionType: data.transactionType || editingAsset.transactionType || 'buy',
+      purchaseDate: data.purchaseDate,
+      purchasePrice: data.purchasePrice,
+      purchaseQuantity: data.purchaseQuantity || editingAsset.purchaseQuantity || 1,
+      transactionCosts: data.transactionCosts,
+      notes: data.notes,
+      // Maintain existing timestamps and ID
+      id: editingAsset.id,
+      createdAt: editingAsset.createdAt,
+      updatedAt: new Date().toISOString() // Update timestamp
     };
     
-    updateStockValueFields(transactionData);
+    updateStockValueFields(updatedAsset);
     
     executeAsyncOperation(
       'update transaction',
-      () => dispatch(updateTransaction({ ...transactionData, id: editingAsset.id })),
+      () => dispatch(updateTransaction(updatedAsset)),
       () => setEditingAsset(null)
     );
   };

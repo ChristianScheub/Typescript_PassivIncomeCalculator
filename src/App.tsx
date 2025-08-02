@@ -26,14 +26,13 @@ import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck
 import PortfolioHubContainer from './container/portfolioHub/portfolio/PortfolioHubContainer';
 import AnalyticsHubContainer from './container/analyticsHub/AnalyticsHubContainer';
 
-// Main App Content with initialization check
 const AppContent = () => {
   const { isInitialized, isInitializing, initializationError } = useAppInitialization();
   const { isFirstTimeUser, isCheckingSetup } = useSetupStatus();
   const isDesktop = useDeviceCheck();
-  
-  // Auto-update portfolio history when assets change
   useAutoPortfolioHistoryUpdate();
+
+
 
   if (initializationError) {
     return <ErrorScreenAppStart error={initializationError} />;
@@ -42,8 +41,7 @@ const AppContent = () => {
   if (isInitializing || !isInitialized || isCheckingSetup) {
     return <LoadingScreenAppStart />;
   }
-  
-  // Render the appropriate layout
+
   const Layout = isDesktop ? DesktopLayout : MobileLayout;
 
   return (

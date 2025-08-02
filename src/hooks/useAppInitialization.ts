@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAppDispatch } from './redux';
 import { appInitializationService } from '../service/application/orchestration/initService/appInitialization';
-import { store } from '@/store';
 import Logger from '@/service/shared/logging/Logger/logger';
 
 interface UseAppInitializationResult {
@@ -55,7 +54,7 @@ export const useAppInitialization = (): UseAppInitializationResult => {
     setInitializationError(null);
 
     appInitializationService
-      .initialize(dispatch, () => store.getState())
+      .initialize()
       .then(() => {
         Logger.info('useAppInitialization: App initialization completed successfully');
         setIsInitialized(true);

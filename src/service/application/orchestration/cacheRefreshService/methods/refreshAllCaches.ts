@@ -84,7 +84,7 @@ export async function refreshAllCaches(): Promise<void> {
         Logger.infoService("Recalculating ALL derived data");
         
         // Get fresh data from store
-        const state = store.getState();
+        const state = store.getState() as RootState;
         const { items: assets } = state.transactions;
         const { items: assetDefinitions } = state.assetDefinitions;
         const { categories, categoryOptions, categoryAssignments } = state.assetCategories;
@@ -112,7 +112,7 @@ export async function refreshAllCaches(): Promise<void> {
         // Step 9: Clear and recalculate portfolio history database with all time ranges
         Logger.infoService("Clearing and recalculating portfolio history database via Web Worker");
         // Hole aktuelle Daten für Worker
-        const refreshedStateForWorker = store.getState();
+        const refreshedStateForWorker = store.getState() as RootState;
         const portfolioPositionsForWorker = refreshedStateForWorker.transactions?.cache?.positions || [];
         const assetDefinitionsForHistory = refreshedStateForWorker.assetDefinitions?.items || [];
         if (portfolioPositionsForWorker.length > 0 && assetDefinitionsForHistory.length > 0) {
@@ -146,7 +146,7 @@ export async function refreshAllCaches(): Promise<void> {
         Logger.infoService("COMPLETE cache refresh completed successfully - ALL data refreshed from SQL database");
 
         // Step 10: Trigger portfolio intraday aggregation with latest data
-        const refreshedState = store.getState();
+        const refreshedState = store.getState() as RootState;
         const portfolioPositions = refreshedState.transactions?.cache?.positions || [];
         const assetDefinitionsForIntraday = refreshedState.assetDefinitions?.items || [];
         // No id property on cache, use 'default' or generate as needed
