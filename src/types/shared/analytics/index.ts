@@ -2,8 +2,6 @@
  * Analytics component types
  */
 
-import { BaseChartData } from '../charts';
-
 // Debt projection data types
 export interface DebtProjectionData {
   month: string;
@@ -24,10 +22,6 @@ export interface PortfolioPosition {
   totalReturn: number;
   monthlyIncome: number;
 }
-
-// Analytics data mappers
-export type AssetTypeDataMapper = (items: unknown[]) => BaseChartData[];
-export type GenericDataMapper = (items: unknown[]) => BaseChartData[];
 
 // Chart tooltip props for analytics
 export interface AnalyticsTooltipProps {

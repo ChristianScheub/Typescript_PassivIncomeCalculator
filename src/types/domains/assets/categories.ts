@@ -19,9 +19,6 @@ export interface AssetCategoryAssignment extends BaseEntity {
   categoryOptionId: string;
 }
 
-// Form data types for creating/updating categories
-export type CreateAssetCategoryAssignmentData = Omit<AssetCategoryAssignment, "id" | "createdAt" | "updatedAt">;
-
 // Asset allocation for portfolio analysis
 export interface AssetCategoryAllocation {
   type: string;

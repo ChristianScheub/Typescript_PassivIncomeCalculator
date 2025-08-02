@@ -34,12 +34,9 @@ export type PriceSource = 'manual' | 'api' | 'import';
 
 // Status enums
 export type Status = 'active' | 'inactive' | 'pending' | 'archived';
-export type ProcessingStatus = 'idle' | 'loading' | 'success' | 'error';
 
 // UI-related enums
 export type Theme = 'light' | 'dark' | 'auto';
-export type Breakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type Variant = 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info';
 
 // API Provider enums
 export enum StockAPIProvider {

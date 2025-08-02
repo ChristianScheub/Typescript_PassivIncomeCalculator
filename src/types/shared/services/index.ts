@@ -2,8 +2,6 @@
  * Service layer types
  */
 
-// Logger service types
-export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 export interface LoggerMethods {
   info: (message: string) => void;

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+
 /**
  * Pre-Build Checks for Naming, Types, Console Logs, and Heuristics (ESM)
  * - File Name Check: Enforce naming conventions in container, view, workers
@@ -79,6 +79,7 @@ if (checks.length > 0) {
     console.warn('\n\x1b[33mTypes Check Warnungen (blockieren Build nicht):\x1b[0m');
     typeViolations.forEach((msg) => console.warn('- ' + msg));
   }
+  console.log('\n\x1b[31mWeitere Checks werden ausgeführt ...\x1b[0m');
   process.exit(1);
 } else {
   if (typeViolations.length > 0) {
@@ -155,3 +156,113 @@ if (consoleLogViolations.length > 0) {
   process.exit(1);
 }
 
+
+// 5. Types Usage Check: Alle im types-Ordner exportierten Typen müssen irgendwo im Types- oder src-Ordner verwendet werden
+(() => {
+  const unusedTypes = [];
+  const typesDir = path.join(srcDir, 'types');
+  if (fs.existsSync(typesDir)) {
+    // Alle exportierten Typen im types-Ordner sammeln
+    const exportedTypes = [];
+    walkDir(typesDir, (file) => {
+      if (!file.endsWith('.ts')) return;
+      const content = fs.readFileSync(file, 'utf8');
+      // Finde alle "export type <TypeName>"
+      const matches = [...content.matchAll(/export\s+type\s+(\w+)/g)];
+      matches.forEach((m) => {
+        exportedTypes.push({ typeName: m[1], file });
+      });
+    });
+
+    // Für jeden exportierten Typ prüfen, ob er irgendwo im types- oder src-Ordner verwendet wird
+    exportedTypes.forEach(({ typeName, file }) => {
+      let used = false;
+      // Suche in der eigenen Exportdatei, aber ignoriere die eigentliche Exportzeile
+      const ownContent = fs.readFileSync(file, 'utf8');
+      
+      // Entferne die Export-Zeile für diesen Typ und prüfe dann den Rest
+      const exportPattern = new RegExp(`^\\s*export\\s+type\\s+${typeName}\\b.*$`, 'gm');
+      const contentWithoutExport = ownContent.replace(exportPattern, '');
+      
+      // Prüfe, ob der Typ im verbleibenden Inhalt als TypeScript-Typ verwendet wird
+      const typeUsagePattern = new RegExp(
+        `(?:^|[^\\w])(?:` +
+        `${typeName}\\s*[\\[<]|` +           // Array/Generic syntax: TypeName[, TypeName<
+        `:\\s*${typeName}\\b|` +             // Type annotation: : TypeName
+        `:\\s*\\([^)]*:\\s*${typeName}\\b|` + // Function parameter type: : (param: TypeName
+        `\\w+\\s*:\\s*${typeName}\\b|` +     // Parameter declaration: paramName: TypeName
+        `<\\s*${typeName}\\b|` +             // Generic parameter: <TypeName
+        `extends\\s+${typeName}\\b|` +       // Interface extension: extends TypeName
+        `implements\\s+${typeName}\\b|` +    // Interface implementation: implements TypeName
+        `as\\s+${typeName}\\b|` +            // Type assertion: as TypeName
+        `=\\s*${typeName}\\b|` +             // Type alias assignment: = TypeName
+        `\\|\\s*${typeName}\\b|` +           // Union type: | TypeName
+        `&\\s*${typeName}\\b|` +             // Intersection type: & TypeName
+        `\\b${typeName}\\s*;` +              // Property with type: propertyName: TypeName;
+        `)`, 'gm'
+      );
+      if (typeUsagePattern.test(contentWithoutExport)) {
+        used = true;
+      }
+      // Suche im types-Ordner (andere Dateien)
+      if (!used) {
+        walkDir(typesDir, (f) => {
+          if (!f.endsWith('.ts')) return;
+          if (f === file) return;
+          const c = fs.readFileSync(f, 'utf8');
+          const typeUsagePattern = new RegExp(
+            `(?:^|[^\\w])(?:` +
+            `${typeName}\\s*[\\[<]|` +           // Array/Generic syntax: TypeName[, TypeName<
+            `:\\s*${typeName}\\b|` +             // Type annotation: : TypeName
+            `<\\s*${typeName}\\b|` +             // Generic parameter: <TypeName
+            `extends\\s+${typeName}\\b|` +       // Interface extension: extends TypeName
+            `implements\\s+${typeName}\\b|` +    // Interface implementation: implements TypeName
+            `as\\s+${typeName}\\b|` +            // Type assertion: as TypeName
+            `=\\s*${typeName}\\b|` +             // Type alias assignment: = TypeName
+            `\\|\\s*${typeName}\\b|` +           // Union type: | TypeName
+            `&\\s*${typeName}\\b|` +             // Intersection type: & TypeName
+            `\\b${typeName}\\s*;` +              // Property with type: propertyName: TypeName;
+            `)`, 'gm'
+          );
+          if (typeUsagePattern.test(c)) {
+            used = true;
+          }
+        });
+      }
+      // Suche im restlichen src-Ordner (außerhalb von types)
+      if (!used) {
+        walkDir(srcDir, (f) => {
+          if (!f.endsWith('.ts') && !f.endsWith('.tsx')) return;
+          if (f.includes(`${path.sep}types${path.sep}`)) return; // types-Ordner überspringen
+          const c = fs.readFileSync(f, 'utf8');
+          const typeUsagePattern = new RegExp(
+            `(?:^|[^\\w])(?:` +
+            `${typeName}\\s*[\\[<]|` +           // Array/Generic syntax: TypeName[, TypeName<
+            `:\\s*${typeName}\\b|` +             // Type annotation: : TypeName
+            `<\\s*${typeName}\\b|` +             // Generic parameter: <TypeName
+            `extends\\s+${typeName}\\b|` +       // Interface extension: extends TypeName
+            `implements\\s+${typeName}\\b|` +    // Interface implementation: implements TypeName
+            `as\\s+${typeName}\\b|` +            // Type assertion: as TypeName
+            `=\\s*${typeName}\\b|` +             // Type alias assignment: = TypeName
+            `\\|\\s*${typeName}\\b|` +           // Union type: | TypeName
+            `&\\s*${typeName}\\b|` +             // Intersection type: & TypeName
+            `import.*\\b${typeName}\\b|` +       // Import statement: import { TypeName }
+            `\\b${typeName}\\s*;` +              // Property with type: propertyName: TypeName;
+            `)`, 'gm'
+          );
+          if (typeUsagePattern.test(c)) {
+            used = true;
+          }
+        });
+      }
+      if (!used) {
+        unusedTypes.push(`Unused Type: '${typeName}' von '${path.relative(projectRoot, file)}' wird exportiert, aber nirgends verwendet.`);
+      }
+    });
+  }
+  if (unusedTypes.length > 0) {
+    console.error(`\n\x1b[31mUnused Types gefunden (${unusedTypes.length}) (blockieren Build):\x1b[0m`);
+    unusedTypes.forEach((msg) => console.error('- ' + msg));
+    process.exit(1);
+  }
+})();

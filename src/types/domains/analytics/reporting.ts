@@ -2,12 +2,6 @@
  * Analytics reporting and dashboard types
  */
 
-// Chart configuration types
-export type ChartType = 'pie' | 'bar' | 'line';
-export type AnalyticsDataSource = 'assetValue' | 'income' | 'growth'; // Renamed to avoid conflict
-export type GroupBy = 'assetType' | 'sector' | 'country' | 'category' | 'categoryOptions' | 'specificCategory' | 'assetDefinition';
-
-
 
 // Financial summary for analytics
 export interface FinancialSummary {

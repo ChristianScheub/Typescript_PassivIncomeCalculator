@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "npm run prebuild && tsc && vite build",
+    "build:skip-prebuild": "tsc && vite build",
     "build:app": "npm run prebuild && tsc && vite build && npx cap sync",
     "prebuild": "node scripts/prebuild-checks.mjs && npm run check-lint && npm run test",
     "lint": "eslint .",

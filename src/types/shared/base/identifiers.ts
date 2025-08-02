@@ -17,18 +17,3 @@ export interface CategoryReference extends EntityReference {
   level?: number;
   parentId?: string;
 }
-
-// Key generation utilities
-export type KeyOfType<T, U> = {
-  [K in keyof T]: T[K] extends U ? K : never;
-}[keyof T];
-
-export type RequiredKeys<T> = {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
-}[keyof T];
-
-export type OptionalKeys<T> = {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  [K in keyof T]-?: {} extends Pick<T, K> ? K : never;
-}[keyof T];
