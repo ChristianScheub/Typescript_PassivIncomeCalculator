@@ -22,7 +22,6 @@ const compositeCalculatorService = {
   
   // Cached asset calculations
   calculateAssetMonthlyIncomeWithCache: assetCalculatorService.calculateAssetMonthlyIncomeWithCache,
-  calculateTotalAssetIncomeForMonthWithCache: assetCalculatorService.calculateTotalAssetIncomeForMonthWithCache,
   areAssetsCached: assetCalculatorService.areAssetsCached,
 
   // Income calculations (delegated to incomeCalculatorService)
@@ -52,8 +51,6 @@ const compositeCalculatorService = {
   calculateIncomeAllocation: incomeCalculatorService.calculateIncomeAllocation,
   calculateExpenseBreakdown: expenseCalculatorService.calculateExpenseBreakdown,
   
-  calculateProjections: financialCalculatorService.calculateProjections,
-
   calculateProjectionsWithCache: financialCalculatorService.calculateProjectionsWithCache,
 
   calculatePortfolioAnalytics: financialCalculatorService.calculatePortfolioAnalytics,

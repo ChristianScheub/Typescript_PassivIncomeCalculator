@@ -26,7 +26,7 @@ export const calculateMonthlyAmountFromFrequency = (
 // Move outside to avoid lexical declaration in case block
 const defaultQuarterlyMonths = [3, 6, 9, 12];
 
-export const isPaymentMonthForFrequency = (
+const isPaymentMonthForFrequency = (
   monthNumber: number,
   frequency: string,
   specifiedMonths?: number[],

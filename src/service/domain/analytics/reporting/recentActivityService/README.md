@@ -43,16 +43,6 @@ recentActivityService.addPortfolioActivity('assets', 'portfolio');
 // Add analytics activity
 recentActivityService.addAnalyticsActivity('distributions', 'assets');
 
-// Add transaction activity
-recentActivityService.addTransactionActivity(
-  'asset', 
-  'transactions.asset.purchase', 
-  'transactions.asset.purchase.subtitle', 
-  'asset-123', 
-  150.50, 
-  'USD'
-);
-
 // Get recent activities
 const recentActivities = recentActivityService.getRecentActivities(5);
 

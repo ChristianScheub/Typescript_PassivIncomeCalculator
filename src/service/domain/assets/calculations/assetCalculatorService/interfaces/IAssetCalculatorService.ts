@@ -25,9 +25,7 @@ export interface IAssetCalculatorService {
       annualAmount: number;
       monthlyBreakdown: Record<number, number>;
     };
-  };
-  calculateTotalAssetIncomeForMonthWithCache?: (assets: Asset[], monthNumber: number) => number;
-  
+  };  
   // Cache status helpers
   areAssetsCached?: (assets: Asset[]) => boolean;
 }

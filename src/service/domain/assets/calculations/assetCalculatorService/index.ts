@@ -4,7 +4,6 @@ import {
   calculateAssetIncomeForMonth, 
   calculateTotalAssetIncomeForMonth
 } from './methods/calculateAssetIncome';
-import { calculateTotalAssetIncomeForMonthWithCache } from './methods/calculateAssetIncomeCache';
 import { calculateAssetAllocation } from './methods/calculateAllocations';
 import { 
   areAssetsCached, 
@@ -98,7 +97,6 @@ const assetCalculatorService: IAssetCalculatorService = {
   
   // Cached asset calculations
   calculateAssetMonthlyIncomeWithCache,
-  calculateTotalAssetIncomeForMonthWithCache,
   
   // Cache status helpers
   areAssetsCached: (assets) => areAssetsCached(assets),

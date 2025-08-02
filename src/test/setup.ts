@@ -74,10 +74,6 @@ jest.mock('@/service/domain/assets/market-data/stockAPIService/utils/fetch', () 
 
 // Mock analytics service methods
 jest.mock('@/service/domain/analytics/calculations/financialAnalyticsService/methods/calculateProjections', () => ({
-  calculateProjections: jest.fn(() => [
-    { month: 1, income: 5000, expenses: 3000, cashFlow: 2000, cumulativeCashFlow: 2000 },
-    { month: 2, income: 5000, expenses: 3000, cashFlow: 2000, cumulativeCashFlow: 4000 },
-  ]),
   calculateProjectionsWithCache: jest.fn(() => [
     { month: 1, income: 5000, expenses: 3000, cashFlow: 2000, cumulativeCashFlow: 2000 },
     { month: 2, income: 5000, expenses: 3000, cashFlow: 2000, cumulativeCashFlow: 4000 },

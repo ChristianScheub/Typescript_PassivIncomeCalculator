@@ -5,6 +5,7 @@
  * - Types Check: No `export type` outside of types/
  * - Console Log Check: No `console.log` in .ts/.tsx files outside of scripts/ or workers/
  * - Heuristic Check: Analyze files in the view directory for patterns like useEffect, useState, etc.
+ * - Types Usage Check: Ensure all exported types in types/ are used somewhere in types/ or src/
  */
 import fs from 'fs';
 import path from 'path';
@@ -296,6 +297,65 @@ if (consoleLogViolations.length > 0) {
   if (unusedTypes.length > 0) {
     console.error(`\n\x1b[31mUnused Types found (${unusedTypes.length}) (block build):\x1b[0m`);
     unusedTypes.forEach((msg) => console.error('- ' + msg));
+    process.exit(1);
+  }
+})();
+
+// 6. Service Method Usage Check: Alle Methoden in src/service/ müssen irgendwo verwendet werden
+(function () {
+  const serviceDir = path.join(srcDir, 'service');
+  if (!fs.existsSync(serviceDir)) return;
+  const allServiceMethods = [];
+  // Sammle alle exportierten Funktionen aus allen .ts Dateien im service-Verzeichnis
+  walkDir(serviceDir, (file) => {
+    if (!file.endsWith('.ts')) return;
+    // Ignoriere Dateien im test-Ordner
+    if (file.includes(`${path.sep}test${path.sep}`) || file.includes(`${path.sep}__tests__${path.sep}`)) return;
+    const content = fs.readFileSync(file, 'utf8');
+    // Finde alle "export function <name>" und "export const <name> = ("
+    const fnMatches = [...content.matchAll(/export\s+(function|const)\s+(\w+)/g)];
+    fnMatches.forEach((m) => {
+      allServiceMethods.push({ methodName: m[2], file });
+    });
+  });
+
+  // Prüfe für jede Methode, ob sie irgendwo in src/ oder types/ verwendet wird (außer in der eigenen Definition)
+  const unusedMethods = [];
+  allServiceMethods.forEach(({ methodName, file }) => {
+    let used = false;
+    // Suche in allen src/ und types/ Dateien außer der eigenen Definition
+    walkDir(srcDir, (f) => {
+      if (!f.endsWith('.ts') && !f.endsWith('.tsx')) return;
+      if (f === file) return;
+      const c = fs.readFileSync(f, 'utf8');
+      // Suche nach Funktionsaufrufen: <methodName>( oder <methodName>.<
+      const usagePattern = new RegExp(`\\b${methodName}\\s*\\(`, 'm');
+      const usagePatternObj = new RegExp(`\\b${methodName}\\s*\\.`, 'm');
+      if (usagePattern.test(c) || usagePatternObj.test(c)) {
+        used = true;
+      }
+    });
+    // Auch in types/ suchen
+    const typesDir = path.join(srcDir, 'types');
+    if (!used && fs.existsSync(typesDir)) {
+      walkDir(typesDir, (f) => {
+        if (!f.endsWith('.ts')) return;
+        if (f === file) return;
+        const c = fs.readFileSync(f, 'utf8');
+        const usagePattern = new RegExp(`\\b${methodName}\\s*\\(`, 'm');
+        const usagePatternObj = new RegExp(`\\b${methodName}\\s*\\.`, 'm');
+        if (usagePattern.test(c) || usagePatternObj.test(c)) {
+          used = true;
+        }
+      });
+    }
+    if (!used) {
+      unusedMethods.push(`Unused Service Method: '${methodName}' from '${path.relative(projectRoot, file)}' is exported but not used anywhere.`);
+    }
+  });
+  if (unusedMethods.length > 0) {
+    console.error(`\n\x1b[31mUnused Service Methods found (${unusedMethods.length}) (block build):\x1b[0m`);
+    unusedMethods.forEach((msg) => console.error('- ' + msg));
     process.exit(1);
   }
 })();

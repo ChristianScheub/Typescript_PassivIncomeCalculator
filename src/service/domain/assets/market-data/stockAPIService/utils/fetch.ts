@@ -19,7 +19,7 @@ export const setCurrency = (currency: 'EUR' | 'USD'): void => {
 /**
  * Get USD to EUR exchange rate from Exchange Service
  */
-export const getUSDToEURRate = async (): Promise<number> => {
+const getUSDToEURRate = async (): Promise<number> => {
   try {
     Logger.infoService('Getting USD/EUR exchange rate from Exchange Service');
     const rate = await exchangeService.getExchangeRate();

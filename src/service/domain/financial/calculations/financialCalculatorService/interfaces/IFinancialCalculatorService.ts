@@ -1,9 +1,4 @@
-import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
-import { 
-  Income, 
-  Liability, 
-  Expense
-} from '@/types/domains/financial/';
+import { AssetDefinition } from '@/types/domains/assets/';
 import { 
   MonthlyProjection 
 } from '@/types/domains/analytics/';
@@ -20,15 +15,6 @@ export interface IFinancialCalculatorService {
 
   // Net worth calculations
   calculateNetWorth: (totalAssetValue: number, totalDebt: number) => number;
-
-  // Financial projections and analytics
-  calculateProjections: (
-    income: Income[], 
-    expenses: Expense[], 
-    liabilities: Liability[],
-    assets?: Asset[],
-    months?: number
-  ) => MonthlyProjection[];
   
   calculateProjectionsWithCache: (
     baseValues: {

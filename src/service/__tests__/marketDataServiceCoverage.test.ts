@@ -266,7 +266,6 @@ describe('Asset Calculator Store Service Coverage', () => {
 describe('Exchange Service Coverage', () => {
   describe('Exchange Rate Methods', () => {
     let refreshExchangeRate: Function;
-    let getAllExchangeRates: Function;
     let clearExchangeRates: Function;
     let getExchangeRate: Function;
     let getExchangeRateByDate: Function;
@@ -274,19 +273,16 @@ describe('Exchange Service Coverage', () => {
     beforeEach(() => {
       try {
         const refreshModule = require('../domain/financial/exchange/exchangeService/methods/refreshExchangeRate');
-        const getAllModule = require('../domain/financial/exchange/exchangeService/methods/getAllExchangeRates');
         const clearModule = require('../domain/financial/exchange/exchangeService/methods/clearExchangeRates');
         const getModule = require('../domain/financial/exchange/exchangeService/methods/getExchangeRate');
         const getByDateModule = require('../domain/financial/exchange/exchangeService/methods/getExchangeRateByDate');
         
         refreshExchangeRate = refreshModule.refreshExchangeRate;
-        getAllExchangeRates = getAllModule.getAllExchangeRates;
         clearExchangeRates = clearModule.clearExchangeRates;
         getExchangeRate = getModule.getExchangeRate;
         getExchangeRateByDate = getByDateModule.getExchangeRateByDate;
       } catch (error) {
         refreshExchangeRate = jest.fn(async () => 1.0);
-        getAllExchangeRates = jest.fn(() => ({ 'USD': 1.0, 'EUR': 0.85 }));
         clearExchangeRates = jest.fn();
         getExchangeRate = jest.fn((_from, _to) => 1.0);
         getExchangeRateByDate = jest.fn((_from, _to, _date) => 1.0);
@@ -296,11 +292,6 @@ describe('Exchange Service Coverage', () => {
     it('should refresh exchange rates', async () => {
       const result = await refreshExchangeRate('USD', 'EUR');
       expect(typeof result).toBe('number');
-    });
-
-    it('should get all exchange rates', () => {
-      const result = getAllExchangeRates();
-      expect(typeof result).toBe('object');
     });
 
     it('should clear exchange rates', () => {

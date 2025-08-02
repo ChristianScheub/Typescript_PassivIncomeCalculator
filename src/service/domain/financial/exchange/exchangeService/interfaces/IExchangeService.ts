@@ -1,5 +1,3 @@
-import type { ExchangeRate } from '@/types/domains/financial/calculations';
-
 export interface IExchangeService {
   /**
    * Refreshes the exchange rate for today if not already stored
@@ -19,15 +17,4 @@ export interface IExchangeService {
    */
   getExchangeRate(date: string): Promise<number | null>;
 
-  /**
-   * Gets all stored exchange rates
-   * Useful for historical data analysis
-   */
-  getAllExchangeRates(): Promise<ExchangeRate[]>;
-
-  /**
-   * Clears all exchange rate data from database
-   * Used for testing or data reset
-   */
-  clearExchangeRates(): Promise<void>;
 }

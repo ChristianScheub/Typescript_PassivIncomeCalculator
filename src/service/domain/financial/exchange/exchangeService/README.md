@@ -25,9 +25,6 @@ const historicalRate = await exchangeService.getExchangeRate('2024-01-15');
 // Manually refresh today's rate
 await exchangeService.refreshExchangeRate();
 
-// Get all stored exchange rates
-const allRates = await exchangeService.getAllExchangeRates();
-
 // Clear all exchange rate data
 await exchangeService.clearExchangeRates();
 ```

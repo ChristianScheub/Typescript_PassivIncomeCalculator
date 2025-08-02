@@ -65,22 +65,3 @@ export const calculateNextPaymentDate = (income: Income, fromDate?: Date): Date 
     
     return nextPayment;
 };
-
-/**
- * Überprüft, ob eine Zahlung an einem bestimmten Datum fällig ist
- * @param income Das Einkommensobjekt 
- * @param date Das zu prüfende Datum
- * @returns true wenn eine Zahlung fällig ist
- */
-export const isPaymentDue = (income: Income, date: Date): boolean => {
-    const paymentDay = income.paymentSchedule.dayOfMonth || 1;
-    const currentDay = date.getDate();
-    
-    // Für monatliche Zahlungen: prüfe ob es der richtige Tag ist
-    if (income.paymentSchedule.frequency === 'monthly') {
-        return currentDay === paymentDay;
-    }
-    
-    // Für andere Frequenzen: zusätzliche Logik könnte hier implementiert werden
-    return false;
-};
