@@ -1,7 +1,6 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import { recommendationService } from "@service/domain/analytics/calculations/recommendationService";
 import { generateAssetRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateAssetRecommendations";
 import { generateIncomeRecommendations } from "@service/domain/analytics/calculations/recommendationService/methods/generateIncomeRecommendations";
@@ -10,6 +9,7 @@ import { generateLiabilityRecommendations } from "@service/domain/analytics/calc
 import { PortfolioRecommendation, RecommendationPriority } from "@/types/domains/analytics";
 import { Target } from "lucide-react";
 import { CollapsibleSection } from "@/ui/shared";
+import { RootState } from "@/store/config/storeConfig";
 
 interface PortfolioHubRecommendationsProps {
   className?: string;
@@ -42,7 +42,6 @@ const PortfolioHubRecommendations: React.FC<PortfolioHubRecommendationsProps> = 
       ...generateIncomeRecommendations(
         assets,
         income,
-        assetDefinitions
       ),
       ...generateExpenseRecommendations(
         expenses,

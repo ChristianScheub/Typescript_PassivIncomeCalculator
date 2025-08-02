@@ -1,12 +1,10 @@
-import { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
+import { Transaction as Asset } from '@/types/domains/assets/';
 import { Income } from '@/types/domains/financial/';
 import { PortfolioRecommendation } from '@/types/domains/analytics';
 
 export const generateIncomeRecommendations = (
   _assets: Asset[],
   income: Income[],
-  _assetDefinitions: AssetDefinition[] = [],
-  _portfolioCache?: { totals: { monthlyIncome: number } } | null
 ): PortfolioRecommendation[] => {
   const recommendations: PortfolioRecommendation[] = [];
 
