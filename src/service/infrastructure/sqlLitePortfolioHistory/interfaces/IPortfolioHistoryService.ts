@@ -35,7 +35,7 @@ export interface PortfolioIntradayPoint {
 }
 
 // Store names type
-export type PortfolioHistoryStoreNames = 'portfolioIntradayData' | 'portfolioHistory';
+type PortfolioHistoryStoreNames = 'portfolioIntradayData' | 'portfolioHistory';
 
 // Interface for the portfolio history service
 export interface IPortfolioHistoryService {

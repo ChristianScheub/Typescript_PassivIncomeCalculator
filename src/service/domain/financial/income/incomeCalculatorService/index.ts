@@ -31,7 +31,7 @@ const incomeCalculatorService: IIncomeCalculatorService = {
 };
 
 // Export the service interface
-export type { IIncomeCalculatorService };
+
 
 // Export the service
 export { incomeCalculatorService };

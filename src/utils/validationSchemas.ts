@@ -316,4 +316,3 @@ export const createValidationSchema = <T extends z.ZodRawShape>(additionalFields
   return baseEntitySchema.extend(additionalFields);
 };
 
-export type ValidationSchema<T extends z.ZodRawShape> = ReturnType<typeof createValidationSchema<T>>;

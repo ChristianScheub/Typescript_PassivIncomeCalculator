@@ -65,7 +65,15 @@ export const createStoreConfig = (preloadedState?: Partial<RootState>) => {
   const store = configureStore({
     reducer: rootReducer,
     preloadedState,
-    middleware: middlewareConfig,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE'],
+        ignoredPaths: ['register', 'rehydrate'],
+      },
+      immutableCheck: {
+        warnAfter: 128,
+      },
+    }).concat(...middlewareConfig()),
     devTools: process.env.NODE_ENV === 'development' ? {
       // Enhanced DevTools configuration
       maxAge: 100, // Limit action history
@@ -83,7 +91,7 @@ export const createStoreConfig = (preloadedState?: Partial<RootState>) => {
   // Add global error handler for store
   if (process.env.NODE_ENV === 'development') {
     store.subscribe(() => {
-      const state = store.getState();
+      const state = store.getState() as RootState;
       // Check for common state issues in development
       if (state.transactions.error) {
         console.warn('Store Error - Transactions (Consolidated Cache):', state.transactions.error);

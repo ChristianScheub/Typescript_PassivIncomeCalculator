@@ -9,5 +9,5 @@ const configService: IConfigService = {
   getDashboardMilestones,
 };
 
-export type { IConfigService };
+
 export default configService;

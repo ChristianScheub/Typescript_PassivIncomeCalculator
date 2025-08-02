@@ -105,7 +105,7 @@ const assetCalculatorService: IAssetCalculatorService = {
 };
 
 // Export the service interface
-export type { IAssetCalculatorService };
+
 
 // Export the service
 export { assetCalculatorService };

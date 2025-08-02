@@ -11,8 +11,7 @@ import ForecastContainer from './forecast/ForecastContainer';
 import MilestonesContainer from './forecast/MilestonesContainer';
 import AssetCalendarContainer from './AssetCalendarContainer';
 
-// Re-export types for external use
-export type { AnalyticsCategory, AnalyticsSubCategory };
+
 
 interface AnalyticsHubContainerProps {
   onBack?: () => void;

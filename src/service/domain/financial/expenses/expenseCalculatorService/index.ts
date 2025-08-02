@@ -21,7 +21,7 @@ const expenseCalculatorService: IExpenseCalculatorService = {
 };
 
 // Export the service interface
-export type { IExpenseCalculatorService };
+
 
 // Export the service
 export { expenseCalculatorService };

@@ -59,7 +59,7 @@ export interface FinanceDB extends DBSchema {
   };
 }
 
-export type StoreNames = import('@/types/domains/database/config').StoreNames;
+type StoreNames = import('@/types/domains/database/config').StoreNames;
 
 export interface ISQLiteService {
   getAll<K extends StoreNames>(storeName: K): Promise<FinanceDB[K]['value'][]>;

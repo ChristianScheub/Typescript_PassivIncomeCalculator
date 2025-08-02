@@ -7,7 +7,6 @@ const cacheRefreshService: CacheRefreshService = {
 };
 
 // Export the service interface and implementation
-export type { CacheRefreshService };
 export { cacheRefreshService };
 
 // Export default instance for direct use

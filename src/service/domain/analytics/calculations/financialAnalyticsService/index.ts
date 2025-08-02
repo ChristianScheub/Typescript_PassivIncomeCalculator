@@ -7,5 +7,4 @@ const analyticsService: IAnalyticsService = {
   calculateRatios,
 };
 
-export type { IAnalyticsService } from './interfaces/IAnalyticsService';
 export default analyticsService;

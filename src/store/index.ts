@@ -40,9 +40,3 @@ StoreInitializationService.setupDevelopmentTools(store);
 
 // Helper to get the store instance for use outside React
 export const getStore = () => store;
-
-// Re-export types from storeConfig to maintain single source of truth
-export type { RootState, AppStore, AppDispatch, AppThunk } from './config/storeConfig';
-
-// Export StoreState as an alias for RootState for backward compatibility
-export type { RootState as StoreState } from './config/storeConfig';

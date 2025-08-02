@@ -186,4 +186,4 @@ export const BaseAssetFields: React.FC<BaseAssetFieldsProps> = ({
   );
 };
 
-export type { BaseAssetFieldsProps };
+

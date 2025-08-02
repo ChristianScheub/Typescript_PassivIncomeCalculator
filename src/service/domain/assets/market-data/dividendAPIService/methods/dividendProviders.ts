@@ -1,8 +1,10 @@
-import { DividendApiProvider, DividendData } from '../types';
+
 import { fetchDividendsYahoo } from '../providers/yahoo/fetchDividendsYahoo';
 import { fetchDividendsFinnhub } from '../providers/finnhub/fetchDividendsFinnhub';
+import { DividendApiProvider } from '@/types/shared';
+import { DividendData } from '../types';
 
-export type DividendProviderFn = (ticker: string, opts: { apiKey?: string; interval?: string; range?: string }) => Promise<{ dividends: DividendData[] }>;
+type DividendProviderFn = (ticker: string, opts: { apiKey?: string; interval?: string; range?: string }) => Promise<{ dividends: DividendData[] }>;
 
 export const dividendProviders: Record<DividendApiProvider, DividendProviderFn> = {
   yahoo: async (ticker, opts) => {

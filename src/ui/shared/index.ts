@@ -28,5 +28,4 @@ export { NavLinkItem } from './navigation/NavLinkItem';
 export { default as TabSelector } from './navigation/TabSelector';
 
 // Types
-export type { ButtonProps } from './Button';
-export type { IconButtonProps } from './IconButton';
+

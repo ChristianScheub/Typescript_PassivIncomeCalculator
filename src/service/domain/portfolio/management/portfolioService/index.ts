@@ -13,7 +13,7 @@ const portfolioService: IPortfolioService = {
 };
 
 // Export the interface
-export type { IPortfolioService };
+
 
 // Export the service
 export { portfolioService };

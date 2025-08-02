@@ -34,4 +34,4 @@ export function useFormConfig<T extends FieldValues>({
   };
 }
 
-export type FormConfig<T extends FieldValues> = ReturnType<typeof useFormConfig<T>>;
+

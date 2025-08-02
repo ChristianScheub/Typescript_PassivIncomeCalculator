@@ -15,11 +15,12 @@ const alertsService: IAlertsService = {
   transformToUIAlerts,
 };
 
-// Export types
-export type { IAlertsService } from './interfaces/IAlertsService';
+
 
 // Export the service
 export { alertsService };
 
+
 // Export default instance for direct use
 export default alertsService;
+

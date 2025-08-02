@@ -61,31 +61,30 @@ function defaultFileNameCheck() {
   });
 }
 
-// 2. Types Check (log only, don't block build)
+// 2. Types Check (block build except for storeConfig.ts)
 const typeViolations = [];
+const allowedTypeExportFile = path.join(srcDir, 'store', 'config', 'storeConfig.ts');
 walkDir(srcDir, (file) => {
   if (file.includes(`${path.sep}types${path.sep}`)) return;
   if (!file.endsWith('.ts') && !file.endsWith('.tsx')) return;
   const content = fs.readFileSync(file, 'utf8');
   if (/export\s+type\s+/.test(content)) {
-    typeViolations.push(`Types Check: Found 'export type' outside of 'types/' in file ${path.relative(projectRoot, file)}.`);
+    // Only allow storeConfig.ts
+    if (path.resolve(file) !== path.resolve(allowedTypeExportFile)) {
+      typeViolations.push(`Types Check: Found 'export type' outside of 'types/' in file ${path.relative(projectRoot, file)}.`);
+    }
   }
 });
 
-if (checks.length > 0) {
+if (checks.length > 0 || typeViolations.length > 0) {
   console.error('\n\x1b[31mPre-Build Checks failed!\x1b[0m');
   checks.forEach((msg) => console.error('- ' + msg));
   if (typeViolations.length > 0) {
-    console.warn('\n\x1b[33mTypes Check Warnings (do not block build):\x1b[0m');
-    typeViolations.forEach((msg) => console.warn('- ' + msg));
+    console.error('\n\x1b[31mTypes Check Violations (block build):\x1b[0m');
+    typeViolations.forEach((msg) => console.error('- ' + msg));
   }
-  console.log('\n\x1b[31mContinuing with additional checks ...\x1b[0m');
   process.exit(1);
 } else {
-  if (typeViolations.length > 0) {
-    console.warn('\n\x1b[33mTypes Check Warnings (do not block build):\x1b[0m');
-    typeViolations.forEach((msg) => console.warn('- ' + msg));
-  }
   console.log('\x1b[32mPre-Build Checks successful.\x1b[0m');
 }
 

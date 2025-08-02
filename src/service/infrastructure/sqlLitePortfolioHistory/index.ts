@@ -1,7 +1,8 @@
-import { IPortfolioHistoryService, PortfolioHistoryStoreNames, PortfolioHistoryDB } from './interfaces/IPortfolioHistoryService';
+import { IPortfolioHistoryService, PortfolioHistoryDB } from './interfaces/IPortfolioHistoryService';
 import { dbOperations } from './methods/dbOperations';
 import { specializedOperations } from './methods/specializedOperations';
 import { importExportOperations } from './methods/importExportOperations';
+import { PortfolioHistoryStoreNames } from '@/types/domains/portfolio/performance';
 
 const portfolioHistoryService: IPortfolioHistoryService = {
   // Basic CRUD operations
@@ -79,5 +80,4 @@ const portfolioHistoryService: IPortfolioHistoryService = {
 };
 
 export default portfolioHistoryService;
-export type { IPortfolioHistoryService } from './interfaces/IPortfolioHistoryService';
-export type { PortfolioIntradayPoint } from './interfaces/IPortfolioHistoryService';
+

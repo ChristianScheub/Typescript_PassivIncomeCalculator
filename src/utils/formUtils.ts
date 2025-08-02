@@ -1,44 +1,25 @@
 import { z } from 'zod';
+// String validation creator
+const createStringValidation = (options: ValidationOptions): z.ZodString | z.ZodOptional<z.ZodString> => {
+  let schema = z.string();
+  if (options.max !== undefined && options.min !== undefined) {
+    schema = schema.min(options.min).max(options.max);
+  } else if (options.max !== undefined) {
+    schema = schema.max(options.max);
+  } else if (options.min !== undefined) {
+    schema = schema.min(options.min);
+  }
+  if (options.pattern) {
+    schema = schema.regex(options.pattern);
+  }
+  return options.required ? schema : schema.optional();
+};
 import { 
   FieldType, 
   FieldValidation, 
   ValidationOptions, 
   FieldConfig 
 } from '@/types/shared/utils/form-validation';
-
-// Basic field types
-const baseFields = {
-  name: z.string().min(1, 'Name is required'),
-  notes: z.string().optional(),
-  // Common fields for dates
-  startDate: z.string(),
-  endDate: z.string().optional(),
-};
-
-// Payment schedule validation
-export const paymentScheduleSchema = z.object({
-  frequency: z.enum(['monthly', 'quarterly', 'annually', 'custom', 'none']),
-  amount: z.number().min(0, 'Payment amount must be positive'),
-  months: z.array(z.number().min(1).max(12)).optional(),
-  customAmounts: z.record(z.number()).optional(),
-});
-
-// Form validation utilities with proper typing
-export type ValidationSchema<T = unknown> = z.ZodType<T>;
-
-export interface LocalValidationOptions {
-  required?: boolean;
-  min?: number;
-  max?: number;
-  pattern?: RegExp;
-  customValidation?: (value: unknown) => boolean;
-}
-
-const createStringValidation = (options: ValidationOptions): z.ZodString | z.ZodOptional<z.ZodString> => {
-  const schema = z.string();
-  const withPattern = options.pattern ? schema.regex(options.pattern) : schema;
-  return options.required ? withPattern.min(1, 'Field is required') : withPattern.optional();
-};
 
 const createNumberValidation = (options: ValidationOptions): z.ZodNumber | z.ZodOptional<z.ZodNumber> => {
   const schema = z.number();
@@ -110,9 +91,6 @@ export function createValidationSchema<T extends Record<string, FieldType | Fiel
 
   return z.object(shape);
 }
-
-// Re-export base fields for use in form schemas
-export { baseFields };
 
 // Helper functions for form arrays
 export const addArrayItem = <T>(array: T[] | null | undefined, item: T): T[] => {

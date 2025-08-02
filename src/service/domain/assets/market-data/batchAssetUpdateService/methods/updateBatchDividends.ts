@@ -1,12 +1,13 @@
+
 import type { AssetDefinition } from '@/types/domains/assets/entities';
 import type { BatchResult } from '@/types/shared/batch';
-import { DividendFrequency } from '@/types/shared';
-import { dividendApiService } from '@/service/domain/assets/market-data/dividendAPIService';
 import type { ApiConfig } from '@/types/shared/apiConfig';
+import { dividendApiService } from '@/service/domain/assets/market-data/dividendAPIService';
+import { DividendFrequency } from '@/types/shared';
 
 // Typen für interne Verarbeitung
-export type RawDividend = { amount: number; date?: number; lastDividendDate?: string; frequency?: DividendFrequency };
-export type DividendEntry = { date: string; amount: number; source: 'api' | 'manual'; currency?: string };
+type RawDividend = { amount: number; date?: number; lastDividendDate?: string; frequency?: DividendFrequency };
+type DividendEntry = { date: string; amount: number; source: 'api' | 'manual'; currency?: string };
 
 // Hilfsfunktionen für Frequenz, Monate, Wachstum, Forecast
 type DividendApiResult = { dividends?: Array<{ frequency?: DividendFrequency }> };

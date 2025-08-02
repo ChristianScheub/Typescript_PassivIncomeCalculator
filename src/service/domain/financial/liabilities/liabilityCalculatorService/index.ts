@@ -17,7 +17,7 @@ const liabilityCalculatorService: ILiabilityCalculatorService = {
 };
 
 // Export the service interface
-export type { ILiabilityCalculatorService };
+
 
 // Export the service
 export { liabilityCalculatorService };

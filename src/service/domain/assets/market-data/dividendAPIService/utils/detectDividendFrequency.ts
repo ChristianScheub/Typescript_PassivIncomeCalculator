@@ -1,5 +1,5 @@
 // Utility to detect dividend frequency from an array of dividend objects with a 'date' property (UNIX timestamp in seconds)
-export type DividendFrequency = 'monthly' | 'quarterly' | 'annually';
+type DividendFrequency = 'monthly' | 'quarterly' | 'annually';
 
 export function detectDividendFrequency(dividendArray: { date?: number }[]): DividendFrequency {
   if (!dividendArray || dividendArray.length < 2) return 'annually';

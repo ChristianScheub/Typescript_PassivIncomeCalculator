@@ -70,4 +70,4 @@ const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
 };
 
 export { OptionalFieldsSection };
-export type { OptionalFieldsSectionProps };
+

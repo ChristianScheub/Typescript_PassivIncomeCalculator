@@ -28,4 +28,4 @@ export default exchangeService;
 
 // Export the service and types for use in other modules
 export { exchangeService };
-export type { IExchangeService };
+

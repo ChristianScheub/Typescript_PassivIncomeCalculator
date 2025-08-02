@@ -1,3 +1,5 @@
+// Store names type for portfolio history DB
+export type PortfolioHistoryStoreNames = 'portfolioIntradayData' | 'portfolioHistory';
 /**
  * Portfolio performance metrics and calculations
  */

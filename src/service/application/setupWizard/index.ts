@@ -25,7 +25,6 @@ const setupWizardService: ISetupWizardService = {
 };
 
 // Export the service interface and implementation
-export type { ISetupWizardService };
 export { setupWizardService };
 
 // Export default instance for direct use

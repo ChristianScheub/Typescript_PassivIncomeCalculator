@@ -25,7 +25,7 @@ const financialCalculatorService: IFinancialCalculatorService = {
 };
 
 // Export the service interface
-export type { IFinancialCalculatorService };
+
 
 // Export the service
 export { financialCalculatorService };

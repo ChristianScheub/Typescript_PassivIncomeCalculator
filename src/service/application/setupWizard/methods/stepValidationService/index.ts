@@ -21,7 +21,6 @@ const stepValidationService: IStepValidationService = {
 };
 
 // Export the service interface and implementation
-export type { IStepValidationService };
 export { stepValidationService };
 
 // Export default instance for direct use

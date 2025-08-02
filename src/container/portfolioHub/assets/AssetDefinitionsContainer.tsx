@@ -12,7 +12,7 @@ type BatchResult<T> = {
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
-import { RootState } from "@/store";
+import { RootState } from "@/store/config/storeConfig";
 import {
   addAssetDefinition,
   updateAssetDefinition,
@@ -47,13 +47,12 @@ import { addPriceToHistory } from "@/utils/priceHistoryUtils";
 import { calculatePortfolioIntradayDataDirect } from "@/store/slices/cache";
 import { DividendFrequency } from "@/types/shared";
 
-
 interface AssetDefinitionsContainerProps {
   onBack?: () => void;
 }
 
 // Type alias for asset types
-export type AssetTypeAlias = "stock" | "real_estate" | "bond" | "cash" | "crypto" | "other";
+
 
 // Type alias for dividend frequency
 

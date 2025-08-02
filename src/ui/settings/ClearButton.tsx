@@ -72,4 +72,4 @@ export const ClearButton: React.FC<ClearButtonProps> = ({ status, onClick, title
 };
 
 export default ClearButton;
-export type { ClearStatus };
+

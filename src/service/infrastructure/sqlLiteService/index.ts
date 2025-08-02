@@ -1,4 +1,5 @@
-import { ISQLiteService, StoreNames, FinanceDB } from './interfaces/ISQLiteService';
+import { StoreNames } from '@/types/domains/database';
+import { ISQLiteService, FinanceDB } from './interfaces/ISQLiteService';
 import { dbOperations } from './methods/dbOperations';
 import { importExportOperations } from './methods/importExportOperations';
 
@@ -35,4 +36,3 @@ const sqliteService: ISQLiteService = {
 };
 
 export default sqliteService;
-export type { ISQLiteService } from './interfaces/ISQLiteService';

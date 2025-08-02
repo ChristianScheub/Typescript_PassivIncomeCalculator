@@ -89,7 +89,7 @@ export function useSharedForm<T extends FieldValues>({
 }
 
 // Helper types for form array operations
-export type FormArrayOperation<T> = {
+type FormArrayOperation<T> = {
   append: (value: T) => void;
   remove: (index: number) => void;
   update: (index: number, value: T) => void;

@@ -8,7 +8,7 @@ import { BaseEntity } from '@/types/shared/base/entities';
 /**
  * Standard-Status für async operations
  */
-export type AsyncStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
+type AsyncStatus = 'idle' | 'loading' | 'succeeded' | 'failed';
 
 /**
  * Standard-State-Interface für alle CRUD-Slices

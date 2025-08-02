@@ -17,7 +17,7 @@ const recentActivityService: IRecentActivityService = {
   replaceAnalyticsActivity
 };
 
-export type { IRecentActivityService };
+
 export default recentActivityService;
 
 // Keine fachlichen Types mehr exportieren, nur noch Service-Interface falls vorhanden.

@@ -26,7 +26,6 @@ const deleteDataService: DeleteDataService = {
 };
 
 // Export the service interface and implementation
-export type { DeleteDataService };
 export { deleteDataService };
 
 // Export default instance for direct use
