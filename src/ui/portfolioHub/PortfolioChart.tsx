@@ -125,6 +125,15 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
     });
   }, [chartData]);
 
+  // Ensure all dates and values are valid before rendering
+  const sanitizedChartData = useMemo(() => {
+    return validChartData.map((point) => {
+      const date = new Date(point.date).getTime();
+      const value = isFinite(point.value) ? point.value : 0;
+      return { ...point, date, value };
+    });
+  }, [validChartData]);
+
   // Calculate performance metrics
   const performanceMetrics = useMemo((): PortfolioPerformanceMetrics => {
     if (validChartData.length === 0 || !currentValue || !totalInvestment) {
@@ -324,16 +333,18 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
         <div style={{ height: config.height }}>
           <ResponsiveContainer width="100%" height="100%">
             {config.chartType === 'area' ? (
-              <AreaChart data={validChartData}>
+              <AreaChart data={sanitizedChartData}> {/* Use sanitized data */}
                 {config.showGrid && (
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.3} />
                 )}
                 <XAxis 
-                  dataKey="formattedDate"
+                  dataKey="date" // Use sanitized date
                   tick={{ fontSize: 12 }}
                   stroke="#6B7280"
                   tickFormatter={formatXAxisLabel}
-                  interval={isIntradayView ? Math.floor(validChartData.length / 10) : 'preserveStart'}
+                  scale="time" // Use time scale for consistent day spacing
+                  type="number" // Ensure numeric time values
+                  domain={['dataMin', 'dataMax']} // Fit domain to data range
                 />
                 <YAxis 
                   tick={false} // Disable Y-axis labels
@@ -367,15 +378,18 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
                 </defs>
               </AreaChart>
             ) : (
-              <LineChart data={validChartData}>
+              <LineChart data={sanitizedChartData}> {/* Use sanitized data */}
                 {config.showGrid && (
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.3} />
                 )}
                 <XAxis 
-                  dataKey="formattedDate"
+                  dataKey="date" // Use sanitized date
                   tick={{ fontSize: 12 }}
                   stroke="#6B7280"
                   tickFormatter={formatXAxisLabel}
+                  scale="time" // Use time scale for consistent day spacing
+                  type="number" // Ensure numeric time values
+                  domain={['dataMin', 'dataMax']} // Fit domain to data range
                 />
                 <YAxis 
                   tick={false} // Disable Y-axis labels
