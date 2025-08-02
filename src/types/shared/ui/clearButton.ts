@@ -1,0 +1,1 @@
+export type ClearStatus = 'idle' | 'clearing' | 'success';

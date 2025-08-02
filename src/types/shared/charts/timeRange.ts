@@ -43,7 +43,6 @@ export interface ChartConfig {
 
 /**
  * Default time range filters with German labels
- * ToDo: Use i18Next Keys for translations and use it in AssetFocusDashboard
  */
 export const DEFAULT_TIME_RANGE_FILTERS: TimeRangeChartFilter[] = [
   { key: '1T', label: 'chart.timeRange.1D' },

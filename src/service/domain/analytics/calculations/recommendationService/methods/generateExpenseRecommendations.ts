@@ -149,10 +149,19 @@ const findHighExpenseCategories = (
     .filter(cat => cat.percentage > 30);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const findSeasonalExpenses = (_expenses: Expense[]): Expense[] => {
-  // TODO: Find expenses with seasonal patterns
-  return [];
+  // Finde Expenses mit jährlichem, quartalsweisem oder benutzerdefiniertem Rhythmus
+  // Erkenne Expenses mit jährlichem, quartalsweisem oder benutzerdefiniertem Rhythmus
+  return _expenses.filter(expense => {
+    const schedule = expense.paymentSchedule;
+    if (!schedule || !schedule.frequency) return false;
+    const freq = String(schedule.frequency).toLowerCase();
+    // Jährlich, Quartalsweise, Custom
+    if (freq === 'annually' || freq === 'annual' || freq === 'jahr') return true;
+    if (freq === 'quarterly' || freq === 'quartal') return true;
+    if (freq === 'custom' && schedule.customAmounts && Object.keys(schedule.customAmounts).length > 0) return true;
+    return false;
+  });
 };
 
 // Helper function: Prüft, ob genug Cash für mindestens 1 Monat Ausgaben vorhanden ist

@@ -3,6 +3,7 @@ import { ChevronRight, Trash } from 'lucide-react';
 import clsx from 'clsx';
 import { TFunction } from 'i18next';
 import { Button } from '../shared';
+import { ClearStatus } from '@/types/shared/ui/clearButton';
 
 // LoadingSpinner component
 const LoadingSpinner: React.FC = () => (
@@ -32,8 +33,6 @@ export const getClearButtonIcon = (status: ClearStatus) => {
   }
   return <Trash className="h-4 w-4 mr-2" />;
 };
-
-type ClearStatus = 'idle' | 'clearing' | 'success';
 
 interface ClearButtonProps {
   status: ClearStatus;

@@ -24,7 +24,7 @@ import PortfolioAnalyticsContainer from '@/container/analyticsHub/distribution/P
 import { useAsyncOperation } from '@/utils/containerUtils';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
-import { RootState } from '@/store';
+import { RootState } from '@/store/config/storeConfig';
 
 const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }> = ({ onBack, initialAction }) => {
   const { t } = useTranslation();

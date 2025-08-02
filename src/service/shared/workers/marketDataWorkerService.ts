@@ -1,7 +1,7 @@
 /**
  * Worker Service for managing Web Worker operations
  * Provides a convenient interface for containers to use the new workers
- * ToDO: Prüfen ob zu komplex
+ * TODO: Prüfen ob zu komplex
  */
 
 import { AssetDefinition } from '@/types/domains/assets';

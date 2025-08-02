@@ -11,7 +11,8 @@ import { DividendApiSettingsSection } from '../../../ui/settings/DividendApiSett
 import { StockApiSettingsSection } from '../../../ui/settings/StockApiSettingsSection';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 import { AISettingsContainer } from '@/container/settings/AISettingsContainer';
-import { ClearButton, ClearStatus, getButtonText, getClearButtonIcon } from '@/ui/settings';
+import { ClearButton, getButtonText, getClearButtonIcon } from '@/ui/settings';
+import { ClearStatus } from '@/types/shared/ui/clearButton';
 
 interface ProviderInfo {
   name: string;
