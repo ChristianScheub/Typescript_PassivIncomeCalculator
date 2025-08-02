@@ -1,9 +1,7 @@
-import type { Transaction as Asset, AssetDefinition } from '@/types/domains/assets/';
-import type { 
-  PortfolioHistoryPoint,
-  PerformanceMetrics,
-  ChartDataPoint 
-} from '@/types/domains/portfolio/performance';
+import type { Transaction, AssetDefinition } from '@/types/domains/assets/';
+import type { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
+import type { PortfolioPosition } from '@/types/domains/portfolio';
+import type { PortfolioIntradayPoint } from '@/service/infrastructure/sqlLitePortfolioHistory/interfaces/IPortfolioHistoryService';
 
 
 
@@ -13,32 +11,12 @@ import type {
 export interface IPortfolioHistoryService {
   // Portfolio history calculations
   calculatePortfolioHistory(
-    assets: Asset[], 
+    assets: Transaction[],
     assetDefinitions: AssetDefinition[]
   ): PortfolioHistoryPoint[];
-  
-  calculatePortfolioHistoryForDays(
-    assets: Asset[], 
-    assetDefinitions: AssetDefinition[],
-    daysBack: number
-  ): PortfolioHistoryPoint[];
-  
-  // Performance calculations
-  calculatePerformanceMetrics(
-    historyPoints: PortfolioHistoryPoint[], 
-    totalInvestment: number
-  ): PerformanceMetrics;
-  
-  // Chart formatting
-  formatForChart(historyPoints: PortfolioHistoryPoint[]): ChartDataPoint[];
 
-  // Time range helpers
-  getLastWeek(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
-  getLastMonth(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
-  getLastQuarter(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
-  getLastHalfYear(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
-  getLastYear(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
-  getLastTwoYears(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
-  getLastFiveYears(assets: Asset[], assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
-  getCustomDays(assets: Asset[], days: number, assetDefinitions?: AssetDefinition[]): PortfolioHistoryPoint[];
+  calculatePortfolioIntraday(
+    assetDefinitions: AssetDefinition[],
+    portfolioPositions: PortfolioPosition[]
+  ): PortfolioIntradayPoint[];
 }

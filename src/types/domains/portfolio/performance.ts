@@ -2,19 +2,6 @@
  * Portfolio performance metrics and calculations
  */
 
-// Performance tracking
-export interface PerformanceMetrics {
-  totalReturn: number;
-  totalReturnPercentage: number;
-  annualizedReturn: number;
-  volatility: number;
-  sharpeRatio: number;
-  maxDrawdown: number;
-  winRate: number;
-  averageGain: number;
-  averageLoss: number;
-}
-
 // Chart-specific performance metrics
 export interface PortfolioPerformanceMetrics {
   totalReturn: number;

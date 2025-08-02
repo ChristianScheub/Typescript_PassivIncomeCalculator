@@ -118,50 +118,33 @@ describe('Portfolio Management Service Coverage', () => {
   });
 
   describe('Portfolio History Service', () => {
-    let calculatePerformanceMetrics: Function;
     let calculatePortfolioHistory: Function;
-    let calculatePortfolioHistoryForDays: Function;
     let calculatePortfolioHistoryTimeRanges: Function;
     let calculatePortfolioIntraday: Function;
     let calculatePortfolioValueForDate: Function;
-    let formatForChart: Function;
     let getHistoricalPrice: Function;
     let portfolioHistoryHelper: any;
 
     beforeEach(() => {
       try {
-        const metricsModule = require('../domain/portfolio/history/portfolioHistoryService/methods/calculatePerformanceMetrics');
         const historyModule = require('../domain/portfolio/history/portfolioHistoryService/methods/calculatePortfolioHistory');
-        const daysModule = require('../domain/portfolio/history/portfolioHistoryService/methods/calculatePortfolioHistoryForDays');
         const rangesModule = require('../domain/portfolio/history/portfolioHistoryService/methods/calculatePortfolioHistoryTimeRanges');
         const intradayModule = require('../domain/portfolio/history/portfolioHistoryService/methods/calculatePortfolioIntraday');
         const valueModule = require('../domain/portfolio/history/portfolioHistoryService/methods/calculatePortfolioValueForDate');
-        const chartModule = require('../domain/portfolio/history/portfolioHistoryService/methods/formatForChart');
         const priceModule = require('../domain/portfolio/history/portfolioHistoryService/methods/getHistoricalPrice');
         const helperModule = require('../domain/portfolio/history/portfolioHistoryService/methods/portfolioHistoryHelper');
         
-        calculatePerformanceMetrics = metricsModule.calculatePerformanceMetrics;
         calculatePortfolioHistory = historyModule.calculatePortfolioHistory;
-        calculatePortfolioHistoryForDays = daysModule.calculatePortfolioHistoryForDays;
         calculatePortfolioHistoryTimeRanges = rangesModule.calculatePortfolioHistoryTimeRanges;
         calculatePortfolioIntraday = intradayModule.calculatePortfolioIntraday;
         calculatePortfolioValueForDate = valueModule.calculatePortfolioValueForDate;
-        formatForChart = chartModule.formatForChart;
         getHistoricalPrice = priceModule.getHistoricalPrice;
         portfolioHistoryHelper = helperModule;
       } catch (error) {
-        calculatePerformanceMetrics = jest.fn(() => ({
-          totalReturn: 0.15,
-          annualizedReturn: 0.12,
-          volatility: 0.18,
-          sharpeRatio: 0.67,
-        }));
         calculatePortfolioHistory = jest.fn(() => []);
-        calculatePortfolioHistoryForDays = jest.fn(() => []);
         calculatePortfolioHistoryTimeRanges = jest.fn(() => ({}));
         calculatePortfolioIntraday = jest.fn(() => []);
         calculatePortfolioValueForDate = jest.fn(() => 100000);
-        formatForChart = jest.fn(() => []);
         getHistoricalPrice = jest.fn(() => 150);
         portfolioHistoryHelper = {
           interpolateValues: jest.fn(() => []),
@@ -170,27 +153,8 @@ describe('Portfolio Management Service Coverage', () => {
       }
     });
 
-    it('should calculate performance metrics', () => {
-      const history = [
-        { date: '2023-01-01', value: 100000 },
-        { date: '2023-06-01', value: 110000 },
-        { date: '2023-12-31', value: 115000 },
-      ];
-      const result = calculatePerformanceMetrics(history);
-      expect(typeof result).toBe('object');
-      if (result) {
-        expect(result).toHaveProperty('totalReturn');
-        expect(result).toHaveProperty('annualizedReturn');
-      }
-    });
-
     it('should calculate portfolio history', () => {
       const result = calculatePortfolioHistory([]);
-      expect(Array.isArray(result)).toBe(true);
-    });
-
-    it('should calculate portfolio history for specific days', () => {
-      const result = calculatePortfolioHistoryForDays([], 30);
       expect(Array.isArray(result)).toBe(true);
     });
 
@@ -207,15 +171,6 @@ describe('Portfolio Management Service Coverage', () => {
     it('should calculate portfolio value for specific date', () => {
       const result = calculatePortfolioValueForDate([], new Date());
       expect(typeof result).toBe('number');
-    });
-
-    it('should format data for charts', () => {
-      const data = [
-        { date: '2023-01-01', value: 100000 },
-        { date: '2023-02-01', value: 105000 },
-      ];
-      const result = formatForChart(data);
-      expect(Array.isArray(result)).toBe(true);
     });
 
     it('should get historical prices', () => {
@@ -437,7 +392,7 @@ describe('Helper Utilities Service Coverage', () => {
 
     beforeEach(() => {
       // Always use mock to avoid Capacitor API issues in tests
-      downloadFile = jest.fn((content) => {
+      downloadFile = jest.fn(() => {
         return Promise.resolve();
       });
     });

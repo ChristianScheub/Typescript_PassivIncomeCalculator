@@ -6,34 +6,69 @@ function findLastAvailablePrice(
 ): number | null {
   const ticker = assetDefinition.ticker || assetDefinition.id;
   const assetTimestampMap = assetDataMap[ticker];
-  if (!assetTimestampMap) return null;
-  if (assetTimestampMap[targetTimestamp]) {
-    return assetTimestampMap[targetTimestamp];
-  }
-  let latestPrice: number | null = null;
-  let latestTimestamp: Date | null = null;
-  const targetDate = new Date(targetTimestamp);
-  Object.entries(assetTimestampMap).forEach(([timestamp, price]) => {
-    const entryDate = new Date(timestamp);
-    if (entryDate <= targetDate) {
-      if (!latestTimestamp || entryDate > latestTimestamp) {
-        latestTimestamp = entryDate;
-        latestPrice = price;
-      }
+  
+  // First, try to find intraday price from the timestamp map
+  if (assetTimestampMap) {
+    // Check exact timestamp match
+    if (assetTimestampMap[targetTimestamp]) {
+      return assetTimestampMap[targetTimestamp];
     }
-  });
-  if (latestPrice !== null) return latestPrice;
-  if (assetDefinition.priceHistory) {
+    
+    // Find the latest intraday price before target timestamp
+    let latestPrice: number | null = null;
+    let latestTimestamp: Date | null = null;
+    const targetDate = new Date(targetTimestamp);
+    
+    Object.entries(assetTimestampMap).forEach(([timestamp, price]) => {
+      const entryDate = new Date(timestamp);
+      if (entryDate <= targetDate) {
+        if (!latestTimestamp || entryDate > latestTimestamp) {
+          latestTimestamp = entryDate;
+          latestPrice = price;
+        }
+      }
+    });
+    
+    if (latestPrice !== null) {
+      return latestPrice;
+    }
+  }
+  
+  // Second, try to find historical daily prices from priceHistory
+  if (assetDefinition.priceHistory && assetDefinition.priceHistory.length > 0) {
     const targetDateStr = targetTimestamp.split('T')[0];
-    const sortedHistory = assetDefinition.priceHistory
-      .filter((entry: PriceHistoryEntry) => !entry.date.includes('T'))
-      .sort((a: PriceHistoryEntry, b: PriceHistoryEntry) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    const targetDate = new Date(targetDateStr);
+    
+    // Sort by date descending (newest first) and find the most recent price before or on target date
+    const sortedHistory = [...assetDefinition.priceHistory]
+      .sort((a: PriceHistoryEntry, b: PriceHistoryEntry) =>
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+    
     for (const entry of sortedHistory) {
-      if (entry.date <= targetDateStr) {
+      const entryDate = new Date(entry.date.split('T')[0]);
+      if (entryDate <= targetDate && entry.price > 0) {
+        Logger.infoService(`[useAutoUpdatingPortfolioHistory] Using historical price for ${ticker}: €${entry.price.toFixed(2)} from ${entry.date}`);
         return entry.price;
       }
     }
+    
+    // If no price found before target date, use the earliest available price as fallback
+    if (sortedHistory.length > 0 && sortedHistory[sortedHistory.length - 1].price > 0) {
+      const fallbackEntry = sortedHistory[sortedHistory.length - 1];
+      Logger.infoService(`[useAutoUpdatingPortfolioHistory] No price before ${targetDateStr}, using earliest available price for ${ticker}: €${fallbackEntry.price.toFixed(2)} from ${fallbackEntry.date}`);
+      return fallbackEntry.price;
+    }
   }
+  
+  // Third, use currentPrice as final fallback
+  if (assetDefinition.currentPrice && assetDefinition.currentPrice > 0) {
+    Logger.infoService(`[useAutoUpdatingPortfolioHistory] Using currentPrice as fallback for ${ticker}: €${assetDefinition.currentPrice.toFixed(2)}`);
+    return assetDefinition.currentPrice;
+  }
+  
+  // Last resort: no price available
+  Logger.warnService(`[useAutoUpdatingPortfolioHistory] No price available for ${ticker} at ${targetTimestamp}`);
   return null;
 }
 

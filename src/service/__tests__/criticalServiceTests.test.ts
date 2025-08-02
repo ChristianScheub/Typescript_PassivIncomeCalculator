@@ -305,10 +305,6 @@ describe('Critical Service Coverage Tests', () => {
 
       const emptyHistory = portfolioHistoryService.calculatePortfolioHistory([], 0);
       expect(emptyHistory).toEqual([]);
-
-      const emptyMetrics = portfolioHistoryService.calculatePerformanceMetrics([]);
-      expect(emptyMetrics.totalReturn).toBe(0);
-      expect(emptyMetrics.volatility).toBe(0);
     });
   });
 

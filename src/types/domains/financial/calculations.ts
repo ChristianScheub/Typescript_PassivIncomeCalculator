@@ -14,14 +14,6 @@ export interface DividendSchedule {
   dayOfMonth?: number; // Tag des Monats (1-31) an dem die Dividende ausgezahlt wird
 }
 
-// Net worth tracking
-export interface NetWorthHistory {
-  date: string;
-  assets: number;
-  liabilities: number;
-  netWorth: number;
-}
-
 // Milestone tracking
 export interface DebtEntry {
   name: string;
