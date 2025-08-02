@@ -40,11 +40,7 @@
     "totalAssets": "Gesamtvermögen",
     "totalLiabilities": "Gesamtverbindlichkeiten",
     "symbol": "Symbol",
-    "currentPrice": "Aktueller Preis",
-    "change": "Veränderung",
-    "assets": "Vermögenswerte",
     "portfolioHistory": "Vermögens Historie",
-    "quickActions": "Schnellaktionen",
     "addIncome": "Einkommen hinzufügen",
     "addExpense": "Ausgabe hinzufügen",
     "recordTransaction": "Transaktion erfassen",
@@ -317,8 +313,6 @@
   },
   "forecast": {
     "title": "Finanzprognose",
-    "allocations": "Zuordnungen",
-    "fire": "Meilensteine",
     "cashFlowProjection": "Monatliche Cashflow-Prognose",
     "assetAllocation": "Vermögensaufteilung",
     "noAssetData": "Keine Vermögensdaten verfügbar",
@@ -388,9 +382,6 @@
     "editDefinition": "Definition bearbeiten",
     "noDefinitions": "Keine Asset-Definitionen",
     "noDefinitionsDesc": "Erstellen Sie Asset-Definitionen, um Transaktionen zu vereinfachen"
-  },
-  "assetCategories": {
-    "management": "Asset-Kategorien"
   },
   "categories": {
     "income": "Einkommen",
@@ -985,11 +976,6 @@
         "transactions.recent": "Letzte Transaktionen angesehen",
         "transactions.import": "Transaktionen importiert",
         "transactions.export": "Transaktionen exportiert"
-      },
-      "quickActions": {
-        "addTransaction": "Transaktion hinzufügen",
-        "addIncome": "Einkommen hinzufügen",
-        "addExpense": "Ausgabe hinzufügen"
       }
     }
   },
@@ -1423,7 +1409,6 @@
     },
     "progress": {
       "saving": "Speichern...",
-      "saved": "Gespeichert!",
       "processing": "Verarbeiten...",
       "step": "Schritt {{current}} von {{total}}",
       "completion": "{{percent}}% abgeschlossen"
@@ -1521,7 +1506,6 @@
         "title": "Verfolgen Sie Ihre Verbindlichkeiten",
         "description": "Fügen Sie Ihre Schulden und Verbindlichkeiten hinzu, um ein vollständiges Bild Ihrer finanziellen Gesundheit zu erhalten. Dies umfasst Hypotheken, Kreditkarten, Darlehen und andere Schulden.",
         "yourLiabilities": "Ihre Verbindlichkeiten",
-        "totalLiabilities": "Gesamtverbindlichkeiten",
         "monthlyPayments": "Monatliche Zahlungen",
         "addLiability": "Verbindlichkeit hinzufügen",
         "addNewLiability": "Neue Verbindlichkeit hinzufügen",
