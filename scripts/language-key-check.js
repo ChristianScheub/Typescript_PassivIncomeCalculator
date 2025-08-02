@@ -44,8 +44,17 @@ function walkDir(dir, callback) {
   fs.readdirSync(dir, { withFileTypes: true }).forEach((entry) => {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
+      // Ignore __tests__ folders
+      if (entry.name === '__tests__') return;
       walkDir(fullPath, callback);
     } else {
+      // Ignore test files
+      if (
+        fullPath.endsWith('.test.ts') ||
+        fullPath.endsWith('.test.tsx') ||
+        fullPath.endsWith('.spec.ts') ||
+        fullPath.endsWith('.spec.tsx')
+      ) return;
       callback(fullPath);
     }
   });
@@ -53,6 +62,8 @@ function walkDir(dir, callback) {
 
 const usedKeys = new Set();
 const missingKeys = new Set();
+const dynamicKeys = new Set();
+const importKeys = new Set();
 const keyUsagePattern = /t\s*\(\s*(['"`])([^'"`]+)\1/g;
 
 walkDir(srcDir, (file) => {
@@ -61,6 +72,22 @@ walkDir(srcDir, (file) => {
   let match;
   while ((match = keyUsagePattern.exec(content)) !== null) {
     const key = match[2];
+    // Ignore dynamic keys (template strings, variables, etc.)
+    if (
+      key.includes('${') || // template string
+      key.includes('\n') || key.includes('\r') || // line breaks
+      key.includes(',') || // comma separated
+      key.includes('/') || key.includes('@') || key.includes('./') || key.includes('../') || // import/module path
+      key.match(/\s/) // whitespace (likely not a real key)
+    ) {
+      // Collect import/module keys separately
+      if (key.includes('/') || key.includes('@') || key.includes('./') || key.includes('../')) {
+        importKeys.add(key);
+      } else {
+        dynamicKeys.add(key);
+      }
+      continue;
+    }
     usedKeys.add(key);
     if (!allTranslationKeys.includes(key)) {
       missingKeys.add(key);
@@ -69,7 +96,26 @@ walkDir(srcDir, (file) => {
 });
 
 // 1. Check for unused keys in de.json
-const unusedKeys = allTranslationKeys.filter((key) => !usedKeys.has(key));
+function isKeyUsedAnywhere(key) {
+  let found = false;
+  walkDir(srcDir, (file) => {
+    if (!file.endsWith('.ts') && !file.endsWith('.tsx') && !file.endsWith('.js')) return;
+    // Ignore test files and __tests__
+    if (
+      file.endsWith('.test.ts') ||
+      file.endsWith('.test.tsx') ||
+      file.endsWith('.spec.ts') ||
+      file.endsWith('.spec.tsx') ||
+      file.includes(`${path.sep}__tests__${path.sep}`)
+    ) return;
+    const content = fs.readFileSync(file, 'utf8');
+    if (content.includes(key)) {
+      found = true;
+    }
+  });
+  return found;
+}
+const unusedKeys = allTranslationKeys.filter((key) => !isKeyUsedAnywhere(key));
 if (unusedKeys.length > 0) {
   console.error(`\n\x1b[31mUnused translation keys in de.json (${unusedKeys.length}):\x1b[0m`);
   unusedKeys.forEach((key) => console.error('- ' + key));
@@ -79,6 +125,18 @@ if (unusedKeys.length > 0) {
 if (missingKeys.size > 0) {
   console.error(`\n\x1b[31mMissing translation keys (used in code but not in de.json) (${missingKeys.size}):\x1b[0m`);
   missingKeys.forEach((key) => console.error('- ' + key));
+}
+
+// 3. Show dynamic keys (template strings, variables, etc.)
+if (dynamicKeys.size > 0) {
+  console.warn(`\n\x1b[33mDynamic translation keys (not checked, may be valid at runtime) (${dynamicKeys.size}):\x1b[0m`);
+  dynamicKeys.forEach((key) => console.warn('- ' + key));
+}
+
+// 4. Show import/module keys (likely not translation keys)
+if (importKeys.size > 0) {
+  console.warn(`\n\x1b[33mImport/Module-like keys found in t() (${importKeys.size}):\x1b[0m`);
+  importKeys.forEach((key) => console.warn('- ' + key));
 }
 
 if (unusedKeys.length === 0 && missingKeys.size === 0) {

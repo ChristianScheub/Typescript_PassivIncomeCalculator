@@ -163,12 +163,6 @@
     "home": "Start",
     "dashboard": "Dashboard",
     "portfolio": "Portfolio",
-    "assets": "Vermögen",
-    "liabilities": "Verbindlichkeiten",
-    "debts": "Schulden",
-    "expenses": "Ausgaben",
-    "income": "Einkommen",
-    "forecast": "Prognose",
     "analytics": "Analysen",
     "settings": "Einstellungen"
   },
@@ -265,8 +259,7 @@
     "clearReduxCache": "Redux Cache löschen",
     "clearReduxCacheDesc": "Alle zwischengespeicherten Berechnungen und temporären Daten im Arbeitsspeicher zurücksetzen",
     "ai": {
-      "title": "KI-Assistent",
-      "size": "Größe"
+      "title": "KI-Assistent"
     },
     "clearAllDataConfirm": "Sind Sie sicher, dass Sie ALLE Daten löschen möchten? Dies wird sämtliche Einstellungen und Daten unwiderruflich entfernen.",
     "clearDividendHistory": "Dividendenverlauf löschen",
@@ -316,7 +309,6 @@
     "selectDataSetsHint": "Wählen Sie die zu exportierenden Datenbereiche aus."
   },
   "pages": {
-    "totalValue": "Gesamtwert",
     "totalMonthlyIncome": "Gesamtes monatliches Einkommen",
     "totalAnnualIncome": "Gesamtes jährliches Einkommen",
     "netWorth": "Nettovermögen",
@@ -328,13 +320,10 @@
     "allocations": "Zuordnungen",
     "fire": "Meilensteine",
     "cashFlowProjection": "Monatliche Cashflow-Prognose",
-    "passiveIncomeCoverage": "Deckung aller Ausgaben durch passives Einkommen",
     "assetAllocation": "Vermögensaufteilung",
     "noAssetData": "Keine Vermögensdaten verfügbar",
-    "month": "Monat",
     "coverage": "Deckungsgrad",
     "net": "Netto",
-    "income": "Einkommen",
     "expenses": "Ausgaben",
     "netCashFlow": "Netto-Cashflow",
     "dividendPayment": "Dividendenzahlung",
@@ -406,7 +395,6 @@
   "categories": {
     "income": "Einkommen",
     "expenses": "Ausgaben",
-    "planning": "Planung",
     "title": "Asset-Kategorien",
     "addCategory": "Kategorie hinzufügen",
     "editCategory": "Kategorie bearbeiten",
@@ -416,8 +404,6 @@
     "categoryNamePlaceholder": "z.B. Dividenden-Typ",
     "optionName": "Optionsname",
     "optionNamePlaceholder": "z.B. Dividendenaktie",
-    "description": "Beschreibung",
-    "color": "Farbe",
     "isActive": "Aktiv",
     "options": "Optionen",
     "noCategories": "Keine Kategorien vorhanden",
@@ -547,14 +533,10 @@
     "priceHistory": {
       "entries": "Preishistorie-Einträge",
       "title": "Preishistorie",
-      "noHistory": "Keine Preishistorie verfügbar",
-      "manual": "Manuell",
-      "api": "API",
-      "import": "Import"
+      "noHistory": "Keine Preishistorie verfügbar"
     },
     "priceChart": {
-      "title": "Kursverlauf",
-      "max": "Max"
+      "title": "Kursverlauf"
     },
     "selectDividendMonths": "Dividendenzahlungsmonate auswählen",
     "selectRentalMonths": "Mietzahlungsmonate auswählen",
@@ -591,25 +573,23 @@
     "percentageMustBe100": "Summe muss 100% sein"
   },
   "paymentFrequency": {
-    "12": "Monatlich (12 Monate)",
     "monthly": "Monatlich",
     "quarterly": "Quartalsweise",
     "annually": "Jährlich",
     "annual": "Jährlich",
-    "custom": "Individuell",
-    "undefined": "Nicht definiert"
+    "custom": "Individuell"
   },
   "frequency": {
     "monthly": "Monatlich",
     "quarterly": "Quartalsweise",
     "annually": "Jährlich",
-    "custom": "Individuell"
+    "custom": "Individuell",
+    "none": "Keine"
   },
   "common": {
     "back": "Zurück",
     "add": "Hinzufügen",
     "remove": "Löschen",
-    "update": "Aktualisieren",
     "cancel": "Abbrechen",
     "edit": "Bearbeiten",
     "delete": "Löschen",
@@ -630,7 +610,6 @@
     "optionalFields": "Optionale Felder",
     "notes": "Notizen",
     "notesPlaceholder": "Zusätzliche Informationen oder Notizen...",
-    "all": "Alle",
     "income": "Einkommen",
     "expenses": "Ausgaben",
     "asset": "Asset",
@@ -678,7 +657,6 @@
     "form": {
       "currentBalance": "Aktueller Saldo",
       "interestRate": "Zinssatz",
-      "months": "Monate",
       "paymentAmount": "Zahlungsbetrag",
       "paymentFrequency": "Zahlungshäufigkeit",
       "paymentMonths": "Zahlungsmonate",
@@ -699,7 +677,6 @@
     "addIncome": "Einkommen hinzufügen",
     "editIncome": "Einkommen bearbeiten",
     "summary": "Einkommensübersicht",
-    "passiveIncome": "Passives Einkommen",
     "form": {
       "type": "Typ",
       "amount": "Betrag",
@@ -715,8 +692,6 @@
     },
     "types": {
       "salary": "Gehalt",
-      "rental": "Mieteinnahmen",
-      "dividend": "Dividende",
       "interest": "Zinsen",
       "side_hustle": "Nebeneinkünfte",
       "other": "Sonstiges"
@@ -939,25 +914,15 @@
   },
   "portfolio": {
     "netWorth": "Nettovermögen",
-    "trending": {
-      "down": "Trend nach unten",
-      "up": "Trend nach oben"
-    },
     "assets": "Vermögenswerte",
     "liabilities": "Verbindlichkeiten",
     "monthlyCashFlow": "Monatlicher Cashflow",
     "monthlyExpenses": "Monatliche Ausgaben",
     "sources": "Quellen",
-    "quickActions": {
-      "addTransaction": "Transaktion hinzufügen",
-      "addIncome": "Einkommen hinzufügen",
-      "addExpense": "Ausgabe hinzufügen"
-    },
     "track": "Verfolgen",
     "manage": "Verwalten",
     "totalDebt": "Gesamtschulden",
     "debts": "Schulden",
-    "diversification": "Diversifikation",
     "historyTitle": "Portfolio-Wertverlauf",
     "value": "Wert",
     "transactionDay": "Transaktionstag",
@@ -980,13 +945,8 @@
       "assets": "Asset-Management",
       "expenses": "Ausgabenverwaltung",
       "liabilities": "Verbindlichkeitenverwaltung",
-      "transactions": "Transaktionszentrum",
-      "analytics": "Portfolio-Analysen",
       "income": "Einkommensverwaltung"
     },
-    "debtRatio": "Schuldenquote",
-    "analyze": "Analysieren",
-    "totalAssets": "Gesamtvermögen",
     "hub": {
       "title": "Portfolio Hub",
       "subtitle": "Verwalten Sie Ihr komplettes finanzielles Portfolio",

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { StoreState } from '../../store';
 import { AssetType } from '@/types/shared/';
 import { RechartsClickData } from '@/types/shared/charts';
 import AssetCalendarView from '@/view/portfolio-hub/assets/AssetCalendarView';
@@ -13,6 +12,7 @@ import { calculatePortfolioData } from '@/store/slices/domain';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { AssetDefinition } from '@/types/domains/assets/entities';
 import { DividendHistoryEntry } from '@/types/domains/assets/dividends';
+import { RootState } from '@/store/config/storeConfig';
 
 interface MonthData {
   month: number;
@@ -44,11 +44,11 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   selectedTab = 'calendar', 
   onBack 
 }) => {
-  const assets = useSelector((state: StoreState) => state.transactions.items);
-  const assetDefinitions = useSelector((state: StoreState) => state.assetDefinitions.items);
-  const assetCategories = useSelector((state: StoreState) => state.assetCategories.categories);
-  const categoryOptions = useSelector((state: StoreState) => state.assetCategories.categoryOptions);
-  const categoryAssignments = useSelector((state: StoreState) => state.assetCategories.categoryAssignments);
+  const assets = useSelector((state: RootState) => state.transactions.items);
+  const assetDefinitions = useSelector((state: RootState) => state.assetDefinitions.items);
+  const assetCategories = useSelector((state: RootState) => state.assetCategories.categories);
+  const categoryOptions = useSelector((state: RootState) => state.assetCategories.categoryOptions);
+  const categoryAssignments = useSelector((state: RootState) => state.assetCategories.categoryAssignments);
   
   // Use Redux cache instead of recalculating
   const dispatch = useAppDispatch();
@@ -73,7 +73,7 @@ const AssetCalendarContainer: React.FC<AssetCalendarContainerProps> = ({
   useEffect(() => {
     if ((portfolioCache?.positions?.length ?? 0) === 0 && assets.length > 0 && assetDefinitions.length > 0) {
       Logger.info('Portfolio cache invalid, recalculating for asset calendar');
-      (dispatch as ThunkDispatch<StoreState, unknown, AnyAction>)(calculatePortfolioData({ 
+      (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(calculatePortfolioData({ 
         assetDefinitions, 
         categoryData: { categories: assetCategories, categoryOptions, categoryAssignments } 
       }));
