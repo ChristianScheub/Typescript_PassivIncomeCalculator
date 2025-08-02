@@ -1,6 +1,7 @@
 import { IPortfolioHistoryService } from './interfaces/IPortfolioHistoryService';
 import { calculatePortfolioHistory } from './methods/calculatePortfolioHistory';
 import { calculatePortfolioHistoryForDays } from './methods/calculatePortfolioHistoryForDays';
+import { calculatePortfolioIntraday } from './methods/calculatePortfolioIntraday';
 import { calculatePerformanceMetrics } from './methods/calculatePerformanceMetrics';
 import { formatForChart } from './methods/formatForChart';
 import { calculatePortfolioValueForDate } from './methods/calculatePortfolioValueForDate';
@@ -43,6 +44,7 @@ export default portfolioHistoryService;
 export { 
   calculatePortfolioHistory,
   calculatePortfolioHistoryForDays,
+  calculatePortfolioIntraday,
   calculatePerformanceMetrics,
   formatForChart,
   calculatePortfolioValueForDate,

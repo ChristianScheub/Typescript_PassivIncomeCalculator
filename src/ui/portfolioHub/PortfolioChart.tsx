@@ -162,12 +162,12 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
   const yDomain = useMemo((): [number | 'auto', number | 'auto'] => {
     const values = validChartData.map(p => p.value).filter(v => isFinite(v));
     if (values.length === 0) return ['auto', 'auto'];
-    
+
     const min = Math.min(...values);
     const max = Math.max(...values);
-    const domainMin = Math.max(0, Math.floor(min - min * 0.1));
-    const domainMax = Math.ceil(max + max * 0.1);
-    
+    const domainMin = Math.max(0, min - min * 0.001); // Subtract 0,1% from the lowest value
+    const domainMax = max + max * 0.001; // Add 0,1% to the highest value
+
     return [domainMin, domainMax];
   }, [validChartData]);
 
@@ -336,9 +336,8 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
                   interval={isIntradayView ? Math.floor(validChartData.length / 10) : 'preserveStart'}
                 />
                 <YAxis 
-                  tick={{ fontSize: 12 }}
+                  tick={false} // Disable Y-axis labels
                   stroke="#6B7280"
-                  tickFormatter={(value) => formatService.formatCurrency(value)}
                   domain={yDomain}
                 />
                 <Tooltip 
@@ -379,9 +378,8 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
                   tickFormatter={formatXAxisLabel}
                 />
                 <YAxis 
-                  tick={{ fontSize: 12 }}
+                  tick={false} // Disable Y-axis labels
                   stroke="#6B7280"
-                  tickFormatter={(value) => formatService.formatCurrency(value)}
                   domain={yDomain}
                 />
                 <Tooltip 

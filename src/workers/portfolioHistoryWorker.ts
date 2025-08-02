@@ -4,6 +4,10 @@ import { PortfolioIntradayPoint } from '@/service/infrastructure/sqlLitePortfoli
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
 import { calculatePortfolioHistory, calculatePortfolioIntraday } from '@/service/domain/portfolio/history/portfolioHistoryService';
 
+// Debug: Check if functions are imported correctly
+console.log('🔧 WORKER INIT: calculatePortfolioIntraday function:', typeof calculatePortfolioIntraday);
+console.log('🔧 WORKER INIT: calculatePortfolioHistory function:', typeof calculatePortfolioHistory);
+
 // Typen für Nachrichten
 interface CalculatePortfolioHistoryParams {
   assetDefinitions: AssetDefinition[];
@@ -34,26 +38,46 @@ function flattenPortfolioPositionsToAssets(portfolioPositions: PortfolioPosition
 // --- Worker Event Handling ---
 
 self.onmessage = function (e: MessageEvent<WorkerRequest>) {
+  console.log('🔧 WORKER: Received message', e.data.type);
+  console.log('🔧 WORKER: AssetDefinitions count:', e.data.params.assetDefinitions?.length || 0);
+  console.log('🔧 WORKER: PortfolioPositions count:', e.data.params.portfolioPositions?.length || 0);
+  
   try {
     if (e.data.type === 'calculateAll') {
+      console.log('🔧 WORKER: Starting calculateAll');
       // Always calculate both intraday and daily history and return both
       const assets = flattenPortfolioPositionsToAssets(e.data.params.portfolioPositions);
+      console.log('🔧 WORKER: Flattened assets count:', assets.length);
+      
+      console.log('🔧 WORKER: Calling calculatePortfolioIntraday...');
       const intraday = calculatePortfolioIntraday(e.data.params.assetDefinitions, e.data.params.portfolioPositions);
+      console.log('🔧 WORKER: calculatePortfolioIntraday result:', intraday.length, 'points');
+      
+      console.log('🔧 WORKER: Calling calculatePortfolioHistory...');
       const history = calculatePortfolioHistory(assets, e.data.params.assetDefinitions);
+      console.log('🔧 WORKER: calculatePortfolioHistory result:', history.length, 'points');
+      
       const response: WorkerResponse = { type: 'resultAll', intraday, history };
+      console.log('🔧 WORKER: Sending response with intraday:', intraday.length, 'history:', history.length);
       self.postMessage(response);
     } else if (e.data.type === 'calculateIntraday') {
+      console.log('🔧 WORKER: Starting calculateIntraday');
       const data = calculatePortfolioIntraday(e.data.params.assetDefinitions, e.data.params.portfolioPositions);
+      console.log('🔧 WORKER: calculateIntraday result:', data.length, 'points');
       const response: WorkerResponse = { type: 'resultIntraday', data };
       self.postMessage(response);
     } else if (e.data.type === 'calculateHistory') {
+      console.log('🔧 WORKER: Starting calculateHistory');
       const assets = flattenPortfolioPositionsToAssets(e.data.params.portfolioPositions);
       const data = calculatePortfolioHistory(assets, e.data.params.assetDefinitions);
+      console.log('🔧 WORKER: calculateHistory result:', data.length, 'points');
       const response: WorkerResponse = { type: 'resultHistory', data };
       self.postMessage(response);
     }
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error('🔧 WORKER ERROR:', errorMessage);
+    console.error('🔧 WORKER ERROR STACK:', err instanceof Error ? err.stack : 'No stack');
     self.postMessage({ type: 'error', error: errorMessage });
   }
 };

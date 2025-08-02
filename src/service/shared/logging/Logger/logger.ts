@@ -114,7 +114,7 @@ class Logger {
   }
 
   static warnService(message: string): void {
-    if (featureFlag_Debug_Log_Service || featureFlag_Debug_AllLogs) {
+    if (featureFlag_Debug_Log_Warning ||featureFlag_Debug_Log_Service || featureFlag_Debug_AllLogs) {
       this.log(this.formatMessage(`Service Warning: ${message}`, "⚙️⚠️"));
     }
   }

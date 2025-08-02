@@ -76,7 +76,6 @@ interface SettingsViewProps {
   onClearExpenses: () => void;
   onClearIncome: () => void;
   onClearReduxCache: () => void;
-  // Dividend API
   selectedDiviProvider: string;
   dividendApiKey: { [provider: string]: string };
   onDiviApiKeyChange: (provider: string, apiKey: string) => void;
@@ -84,9 +83,7 @@ interface SettingsViewProps {
   onDiviProviderChange: (provider: string) => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
   getLogLevelColor: (level: string) => string;
-  // Fix: Add missing prop for dividend history clear
   onClearDividendHistory: () => void;
-  // NEW: Debug button for portfolio history refresh
   onPortfolioHistoryRefresh?: () => void;
 }
 

@@ -31,14 +31,6 @@ export const fetchAssetDefinitions = createAsyncThunk(
       // Abrufen der Asset-Definitionen aus der Datenbank
       const definitions = await sqliteService.getAll('assetDefinitions');
       Logger.infoRedux(logger.completeOperation('fetch', `${definitions.length} asset definitions`));
-      definitions.forEach(def => {
-        const defName = def.name || def.fullName || 'Unnamed Asset';
-        if (def.dividendHistory) {
-          Logger.info(`[DEBUG] Asset ${defName} hat dividendHistory mit ${def.dividendHistory.length} Einträgen`);
-        } else {
-          Logger.info(`[DEBUG] Asset ${defName} hat KEINE dividendHistory`);
-        }
-      });
       
       // Migration: dividendHistory immer setzen und name field sicherstellen
       for (const def of definitions) {
@@ -112,7 +104,6 @@ export const updateAssetDefinition = createAsyncThunk(
   async (assetDefinition: AssetDefinition) => {
     Logger.info(`Updating asset definition in database: ${assetDefinition.name || assetDefinition.fullName || 'Unnamed Asset'}`);
     try {
-      Logger.info('[DEBUG] Vor DeepClean: ' + JSON.stringify(assetDefinition));
       // Ensure name field and sectors are always set
       const safeAssetDefinition = {
         ...assetDefinition,
@@ -125,17 +116,8 @@ export const updateAssetDefinition = createAsyncThunk(
         dividendHistory: assetDefinition.dividendHistory ?? [],
         updatedAt: new Date().toISOString(),
       };
-      Logger.info('[DEBUG] Nach updatedAt: ' + JSON.stringify(updatedDefinition));
       // Deep clean before DB update
       const cleanedDefinition = deepCleanObject(updatedDefinition);
-      Logger.info('[DEBUG] Nach DeepClean: ' + JSON.stringify(cleanedDefinition));
-      if (cleanedDefinition.dividendHistory) {
-        const defName = cleanedDefinition.name || cleanedDefinition.fullName || 'Unnamed Asset';
-        Logger.info(`[DEBUG] Update: Asset ${defName} hat dividendHistory mit ${cleanedDefinition.dividendHistory.length} Einträgen`);
-      } else {
-        const defName = cleanedDefinition.name || cleanedDefinition.fullName || 'Unnamed Asset';
-        Logger.info(`[DEBUG] Update: Asset ${defName} hat KEINE dividendHistory`);
-      }
       // Speichern der Aktualisierung in der Datenbank
       await sqliteService.update('assetDefinitions', cleanedDefinition);
       Logger.info(`Asset definition updated successfully: ${cleanedDefinition.name || cleanedDefinition.fullName || 'Unnamed Asset'}`);

@@ -514,4 +514,147 @@ export class StockPriceUpdater {
     const diffTime = Math.abs(now.getTime() - startOfYear.getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
+
+  /**
+   * Updates intraday history for asset definitions
+   * @param definitions Array of asset definitions (only stock types with tickers will be updated)
+   * @param days Number of days to fetch intraday data for (default: 1)
+   * @param apiKeys API keys for different providers
+   * @param selectedProvider Selected API provider
+   * @returns Array of updated asset definitions with new intraday history
+   */
+  static async updateIntradayHistory(
+    definitions: AssetDefinition[],
+    days: number = 1,
+    apiKeys?: Record<string, string | undefined>,
+    selectedProvider?: string
+  ): Promise<AssetDefinition[]> {
+    const stockDefinitionsToUpdate = definitions
+      .filter(
+        (definition) =>
+          definition.type === "stock" && definition.ticker
+      )
+      .slice(0, 30);
+
+    if (stockDefinitionsToUpdate.length === 0) {
+      Logger.infoService("No stock definitions to update intraday history for");
+      return [];
+    }
+
+    Logger.infoService(
+      `Updating intraday history for ${stockDefinitionsToUpdate.length} stock definitions`
+    );
+
+    // Dynamische API-Service-Auswahl (Worker: API-Keys und Provider werden übergeben)
+    let stockAPI: IStockAPIService = stockAPIService;
+    if (apiKeys && selectedProvider) {
+      // Use dynamic import for provider selection
+      const { StockAPIProvider } = await import("@/types/shared/base/enums");
+      const apiKey = apiKeys[selectedProvider.toLowerCase()];
+      Logger.infoService(`[StockPriceUpdater] Intraday Provider: ${selectedProvider}, apiKeys: ${JSON.stringify(apiKeys)}, verwendeter apiKey: ${apiKey}`);
+      switch (selectedProvider) {
+        case StockAPIProvider.FINNHUB: {
+          const { FinnhubAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/FinnhubAPIService");
+          stockAPI = new FinnhubAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.YAHOO: {
+          const { YahooAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/YahooAPIService");
+          stockAPI = new YahooAPIService();
+          break;
+        }
+        case StockAPIProvider.ALPHA_VANTAGE: {
+          const { AlphaVantageAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/AlphaVantageAPIService");
+          stockAPI = new AlphaVantageAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.IEX_CLOUD: {
+          const { IEXCloudAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/IEXCloudAPIService");
+          stockAPI = new IEXCloudAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.TWELVE_DATA: {
+          const { TwelveDataAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/TwelveDataAPIService");
+          stockAPI = new TwelveDataAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.QUANDL: {
+          const { QuandlAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/QuandlAPIService");
+          stockAPI = new QuandlAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.EOD_HISTORICAL_DATA: {
+          const { EODHistoricalDataAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/EODHistoricalDataAPIService");
+          stockAPI = new EODHistoricalDataAPIService(apiKey);
+          break;
+        }
+        case StockAPIProvider.POLYGON_IO: {
+          const { PolygonIOAPIService } = await import("@/service/domain/assets/market-data/stockAPIService/providers/PolygonIOAPIService");
+          stockAPI = new PolygonIOAPIService(apiKey);
+          break;
+        }
+        default:
+          throw new Error('Kein unterstützter Stock API Provider ausgewählt!');
+      }
+    }
+
+    const updatedDefinitions: AssetDefinition[] = [];
+    const failedTickers: { ticker: string; name: string }[] = [];
+
+    for (const definition of stockDefinitionsToUpdate) {
+      try {
+        Logger.infoService(`Fetching intraday data for ${definition.ticker}`);
+        
+        const intradayData = await stockAPI.getIntradayHistory(definition.ticker!, days);
+
+        if (!intradayData?.entries || intradayData.entries.length === 0) {
+          failedTickers.push({ ticker: definition.ticker!, name: definition.name });
+          Logger.warnService(`No intraday data received for ${definition.ticker}`);
+          continue;
+        }
+
+        // Import addIntradayPriceHistory for merging
+        const { addIntradayPriceHistory } = await import("@/utils/priceHistoryUtils");
+
+        // Map intraday data to price history format preserving minute-level timestamps
+        const newPriceEntries = intradayData.entries.map((entry: unknown) => ({
+          date: new Date((entry as { timestamp: number }).timestamp).toISOString(),
+          price: (entry as { close: number }).close,
+          source: 'api' as const
+        }));
+
+        // Use addIntradayPriceHistory to properly merge with existing history
+        const existingHistory = definition.priceHistory || [];
+        const updatedHistory = addIntradayPriceHistory(newPriceEntries, existingHistory, 500);
+
+        const updatedDefinition: AssetDefinition = {
+          ...definition,
+          priceHistory: updatedHistory,
+          lastPriceUpdate: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+
+        updatedDefinitions.push(updatedDefinition);
+        Logger.infoService(`Successfully updated intraday history for ${definition.ticker}: ${newPriceEntries.length} entries`);
+
+      } catch (error) {
+        failedTickers.push({ ticker: definition.ticker!, name: definition.name });
+        Logger.errorService(
+          `Failed to fetch intraday data for ${definition.ticker}: ${error instanceof Error ? error.message : String(error)}`
+        );
+      }
+    }
+
+    if (failedTickers.length > 0) {
+      Logger.warnService(
+        `Failed to update intraday history for ${failedTickers.length} tickers: ${failedTickers.map((t) => t.ticker).join(", ")}`
+      );
+    }
+
+    Logger.infoService(
+      `Successfully updated intraday history for ${updatedDefinitions.length} out of ${stockDefinitionsToUpdate.length} definitions`
+    );
+
+    return updatedDefinitions;
+  }
 }

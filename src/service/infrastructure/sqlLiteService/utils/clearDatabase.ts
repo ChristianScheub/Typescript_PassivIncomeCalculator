@@ -1,3 +1,5 @@
+import Logger from "@/service/shared/logging/Logger/logger";
+
 /**
  * Development utility to clear the IndexedDB database
  * Use this if you encounter database schema conflicts during development
@@ -22,17 +24,20 @@ export const clearDatabase = async (): Promise<void> => {
       };
       
       request.onsuccess = () => {
-        console.log('Database deleted successfully');
+        Logger.infoService('Database deleted successfully');
         resolve();
       };
       
       request.onblocked = () => {
-        console.warn('Database deletion blocked - close all tabs and try again');
+        Logger.warn('Database deletion blocked - close all tabs and try again');
         reject(new Error('Database deletion blocked'));
       };
     });
   } catch (error) {
-    console.error('Failed to delete database:', error);
+    Logger.errorStack(
+      'Failed to delete database:',
+      error instanceof Error ? error : new Error(String(error))
+    );
     throw error;
   }
 };

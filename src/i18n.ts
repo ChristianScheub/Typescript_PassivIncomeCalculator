@@ -5,8 +5,6 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import deTranslation from './locales/de.json';
 import enTranslation from './locales/en.json';
 
-console.log('DE translations loaded:', deTranslation ? 'yes' : 'no');
-
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)

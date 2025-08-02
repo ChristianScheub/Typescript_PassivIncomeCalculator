@@ -3,6 +3,7 @@ import {
   PortfolioIntradayPoint 
 } from '../interfaces/IPortfolioHistoryService';
 import { PortfolioHistoryPoint } from '@/types/domains/portfolio/performance';
+import Logger from '@/service/shared/logging/Logger/logger';
 
 interface PortfolioHistoryExportData {
   version: string;
@@ -45,23 +46,23 @@ export const importExportOperations = {
       }
 
       // Clear existing data (optional - you might want to merge instead)
-      console.log('Clearing existing portfolio history data...');
+      Logger.infoService('Clearing existing portfolio history data...');
       await dbOperations.clearStore('portfolioIntradayData');
       await dbOperations.clearStore('portfolioHistory');
 
       // Import portfolio intraday data
       if (importData.data.portfolioIntradayData?.length > 0) {
-        console.log(`Importing ${importData.data.portfolioIntradayData.length} portfolio intraday points...`);
+        Logger.infoService(`Importing ${importData.data.portfolioIntradayData.length} portfolio intraday points...`);
         await dbOperations.bulkAdd('portfolioIntradayData', importData.data.portfolioIntradayData);
       }
 
       // Import portfolio history
       if (importData.data.portfolioHistory?.length > 0) {
-        console.log(`Importing ${importData.data.portfolioHistory.length} portfolio history points...`);
+        Logger.infoService(`Importing ${importData.data.portfolioHistory.length} portfolio history points...`);
         await dbOperations.bulkAdd('portfolioHistory', importData.data.portfolioHistory);
       }
 
-      console.log('Portfolio history data import completed successfully');
+      Logger.infoService('Portfolio history data import completed successfully');
     } catch (error) {
       console.error('Error importing portfolio history data:', error);
       throw new Error(`Failed to import data: ${error instanceof Error ? error.message : 'Unknown error'}`);

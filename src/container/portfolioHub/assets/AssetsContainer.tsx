@@ -122,7 +122,6 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
   }, [portfolioCache, portfolioTotals, assets.length, assetDefinitions.length]);
 
     const handleAddAsset = (data: AssetFormData) => {
-    console.log('AssetsContainer: handleAddAsset called with data:', data);
     Logger.info('Adding new asset transaction' + " - " + JSON.stringify(data));
     
     // Transform AssetFormData to match Redux Transaction type requirements
@@ -139,9 +138,9 @@ const AssetsContainer: React.FC<{ onBack?: () => void; initialAction?: string }>
       transactionCosts: data.transactionCosts,
       notes: data.notes
     };
-    
-    console.log('AssetsContainer: Final transaction data:', transactionData);
-    
+
+    Logger.info('AssetsContainer: Final transaction data:'+ JSON.stringify(transactionData));
+
     executeAsyncOperation(
       'add transaction',
       () => dispatch(addTransaction(transactionData)),

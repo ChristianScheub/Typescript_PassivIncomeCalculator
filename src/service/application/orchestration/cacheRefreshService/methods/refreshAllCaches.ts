@@ -22,6 +22,7 @@ import Logger from "@/service/shared/logging/Logger/logger";
 import PortfolioHistoryWorker from '@/workers/portfolioHistoryWorker.ts?worker';
 import type { ThunkDispatch, AnyAction } from '@reduxjs/toolkit';
 import type { RootState } from '@/store';
+import portfolioHistoryService from '@/service/infrastructure/sqlLitePortfolioHistory';
 
 /**
  * Refreshes all caches in the application (e.g. for pull to refresh)
@@ -115,21 +116,36 @@ export async function refreshAllCaches(): Promise<void> {
         const refreshedStateForWorker = store.getState() as RootState;
         const portfolioPositionsForWorker = refreshedStateForWorker.transactions?.cache?.positions || [];
         const assetDefinitionsForHistory = refreshedStateForWorker.assetDefinitions?.items || [];
+        
+        Logger.infoService(`🔧 WORKER SETUP: portfolioPositions: ${portfolioPositionsForWorker.length}, assetDefinitions: ${assetDefinitionsForHistory.length}`);
+        
         if (portfolioPositionsForWorker.length > 0 && assetDefinitionsForHistory.length > 0) {
+            Logger.infoService("🔧 WORKER SETUP: Creating new PortfolioHistoryWorker");
             const worker = new PortfolioHistoryWorker();
             const workerPromise = new Promise((resolve, reject) => {
                 worker.onmessage = async (event) => {
-                    const { type, history, error } = event.data || {};
-                    if (type === 'resultAll' && history) {
-                        const portfolioHistoryService = (await import('@/service/infrastructure/sqlLitePortfolioHistory')).default;
-                        await portfolioHistoryService.bulkAddPortfolioHistory(history);
-                        Logger.infoService('✅ Portfolio history updated via Web Worker');
+                    Logger.infoService("🔧 WORKER RESPONSE: Received message from worker");
+                    const { type, intraday, history, error } = event.data || {};
+                    Logger.infoService(`🔧 WORKER RESPONSE: type=${type}, intraday=${intraday?.length || 0}, history=${history?.length || 0}`);
+                    
+                    if (type === 'resultAll' && history && intraday) {
+                        // Save both intraday and history data to IndexedDB
+                        Logger.infoService("Count intraday points: " + intraday.length);
+                        Logger.infoService("INTRADAY_DATA: " + intraday.toString());
+                        Logger.infoService("Count history points: " + history.length);
+                        await Promise.all([
+                            portfolioHistoryService.bulkAddPortfolioIntradayData(intraday),
+                            portfolioHistoryService.bulkAddPortfolioHistory(history)
+                        ]);
+                        Logger.infoService('✅ Portfolio intraday and history data updated via Web Worker');
                         resolve(null);
                     } else if (type === 'error') {
                         Logger.error('❌ Worker error: ' + error);
                         reject(new Error(error));
                     }
                 };
+                
+                Logger.infoService("🔧 WORKER SETUP: Posting message to worker");
                 worker.postMessage({
                     type: 'calculateAll',
                     params: {
@@ -137,6 +153,7 @@ export async function refreshAllCaches(): Promise<void> {
                         portfolioPositions: portfolioPositionsForWorker
                     }
                 });
+                Logger.infoService("🔧 WORKER SETUP: Message posted to worker");
             });
             await workerPromise;
         } else {

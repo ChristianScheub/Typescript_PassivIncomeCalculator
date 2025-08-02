@@ -56,7 +56,6 @@ export const PortfolioHistoryContainer: React.FC<PortfolioHistoryContainerProps>
     return transformed;
   }, [portfolioHistoryData]);
 
-  console.log('Container: Rendering PortfolioHistoryView', selectedTimeRange, transformedHistoryData.length);
   return (
     <div className="container mx-auto px-4 py-4">
       <ViewHeader

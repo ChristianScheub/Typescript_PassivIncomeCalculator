@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /**
- * Pre-Build Checks for Naming and Types (ESM)
+ * Pre-Build Checks for Naming, Types, Console Logs, and Heuristics (ESM)
  * - File Name Check: Enforce naming conventions in container, view, workers
  * - Types Check: No `export type` outside of types/
+ * - Console Log Check: No `console.log` in .ts/.tsx files outside of scripts/ or workers/
+ * - Heuristic Check: Analyze files in the view directory for patterns like useEffect, useState, etc.
  */
 import fs from 'fs';
 import path from 'path';
@@ -127,5 +129,29 @@ if (fs.existsSync(viewDir)) {
   console.log(`🔍 Starte Analyse aller Dateien unter "${viewDir}" ...\n`);
   walkDir(viewDir, analyzeFile);
   console.log(`✅ Analyse abgeschlossen.\n`);
+}
+
+// 4. Console Log Check
+const consoleLogViolations = [];
+walkDir(srcDir, (file) => {
+  if (
+    file.includes(`${path.sep}scripts${path.sep}`) ||
+    file.includes(`${path.sep}workers${path.sep}`) ||
+    file.includes('.test.') || // Allow console.log in .test. files
+    file.endsWith('logger.ts') // Allow console.log in logger.ts
+  ) {
+    return;
+  }
+  if (!file.endsWith('.ts') && !file.endsWith('.tsx')) return;
+  const content = fs.readFileSync(file, 'utf8');
+  if (/console\.log\(/.test(content)) {
+    consoleLogViolations.push(`Console Log Check: In Datei ${path.relative(projectRoot, file)} wurde ein 'console.log' gefunden.`);
+  }
+});
+
+if (consoleLogViolations.length > 0) {
+  console.error('\n\x1b[31mPre-Build Checks fehlgeschlagen!\x1b[0m');
+  consoleLogViolations.forEach((msg) => console.error('- ' + msg));
+  process.exit(1);
 }
 

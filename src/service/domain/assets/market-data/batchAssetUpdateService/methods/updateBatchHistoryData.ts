@@ -4,6 +4,7 @@ import type { PriceHistoryEntry } from '@/types/domains/assets/market-data';
 import type { BatchResult } from '@/types/shared/batch';
 import type { TimeRangePeriod } from '@/types/shared/time';
 import type { ApiConfig } from '@/types/shared/apiConfig';
+import { StockPriceUpdater } from '@/service/shared/utilities/helper/stockPriceUpdater';
 
 // Main batch update for price history (provider-agnostisch)
 // Supports both main thread (using configured service) and worker usage (with API config)
@@ -21,7 +22,6 @@ export async function updateBatchHistoryData(
       
       if (apiConfig) {
         // Worker mode: Use StockPriceUpdater with API config
-        const { StockPriceUpdater } = await import('@/service/shared/utilities/helper/stockPriceUpdater');
         const updatedDefs = period 
           ? await StockPriceUpdater.updateStockHistoricalDataWithPeriod([def], period, apiConfig.apiKeys, apiConfig.selectedProvider)
           : await StockPriceUpdater.updateStockHistoricalData([def], apiConfig.apiKeys, apiConfig.selectedProvider);

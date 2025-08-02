@@ -3,6 +3,7 @@ import { StateHydrationService } from './services/stateHydrationService';
 import { StatePersistenceService } from './services/statePersistenceService';
 import { StoreInitializationService } from './services/storeInitializationService';
 import { hydrateStore } from './actions/hydrateAction';
+import { Logger } from '@/service';
 
 // Load persisted state
 const persistedState = StateHydrationService.loadPersistedState();
@@ -13,22 +14,20 @@ export const store: AppStore = createStoreConfig();
 // Initialize store based on whether we have persisted state
 if (persistedState) {
   // Debug: Log what's being hydrated
-  console.log('[Store] Hydrating with config:', persistedState.config);
+  Logger.infoRedux('[Store] Hydrating with config:'+ persistedState.config);
   
   // Dispatch hydration action to trigger all extraReducers
   store.dispatch(hydrateStore(persistedState as never));
   StoreInitializationService.initializeWithPersistedState(store);
   
-  // Debug: Log final config state
-  console.log('[Store] Final config state:', (store.getState() as import('./config/storeConfig').RootState).config);
 } else {
-  console.log('[Store] No persisted state found');
+  Logger.infoRedux('[Store] No persisted state found');
   StoreInitializationService.initializeWithoutPersistedState(store);
 }
 
 // Debug: Log config after hydration
 if (persistedState?.config?.dashboard) {
-  console.info('[Hydration] Dashboard assetFocus nach Laden:', persistedState.config.dashboard?.assetFocus);
+  Logger.infoRedux('[Hydration] Dashboard assetFocus nach Laden: ' + persistedState.config.dashboard?.assetFocus);
 }
 
 // Setup state persistence with throttling

@@ -22,7 +22,6 @@ export const PortfolioHistoryView: React.FC<PortfolioHistoryViewProps> = ({
   timeRange,
   onTimeRangeChange
 }) => {
-  console.log('PortfolioHistoryView received', historyData.length, 'points for', timeRange);
   const { t } = useTranslation();
 
   // Transform historyData to PortfolioChartDataPoint format

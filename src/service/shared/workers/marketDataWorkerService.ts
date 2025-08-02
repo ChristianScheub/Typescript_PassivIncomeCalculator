@@ -1,6 +1,7 @@
 /**
  * Worker Service for managing Web Worker operations
  * Provides a convenient interface for containers to use the new workers
+ * ToDO: Prüfen ob zu komplex
  */
 
 import { AssetDefinition } from '@/types/domains/assets';
@@ -9,6 +10,7 @@ import { TimeRangePeriod } from '@/types/shared/time';
 // Import workers using Vite's worker syntax
 import StockPriceWorker from '@/workers/stockPriceUpdateWorker.ts?worker';
 import StockHistoryWorker from '@/workers/stockHistoryUpdateWorker.ts?worker';
+import StockIntradayWorker from '@/workers/stockIntradayUpdateWorker.ts?worker';
 import DividendWorker from '@/workers/dividendUpdateWorker.ts?worker';
 
 // Union type alias for worker response types
@@ -126,11 +128,10 @@ export class StockPriceWorkerService {
 
 // Stock History Update Worker Service
 interface StockHistoryUpdateRequest {
-  type: 'updateBatch' | 'updateSingle' | 'updateBatchDefault' | 'updateSingleDefault' | 'updateBatchIntraday' | 'updateSingleIntraday';
+  type: 'updateBatch' | 'updateSingle' | 'updateBatchDefault' | 'updateSingleDefault';
   definitions?: AssetDefinition[];
   definition?: AssetDefinition;
   period?: TimeRangePeriod;
-  days?: number;
   apiKeys?: Record<string, string | undefined>;
   selectedProvider?: string;
 }
@@ -183,7 +184,50 @@ export class StockHistoryWorkerService {
     });
   }
 
-  async updateBatchIntraday(definitions: AssetDefinition[], days?: number, apiKeys?: Record<string, string | undefined>, selectedProvider?: string): Promise<StockHistoryUpdateResponse> {
+  terminate() {
+    this.workerService.terminate();
+  }
+}
+
+// Stock Intraday Update Worker Service
+interface StockIntradayUpdateRequest {
+  type: 'updateBatchIntraday';
+  definitions?: AssetDefinition[];
+  definition?: AssetDefinition;
+  days?: number;
+  apiKeys?: Record<string, string | undefined>;
+  selectedProvider?: string;
+}
+
+interface StockIntradayUpdateResponse {
+  type: WorkerResponseType;
+  results?: Array<{
+    symbol: string;
+    success: boolean;
+    updatedDefinition?: AssetDefinition;
+    entriesCount?: number;
+    error?: string;
+  }>;
+  result?: {
+    symbol: string;
+    success: boolean;
+    updatedDefinition?: AssetDefinition;
+    entriesCount?: number;
+    error?: string;
+  };
+  error?: string;
+}
+
+export class StockIntradayWorkerService {
+  private readonly workerService: WorkerService<StockIntradayUpdateRequest, StockIntradayUpdateResponse>;
+
+  constructor() {
+    this.workerService = new WorkerService<StockIntradayUpdateRequest, StockIntradayUpdateResponse>(
+      () => new StockIntradayWorker()
+    );
+  }
+
+  async updateBatch(definitions: AssetDefinition[], days?: number, apiKeys?: Record<string, string | undefined>, selectedProvider?: string): Promise<StockIntradayUpdateResponse> {
     return this.workerService.sendMessage({
       type: 'updateBatchIntraday',
       definitions,
@@ -191,20 +235,6 @@ export class StockHistoryWorkerService {
       apiKeys,
       selectedProvider
     });
-  }
-
-  async updateSingleIntraday(definition: AssetDefinition, days?: number, apiKeys?: Record<string, string | undefined>, selectedProvider?: string): Promise<StockHistoryUpdateResponse> {
-    return this.workerService.sendMessage({
-      type: 'updateSingleIntraday',
-      definition,
-      days,
-      apiKeys,
-      selectedProvider
-    });
-  }
-
-  terminate() {
-    this.workerService.terminate();
   }
 }
 
@@ -278,11 +308,13 @@ export class DividendWorkerService {
 export class MarketDataWorkerService {
   public stockPrice: StockPriceWorkerService;
   public stockHistory: StockHistoryWorkerService;
+  public stockIntraday: StockIntradayWorkerService;
   public dividend: DividendWorkerService;
 
   constructor() {
     this.stockPrice = new StockPriceWorkerService();
     this.stockHistory = new StockHistoryWorkerService();
+    this.stockIntraday = new StockIntradayWorkerService();
     this.dividend = new DividendWorkerService();
   }
 

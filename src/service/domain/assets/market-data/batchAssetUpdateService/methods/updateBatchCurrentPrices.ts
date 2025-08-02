@@ -2,6 +2,7 @@ import { stockAPIService } from '@/service/domain/assets/market-data/stockAPISer
 import type { AssetDefinition } from '@/types/domains/assets/entities';
 import type { BatchResult } from '@/types/shared/batch';
 import type { ApiConfig } from '@/types/shared/apiConfig';
+import { StockPriceUpdater } from '@/service/shared/utilities/helper/stockPriceUpdater';
 
 /**
  * Provider-agnostische Batch-Methode für aktuelle Aktienpreise.
@@ -20,7 +21,6 @@ export async function updateBatchCurrentPrices(
         
         if (apiConfig) {
           // Worker mode: Use StockPriceUpdater with API config
-          const { StockPriceUpdater } = await import('@/service/shared/utilities/helper/stockPriceUpdater');
           const updatedDefs = await StockPriceUpdater.updateStockPrices([def], apiConfig.apiKeys, apiConfig.selectedProvider);
           if (updatedDefs.length > 0 && updatedDefs[0].currentPrice !== undefined) {
             price = { price: updatedDefs[0].currentPrice };

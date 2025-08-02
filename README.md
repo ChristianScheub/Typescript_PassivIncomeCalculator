@@ -410,6 +410,7 @@ npm run android:open
 ```bash
 npm run dev                    # Start development server (Vite + React)
 npm run build                  # Build production version
+npm run build:app             # Build production version and sync with Capacitor
 npm run preview                # Preview production build locally
 npm run lint                   # Run ESLint with TypeScript rules
 npm run lint:fix               # Fix ESLint issues automatically
@@ -424,7 +425,7 @@ npm run ios:open               # Open iOS project in Xcode
 npm run ios:build              # Build iOS app
 npm run ios:run                # Run iOS app on simulator/device
 
-# Android Development  
+# Android Development
 npm run android:setup          # Initial Android project setup
 npm run android:sync           # Sync web assets to Android project
 npm run android:open           # Open Android project in Android Studio

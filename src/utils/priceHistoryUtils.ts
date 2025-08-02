@@ -102,6 +102,7 @@ export function addOrUpdateDailyPrice(
  * Add intraday price entries to history (preserves minute-level timestamps)
  * This is specifically for intraday data where we want to keep all minute-level prices
  * Unlike addOrUpdateDailyPrice, this preserves all entries with different timestamps
+ * Only adds entries if the price is different from the previous entry at the same timestamp
  */
 export function addIntradayPriceHistory(
   intradayEntries: PriceHistoryEntry[],
@@ -114,10 +115,45 @@ export function addIntradayPriceHistory(
     !(entry.date.startsWith(today) && entry.source === 'api')
   );
   
+  // Create a map of existing entries by timestamp for quick lookup
+  const existingEntriesMap = new Map<string, number>();
+  filteredHistory.forEach(entry => {
+    existingEntriesMap.set(entry.date, entry.price);
+  });
+  
+  // Filter intraday entries to only include those with different prices or new timestamps
+  const uniqueIntradayEntries = intradayEntries.filter(newEntry => {
+    const existingPrice = existingEntriesMap.get(newEntry.date);
+    
+    // Include if:
+    // 1. No existing entry for this timestamp, OR
+    // 2. The price is different from the existing entry
+    return existingPrice === undefined || Math.abs(existingPrice - newEntry.price) > 0.001;
+  });
+  
+  // Also filter out duplicate prices within the new intraday entries themselves
+  const deduplicatedEntries: PriceHistoryEntry[] = [];
+  const seenPrices = new Map<string, number>();
+  
+  // Sort new entries by timestamp first
+  const sortedNewEntries = uniqueIntradayEntries.sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  
+  for (const entry of sortedNewEntries) {
+    const existingPrice = seenPrices.get(entry.date);
+    
+    // Only add if no existing entry for this timestamp or price is different
+    if (existingPrice === undefined || Math.abs(existingPrice - entry.price) > 0.001) {
+      deduplicatedEntries.push(entry);
+      seenPrices.set(entry.date, entry.price);
+    }
+  }
+  
   // Take only the most recent intraday entries if we exceed the limit
-  const intradayCopy = [...intradayEntries];
-  const sortedIntraday = intradayCopy.toSorted((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  const limitedIntradayEntries = sortedIntraday.slice(0, maxIntradayEntries);
+  const limitedIntradayEntries = deduplicatedEntries
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, maxIntradayEntries);
   
   // Combine with existing history and sort by date (newest first)
   return [...filteredHistory, ...limitedIntradayEntries].sort((a, b) => 

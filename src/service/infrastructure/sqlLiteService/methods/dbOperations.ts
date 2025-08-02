@@ -23,10 +23,10 @@ export const dbOperations = {
     try {
       // Log the item and its keys before update
        
-      console.log('[DB UPDATE] Store:', storeName, 'Item:', item, 'Keys:', Object.keys(item));
+      Logger.infoService('[DB UPDATE] Store:');
       const result = await db.put(storeName, item);
        
-      console.log('[DB UPDATE] Success:', result);
+      Logger.infoService('[DB UPDATE] Success:'+ result);
       return result;
     } catch (error) {
       Logger.errorStack('[DB UPDATE ERROR]', error instanceof Error ? error : new Error(String(error)));
