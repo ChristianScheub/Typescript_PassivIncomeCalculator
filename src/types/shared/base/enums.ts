@@ -32,9 +32,6 @@ export type ExpenseCategory =
 export type DataSource = 'manual' | 'api' | 'import' | 'calculated';
 export type PriceSource = 'manual' | 'api' | 'import';
 
-// Status enums
-export type Status = 'active' | 'inactive' | 'pending' | 'archived';
-
 // UI-related enums
 export type Theme = 'light' | 'dark' | 'auto';
 
