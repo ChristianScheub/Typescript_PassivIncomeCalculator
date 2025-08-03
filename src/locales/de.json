@@ -34,12 +34,10 @@
     "fromDividendsAndRental": "Aus Dividenden und Mieteinnahmen",
     "expenses": "Ausgaben",
     "liabilities": "Verbindlichkeitszahlungen",
-    "liabilityPayments": "Verbindlichkeitszahlungen",
     "monthlyCashFlow": "Monatlicher Cashflow",
     "netWorth": "Nettovermögen",
     "totalAssets": "Gesamtvermögen",
     "totalLiabilities": "Gesamtverbindlichkeiten",
-    "symbol": "Symbol",
     "portfolioHistory": "Vermögens Historie",
     "addIncome": "Einkommen hinzufügen",
     "addExpense": "Ausgabe hinzufügen",
@@ -272,8 +270,6 @@
       "diviApiKeySaved": "Dividend-API-Schlüssel gespeichert.",
       "diviApiKeyRemoved": "Dividend-API-Schlüssel entfernt.",
       "diviProviderChanged": "Dividend-Provider geändert.",
-      "dividendApiEnabled": "Dividenden-API aktiviert.",
-      "dividendApiDisabled": "Dividenden-API deaktiviert.",
       "allDataCleared": "Alle Daten erfolgreich gelöscht.",
       "allDataClearError": "Fehler beim Löschen aller Daten.",
       "assetDefinitionsCleared": "Asset-Definitionen gelöscht.",
@@ -1081,18 +1077,6 @@
       }
     },
     "income": {
-      "increasePassiveIncome": {
-        "title": "Passives Einkommen steigern",
-        "description": "Ihr passives Einkommen macht weniger als 10 % Ihres Gesamteinkommens aus. Mehr passives Einkommen (z. B. durch Dividenden, Miete oder Zinsen) erhöht Ihre finanzielle Unabhängigkeit."
-      },
-      "addDividendAssets": {
-        "title": "Dividenden-Assets hinzufügen",
-        "description": "Sie besitzen Assets, aber keine davon zahlen Dividenden. Dividendenwerte bringen regelmäßiges passives Einkommen."
-      },
-      "optimizeRentalIncome": {
-        "title": "Mieteinnahmen optimieren",
-        "description": "Ein erheblicher Teil Ihrer Immobilien generiert keine Mieteinnahmen. Prüfen Sie Leerstand oder Optimierungsmöglichkeiten, um die Rendite zu steigern."
-      },
       "diversifyIncomeSources": {
         "title": "Einkommensquellen diversifizieren",
         "description": "Sie haben weniger als zwei Einkommensquellen. Mehrere Einkommensströme machen Sie unabhängiger und reduzieren das Risiko."
@@ -1239,21 +1223,11 @@
     },
     "responses": {
       "requestTypes": {
-        "general": "Allgemeine Analyse",
-        "portfolio": "Portfolio-Analyse",
-        "budget": "Budget-Analyse",
-        "forecast": "Prognose-Analyse",
-        "custom": "Benutzerdefinierte Analyse"
+        "general": "Allgemeine Analyse"
       }
     },
     "model": {
-      "status": "Status",
-      "states": {
-        "unloaded": "Nicht geladen",
-        "loading": "Lädt...",
-        "loaded": "Bereit",
-        "error": "Fehler"
-      }
+      "status": "Status"
     }
   },
   "setupWizard": {
@@ -1387,8 +1361,7 @@
         "transactions": "Transaktionen hinzugefügt",
         "liabilities": "Verbindlichkeiten verfolgt",
         "income": "Einkommensquellen",
-        "monthlyIncome": "Monatliches Einkommen",
-        "monthlyExpenses": "Monatliche Schuldenzahlungen"
+        "monthlyIncome": "Monatliches Einkommen"
       }
     },
     "fileImport": {
@@ -1591,7 +1564,6 @@
           "transactionsCount": "Transaktionen",
           "liabilitiesCount": "Verbindlichkeiten",
           "totalLiabilities": "Gesamtverbindlichkeiten",
-          "monthlyIncome": "Monatliches Einkommen",
           "stepSkipped": "Schritt wurde übersprungen"
         },
         "configurationSummary": "Konfigurationszusammenfassung",

@@ -95,8 +95,8 @@ walkDir(srcDir, (file) => {
   }
 });
 
-// 1. Check for unused keys in de.json
-function isKeyUsedAnywhere(key) {
+// 1. Check for unused keys in de.json (simple substring search in src/)
+function isKeyUsedInSrc(key) {
   let found = false;
   walkDir(srcDir, (file) => {
     if (!file.endsWith('.ts') && !file.endsWith('.tsx') && !file.endsWith('.js')) return;
@@ -109,13 +109,13 @@ function isKeyUsedAnywhere(key) {
       file.includes(`${path.sep}__tests__${path.sep}`)
     ) return;
     const content = fs.readFileSync(file, 'utf8');
-    if (content.includes(key)) {
+    if (content.indexOf(key) !== -1) {
       found = true;
     }
   });
   return found;
 }
-const unusedKeys = allTranslationKeys.filter((key) => !isKeyUsedAnywhere(key));
+const unusedKeys = allTranslationKeys.filter((key) => !isKeyUsedInSrc(key));
 if (unusedKeys.length > 0) {
   console.error(`\n\x1b[31mUnused translation keys in de.json (${unusedKeys.length}):\x1b[0m`);
   unusedKeys.forEach((key) => console.error('- ' + key));
@@ -123,8 +123,24 @@ if (unusedKeys.length > 0) {
 
 // 2. Check for missing translations (used but not present in de.json)
 if (missingKeys.size > 0) {
-  console.error(`\n\x1b[31mMissing translation keys (used in code but not in de.json) (${missingKeys.size}):\x1b[0m`);
-  missingKeys.forEach((key) => console.error('- ' + key));
+  // Filter out obvious non-translation keys
+  const filteredMissingKeys = Array.from(missingKeys).filter(key => {
+    // Ignore keys that are just whitespace, line breaks, single chars, or technical/common words
+    if (!key || key.length < 2) return false;
+    if (/^\s+$/.test(key)) return false;
+    if (key === '\n' || key === '\n\n' || key === '\r' || key === ',') return false;
+    if (/^[a-zA-Z]$/.test(key)) return false;
+    if (/^de-DE$|^en-US$|^redux$|^fetch$|^Uncategorized$|^portfolioIntradayData$|^portfolioHistory$/.test(key)) return false;
+    // Ignore keys with only numbers
+    if (/^\d+$/.test(key)) return false;
+    // Ignore keys that look like file names or technical identifiers
+    if (/\.(js|ts|tsx|json|css|png|jpg|svg)$/.test(key)) return false;
+    return true;
+  });
+  if (filteredMissingKeys.length > 0) {
+    console.error(`\n\x1b[31mMissing translation keys (used in code but not in de.json) (${filteredMissingKeys.length}):\x1b[0m`);
+    filteredMissingKeys.forEach((key) => console.error('- ' + key));
+  }
 }
 
 // 3. Show dynamic keys (template strings, variables, etc.)

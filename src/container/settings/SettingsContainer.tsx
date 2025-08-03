@@ -14,7 +14,6 @@ import { clearAllExpenses } from "@/store/slices/domain/expensesSlice";
 import { clearAllIncome } from "@/store/slices/domain/incomeSlice";
 import { clearAllAssetCategories } from "@/store/slices/domain/assetCategoriesSlice";
 import sqliteService from "@/service/infrastructure/sqlLiteService";
-import { StoreNames } from "@/service/infrastructure/sqlLiteService/interfaces/ISQLiteService";
 import Logger from "@/service/shared/logging/Logger/logger";
 import SettingsView from "@/view/settings/general/SettingsView";
 import { handleFileDownload } from "@/service/shared/utilities/helper/downloadFile";
@@ -29,6 +28,7 @@ import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '@/stor
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
 import { clearAllLiabilities } from "@/store/slices/domain";
 import { StockAPIProvider, DividendApiProvider } from "@/types/shared/base/enums";
+import { StoreNames } from "@/types/domains/database";
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";
 type AsyncOperationStatus = "idle" | "loading" | "success" | "error";
@@ -589,20 +589,10 @@ const SettingsContainer: React.FC = () => {
   const handleStockApiToggle = (enabled: boolean) => {
     Logger.info(`[Settings] Stock API toggle changed to: ${enabled}`);
     dispatch(setStockApiEnabled(enabled));
-    if (enabled) {
-      dispatch(showSuccessSnackbar(t("settings.snackbar.stockApiEnabled") || "Stock-API aktiviert."));
-    } else {
-      dispatch(showSuccessSnackbar(t("settings.snackbar.stockApiDisabled") || "Stock-API deaktiviert."));
-    }
   };
 
   const handleDividendApiToggle = (enabled: boolean) => {
     dispatch(setDividendApiEnabled(enabled));
-    if (enabled) {
-      dispatch(showSuccessSnackbar(t("settings.snackbar.dividendApiEnabled") || "Dividenden-API aktiviert."));
-    } else {
-      dispatch(showSuccessSnackbar(t("settings.snackbar.dividendApiDisabled") || "Dividenden-API deaktiviert."));
-    }
   };
 
   // Handle clearing only dividend history
