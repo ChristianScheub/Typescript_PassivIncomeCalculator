@@ -76,6 +76,3 @@ export { SectorSection } from './forms/sections/SectorSection';
 
 // Input Components
 export { SearchInput } from './inputs/SearchInput';
-
-// Sections
-export { CustomScheduleSection as PortfolioCustomScheduleSection } from './sections/CustomScheduleSection';
