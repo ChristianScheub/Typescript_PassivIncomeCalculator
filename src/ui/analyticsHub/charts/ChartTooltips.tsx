@@ -21,6 +21,7 @@ interface ChartTooltipProps extends ChartTooltipPayload {
   useCustomFormatting?: boolean;
   showTransactions?: boolean;
   firstBarColor?: string;
+  showTime?: boolean; // NEW: show time in tooltip if present
   
   // Custom translations
   t?: (key: string) => string;
@@ -50,6 +51,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   useCustomFormatting = false,
   showTransactions = false,
   firstBarColor,
+  showTime = false,
   t: propT,
   name
 }) => {
@@ -67,10 +69,34 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
   
   // Portfolio history special case
   if (useCustomFormatting && data.formattedDate) {
+    // If showTime is true, format with time if present
+    let formattedDate = data.formattedDate;
+    if (showTime && data.date) {
+      const dateObj = new Date(data.date);
+      if (!isNaN(dateObj.getTime())) {
+        const hours = dateObj.getHours();
+        const minutes = dateObj.getMinutes();
+        if (!(hours === 2 && minutes === 0)) {
+          formattedDate = dateObj.toLocaleString('de-DE', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        } else {
+          formattedDate = dateObj.toLocaleDateString('de-DE', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+          });
+        }
+      }
+    }
     return (
       <div className="bg-white dark:bg-gray-800 p-3 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg">
         <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-          {data.formattedDate}
+          {formattedDate}
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           {t('portfolio.value')}: {formatCurrencyFn(payload[0].value)}

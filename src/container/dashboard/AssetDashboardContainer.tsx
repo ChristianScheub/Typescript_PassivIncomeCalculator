@@ -1,7 +1,6 @@
 import React, { useCallback, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { AnyAction, ThunkDispatch } from "@reduxjs/toolkit";
-import { RootState } from "@/store";
 import { useAppSelector, useAppDispatch } from "../../hooks/redux";
 import { AssetFocusTimeRange } from "@/types/shared/analytics";
 import { updateAssetDefinition } from "@/store/slices/domain";
@@ -10,9 +9,7 @@ import {
   calculateFinancialSummary,
   calculateAssetFocusData,
 } from "@/store/slices/domain/transactionsSlice";
-import AssetDashboardView, {
-  PortfolioSummary,
-} from "@/view/finance-hub/overview/AssetDashboardView";
+import AssetDashboardView from "@/view/finance-hub/overview/AssetDashboardView";
 import AssetDetailModal from "@/view/finance-hub/overview/AssetDetailModalView";
 import { Asset, AssetDefinition } from "@/types/domains/assets/entities";
 import { useAsyncOperation } from "../../utils/containerUtils";
@@ -22,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { marketDataWorkerService } from "@/service/shared/workers/marketDataWorkerService";
 import { usePortfolioHistoryView } from "@/hooks/usePortfolioHistoryView";
 import batchAssetUpdateService from "@/service/domain/assets/market-data/batchAssetUpdateService";
+import { RootState } from "@/store/config/storeConfig";
 
 const AssetFocusDashboardContainer: React.FC = () => {
   const navigate = useNavigate();
@@ -207,7 +205,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
 
           // Filter data to show the last 24 hours of available data
           filteredIntradayData = intradayData.filter(
-            (point) => new Date(point.timestamp) >= twentyFourHoursBack
+            (point: { timestamp: string | number | Date; }) => new Date(point.timestamp) >= twentyFourHoursBack
           );
 
           Logger.info(
@@ -218,7 +216,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
         }
 
         // Convert filtered intraday data to portfolio history format
-        const intradayHistoryPoints = filteredIntradayData.map((point) => ({
+        const intradayHistoryPoints = filteredIntradayData.map((point: { timestamp: string; value: number }) => ({
           date: point.timestamp,
           totalValue: point.value,
           totalInvested: 0,
@@ -324,8 +322,7 @@ const AssetFocusDashboardContainer: React.FC = () => {
     assetsWithValues: [],
     portfolioSummary: null,
   };
-  // Sort assetsWithValues by totalValue descending before passing to view
-  const { portfolioSummary } = assetFocusDataResult;
+
   // AssetWithValue uses 'value' as the total value field
   const sortedAssetsWithValues = Array.isArray(
     assetFocusDataResult.assetsWithValues
@@ -573,7 +570,6 @@ const AssetFocusDashboardContainer: React.FC = () => {
       <AssetDashboardView
         portfolioHistory={enhancedPortfolioHistory}
         assetsWithValues={sortedAssetsWithValues}
-        portfolioSummary={portfolioSummary as PortfolioSummary}
         selectedTimeRange={reduxState.assetFocus.timeRange}
         onTimeRangeChange={handleTimeRangeChange}
         onRefresh={handleRefresh}
@@ -586,11 +582,6 @@ const AssetFocusDashboardContainer: React.FC = () => {
         totalLiabilities={financialSummary.data?.totalLiabilities || 0}
         isApiEnabled={reduxState.isApiEnabled}
         onUpdateIntradayHistory={handleUpdateIntradayHistory}
-        isIntradayView={
-          (reduxState.assetFocus.timeRange === "1T" ||
-            reduxState.assetFocus.timeRange === "5D") &&
-          intradayData.length > 0
-        }
       />
       {/* Asset Detail Modal */}
       <AssetDetailModal

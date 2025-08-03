@@ -20,7 +20,6 @@ export interface PortfolioSummary {
 interface AssetDashboardViewProps {
   portfolioHistory: PortfolioHistoryPoint[];
   assetsWithValues: AssetWithValue[];
-  portfolioSummary: PortfolioSummary;
   selectedTimeRange: AssetFocusTimeRange;
   onTimeRangeChange: (timeRange: AssetFocusTimeRange) => void;
   onRefresh: () => Promise<void>;
@@ -33,26 +32,23 @@ interface AssetDashboardViewProps {
   totalLiabilities: number;
   isApiEnabled: boolean;
   onUpdateIntradayHistory: () => Promise<void>;
-  isIntradayView?: boolean; // New prop to indicate if showing intraday data
 }
 
 const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
   portfolioHistory,
   assetsWithValues,
-  portfolioSummary: _portfolioSummary, // eslint-disable-line @typescript-eslint/no-unused-vars
   selectedTimeRange,
   onTimeRangeChange,
   onRefresh,
   isRefreshing,
   onNavigateToForecast,
   onNavigateToSettings,
-  onNavigateToAssetDetail, // Destructure the updated prop
+  onNavigateToAssetDetail,
   netWorth,
   totalAssets,
   totalLiabilities,
   isApiEnabled,
-  onUpdateIntradayHistory,
-  isIntradayView
+  onUpdateIntradayHistory
 }) => {
   const { t } = useTranslation();
 
@@ -68,7 +64,7 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
       isRefreshing={isRefreshing}
       className="min-h-screen"
     >
-      <div className="space-y-6 pb-8 overflow-x-hidden">
+      <div className="space-y-6 pb-8 overflow-x-visible">
         <div style={{ height: "10vw" }}> </div>
 
         {/* Net Worth Snapshot */}
@@ -82,10 +78,10 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
 
         {/* Portfolio History Chart */}
         {portfolioHistory.length > 0 && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-4">
-            <div className="flex justify-between items-center mb-4">
+          <div className="w-full">
+            <div className="flex justify-between items-center mb-2">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                {t('assetFocus.portfolioHistory') || 'Portfolio Verlauf'}
+                {t('assetFocus.portfolioHistory')}
               </h3>
               {isApiEnabled && (
                 <IconButton
@@ -98,17 +94,18 @@ const AssetDashboardView: React.FC<AssetDashboardViewProps> = ({
                 />
               )}
             </div>
-            <PortfolioHistoryCard 
-              history={portfolioHistory.map((point, index) => ({
-                date: point.date,
-                value: point.totalValue,
-                change: index > 0 ? point.totalValue - portfolioHistory[index - 1].totalValue : 0,
-                changePercentage: index > 0 && portfolioHistory[index - 1].totalValue > 0 
-                  ? ((point.totalValue - portfolioHistory[index - 1].totalValue) / portfolioHistory[index - 1].totalValue) * 100 
-                  : 0
-              }))}
-              isIntradayView={isIntradayView || false}
-            />
+            <div className="w-full" style={{minWidth: 0}}>
+              <PortfolioHistoryCard 
+                history={portfolioHistory.map((point, index) => ({
+                  date: point.date,
+                  value: point.totalValue,
+                  change: index > 0 ? point.totalValue - portfolioHistory[index - 1].totalValue : 0,
+                  changePercentage: index > 0 && portfolioHistory[index - 1].totalValue > 0 
+                    ? ((point.totalValue - portfolioHistory[index - 1].totalValue) / portfolioHistory[index - 1].totalValue) * 100 
+                    : 0
+                }))}
+              />
+            </div>
           </div>
         )}
 

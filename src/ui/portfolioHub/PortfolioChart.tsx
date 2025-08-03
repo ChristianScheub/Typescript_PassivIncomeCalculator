@@ -323,33 +323,36 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
       )}
 
       {/* Chart Section */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow">
+      <div className="w-full m-0 p-0">
         {title && (
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             {title}
           </h3>
         )}
-        
         <div style={{ height: config.height }}>
           <ResponsiveContainer width="100%" height="100%">
             {config.chartType === 'area' ? (
-              <AreaChart data={sanitizedChartData}> {/* Use sanitized data */}
+              <AreaChart data={sanitizedChartData} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
                 {config.showGrid && (
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.3} />
                 )}
                 <XAxis 
-                  dataKey="date" // Use sanitized date
-                  tick={{ fontSize: 12 }}
+                  dataKey="date"
+                  tick={false} // Remove X-axis tick labels
                   stroke="#6B7280"
-                  tickFormatter={formatXAxisLabel}
-                  scale="time" // Use time scale for consistent day spacing
-                  type="number" // Ensure numeric time values
-                  domain={['dataMin', 'dataMax']} // Fit domain to data range
+                  scale="time"
+                  type="number"
+                  domain={['dataMin', 'dataMax']}
+                  allowDataOverflow={true}
+                  axisLine={false} // Remove axis line
                 />
                 <YAxis 
-                  tick={false} // Disable Y-axis labels
+                  tick={false} // Remove Y-axis tick labels
                   stroke="#6B7280"
                   domain={yDomain}
+                  width={0} // Hide Y-axis visually
+                  axisLine={false} // Remove axis line
+                  allowDataOverflow={true}
                 />
                 <Tooltip 
                   content={
@@ -358,6 +361,7 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
                       t={t} 
                       useCustomFormatting={true} 
                       showTransactions={true} 
+                      showTime={true} // Show time in tooltip if present in date
                     />
                   } 
                 />
@@ -378,23 +382,26 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
                 </defs>
               </AreaChart>
             ) : (
-              <LineChart data={sanitizedChartData}> {/* Use sanitized data */}
+              <LineChart data={sanitizedChartData} margin={{ left: 0, right: 0, top: 0, bottom: 0 }}>
                 {config.showGrid && (
                   <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" opacity={0.3} />
                 )}
                 <XAxis 
-                  dataKey="date" // Use sanitized date
+                  dataKey="date"
                   tick={{ fontSize: 12 }}
                   stroke="#6B7280"
                   tickFormatter={formatXAxisLabel}
-                  scale="time" // Use time scale for consistent day spacing
-                  type="number" // Ensure numeric time values
-                  domain={['dataMin', 'dataMax']} // Fit domain to data range
+                  scale="time"
+                  type="number"
+                  domain={['dataMin', 'dataMax']}
+                  allowDataOverflow={true}
                 />
                 <YAxis 
-                  tick={false} // Disable Y-axis labels
+                  tick={false}
                   stroke="#6B7280"
                   domain={yDomain}
+                  width={1}
+                  allowDataOverflow={true}
                 />
                 <Tooltip 
                   content={
@@ -418,7 +425,6 @@ export const PortfolioChart: React.FC<PortfolioChartProps> = ({
             )}
           </ResponsiveContainer>
         </div>
-        
         {/* Legend */}
         {showLegend && (
           <div className="flex items-center justify-center mt-4 space-x-6 text-sm">
