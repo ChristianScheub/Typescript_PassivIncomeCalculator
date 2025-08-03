@@ -116,9 +116,27 @@ function isKeyUsedInSrc(key) {
   return found;
 }
 const unusedKeys = allTranslationKeys.filter((key) => !isKeyUsedInSrc(key));
+
+// Entferne die unusedKeys aus dem deJson Objekt (rekursiv)
+function removeDeepKey(obj, keyPath) {
+  const parts = keyPath.split('.');
+  let current = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    if (typeof current[parts[i]] !== 'object' || current[parts[i]] === null) return;
+    current = current[parts[i]];
+  }
+  const last = parts[parts.length - 1];
+  // Prüfe ob Array-Index (z.B. "0")
+  if (Array.isArray(current) && !isNaN(last)) {
+    current.splice(Number(last), 1);
+  } else {
+    delete current[last];
+  }
+}
 if (unusedKeys.length > 0) {
-  console.error(`\n\x1b[31mUnused translation keys in de.json (${unusedKeys.length}):\x1b[0m`);
-  unusedKeys.forEach((key) => console.error('- ' + key));
+  unusedKeys.forEach((key) => removeDeepKey(deJson, key));
+  fs.writeFileSync(deJsonPath, JSON.stringify(deJson, null, 2), 'utf8');
+  console.error(`\n\x1b[31mUnused translation keys in de.json (${unusedKeys.length}) wurden automatisch entfernt und die Datei wurde aktualisiert.\x1b[0m`);
 }
 
 // 2. Check for missing translations (used but not present in de.json)

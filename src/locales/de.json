@@ -15,7 +15,7 @@
       "december": "Dezember"
     }
   },
-    "chart": {
+  "chart": {
     "timeRange": {
       "1D": "1T",
       "5D": "5T",
@@ -692,19 +692,8 @@
       "analyticsCategories": "Analytics-Kategorien",
       "availableAnalytics": "Verfügbare Analysen",
       "moreOptions": "weitere Optionen",
-      "insights": {
-        "netWorth": "Nettovermögen",
-        "monthlyCashFlow": "Monatlicher Cashflow",
-        "totalAssets": "Gesamtvermögen",
-        "monthlyIncome": "Monatliches Einkommen"
-      },
+      "insights": {},
       "activities": {
-        "overview": "Analytics-Übersicht angesehen",
-        "forecasting": "Prognose angesehen",
-        "milestones": "Meilensteine angesehen",
-        "distributions": "Verteilungen angesehen",
-        "performance": "Performance angesehen",
-        "custom": "Benutzerdefinierte Analytics angesehen",
         "overview.dashboard": "Analytics Dashboard angesehen",
         "overview.summary": "Analytics Zusammenfassung angesehen",
         "forecasting.cashflow": "Cashflow-Prognose angesehen",
@@ -729,20 +718,10 @@
         "portfolioDistribution": "Portfolio-Verteilung",
         "viewedRecently": "Kürzlich angesehen"
       },
-      "recommendationItems": {
-        "diversification": "Portfolio diversifizieren"
-      },
-      "priority": {
-        "high": "Hoch",
-        "medium": "Mittel",
-        "low": "Niedrig"
-      },
+      "recommendationItems": {},
+      "priority": {},
       "categories": {
-        "overview": {
-          "description": "Allgemeine Finanz-Übersicht und Zusammenfassungen",
-          "dashboard": "Dashboard",
-          "summary": "Zusammenfassung"
-        },
+        "overview": {},
         "forecasting": {
           "title": "Prognosen & Projektionen",
           "description": "Zukunftsorientierte Finanzanalysen und Projektionen",
@@ -785,10 +764,7 @@
           "historical": "Historische Analysen",
           "historicalDesc": "Langzeit-Trends und Entwicklungen"
         },
-        "custom": {
-          "description": "Verwalten und verfolgen Sie Ihre Asset-Ereignisse",
-          "saved": "Gespeicherte Analysen"
-        },
+        "custom": {},
         "assetCalendar": {
           "title": "Asset-Kalender",
           "description": "Verwalten und verfolgen Sie Ihre Asset-Ereignisse und -termine",
@@ -803,18 +779,10 @@
     },
     "overview": {
       "net_worth": "Nettovermögen",
-      "netWorth": "Nettovermögen",
-      "monthlyCashFlow": "Monatlicher Cashflow",
       "totalAssets": "Gesamtvermögen",
-      "totalLiabilities": "Gesamtverbindlichkeiten",
       "monthlyIncome": "Monatliches Einkommen",
-      "monthlyExpenses": "Monatliche Ausgaben",
       "assetsCount": "Assets",
-      "savingsRate": "Sparquote",
-      "tabs": {
-        "summary": "Zusammenfassung",
-        "insights": "Einblicke"
-      }
+      "tabs": {}
     },
     "portfolioAnalytics": "Portfolio-Analysen",
     "assetDistribution": "Vermögen",
@@ -864,7 +832,6 @@
       "monthlyPayments": "Monatliche Zahlungen",
       "debtBalanceByType": "Schuldenstände nach Typ",
       "annualInterestByType": "Jährliche Zinsen nach Typ",
-      "interestRate": "Zinssatz",
       "debtProjection5Years": "Schulden-Prognose (5 Jahre)",
       "debtProjection10Years": "Schulden-Prognose (10 Jahre)",
       "debtProjection30Years": "Schulden-Prognose (30 Jahre)",
@@ -886,16 +853,12 @@
       "chartType": "Diagramm-Typ",
       "assetValue": "Asset-Wert",
       "income": "Einkommen",
-      "assets": "Vermögenswerte",
-      "expenses": "Ausgaben",
-      "performance": "Performance",
       "growth": "Wachstum",
       "lineChart": "Liniendiagramm",
       "pieChart": "Tortendiagramm",
       "barChart": "Balkendiagramm",
       "noChartsYet": "Noch keine Diagramme vorhanden",
       "getStarted": "Erstellen Sie Ihr erstes benutzerdefiniertes Diagramm, um Ihre Daten zu analysieren.",
-      "addFirstChart": "Erstes Diagramm hinzufügen",
       "chartTypeNotImplemented": "{{type}}-Diagramm noch nicht implementiert"
     }
   },
@@ -949,14 +912,8 @@
         "incomeSourcesCount": "Einkommensquellen"
       },
       "activities": {
-        "overview": "Portfolio-Übersicht",
-        "assets": "Assets-Bereich angesehen",
         "assets.addTransaction": "Neue Asset-Transaktion hinzugefügt",
-        "liabilities": "Verbindlichkeiten-Bereich angesehen",
-        "income": "Einkommens-Bereich angesehen",
         "income.addIncome": "Neue Einkommensquelle hinzugefügt",
-        "expenses": "Ausgaben-Bereich angesehen",
-        "transactions": "Transaktionen-Bereich angesehen",
         "assets.portfolio": "Asset-Portfolio angesehen",
         "assets.definitions": "Asset-Definitionen angesehen",
         "assets.categories": "Asset-Kategorien angesehen",
@@ -992,9 +949,7 @@
       "primaryAction": "Erstes Asset hinzufügen",
       "secondaryAction": "Leitfaden ansehen",
       "tips": [
-        "Starten Sie mit einem Asset, das Sie bereits besitzen",
-        "Diversifikation reduziert Risiken",
-        "Regelmäßige Investitionen zahlen sich langfristig aus"
+        null
       ]
     },
     "income": {
@@ -1003,9 +958,7 @@
       "motivationalText": "Mehrere Einkommensquellen schaffen finanzielle Sicherheit!",
       "primaryAction": "Einkommen hinzufügen",
       "tips": [
-        "Erfassen Sie auch passive Einkommensquellen",
-        "Unterscheiden Sie zwischen aktivem und passivem Einkommen",
-        "Planen Sie Ihr zukünftiges Einkommen"
+        null
       ]
     },
     "expenses": {
@@ -1014,9 +967,7 @@
       "motivationalText": "Wer seine Ausgaben kennt, kann sie optimieren!",
       "primaryAction": "Ausgabe hinzufügen",
       "tips": [
-        "Beginnen Sie mit Ihren größten Ausgabenposten",
-        "Unterscheiden Sie zwischen Bedürfnissen und Wünschen",
-        "Kleine Einsparungen addieren sich zu großen Summen"
+        null
       ]
     },
     "liabilities": {
@@ -1025,21 +976,14 @@
       "motivationalText": "Jede getilgte Schuld bringt Sie der Freiheit näher!",
       "primaryAction": "Verbindlichkeit hinzufügen",
       "tips": [
-        "Priorisieren Sie Schulden mit hohen Zinsen",
-        "Kleine Zusatzzahlungen verkürzen die Laufzeit erheblich",
-        "Visualisieren Sie Ihren Fortschritt"
+        null
       ]
     },
-    "portfolio": {
-      "description": "Ein diversifiziertes Portfolio ist der Schlüssel zu langfristigem Erfolg. Fügen Sie Assets hinzu, um Ihr Portfolio zu verfolgen."
-    },
+    "portfolio": {},
     "charts": {
       "noData": "Keine Daten für die Darstellung verfügbar"
     },
-    "forecast": {
-      "title": "Planen Sie Ihre finanzielle Zukunft!",
-      "description": "Prognosen helfen Ihnen, fundierte finanzielle Entscheidungen zu treffen. Fügen Sie Assets und Einkommen hinzu, um Ihre Zukunft zu projizieren."
-    }
+    "forecast": {}
   },
   "recommendations": {
     "assets": {
@@ -1241,27 +1185,12 @@
         "skip": "Überspringen"
       },
       "steps": {
-        "welcome": {
-          "description": "Willkommen beim Einrichtungsassistenten. Beginnen Sie mit StrictFinance."
-        },
-        "assetDefinitions": {
-          "title": "Asset-Definitionen",
-          "description": "Definieren Sie Ihre Assets aus Vorlagen oder erstellen Sie benutzerdefinierte Assets."
-        },
-        "transactions": {
-          "description": "Fügen Sie Ihre Asset-Transaktionen hinzu."
-        },
-        "liabilities": {
-          "title": "Verbindlichkeiten",
-          "description": "Verfolgen Sie Ihre Schulden und Verbindlichkeiten."
-        },
-        "income": {
-          "title": "Einkommensquellen",
-          "description": "Definieren Sie Ihre Einkommensquellen."
-        },
-        "completion": {
-          "description": "Überprüfen und schließen Sie Ihre Einrichtung ab."
-        }
+        "welcome": {},
+        "assetDefinitions": {},
+        "transactions": {},
+        "liabilities": {},
+        "income": {},
+        "completion": {}
       }
     },
     "welcome": {
@@ -1298,79 +1227,34 @@
     "assets": {
       "title": "Asset-Definitionen",
       "customAssets": {
-        "form": {
-          "symbol": "Symbol",
-          "name": "Asset-Name",
-          "type": "Asset-Typ",
-          "sector": "Sektor",
-          "country": "Land",
-          "description": "Beschreibung"
-        }
+        "form": {}
       }
     },
     "transactions": {
       "title": "Transaktionshistorie",
-      "noAssets": {
-        "description": "Sie haben noch keine Assets ausgewählt. Sie können:"
-      },
-      "form": {
-        "asset": "Asset",
-        "type": "Transaktionstyp",
-        "date": "Datum",
-        "quantity": "Menge",
-        "price": "Preis pro Aktie",
-        "description": "Beschreibung"
-      },
-      "addTransaction": "Transaktion hinzufügen",
+      "noAssets": {},
+      "form": {},
       "list": {
-        "headers": {
-          "date": "Datum",
-          "asset": "Asset",
-          "type": "Typ",
-          "quantity": "Menge",
-          "price": "Preis",
-          "total": "Gesamt"
-        }
+        "headers": {}
       }
     },
     "liabilities": {
       "title": "Verbindlichkeiten & Schulden",
-      "form": {
-        "name": "Name der Verbindlichkeit",
-        "type": "Verbindlichkeitstyp",
-        "amount": "Gesamtbetrag",
-        "interestRate": "Zinssatz (%)",
-        "description": "Beschreibung"
-      },
-      "addLiability": "Verbindlichkeit hinzufügen"
+      "form": {}
     },
     "income": {
       "title": "Einkommensquellen",
-      "form": {
-        "name": "Name der Einkommensquelle",
-        "type": "Einkommenstyp",
-        "isPassive": "Ist das passives Einkommen?",
-        "description": "Beschreibung"
-      },
-      "addIncome": "Einkommensquelle hinzufügen"
+      "form": {}
     },
     "completion": {
       "title": "Setup abgeschlossen!",
-      "summary": {
-        "assets": "Assets konfiguriert",
-        "transactions": "Transaktionen hinzugefügt",
-        "liabilities": "Verbindlichkeiten verfolgt",
-        "income": "Einkommensquellen",
-        "monthlyIncome": "Monatliches Einkommen"
-      }
+      "summary": {}
     },
     "fileImport": {
       "title": "Daten importieren",
       "dragDrop": "Dateien hier hinziehen und ablegen",
       "or": "oder",
       "clickToSelect": "klicken, um Dateien auszuwählen",
-      "success": "Datei erfolgreich verarbeitet!",
-      "error": "Fehler beim Verarbeiten der Datei",
       "chooseDifferentFile": "Andere Datei wählen",
       "removeFile": "Datei entfernen",
       "browseFiles": "Dateien durchsuchen",
@@ -1563,7 +1447,6 @@
           "assetsCount": "Assets definiert",
           "transactionsCount": "Transaktionen",
           "liabilitiesCount": "Verbindlichkeiten",
-          "totalLiabilities": "Gesamtverbindlichkeiten",
           "stepSkipped": "Schritt wurde übersprungen"
         },
         "configurationSummary": "Konfigurationszusammenfassung",
