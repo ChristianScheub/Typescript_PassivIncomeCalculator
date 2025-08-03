@@ -6,8 +6,9 @@ import {
   clearAllIncome,
   clearAllAssetCategories
 } from '@/store/slices/domain';
-import { setStockApiKey, setStockApiEnabled } from '@/store/slices/configSlice';
+import { setStockApiKey, setStockApiEnabled, setDividendApiKey, setDividendApiEnabled } from '@/store/slices/configSlice';
 import { StockAPIProvider } from '@/types/shared/base/enums';
+import { DividendApiProvider } from '@/types/shared/base/enums';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { clearSQLiteStores } from './utils';
 import { StoreNames } from '@/types/domains/database';
@@ -44,16 +45,19 @@ export async function clearAllData(): Promise<void> {
     localStorage.clear();
     Logger.infoService("LocalStorage cleared completely");
 
-    // Reset API key state
-    const providers: StockAPIProvider[] = [
-        StockAPIProvider.FINNHUB,
-        StockAPIProvider.YAHOO,
-        StockAPIProvider.ALPHA_VANTAGE
-    ];
-    providers.forEach((provider) => {
-        store.dispatch(setStockApiKey({ provider, key: '' }));
+    // Dynamisch alle vorhandenen StockAPIProvider-Keys entfernen
+    const stockApiConfig = store.getState().config.apis.stock;
+    Object.keys(stockApiConfig.apiKeys).forEach((provider) => {
+        store.dispatch(setStockApiKey({ provider: provider as StockAPIProvider, key: '' }));
     });
     store.dispatch(setStockApiEnabled(false));
+
+    // Dynamisch alle vorhandenen DividendApiProvider-Keys entfernen
+    const dividendApiConfig = store.getState().config.apis.dividend;
+    Object.keys(dividendApiConfig.apiKeys).forEach((provider) => {
+        store.dispatch(setDividendApiKey({ provider: provider as DividendApiProvider, key: '' }));
+    });
+    store.dispatch(setDividendApiEnabled(false));
 
     Logger.infoService("All data cleared successfully");
 

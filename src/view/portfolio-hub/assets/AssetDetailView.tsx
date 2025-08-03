@@ -5,8 +5,9 @@ import { PortfolioPosition } from '@/types/domains/portfolio/position';
 import { AssetDefinition } from '@/types/domains/assets/entities';
 import { formatService } from '@service';
 import { PriceHistoryView, PriceChart, DividendHistoryView } from '@ui/portfolioHub';
-import { featureFlag_Debug_View } from '../../../config/featureFlags';
 import { IconButton } from '@/ui/shared';
+import { isDeveloperModeEnabled } from '@/utils/developerMode';
+import { featureFlag_Debug_View } from '@/config/featureFlags';
 
 interface AssetDetailViewProps {
   asset: PortfolioPosition;
@@ -207,7 +208,7 @@ export const AssetDetailView: React.FC<AssetDetailViewProps & { assetDefinition?
           </div>
 
           {/* Price History */}
-          {featureFlag_Debug_View&& assetDefinition?.priceHistory && assetDefinition.priceHistory.length > 0 && (
+          {(isDeveloperModeEnabled()|| featureFlag_Debug_View )&& assetDefinition?.priceHistory && assetDefinition.priceHistory.length > 0 && (
             <PriceHistoryView
               priceHistory={assetDefinition.priceHistory}
               showSourceIcons={true}

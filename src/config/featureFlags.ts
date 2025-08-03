@@ -1,5 +1,5 @@
-const featureFlag_Debug_View: boolean = true; //Show some dev things in the view
-const featureFlag_Debug_Settings_View: boolean = true; //Show dev settings things in the view
+const featureFlag_Debug_View: boolean = false; //Show some dev things in the view
+const featureFlag_Debug_Settings_View: boolean = false; //Show dev settings things in the view
 
 const featureFlag_Debug_StoreLogs: boolean = false; //Store logs in the local storage
 
@@ -15,7 +15,10 @@ const featureFlag_Debug_Log_Cache: boolean = false; //Show cache logs in the con
 const featureFlag_Debug_Log_API: boolean = true; //Show API service logs in the console
 const featureFlag_SetupImport: boolean = false; //Enable setup import feature
 
+const developerPasswordHash: string = "3f3f61d0e6c8f1b6fba7cb59c669fa342a3e02b92fcf80cf2233e3ee3771f98c"; // SHA256 hash of "hello"
+
 export {
+  developerPasswordHash,
   featureFlag_SetupWizzard,
   featureFlag_Debug_Log_Analytics,
   featureFlag_Debug_Settings_View,

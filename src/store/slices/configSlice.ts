@@ -67,6 +67,11 @@ interface ConfigState {
     numberFormat: string;
   };
   
+  // Developer Settings
+  developer: {
+    enabled: boolean;
+  };
+  
   // Status tracking
   status: 'idle' | 'loading' | 'succeeded' | 'failed';
   error: string | null;
@@ -117,6 +122,9 @@ const initialState: ConfigState = {
     currency: 'EUR',
     dateFormat: 'DD/MM/YYYY',
     numberFormat: 'de-DE',
+  },
+  developer: {
+    enabled: false,
   },
   status: 'idle',
   error: null,
@@ -208,6 +216,11 @@ const configSlice = createSlice({
       state.general.currency = action.payload;
     },
     
+    // Developer Settings
+    setDeveloperModeEnabled: (state, action: PayloadAction<boolean>) => {
+      state.developer.enabled = action.payload;
+    },
+    
     // Bulk Configuration Update
     updateConfig: (state, action: PayloadAction<Partial<ConfigState>>) => {
       Object.assign(state, action.payload);
@@ -268,6 +281,9 @@ export const {
   setLanguage,
   setCurrency,
   
+  // Developer
+  setDeveloperModeEnabled,
+  
   // Bulk operations
   updateConfig,
   resetConfig,
@@ -281,6 +297,9 @@ export const selectAIConfig = (state: { config: ConfigState }) => state.config.a
 export const selectDashboardConfig = (state: { config: ConfigState }) => state.config.dashboard;
 export const selectAssetFocusConfig = (state: { config: ConfigState }) => state.config.dashboard.assetFocus;
 export const selectGeneralConfig = (state: { config: ConfigState }) => state.config.general;
+
+// Developer selector
+export const selectDeveloperConfig = (state: { config: ConfigState }) => state.config.developer;
 
 // Derived selectors
 export const selectIsStockApiReady = (state: { config: ConfigState }) => {

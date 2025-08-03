@@ -4,6 +4,8 @@ import type { BatchResult } from '@/types/shared/batch';
 import type { ApiConfig } from '@/types/shared/apiConfig';
 import { dividendApiService } from '@/service/domain/assets/market-data/dividendAPIService';
 import { DividendFrequency } from '@/types/shared';
+import { parseDividendHistoryFromApiResult } from '@/utils/parseDividendHistoryFromApiResult';
+import { dividendProviders } from '../../dividendAPIService/methods/dividendProviders';
 
 // Typen für interne Verarbeitung
 type RawDividend = { amount: number; date?: number; lastDividendDate?: string; frequency?: DividendFrequency };
@@ -53,7 +55,6 @@ export async function updateBatchDividends(
         
         if (apiConfig) {
           // Worker mode: Use direct API provider access
-          const { dividendProviders } = await import('@/service/domain/assets/market-data/dividendAPIService/methods/dividendProviders');
           const provider = apiConfig.selectedProvider === 'finnhub' ? 'finnhub' : 'yahoo';
           const apiKey = apiConfig.apiKeys[provider] || '';
           const providerFn = dividendProviders[provider];
@@ -72,7 +73,6 @@ export async function updateBatchDividends(
           result = await dividendApiService.fetchDividends(def.ticker!, options);
         }
         
-        const { parseDividendHistoryFromApiResult } = await import('@/utils/parseDividendHistoryFromApiResult');
         const currency = def.currency || undefined;
         const rawDividends: RawDividend[] = Array.isArray(result?.dividends) ? result.dividends : [];
         const parsedDividends: DividendEntry[] = rawDividends

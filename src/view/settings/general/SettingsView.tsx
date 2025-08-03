@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardContent, CollapsibleSection, Toggle, ConfirmationDialog, Button, ButtonGroup } from '@ui/shared';
-import { Download, Upload, Key, ChevronRight, Trash, Monitor, Brain } from 'lucide-react';
+import { Download, Upload, Key, ChevronRight, Trash, Monitor, Brain, Shield } from 'lucide-react';
 import DebugSettings from '@/ui/settings/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '@/config/featureFlags';
 import { StockAPIProvider } from '@/types/shared/base/enums';
@@ -86,6 +86,13 @@ interface SettingsViewProps {
   getLogLevelColor: (level: string) => string;
   onClearDividendHistory: () => void;
   onPortfolioHistoryRefresh?: () => void;
+  // Developer Mode Props
+  isDeveloperModeEnabled: boolean;
+  developerPassword: string;
+  developerActivationStatus: 'idle' | 'loading' | 'success' | 'error';
+  onDeveloperPasswordChange: (password: string) => void;
+  onDeveloperModeActivation: () => void;
+  onDeveloperModeDeactivation: () => void;
 }
 
 const SettingsView: React.FC<SettingsViewProps> = ({
@@ -146,6 +153,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   // Fix: Add missing prop for dividend history clear
   onClearDividendHistory,
   onPortfolioHistoryRefresh,
+  // Developer Mode Props
+  isDeveloperModeEnabled,
+  developerPassword,
+  developerActivationStatus,
+  onDeveloperPasswordChange,
+  onDeveloperModeActivation,
+  onDeveloperModeDeactivation,
 }) => {
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
@@ -240,6 +254,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   const exportButtonText = getButtonText(exportStatus, t, 'settings.exporting', 'settings.exported', 'settings.export');
   const importButtonText = getButtonText(importStatus, t, 'settings.importing', 'settings.imported', 'settings.import');
   const apiKeyButtonText = getButtonText(apiKeyStatus, t, 'settings.saving', 'settings.saved', 'settings.saveApiKey');
+  const developerButtonText = getButtonText(developerActivationStatus, t, 'settings.activating', 'settings.activated', 'settings.activate');
 
   // Unterstützte Stores für gezielten Export/Import
   const STORE_OPTIONS = [
@@ -691,8 +706,93 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         </div>
       </CollapsibleSection>
 
+      {/* Developer Mode Settings */}
+      <CollapsibleSection
+        title={t('settings.developerMode')}
+        icon={<Shield size={20} />}
+        defaultExpanded={false}
+      >
+        <div className="space-y-4">
+          {isDeveloperModeEnabled ? (
+            // Developer mode is active
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
+                <div>
+                  <h3 className="font-medium text-green-800 dark:text-green-200">
+                    {t('settings.developerModeActive')}
+                  </h3>
+                  <p className="text-sm text-green-600 dark:text-green-400">
+                    {t('settings.developerModeDescription')}
+                  </p>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded">
+                    {t('settings.activated')}
+                  </span>
+                </div>
+              </div>
+              
+              {/* Deactivation Button */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-medium">{t('settings.disableDeveloperMode')}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('settings.disableDeveloperModeDescription')}
+                  </p>
+                </div>
+                <Button
+                  onClick={onDeveloperModeDeactivation}
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-700 dark:hover:bg-red-900/20"
+                >
+                  {t('settings.deactivate')}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            // Developer mode activation form
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-medium">{t('settings.enableDeveloperMode')}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('settings.developerModeDescription')}
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div>
+                  <label htmlFor="developer-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('settings.developerPassword')}
+                  </label>
+                  <input
+                    id="developer-password"
+                    type="password"
+                    value={developerPassword}
+                    onChange={(e) => onDeveloperPasswordChange(e.target.value)}
+                    placeholder={t('settings.enterDeveloperPassword')}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                    disabled={developerActivationStatus === 'loading'}
+                  />
+                </div>
+
+                <Button
+                  onClick={onDeveloperModeActivation}
+                  disabled={developerActivationStatus === 'loading' || !developerPassword.trim()}
+                  className="w-full"
+                >
+                  {developerButtonText}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      </CollapsibleSection>
+      
       {/* Debug Settings Component */}
-      {featureFlag_Debug_Settings_View && (
+      {featureFlag_Debug_Settings_View || isDeveloperModeEnabled && (
         <DebugSettings
           logs={logs}
           showLogs={showLogs}
@@ -707,7 +807,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           pullToRefreshFake={onPortfolioHistoryRefresh}
         />
       )}
-
       {/* About */}
       <Card className="bg-white dark:bg-gray-800">
         <CardHeader>
@@ -724,8 +823,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
             <p className="text-sm text-gray-600 dark:text-gray-400">
               {t('settings.appDescription')}
             </p>
-            
-            {featureFlag_Debug_Settings_View && (
+
+            {featureFlag_Debug_Settings_View ||  isDeveloperModeEnabled && (
               <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                 <p className="text-xs text-yellow-600 dark:text-yellow-400 font-mono">
                   🚧 {t('settings.debugModeActive')}

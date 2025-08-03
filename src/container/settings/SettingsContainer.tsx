@@ -7,12 +7,9 @@ import {
   setStockApiProvider, 
   setDividendApiProvider, 
   setDividendApiKey,
-  setAssetFocusMode
+  setAssetFocusMode,
+  setDeveloperModeEnabled
 } from "@/store/slices/configSlice";
-import { clearAllTransactions } from "@/store/slices/domain/transactionsSlice";
-import { clearAllExpenses } from "@/store/slices/domain/expensesSlice";
-import { clearAllIncome } from "@/store/slices/domain/incomeSlice";
-import { clearAllAssetCategories } from "@/store/slices/domain/assetCategoriesSlice";
 import sqliteService from "@/service/infrastructure/sqlLiteService";
 import Logger from "@/service/shared/logging/Logger/logger";
 import SettingsView from "@/view/settings/general/SettingsView";
@@ -26,9 +23,10 @@ import { t } from "i18next";
 import { ConfirmationDialogState } from '@/ui/portfolioHub/dialog/types';
 import { showInfoSnackbar, showSuccessSnackbar, showErrorSnackbar } from '@/store/slices/ui';
 import cacheRefreshService from '@/service/application/orchestration/cacheRefreshService';
-import { clearAllLiabilities } from "@/store/slices/domain";
 import { StockAPIProvider, DividendApiProvider } from "@/types/shared/base/enums";
 import { StoreNames } from "@/types/domains/database";
+import { verifyHash } from "@/utils/crypto";
+import { developerPasswordHash } from "@/config/featureFlags";
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";
 type AsyncOperationStatus = "idle" | "loading" | "success" | "error";
@@ -40,6 +38,7 @@ const SettingsContainer: React.FC = () => {
   const dividendApiConfig = useAppSelector((state) => state.config.apis.dividend);
   const dashboardSettings = useAppSelector((state) => state.config.dashboard);
   const currentDashboardMode = useAppSelector((state) => state.config.dashboard.assetFocus.mode);
+  const developerConfig = useAppSelector((state) => state.config.developer);
 
   // Memoized dashboard mode to ensure re-rendering
   const dashboardMode = useMemo(() => currentDashboardMode, [currentDashboardMode]);
@@ -74,6 +73,10 @@ const SettingsContainer: React.FC = () => {
   const [clearAllDataStatus, setClearAllDataStatus] = useState<ClearOperationStatus>("idle");
   const [clearReduxCacheStatus, setClearReduxCacheStatus] = useState<ClearOperationStatus>("idle");
   const [clearDividendHistoryStatus, setClearDividendHistoryStatus] = useState<ClearOperationStatus>("idle");
+
+  // Developer Mode State
+  const [developerPassword, setDeveloperPassword] = useState("");
+  const [developerActivationStatus, setDeveloperActivationStatus] = useState<AsyncOperationStatus>("idle");
 
   // Confirmation Dialog State
   const [confirmDialog, setConfirmDialog] = useState<ConfirmationDialogState>({
@@ -321,70 +324,88 @@ const SettingsContainer: React.FC = () => {
     }
   };
 
+  // Developer Mode Handlers
+  const handleDeveloperPasswordChange = (password: string) => {
+    setDeveloperPassword(password);
+  };
+
+  const handleDeveloperModeActivation = async () => {
+    if (!developerPassword.trim()) {
+      dispatch(showErrorSnackbar(t("settings.invalidPassword")));
+      return;
+    }
+
+    try {
+      setDeveloperActivationStatus("loading");
+      
+      // Verify password hash
+      const isValidPassword = await verifyHash(developerPassword, developerPasswordHash);
+      
+      if (isValidPassword) {
+        // Enable developer mode in Redux
+        dispatch(setDeveloperModeEnabled(true));
+        
+        // Save to localStorage
+        localStorage.setItem('developerModeEnabled', 'true');
+        
+        setDeveloperActivationStatus("success");
+        dispatch(showSuccessSnackbar(t("settings.activated")));
+        
+        // Clear the password field
+        setDeveloperPassword("");
+        
+        Logger.info("Developer mode activated");
+      } else {
+        setDeveloperActivationStatus("error");
+        dispatch(showErrorSnackbar(t("settings.invalidPassword")));
+        Logger.warn("Invalid developer password attempt");
+      }
+    } catch (error) {
+      setDeveloperActivationStatus("error");
+      dispatch(showErrorSnackbar("Error activating developer mode"));
+      Logger.error("Developer mode activation error: " + JSON.stringify(error));
+    }
+    
+    // Reset status after 2 seconds
+    setTimeout(() => setDeveloperActivationStatus("idle"), 2000);
+  };
+
+  const handleDeveloperModeDeactivation = () => {
+    try {
+      // Disable developer mode in Redux
+      dispatch(setDeveloperModeEnabled(false));
+      
+      // Remove from localStorage
+      localStorage.removeItem('developerModeEnabled');
+      
+      dispatch(showSuccessSnackbar(t("settings.deactivate") + "d"));
+      Logger.info("Developer mode deactivated");
+    } catch (error) {
+      dispatch(showErrorSnackbar("Error deactivating developer mode"));
+      Logger.error("Developer mode deactivation error: " + JSON.stringify(error));
+    }
+  };
+
+  // Load developer mode state from localStorage on mount
+  useEffect(() => {
+    const savedDeveloperMode = localStorage.getItem('developerModeEnabled');
+    if (savedDeveloperMode === 'true') {
+      dispatch(setDeveloperModeEnabled(true));
+    }
+  }, [dispatch]);
+
   // Handle clearing all data
   const handleClearAllData = async () => {
     try {
       setClearAllDataStatus("clearing");
       Logger.infoService("Starting to clear all data");
 
-      // 1. Clear Redux store first
-      dispatch(clearAllTransactions());
-      dispatch(clearAllLiabilities());
-      dispatch(clearAllExpenses());
-      dispatch(clearAllIncome());
-      dispatch(clearAllAssetCategories());
-
-      // 2. Clear all data from SQLite
-      const stores: StoreNames[] = [
-        "transactions",
-        "assetDefinitions",
-        "assetCategories",
-        "assetCategoryOptions",
-        "assetCategoryAssignments",
-        "liabilities",
-        "expenses",
-        "income",
-        "exchangeRates",
-      ];
-      for (const store of stores) {
-        try {
-          const items = await sqliteService.getAll(store);
-          for (const item of items) {
-            if (item.id) {
-              await sqliteService.remove(store, item.id.toString());
-            }
-          }
-          Logger.infoService(`Cleared ${items.length} items from ${store}`);
-        } catch (error) {
-          Logger.error(`Failed to clear ${store}: ${JSON.stringify(error)}`);
-        }
-      }
-
-      // 3. Clear ALL localStorage (not just our app data)
-      localStorage.clear();
-      Logger.infoService("LocalStorage cleared completely");
-
-      // 4. Reset API key state - clear all providers
-      const providers: StockAPIProvider[] = [
-        StockAPIProvider.FINNHUB, 
-        StockAPIProvider.YAHOO, 
-        StockAPIProvider.ALPHA_VANTAGE
-      ];
-      providers.forEach((provider) => {
-        dispatch(setStockApiKey({ provider, key: "" }));
-      });
-      dispatch(setStockApiEnabled(false));
+      // Zentrale Löschlogik nutzen
+      await deleteDataService.clearAllData();
 
       setClearAllDataStatus("success");
       Logger.infoService("All data cleared successfully");
       dispatch(showSuccessSnackbar(t("settings.snackbar.allDataCleared") || "Alle Daten erfolgreich gelöscht."));
-      
-      // 5. Wait a bit and then reload the page to ensure clean state
-      setTimeout(() => {
-        Logger.infoService("Reloading page after data clear");
-        window.location.reload();
-      }, 1500);
-      
     } catch (error) {
       Logger.error("Failed to clear all data" + JSON.stringify(error));
       setClearAllDataStatus("idle");
@@ -698,6 +719,13 @@ const SettingsContainer: React.FC = () => {
       onCloseConfirmDialog={closeConfirmDialog}
       formatLogEntry={formatLogEntry}
       getLogLevelColor={getLogLevelColor}
+      // Developer Mode Props
+      isDeveloperModeEnabled={developerConfig.enabled}
+      developerPassword={developerPassword}
+      developerActivationStatus={developerActivationStatus}
+      onDeveloperPasswordChange={handleDeveloperPasswordChange}
+      onDeveloperModeActivation={handleDeveloperModeActivation}
+      onDeveloperModeDeactivation={handleDeveloperModeDeactivation}
     />
   );
 };
