@@ -120,7 +120,7 @@ export const ChartTooltip: React.FC<ChartTooltipProps> = ({
       secondBar?: { name: string; value: number | string };
     }
     
-    const stackedData = data as StackedChartData;
+    const stackedData = data as unknown as StackedChartData;
     const { amount, percentage, firstBar, secondBar } = stackedData;
     
     // Helper function to check if an object has the required properties

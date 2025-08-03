@@ -60,20 +60,24 @@ const PortfolioHubContainer: React.FC<PortfolioHubContainerProps> = () => {
   // Portfolio summary for hub context
   const portfolioSummary = useMemo(() => {
     const totalAssetValue = portfolioCache?.totals?.totalValue || 0;
-    // monthlyIncome soll nur explizite Einkommen (income-Liste) enthalten, keine Asset-Einkommen
-    const monthlyIncome = calculatorService.calculateTotalMonthlyIncome(income);
+    // Explizites Einkommen aus der income-Liste
+    const monthlyIncomeFromIncomeList = calculatorService.calculateTotalMonthlyIncome(income);
+    // Asset-basiertes Einkommen (Dividenden, Mieten, Zinsen etc.) aus Portfolio-Positionen
+    const monthlyAssetIncome = portfolioCache?.totals?.monthlyIncome || 0;
+    // Gesamtes monatliches Einkommen (explizit + Asset-basiert)
+    const totalMonthlyIncome = monthlyIncomeFromIncomeList + monthlyAssetIncome;
     
     const totalLiabilities = liabilities.reduce((sum: number, liability: { currentBalance: number }) => sum + (liability.currentBalance || 0), 0);
     const netWorth = totalAssetValue - totalLiabilities;
     const monthlyExpenses = calculatorService.calculateTotalMonthlyExpenses(expenses);
     const monthlyLiabilityPayments = calculatorService.calculateTotalMonthlyLiabilityPayments(liabilities);
-    const monthlyCashFlow = monthlyIncome - monthlyExpenses - monthlyLiabilityPayments;
+    const monthlyCashFlow = totalMonthlyIncome - monthlyExpenses - monthlyLiabilityPayments;
 
     return {
       totalAssetValue,
       totalLiabilities,
       netWorth,
-      monthlyIncome,
+      monthlyIncome: totalMonthlyIncome,
       monthlyExpenses,
       monthlyLiabilityPayments,
       monthlyCashFlow,

@@ -25,6 +25,7 @@ import GlobalSnackbar from '@/ui/shared/GlobalSnackbar';
 import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
 import PortfolioHubContainer from './container/portfolioHub/portfolio/PortfolioHubContainer';
 import AnalyticsHubContainer from './container/analyticsHub/AnalyticsHubContainer';
+import { featureFlag_SetupWizzard} from './config/featureFlags';
 
 const AppContent = () => {
   const { isInitialized, isInitializing, initializationError } = useAppInitialization();
@@ -50,7 +51,7 @@ const AppContent = () => {
         <Route 
           path="/" 
           element={
-            isFirstTimeUser ? 
+            isFirstTimeUser && featureFlag_SetupWizzard ? 
             <Navigate to="/setup" replace /> : 
             <DashboardContainer />
           } 

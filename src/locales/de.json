@@ -42,7 +42,7 @@
     "addIncome": "Einkommen hinzufügen",
     "addExpense": "Ausgabe hinzufügen",
     "recordTransaction": "Transaktion erfassen",
-    "payDebt": "Schuld bezahlen",
+    "payDebt": "Schuld erfassen",
     "activeMilestones": "Aktive Meilensteine",
     "miniAnalytics": "Schnellübersicht",
     "alertsRecommendations": "Hinweise & Empfehlungen",
@@ -309,6 +309,7 @@
   },
   "forecast": {
     "title": "Finanzprognose",
+    "subtitle": "Projektiere deine finanzielle Zukunft",
     "cashFlowProjection": "Monatliche Cashflow-Prognose",
     "assetAllocation": "Vermögensaufteilung",
     "noAssetData": "Keine Vermögensdaten verfügbar",

@@ -3,7 +3,7 @@ const featureFlag_Debug_Settings_View: boolean = true; //Show dev settings thing
 
 const featureFlag_Debug_StoreLogs: boolean = false; //Store logs in the local storage
 
-
+const featureFlag_SetupWizzard: boolean = true; //Enable setup wizard feature
 const featureFlag_Debug_AllLogs: boolean = false; //Show all logs in the console
 const featureFlag_Debug_Log_infoRedux: boolean = false; //Show info logs of the setter in the console
 const featureFlag_Debug_Log_Service: boolean = false; //Show info logs of the setter in the console
@@ -16,6 +16,7 @@ const featureFlag_Debug_Log_API: boolean = true; //Show API service logs in the 
 const featureFlag_SetupImport: boolean = false; //Enable setup import feature
 
 export {
+  featureFlag_SetupWizzard,
   featureFlag_Debug_Log_Analytics,
   featureFlag_Debug_Settings_View,
   featureFlag_Debug_View,
