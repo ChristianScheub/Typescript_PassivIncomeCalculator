@@ -4,7 +4,6 @@ import type { BatchResult } from '@/types/shared/batch';
 import type { ApiConfig } from '@/types/shared/apiConfig';
 import { dividendApiService } from '@/service/domain/assets/market-data/dividendAPIService';
 import { DividendFrequency } from '@/types/shared';
-import { parseDividendHistoryFromApiResult } from '@/utils/parseDividendHistoryFromApiResult';
 import { dividendProviders } from '../../dividendAPIService/methods/dividendProviders';
 
 // Typen für interne Verarbeitung
@@ -75,7 +74,7 @@ export async function updateBatchDividends(
         
         const currency = def.currency || undefined;
         const rawDividends: RawDividend[] = Array.isArray(result?.dividends) ? result.dividends : [];
-        const parsedDividends: DividendEntry[] = rawDividends
+        const dividendHistory: DividendEntry[] = rawDividends
           .filter((div) => div.amount != null && (div.date || div.lastDividendDate))
           .map((div) => {
             let dividendDate = '';
@@ -92,7 +91,6 @@ export async function updateBatchDividends(
             };
           })
           .filter((entry) => !!entry.date && entry.amount != null);
-        const dividendHistory: DividendEntry[] = rawDividends.length > 0 ? parsedDividends : parseDividendHistoryFromApiResult(result, currency);
         dividendHistory.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
         // Erweiterte Felder berechnen
         const { frequency, paymentMonths } = calculateFrequencyAndMonths(dividendHistory, result);

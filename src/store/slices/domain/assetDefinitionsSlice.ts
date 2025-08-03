@@ -4,7 +4,6 @@ import Logger from '@service/shared/logging/Logger/logger';
 import sqliteService from '@service/infrastructure/sqlLiteService';
 import { deepCleanObject } from '@/utils/deepCleanObject';
 import { DividendHistoryEntry } from '@/types/domains/assets/dividends';
-import { parseDividendHistoryFromApiResult } from '@/utils/parseDividendHistoryFromApiResult';
 import type { DividendFrequency } from '@/types/shared/base/enums';
 import dividendApiService from '@/service/domain/assets/market-data/dividendAPIService';
 import type { DividendData } from '@/service/domain/assets/market-data/dividendAPIService';
@@ -163,22 +162,17 @@ export const fetchAndUpdateDividends = createAsyncThunk(
 
     let dividendHistory: DividendHistoryEntry[] = [];
     const currency = definition.currency || undefined;
-    // Robust handling: if result.dividends is an array, map directly; else, use parser for raw API result
-    if (Array.isArray(result?.dividends)) {
-      dividendHistory = result.dividends
-        .filter((div: DividendData) => div.amount != null && (div.lastDividendDate))
-        .map((div: DividendData) => ({
-          date: div.lastDividendDate
-            ? new Date(div.lastDividendDate).toISOString()
-            : '',
-          amount: div.amount,
-          source: 'api',
-          currency,
-        }))
-        .filter((entry: DividendHistoryEntry) => !!entry.date && entry.amount != null);
-    } else {
-      dividendHistory = parseDividendHistoryFromApiResult(result, currency);
-    }
+    
+    // Der dividendApiService liefert bereits einheitliche DividendData[]
+    dividendHistory = (result?.dividends || [])
+      .filter((div: DividendData) => div.amount != null && div.lastDividendDate)
+      .map((div: DividendData) => ({
+        date: new Date(div.lastDividendDate!).toISOString(),
+        amount: div.amount,
+        source: 'api' as const,
+        currency,
+      }))
+      .filter((entry: DividendHistoryEntry) => !!entry.date && entry.amount != null);
     Logger.info('[DEBUG] Parsed dividendHistory (unified): ' + JSON.stringify(dividendHistory));
     dividendHistory.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
