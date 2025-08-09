@@ -87,7 +87,7 @@ const initialState: ConfigState = {
     },
     dividend: {
       enabled: false,
-      selectedProvider: 'yahoo',
+      selectedProvider: 'finnhub',
       apiKeys: {},
     },
     ai: {

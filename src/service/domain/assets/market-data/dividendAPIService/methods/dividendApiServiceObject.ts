@@ -8,7 +8,7 @@ export async function fetchDividends(
 ): Promise<{ dividends: DividendData[] }> {
   const state = store.getState() as RootState;
   // Use apiConfig.selectedDiviProvider and apiConfig.dividendApiKey for dividend provider selection
-  const provider = (state.config?.apis?.dividend?.selectedProvider || 'yahoo') as DividendApiProvider;
+  const provider = (state.config?.apis?.dividend?.selectedProvider || 'finnhub') as DividendApiProvider;
   const apiKey = state.config?.apis?.dividend?.apiKeys?.[provider] || '';
   const providerFn = dividendProviders[provider];
   if (!providerFn) throw new Error(`No provider implementation for ${provider}`);

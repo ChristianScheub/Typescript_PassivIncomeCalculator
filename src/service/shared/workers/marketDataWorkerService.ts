@@ -285,7 +285,7 @@ export class DividendWorkerService {
       definitions,
       options,
       apiKeys: apiKeys || {},
-      selectedProvider: selectedProvider || 'yahoo'
+      selectedProvider: selectedProvider || 'finnhub'
     });
   }
 
@@ -295,7 +295,7 @@ export class DividendWorkerService {
       definition,
       options,
       apiKeys: apiKeys || {},
-      selectedProvider: selectedProvider || 'yahoo'
+      selectedProvider: selectedProvider || 'finnhub'
     });
   }
 

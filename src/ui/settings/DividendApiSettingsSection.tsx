@@ -42,7 +42,7 @@ export const DividendApiSettingsSection: React.FC<DividendApiSettingsSectionProp
   isDeveloperModeEnabled,
 }) => {
   const { t } = useTranslation();
-  const safeProvider = selectedProvider && providerInfo[selectedProvider as 'yahoo' | 'finnhub'] ? selectedProvider : 'yahoo';
+  const safeProvider = selectedProvider && providerInfo[selectedProvider as 'yahoo' | 'finnhub'] ? selectedProvider : 'finnhub';
   const safeApiKey = apiKeys && apiKeys[safeProvider] !== undefined ? apiKeys[safeProvider] : '';
   const [tempApiKey, setTempApiKey] = useState(safeApiKey);
   const [showApiKey, setShowApiKey] = useState(false);

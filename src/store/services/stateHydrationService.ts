@@ -282,7 +282,7 @@ export class StateHydrationService {
         },
         dividend: {
           enabled: dividendApiData?.enabled ?? (this.getStorageValue('dividend_api_enabled') === 'true'),
-          selectedProvider: dividendApiData?.selectedProvider ?? (this.getStorageValue('selected_divi_api_provider') || 'yahoo'),
+          selectedProvider: dividendApiData?.selectedProvider ?? (this.getStorageValue('selected_divi_api_provider') || 'finnhub'),
           apiKeys: dividendApiData?.apiKeys || {
             finnhub: this.getStorageValue('divi_finnhub_api_key') || undefined,
             yahoo: this.getStorageValue('divi_yahoo_api_key') || undefined,
