@@ -1,7 +1,7 @@
 // Type alias for batch dividends result
 type BatchDividendsResult =
-  | { type: 'batchResult'; results: BatchResult<AssetDefinition>[] }
-  | { type: 'error'; error: string };
+  | { type: "batchResult"; results: BatchResult<AssetDefinition>[] }
+  | { type: "error"; error: string };
 // Helper to process batch update results from worker services
 type BatchResult<T> = {
   success: boolean;
@@ -35,7 +35,7 @@ import { useTranslation } from "react-i18next";
 import { TimeRangePeriod } from "@/types/shared/time";
 import { deepCleanObject } from "@/utils/deepCleanObject";
 import { executeAsyncOperation } from "@/utils/containerUtils";
-import { showSuccessSnackbar } from "@/store/slices/ui";
+import { showSuccessSnackbar, showErrorSnackbar } from "@/store/slices/ui";
 import { marketDataWorkerService } from "@/service/shared/workers/marketDataWorkerService";
 import { batchAssetUpdateService } from "@/service/domain/assets/market-data/batchAssetUpdateService";
 
@@ -52,7 +52,6 @@ interface AssetDefinitionsContainerProps {
 }
 
 // Type alias for asset types
-
 
 // Type alias for dividend frequency
 
@@ -123,18 +122,24 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
 
   const updateBatchDividendsMainThread = async (
     definitions: AssetDefinition[],
-    options = { interval: '1d', range: '2y' }
+    options = { interval: "1d", range: "2y" }
   ): Promise<BatchDividendsResult> => {
-
-    const result = await batchAssetUpdateService.updateBatchDividends(definitions, options);
+    const result = await batchAssetUpdateService.updateBatchDividends(
+      definitions,
+      options
+    );
     // Defensive: filter out undefined/null from results
-    if (result && result.type === 'batchResult' && Array.isArray(result.results)) {
-      return { type: 'batchResult', results: result.results.filter(Boolean) };
+    if (
+      result &&
+      result.type === "batchResult" &&
+      Array.isArray(result.results)
+    ) {
+      return { type: "batchResult", results: result.results.filter(Boolean) };
     }
-    if (result && (result as { type: string }).type === 'error') {
+    if (result && (result as { type: string }).type === "error") {
       return result;
     }
-    return { type: 'error', error: 'Unknown error in batchAssetUpdateService' };
+    return { type: "error", error: "Unknown error in batchAssetUpdateService" };
   };
 
   const addDefinition = async (
@@ -281,9 +286,12 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
     );
   };
 
-  const transactionsCache = useAppSelector((state: RootState) => state.transactions?.cache);
-  const stockApiConfig = useAppSelector((state: RootState) => state.config.apis.stock);
-
+  const transactionsCache = useAppSelector(
+    (state: RootState) => state.transactions?.cache
+  );
+  const stockApiConfig = useAppSelector(
+    (state: RootState) => state.config.apis.stock
+  );
 
   // Provider-agnostische Batch-Methode für aktuelle Aktienpreise
   const updateBatchCurrentPrices = async (definitions: AssetDefinition[]) => {
@@ -291,75 +299,51 @@ const AssetDefinitionsContainer: React.FC<AssetDefinitionsContainerProps> = ({
   };
 
   /**
- * Processes batch results from worker services, dispatches updates, logs outcomes, and returns the number of successful updates.
- */
-async function processBatchResults<T extends { fullName?: string; ticker?: string }>(
-  results: BatchResult<T>[],
-  _dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
-  updateAction: (def: T) => Promise<void | { type: string }>,
-  loggerPrefix: string
-): Promise<number> {
-  const successfulResults = results.filter(r => r.success && r.updatedDefinition);
-  for (const result of successfulResults) {
-    const updatedDefinition = result.updatedDefinition!;
-    if (updatedDefinition.fullName) {
-      await updateAction(updatedDefinition);
-      Logger.info(`${loggerPrefix} updated: ${updatedDefinition.fullName}`);
-    } else {
-      Logger.error(`${loggerPrefix} missing required fields for ${updatedDefinition.ticker}`);
+   * Processes batch results from worker services, dispatches updates, logs outcomes, and returns the number of successful updates.
+   */
+  async function processBatchResults<
+    T extends { fullName?: string; ticker?: string }
+  >(
+    results: BatchResult<T>[],
+    _dispatch: ThunkDispatch<RootState, unknown, AnyAction>,
+    updateAction: (def: T) => Promise<void | { type: string }>,
+    loggerPrefix: string
+  ): Promise<number> {
+    const successfulResults = results.filter(
+      (r) => r.success && r.updatedDefinition
+    );
+    for (const result of successfulResults) {
+      const updatedDefinition = result.updatedDefinition!;
+      if (updatedDefinition.fullName) {
+        await updateAction(updatedDefinition);
+        Logger.info(`${loggerPrefix} updated: ${updatedDefinition.fullName}`);
+      } else {
+        Logger.error(
+          `${loggerPrefix} missing required fields for ${updatedDefinition.ticker}`
+        );
+      }
     }
+    const failedResults = results.filter((r) => !r.success);
+    if (failedResults.length > 0) {
+      Logger.warn(`${loggerPrefix} ${failedResults.length} updates failed:`);
+      failedResults.forEach((r) => Logger.warn(`- ${r.symbol}: ${r.error}`));
+    }
+    return successfulResults.length;
   }
-  const failedResults = results.filter(r => !r.success);
-  if (failedResults.length > 0) {
-    Logger.warn(`${loggerPrefix} ${failedResults.length} updates failed:`);
-    failedResults.forEach(r => Logger.warn(`- ${r.symbol}: ${r.error}`));
-  }
-  return successfulResults.length;
-}
 
   // Helper: fetch stock price update response
-  const fetchStockPriceUpdateResponse = async (stockDefinitions: AssetDefinition[]) => {
-    if (stockApiConfig.selectedProvider === 'yahoo') {
+  const fetchStockPriceUpdateResponse = async (
+    stockDefinitions: AssetDefinition[]
+  ) => {
+    if (stockApiConfig.selectedProvider === "yahoo") {
       return updateBatchCurrentPrices(stockDefinitions);
     } else {
       const { apiKeys, selectedProvider } = stockApiConfig;
-      return marketDataWorkerService.stockPrice.updateBatch(stockDefinitions, apiKeys, selectedProvider);
-    }
-  };
-
-  // Helper: handle stock price update response
-  // Accept unknown, use type guards inside for flexibility
-  const handleStockPriceUpdateResponse = async (response: unknown) => {
-    if (typeof response === 'object' && response !== null) {
-      const r = response as { type?: string; error?: string; results?: BatchResult<AssetDefinition>[] };
-      if (r.type === 'error') {
-        const errMsg = typeof r.error === 'string' ? r.error : 'Unknown error';
-        throw new Error(errMsg);
-      }
-      if (r.type === 'batchResult' && Array.isArray(r.results)) {
-        const filteredResults = r.results.filter(Boolean) as BatchResult<AssetDefinition>[];
-        const numUpdated = await processBatchResults(
-          filteredResults,
-          dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
-          async (def) => (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def)),
-          'Stock price'
-        );
-        if (numUpdated > 0) {
-          Logger.info(`Successfully updated stock prices for ${numUpdated} asset definitions`);
-          const portfolioPositions = transactionsCache?.positions || [];
-          const portfolioCacheId = transactionsCache?.id || "default";
-          if (portfolioPositions.length > 0) {
-            await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
-              calculatePortfolioIntradayDataDirect({ portfolioCacheId })
-            );
-            Logger.info("Triggered portfolio intraday aggregation after price update");
-          } else {
-            Logger.warn("No portfolio positions found for intraday aggregation after price update");
-          }
-        } else {
-          Logger.info("No stock definitions were updated");
-        }
-      }
+      return marketDataWorkerService.stockPrice.updateBatch(
+        stockDefinitions,
+        apiKeys,
+        selectedProvider
+      );
     }
   };
 
@@ -368,7 +352,13 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
       "update stock prices",
       async () => {
         setIsUpdatingPrices(true);
-        Logger.info(`Starting stock price update for asset definitions using ${stockApiConfig.selectedProvider === 'yahoo' ? 'main thread (Yahoo)' : 'worker'}`);
+        Logger.info(
+          `Starting stock price update for asset definitions using ${
+            stockApiConfig.selectedProvider === "yahoo"
+              ? "main thread (Yahoo)"
+              : "worker"
+          }`
+        );
         const stockDefinitions = assetDefinitions.filter(
           (def: AssetDefinition) => def.type === "stock" && def.ticker
         );
@@ -378,18 +368,101 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
           return;
         }
         const response = await fetchStockPriceUpdateResponse(stockDefinitions);
-        await handleStockPriceUpdateResponse(response);
+
+        if (response && (response as { type?: string }).type === "error") {
+          const err = response as { error?: string };
+          const errMsg =
+            typeof err.error === "string" ? err.error : "Unknown error";
+          Logger.error(`Stock price batch failed: ${errMsg}`);
+          (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+            showErrorSnackbar(
+              t(
+                "assets.apiKeyError"              )
+            )
+          );
+          setIsUpdatingPrices(false);
+          return;
+        }
+
+        if (
+          response &&
+          (
+            response as {
+              type?: string;
+              results?: BatchResult<AssetDefinition>[];
+            }
+          ).type === "batchResult"
+        ) {
+          const r = response as { results?: BatchResult<AssetDefinition>[] };
+          const batchResults: BatchResult<AssetDefinition>[] = (
+            r.results || []
+          ).filter(Boolean) as BatchResult<AssetDefinition>[];
+
+          const successful = batchResults.filter(
+            (res) => res.success && res.updatedDefinition
+          );
+          const failed = batchResults.filter(
+            (res) => !res.success || !res.updatedDefinition
+          );
+
+          const numUpdated = await processBatchResults(
+            batchResults,
+            dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
+            async (def) =>
+              (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+                updateAssetDefinition(def)
+              ),
+            "Stock price"
+          );
+
+          if (numUpdated > 0) {
+            const portfolioPositions = transactionsCache?.positions || [];
+            const portfolioCacheId = transactionsCache?.id || "default";
+            if (portfolioPositions.length > 0) {
+              await (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+                calculatePortfolioIntradayDataDirect({ portfolioCacheId })
+              );
+              Logger.info(
+                "Triggered portfolio intraday aggregation after price update"
+              );
+            } else {
+              Logger.warn(
+                "No portfolio positions found for intraday aggregation after price update"
+              );
+            }
+          }
+
+          if (successful.length === batchResults.length) {
+            (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+              showSuccessSnackbar(
+                t(
+                  "assets.updateStockPricesSuccess"                )
+              )
+            );
+          } else if (successful.length === 0) {
+            (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+              showErrorSnackbar(
+                t(
+                  "assets.apiKeyError",
+                  "Es konnten keine Daten abgerufen werden, prüfen sie den API Key"
+                )
+              )
+            );
+          } else {
+            const failedTickers = failed
+              .map((r) => r.symbol || r.updatedDefinition?.ticker || "")
+              .filter(Boolean)
+              .join(", ");
+            window.alert(
+              t(
+                "assets.partialFetchFailed",                { tickers: failedTickers }
+              )
+            );
+          }
+        }
         setIsUpdatingPrices(false);
       },
-      () =>
-        dispatch(
-          showSuccessSnackbar(
-            t(
-              "assets.updateStockPricesSuccess",
-              "Aktuelle Preise erfolgreich abgerufen"
-            )
-          )
-        ),
+      undefined,
       JSON.stringify(
         assetDefinitions.filter(
           (def: AssetDefinition) => def.type === "stock" && def.ticker
@@ -398,10 +471,11 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
     );
   };
 
-
-
   // Helper for main-thread Yahoo batch history update (jetzt über batchAssetUpdateService)
-  const updateBatchHistoryYahoo = async (definitions: AssetDefinition[], period?: TimeRangePeriod) => {
+  const updateBatchHistoryYahoo = async (
+    definitions: AssetDefinition[],
+    period?: TimeRangePeriod
+  ) => {
     // Delegiere an zentrale Service-Methode
     return batchAssetUpdateService.updateBatchHistoryData(definitions, period);
   };
@@ -414,51 +488,106 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
         Logger.info(
           `Starting historical data update for asset definitions with period: ${
             period || "default (30 days)"
-          } using ${stockApiConfig.selectedProvider === 'yahoo' ? 'main thread (Yahoo)' : 'worker'} `
+          } using ${
+            stockApiConfig.selectedProvider === "yahoo"
+              ? "main thread (Yahoo)"
+              : "worker"
+          } `
         );
         const stockDefinitions = assetDefinitions.filter(
           (def: AssetDefinition) => def.type === "stock" && def.ticker
         );
         if (stockDefinitions.length === 0) {
           Logger.info("No stock definitions found to update historical data");
+          setIsUpdatingHistoricalData(false);
           return;
         }
-        let response;
-        if (stockApiConfig.selectedProvider === 'yahoo') {
+        let response: unknown;
+        if (stockApiConfig.selectedProvider === "yahoo") {
           response = await updateBatchHistoryYahoo(stockDefinitions, period);
         } else {
-          response = await marketDataWorkerService.stockHistory.updateBatch(stockDefinitions, period, stockApiConfig.apiKeys, stockApiConfig.selectedProvider);
+          response = await marketDataWorkerService.stockHistory.updateBatch(
+            stockDefinitions,
+            period,
+            stockApiConfig.apiKeys,
+            stockApiConfig.selectedProvider
+          );
         }
-        if (response && response.type === 'error') {
-          // Type guard for error property
-          const errMsg = typeof (response as { error?: string }).error === 'string' ? (response as { error?: string }).error : 'Unknown error';
-          throw new Error(errMsg);
+        if (response && (response as { type?: string }).type === "error") {
+          const err = response as { error?: string };
+          const errMsg =
+            typeof err.error === "string" ? err.error : "Unknown error";
+          Logger.error(`Historical data batch failed: ${errMsg}`);
+          (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+            showErrorSnackbar(t("assets.apiKeyError"))
+          );
+          setIsUpdatingHistoricalData(false);
+          return;
         }
-        if (response && response.type === 'batchResult' && response.results) {
-          const filteredResults = response.results.filter(Boolean) as BatchResult<AssetDefinition>[];
+        if (
+          response &&
+          (
+            response as {
+              type?: string;
+              results?: BatchResult<AssetDefinition>[];
+            }
+          ).type === "batchResult"
+        ) {
+          const r = response as { results?: BatchResult<AssetDefinition>[] };
+          const filteredResults = (r.results || []).filter(
+            Boolean
+          ) as BatchResult<AssetDefinition>[];
+          const successful = filteredResults.filter(
+            (res) => res.success && res.updatedDefinition
+          );
+          const failed = filteredResults.filter(
+            (res) => !res.success || !res.updatedDefinition
+          );
           const numUpdated = await processBatchResults(
             filteredResults,
             dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
-            async (def) => (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def)),
-            'Historical data'
+            async (def) =>
+              (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+                updateAssetDefinition(def)
+              ),
+            "Historical data"
           );
           if (numUpdated > 0) {
-            Logger.info(`Successfully updated historical data for ${numUpdated} asset definitions`);
+            Logger.info(
+              `Successfully updated historical data for ${numUpdated} asset definitions`
+            );
           } else {
-            Logger.info("No historical data updates were needed for stock definitions");
+            Logger.info(
+              "No historical data updates were needed for stock definitions"
+            );
+          }
+
+          if (successful.length === filteredResults.length) {
+            (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+              showSuccessSnackbar(
+                t(
+                  "assets.updateHistoricalDataSuccess",
+                  "Historische Daten erfolgreich abgerufen"
+                )
+              )
+            );
+          } else if (successful.length === 0) {
+            (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+              showErrorSnackbar(t("assets.apiKeyError"))
+            );
+          } else {
+            const failedTickers = failed
+              .map((r) => r.symbol || r.updatedDefinition?.ticker || "")
+              .filter(Boolean)
+              .join(", ");
+            window.alert(
+              t("assets.partialFetchFailed", { tickers: failedTickers })
+            );
           }
         }
         setIsUpdatingHistoricalData(false);
       },
-      () =>
-        dispatch(
-          showSuccessSnackbar(
-            t(
-              "assets.updateHistoricalDataSuccess",
-              "Historische Daten erfolgreich abgerufen"
-            )
-          )
-        ),
+      undefined,
       JSON.stringify(
         assetDefinitions.filter(
           (def: AssetDefinition) => def.type === "stock" && def.ticker
@@ -466,9 +595,6 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
       )
     );
   };
-
-
-
 
   // Helper for main-thread batch dividend update via batchAssetUpdateService (single source of truth)
   // Only one definition allowed!
@@ -478,7 +604,9 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
     await executeAsyncOperation(
       "fetch all dividends",
       async () => {
-        Logger.info("Starting dividend fetch for all eligible assets using main thread (batchAssetUpdateService)");
+        Logger.info(
+          "Starting dividend fetch for all eligible assets using main thread (batchAssetUpdateService)"
+        );
         const eligibleAssets = assetDefinitions.filter(
           (def: AssetDefinition) => def.type === "stock" && def.useDividendApi
         );
@@ -486,20 +614,58 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
           Logger.info("No eligible assets found for dividend fetch");
           return;
         }
-        Logger.info(`Found ${eligibleAssets.length} eligible assets for dividend update`);
-        const response = await updateBatchDividendsMainThread(eligibleAssets, { interval: '1d', range: '2y' });
-        if (response.type === 'error') {
-          const errMsg = typeof response.error === 'string' ? response.error : 'Unknown error';
-          throw new Error(errMsg);
+        Logger.info(
+          `Found ${eligibleAssets.length} eligible assets for dividend update`
+        );
+        const response = await updateBatchDividendsMainThread(eligibleAssets, {
+          interval: "1d",
+          range: "2y",
+        });
+
+        // Fall: kompletter Fehler -> Zeige API-Key Hinweis
+        if (response.type === "error") {
+          const errMsg =
+            typeof response.error === "string"
+              ? response.error
+              : "Unknown error";
+          Logger.error(`Dividend batch failed: ${errMsg}`);
+          (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+            showErrorSnackbar(
+              t(
+                "assets.apiKeyError",
+                "Es konnten keine Daten abgerufen werden, prüfen sie den API Key"
+              )
+            )
+          );
+          return;
         }
-        if (response.type === 'batchResult' && Array.isArray(response.results)) {
-          const batchResults: BatchResult<AssetDefinition>[] = response.results.filter(Boolean);
+
+        if (
+          response.type === "batchResult" &&
+          Array.isArray(response.results)
+        ) {
+          const batchResults: BatchResult<AssetDefinition>[] =
+            response.results.filter(Boolean);
+
+          // Erfolgs-/Fehlerermittlung für Benachrichtigungen
+          const successful = batchResults.filter(
+            (r) => r.success && r.updatedDefinition
+          );
+          const failed = batchResults.filter(
+            (r) => !r.success || !r.updatedDefinition
+          );
+
           const numUpdated = await processBatchResults<AssetDefinition>(
             batchResults,
             dispatch as ThunkDispatch<RootState, unknown, AnyAction>,
             async (def: AssetDefinition) => {
               if (def.dividendInfo) {
-                const allowedFrequencies: DividendFrequency[] = ["monthly", "quarterly", "annually", "custom"];
+                const allowedFrequencies: DividendFrequency[] = [
+                  "monthly",
+                  "quarterly",
+                  "annually",
+                  "custom",
+                ];
                 const rawFrequency = def.dividendInfo.frequency;
                 const frequency: DividendFrequency =
                   allowedFrequencies.includes(rawFrequency as DividendFrequency)
@@ -507,23 +673,59 @@ async function processBatchResults<T extends { fullName?: string; ticker?: strin
                     : "custom";
                 def.dividendInfo = { ...def.dividendInfo, frequency };
               }
-              return (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(updateAssetDefinition(def));
+              return (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+                updateAssetDefinition(def)
+              );
             },
-            'Dividend'
+            "Dividend"
           );
-          Logger.info(`Successfully processed dividends for ${numUpdated} assets`);
+          Logger.info(
+            `Successfully processed dividends for ${numUpdated} assets`
+          );
+
+          // Benachrichtigungen basierend auf Ergebnis
+          if (successful.length === batchResults.length) {
+            // Alle erfolgreich -> Snackbar wie bisher
+            (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+              showSuccessSnackbar(
+                t(
+                  "assets.fetchAllDividendsSuccess",
+                  "Dividenden-Daten für alle Assets erfolgreich abgerufen"
+                )
+              )
+            );
+          } else if (successful.length === 0) {
+            // Alle fehlgeschlagen -> API Key Hinweis
+            (dispatch as ThunkDispatch<RootState, unknown, AnyAction>)(
+              showErrorSnackbar(
+                t(
+                  "assets.apiKeyError",
+                  "Es konnten keine Daten abgerufen werden, prüfen sie den API Key"
+                )
+              )
+            );
+          } else {
+            // Teilweise fehlgeschlagen -> Alert mit Tickern
+            const failedTickers = failed
+              .map((r) => r.symbol || r.updatedDefinition?.ticker || "")
+              .filter(Boolean)
+              .join(", ");
+            window.alert(
+              t(
+                "assets.partialFetchFailed",
+                "Einige Daten konnten nicht abgerufen werden: {{tickers}}",
+                { tickers: failedTickers }
+              )
+            );
+          }
         }
       },
-      () =>
-        dispatch(
-          showSuccessSnackbar(
-            t(
-              "assets.fetchAllDividendsSuccess",
-              "Dividenden-Daten für alle Assets erfolgreich abgerufen"
-            )
-          )
-        ),
-      JSON.stringify(assetDefinitions.filter((def: AssetDefinition) => def.type === "stock" && def.useDividendApi))
+      undefined, // Kein globaler Success-Callback -> wir steuern Benachrichtigungen bedingt oben
+      JSON.stringify(
+        assetDefinitions.filter(
+          (def: AssetDefinition) => def.type === "stock" && def.useDividendApi
+        )
+      )
     );
   };
 

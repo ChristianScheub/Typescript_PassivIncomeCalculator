@@ -501,6 +501,8 @@
     "transactionName": "Transaktionsname",
     "transactionNamePlaceholder": "z.B. Apple Aktien Kauf 2024",
     "noDefinitionsAvailable": "Keine Asset-Definitionen verfügbar",
+    "apiKeyError": "Es konnten keine Daten abgerufen werden, prüfen sie den API Key",
+    "partialFetchFailed": "Einige Daten konnten nicht abgerufen werden: {{tickers}}",
     "types": {
       "all": "Alle",
       "stock": "Aktie",
