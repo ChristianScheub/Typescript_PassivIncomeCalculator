@@ -9,7 +9,8 @@ import {
   Calendar,
   ArrowRight
 } from 'lucide-react';
-import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analyticsHub/AnalyticsHubContainer';
+import { AnalyticsCategory, AnalyticsSubCategory } from '@/types/domains/analytics';
+import { featureFlag_Debug_View } from '@/config/featureFlags';
 
 interface AnalyticsCategoryCard {
   id: AnalyticsCategory;
@@ -92,7 +93,7 @@ const AnalyticsCategoriesSection: React.FC<AnalyticsCategoriesSectionProps> = ({
         }
       ]
     },
-        {
+    {
       id: 'forecasting',
       titleKey: 'analytics.hub.categories.forecasting.title',
       descriptionKey: 'analytics.hub.categories.forecasting.description',
@@ -169,6 +170,11 @@ const AnalyticsCategoriesSection: React.FC<AnalyticsCategoriesSectionProps> = ({
     }
   ];
 
+  // Nur anzeigen, wenn Debug-View aktiviert ist
+  const visibleCategories = featureFlag_Debug_View
+    ? analyticsCategories
+    : analyticsCategories.filter(c => c.id !== 'performance');
+    
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
@@ -176,7 +182,7 @@ const AnalyticsCategoriesSection: React.FC<AnalyticsCategoriesSectionProps> = ({
       </h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {analyticsCategories.map((category) => {
+        {visibleCategories.map((category) => {
           const IconComponent = category.icon;
           const isSelected = selectedCategory === category.id;
           

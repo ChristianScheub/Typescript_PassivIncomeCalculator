@@ -15,7 +15,6 @@ A comprehensive, cross-platform financial planning application for tracking pass
 ---
 
 ## Open To Do before release
-- Perfomance Analyse Site: Whole Refactoring
 - Dividend Projection is not really correct for the next year
 - Smarter/Better Recommendations/Alerts
 - Maybe: Improvments in SetUp Wizard
