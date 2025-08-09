@@ -17,7 +17,7 @@ import cacheRefreshService from '@/service/application/orchestration/cacheRefres
 import Logger from '@/service/shared/logging/Logger/logger';
 import { useAsyncOperation } from '../../utils/containerUtils';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
-import { RootState } from '@/store';
+import { RootState } from '@/store/config/storeConfig';
 
 const DashboardContainer: React.FC = () => {
   const { t } = useTranslation();
@@ -38,8 +38,8 @@ const DashboardContainer: React.FC = () => {
   const expenses = useAppSelector((state) => state.expenses.items);
   const income = useAppSelector((state) => state.income.items);
 
-  // Get portfolio history data for dashboard chart (default to ALL timeRange for dashboard)
-  const portfolioHistoryData = usePortfolioHistoryView('ALL');
+  // Get portfolio history data for dashboard chart (default to Max timeRange for dashboard)
+  const portfolioHistoryData = usePortfolioHistoryView('Max');
 
   // Extract core financial data (remove cache metadata)
   const financialSummary = useMemo(() => {

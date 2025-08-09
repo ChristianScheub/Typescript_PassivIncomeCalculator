@@ -1,0 +1,1 @@
+export const impressum_text ="<strong>Herausgeber / Service Provider </strong><br />Angaben gem. § 5 TMG: <br />Christian Scheub<br />Ziegeläcker 56<br />71560 Sulzbach an der Murr <br /><br /><strong>Kontaktaufnahme/Contact us</strong> <br />Telefon: +49 176 21674883 <br />E-Mail: christian.developer.app@gmail.com<br /><br />";

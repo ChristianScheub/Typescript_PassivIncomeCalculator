@@ -1,4 +1,45 @@
 {
+  "setting_Menu_OpenSourceModulList": "Verwendete Bibliotheken",
+  "setting_OpenSurceModulListTItle": "Verwendete NPM-Bibliotheken",
+  "setting_OpenSourceModulListClose": "Schließen",
+  "settings_Datenschutz": "Datenschutz",
+  "settings_Impressum": "Impressum",
+  "settings_GitHubRepo": "GitHub-Repository",
+  "privacy.line_1": "<strong>Diese Datenschutzerklärung ist in Englisch und anderen Sprachen verfügbar. </strong>",
+  "privacy.line_2": "<strong>Für eine andere Sprache verstellen sie bitte einfach die Sprache ihres Gerätes.</strong> <br /> <br />",
+  "privacy.line_3": "<strong>Datenschutzerklärung für Webseite/App</strong> <br /><br />",
+  "privacy.line_4": "Vielen Dank für Ihren Besuch auf unserer Webseite/App. Wir legen großen Wert auf den Schutz Ihrer Daten und möchten Ihnen mit dieser Datenschutzerklärung einen Überblick darüber geben, wie wir Ihre Daten gemäß der Datenschutz-Grundverordnung (DSGVO), den europäischen Datenschutzgesetzen sowie dem California Consumer Privacy Act (CCPA) und kalifornischem Recht behandeln. <br /> <br />",
+  "privacy.line_5": "<strong>1. Verantwortliche Stelle</strong><br />",
+  "privacy.line_6": "Verantwortlich für die Verarbeitung Ihrer Daten und Herausgeber dieser App ist: <br />",
+  "privacy.line_7": "Christian Scheub <br />",
+  "privacy.line_8": "Ziegeläcker 56 <br />",
+  "privacy.line_9": "71560 Sulzbach an der Murr <br /> <br />",
+  "privacy.line_10": "Kontakt Telefon: +49 176 21674883 <br />",
+  "privacy.line_11": "Geschäftsführer/Inhaber: Christian Scheub <br />",
+  "privacy.line_12": "Bei Fragen oder Anliegen zum Datenschutz können Sie uns gerne unter christian.developer.app@gmail.com kontaktieren. <br />",
+  "privacy.line_13": "Link zum Impressum: https://kind-dune-0dfff9903.4.azurestaticapps.net/imprint <br /> <br />",
+  "privacy.line_14": "<strong>2. Cookies, IndexedDB und ähnliche Technologien</strong><br />",
+  "privacy.line_15": "Wir verwenden Cookies und ähnliche Technologien, um Ihnen personalisierte Werbung anzubieten und die Leistung unserer Webseite/App zu verbessern. Dazu gehören Cookies, die auf Ihrem Gerät gespeichert werden. Diese Technologien helfen uns, Ihre Präferenzen zu speichern und die Benutzererfahrung zu optimieren. <br />",
+  "privacy.line_16": "Zudem nutzen wir zur lokalen Speicherung der Kundenkarten eine lokale IndexedDB. Ihre Kundenkarten bleiben aber immer lokal. <br />",
+  "privacy.line_17": "Eine IndexedDB ist eine rein lokale SQL Datenbank im Browser welche sie sich vorstellen können wie eine große Tabelle in welcher wir ihre Daten speichern. <br /> <br />",
+  "privacy.line_18": "<strong>3. Erhebung und Verarbeitung von Daten durch AdMob und AdSense</strong><br />",
+  "privacy.line_19": "Wir nutzen AdMob und AdSense, um Ihnen personalisierte Werbung anzuzeigen. Diese Dienste verwenden Cookies und ähnliche Technologien, um Daten über Ihre Nutzung der Webseite/App zu sammeln und maßgeschneiderte Werbung anzubieten. Die von diesen Diensten gesammelten Daten können Folgendes umfassen:",
+  "privacy.line_20": "- Ihre IP-Adresse",
+  "privacy.line_21": "- Informationen über Ihre Interaktionen mit der Webseite/App",
+  "privacy.line_22": "- Gerätespezifische Informationen",
+  "privacy.line_23": "Die gesammelten Daten werden gemäß den Datenschutzrichtlinien von Google verarbeitet. Weitere Informationen finden Sie in den Datenschutzrichtlinien von Google AdMob und Google AdSense. <br /> <br />Zur Einholung Ihrer Einwilligung für personalisierte Werbung nutzen wir die <strong>Google User Messaging Platform (UMP)</strong>, welche auf dem <strong>Transparency and Consent Framework (TCF) Version 2.2</strong> der <strong>IAB Europe</strong> basiert. Beim ersten Start der App oder nach Ablauf Ihrer vorherigen Entscheidung wird Ihnen eine Einwilligungsabfrage angezeigt, mit der Sie festlegen können, ob und in welchem Umfang Sie der Datenverarbeitung zustimmen. Die erfassten Einwilligungen betreffen unter anderem personalisierte Anzeigen, Messungen und die Weitergabe an Dritte. Ihre Auswahl wird lokal gespeichert und kann jederzeit widerrufen oder angepasst werden. <br /> <br />",
+  "privacy.line_24": "<strong>4. Verkauf von Daten</strong><br />",
+  "privacy.line_25": "Wir verkaufen keine Ihrer Daten. Die von AdMob und AdSense gesammelten Daten unterliegen den Datenschutzrichtlinien der jeweiligen Anbieter. <br /> <br />",
+  "privacy.line_26": "<strong>5. Ihre Rechte</strong><br />",
+  "privacy.line_27": "Sie haben das Recht, Auskunft über die von Ihnen gespeicherten Daten zu verlangen, deren Berichtigung oder Löschung zu verlangen sowie die Verarbeitung einzuschränken. Da wir keine eigenen Daten speichern, beziehen sich diese Rechte auf die Daten, die durch AdMob und AdSense gesammelt werden. Bitte kontaktieren Sie die jeweiligen Anbieter für weitere Informationen und zur Ausübung Ihrer Rechte. <br /> <br />",
+  "privacy.line_28": "<strong>6. Datensicherheit</strong><br />",
+  "privacy.line_29": "Wir bemühen uns, Ihre Daten durch entsprechende technische und organisatorische Maßnahmen zu schützen. Die Sicherheit Ihrer Daten ist uns wichtig, und wir verwenden sicherheitsrelevante Maßnahmen gemäß den gesetzlichen Anforderungen. <br /> <br />",
+  "privacy.line_30": "<strong>7. Verwendete Begrifflichkeiten</strong><br />",
+  "privacy.line_31": "Personenbezogene Daten sind Informationen, die sich auf eine identifizierte oder identifizierbare natürliche Person beziehen. In diesem Zusammenhang können personenbezogene Daten von AdMob und AdSense gesammelt und verarbeitet werden. <br /> <br />",
+  "privacy.line_32": "<strong>8. Änderungen dieser Datenschutzerklärung</strong><br />",
+  "privacy.line_33": "Wir behalten uns das Recht vor, diese Datenschutzerklärung zu ändern, um den rechtlichen Anforderungen zu entsprechen oder Änderungen unserer Datenverarbeitungspraktiken widerzuspiegeln. Bitte überprüfen Sie diese Erklärung regelmäßig, um auf dem Laufenden zu bleiben. <br />",
+  "privacy.line_34": "Datum: 03.05.2025 <br /> <br />",
+  "privacy.update_2025_05": "Unsere Datenschutzerklärung wurde aktualisiert. Wir weisen nun konkret darauf hin, dass wir den Google AdMob-Zustimmungsdialog (User Messaging Platform) zur Einholung Ihrer Einwilligung in die Datenverarbeitung verwenden. Bitte prüfen Sie die aktualisierte Datenschutzerklärung.",
   "dates": {
     "months": {
       "january": "Januar",
@@ -179,8 +220,7 @@
     "export": "Exportieren",
     "importData": "Daten importieren",
     "importDescription": "Stellen Sie Ihre Daten aus einer Backup-Datei wieder her",
-    "about": "Über",
-    "appDescription": "Verfolgen Sie Ihre Vermögenswerte, Verbindlichkeiten, Einkommen und Ausgaben, um finanzielle Unabhängigkeit zu erreichen.",
+    "about": "Informationen",
     "debugModeActive": "Debug-Modus aktiv",
     "debugModeDescription": "Zusätzliche Debug-Funktionen sind aktiviert. In der Produktion deaktivieren.",
     "developerMode": "Entwicklermodus",
@@ -245,7 +285,6 @@
     "eurAutoConverted": "EUR (automatisch umgerechnet)",
     "usdOriginal": "USD (Original)",
     "currentCurrency": "Aktuell: {{currency}}",
-    "appName": "Passive Income Calculator",
     "version": "Version {{version}}",
     "assetManagement": "Asset-Verwaltung",
     "financialManagement": "Finanzverwaltung",
@@ -338,7 +377,10 @@
         "title": "Sicherheitspuffer",
         "description": "Verfolge, wie viele Monate der Gesamtausgaben (Fixkosten und bekannte variable Ausgaben) deine liquiden Mittel abdecken könnten. Dieser finanzielle Puffer bietet Sicherheit und Vertrauen für Investitionsentscheidungen.",
         "noExpenses": "Noch keine Ausgaben erfasst. Füge deine wiederkehrenden Ausgaben hinzu, um deinen Sicherheitspuffer aufzubauen.",
-        "monthsCovered": "{{months}} Monate Ausgaben gedeckt"
+        "monthsCovered": "{{months}} Monate Ausgaben gedeckt",
+        "milestone2": "2 Monate Notgroschen erreicht – Du hast einen ersten Sicherheitspuffer aufgebaut.",
+        "milestone4": "4 Monate Notgroschen – Dein finanzielles Polster wächst weiter.",
+        "milestone6": "+6 Monate Notgroschen – Du bist für die meisten Notfälle bestens abgesichert!"
       },
       "totalExpenseCoverage": {
         "title": "Gesamtausgabendeckung",
@@ -349,7 +391,11 @@
         "totalMonthlyExpenses": "Gesamte monatliche Ausgaben: {{amount}}/Monat",
         "breakdownTitle": "Aufschlüsselung:",
         "regularExpenses": "• Monatliche Ausgaben: {{expenses}}/Monat",
-        "liabilityPayments": "• Monatliche Schuldenrückzahlungen: {{debts}}/Monat"
+        "liabilityPayments": "• Monatliche Schuldenrückzahlungen: {{debts}}/Monat",
+        "milestone25": "25 % der Gesamtausgaben durch passives Einkommen gedeckt!",
+        "milestone50": "Halbzeit! 50 % der Ausgaben durch passives Einkommen gedeckt",
+        "milestone75": "Fast geschafft! 75 % der Ausgaben durch passives Einkommen gedeckt",
+        "milestone100": "Komplette finanzielle Freiheit erreicht! Alle Ausgaben durch passives Einkommen gedeckt 🎉"
       },
       "leisureMilestone": {
         "title": "Freizeitabdeckung",
@@ -949,7 +995,6 @@
   "milestones": {
     "title": "Finanzielle Meilensteine",
     "subtitle": "Verfolgen Sie Ihren Fortschritt zur finanziellen Unabhängigkeit",
-    "progressOverview": "Fortschritts-Übersicht",
     "expenseCoverage": "Ausgabendeckung",
     "debtProgress": "Schuldenfortschritt",
     "monthsBuffer": "Monate Puffer",
@@ -962,36 +1007,28 @@
       "motivationalText": "Jede erfolgreiche Investitionsreise beginnt mit dem ersten Asset!",
       "primaryAction": "Erstes Asset hinzufügen",
       "secondaryAction": "Leitfaden ansehen",
-      "tips": [
-        null
-      ]
+      "tips": [null]
     },
     "income": {
       "title": "Erfassen Sie Ihre Einkommensquellen!",
       "description": "Einkommen ist der Motor Ihres Vermögensaufbaus. Dokumentieren Sie alle Einkommensquellen, um Ihren finanziellen Überblick zu verbessern.",
       "motivationalText": "Mehrere Einkommensquellen schaffen finanzielle Sicherheit!",
       "primaryAction": "Einkommen hinzufügen",
-      "tips": [
-        null
-      ]
+      "tips": [null]
     },
     "expenses": {
       "title": "Behalten Sie Ihre Ausgaben im Blick!",
       "description": "Ausgaben zu kontrollieren ist der erste Schritt zu finanzieller Freiheit. Erfassen Sie Ihre wiederkehrenden Kosten für eine bessere Budgetplanung.",
       "motivationalText": "Wer seine Ausgaben kennt, kann sie optimieren!",
       "primaryAction": "Ausgabe hinzufügen",
-      "tips": [
-        null
-      ]
+      "tips": [null]
     },
     "liabilities": {
       "title": "Schulden strategisch abbauen!",
       "description": "Der Abbau von Verbindlichkeiten ist ein wichtiger Schritt zur finanziellen Unabhängigkeit. Dokumentieren Sie Ihre Schulden, um sie systematisch zu reduzieren.",
       "motivationalText": "Jede getilgte Schuld bringt Sie der Freiheit näher!",
       "primaryAction": "Verbindlichkeit hinzufügen",
-      "tips": [
-        null
-      ]
+      "tips": [null]
     },
     "portfolio": {},
     "charts": {

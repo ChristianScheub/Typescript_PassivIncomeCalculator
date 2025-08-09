@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
 import { 
   setStockApiEnabled, 
@@ -154,7 +154,7 @@ const SettingsContainer: React.FC = () => {
   ], []);
 
   // Special handler for Redux cache (needs dispatch parameter)
-  const handleClearReduxCache = async () => {
+  const handleClearReduxCache = useCallback(async () => {
     const updateStatus = (status: ClearOperationStatus) => {
       setClearStatuses(prev => ({ ...prev, reduxCache: status }));
     };
@@ -173,10 +173,10 @@ const SettingsContainer: React.FC = () => {
       updateStatus("idle");
       dispatch(showErrorSnackbar(t("settings.snackbar.reduxCacheClearError")));
     }
-  };
+  }, [dispatch]);
 
   // Generic clear handler factory
-  const createClearHandler = (config: typeof clearOperationsConfig[0]) => async () => {
+  const createClearHandler = useCallback((config: typeof clearOperationsConfig[0]) => async () => {
     const updateStatus = (status: ClearOperationStatus) => {
       setClearStatuses(prev => ({ ...prev, [config.key]: status }));
     };
@@ -204,7 +204,7 @@ const SettingsContainer: React.FC = () => {
       updateStatus("idle");
       dispatch(showErrorSnackbar(t(config.errorKey)));
     }
-  };
+  }, [dispatch]);
 
   // Generate handlers from config
   const clearHandlers = useMemo(() => {
@@ -215,7 +215,7 @@ const SettingsContainer: React.FC = () => {
     // Add special handler for redux cache
     handlers.reduxCache = handleClearReduxCache;
     return handlers;
-  }, [clearOperationsConfig, dispatch]);
+  }, [clearOperationsConfig, createClearHandler, handleClearReduxCache]);
 
   // Generate confirmation handlers from config
   const clearHandlersWithConfirm = useMemo(() => {
@@ -234,7 +234,7 @@ const SettingsContainer: React.FC = () => {
       handleClearReduxCache
     );
     return handlers;
-  }, [clearOperationsConfig, clearHandlers, showConfirmDialog]);
+  }, [clearOperationsConfig, clearHandlers, handleClearReduxCache]);
 
   const closeConfirmDialog = () => {
     setConfirmDialog((prev) => ({ ...prev, isOpen: false }));

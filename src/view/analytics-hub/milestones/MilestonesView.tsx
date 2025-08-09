@@ -53,28 +53,6 @@ const MilestonesView: React.FC<MilestonesViewProps> = ({
         )}
 
         <div className="space-y-6 mt-8">
-          {/* Progress Overview */}
-          <Card className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Target className="h-5 w-5 text-blue-500" />
-                <span>{t("milestones.progressOverview")}</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center space-x-4">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-4">
-                  <div
-                    className="bg-gradient-to-r from-blue-500 to-green-500 h-4 rounded-full transition-all duration-300"
-                    style={{ width: `${Math.min(totalProgress, 100)}%` }}
-                  />
-                </div>
-                <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  {Math.round(totalProgress)}%
-                </span>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Overview Card */}
           <Card className="bg-gradient-to-r from-purple-500 to-blue-600 text-white">

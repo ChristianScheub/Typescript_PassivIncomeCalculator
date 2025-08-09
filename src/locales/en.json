@@ -939,7 +939,6 @@
   "milestones": {
     "title": "Financial Milestones",
     "subtitle": "Track your progress towards financial independence",
-    "progressOverview": "Progress Overview",
     "expenseCoverage": "Expense Coverage",
     "debtProgress": "Debt Progress",
     "monthsBuffer": "Months Buffer",
