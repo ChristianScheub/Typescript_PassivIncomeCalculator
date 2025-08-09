@@ -1,17 +1,18 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useDeviceCheck } from "@service/shared/utilities/helper/useDeviceCheck";
-import {
-  TrendingUp,
-  Target,
-  AlertTriangle,
-  BarChart3,
-} from "lucide-react";
+import { TrendingUp, Target, AlertTriangle, BarChart3 } from "lucide-react";
 import { TotalExpenseCoverage } from "@ui/portfolioHub";
 import PortfolioHistoryCard from "../../../ui/startHub/PortfolioHistoryCard";
 import MonthlyBreakdownCard from "../../../ui/startHub/MonthlyBreakdownCard";
 import { CollapsibleSection, MiniAnalyticsCard } from "@ui/shared";
-import { QuickActionsCard, MilestoneCard, AlertsCard, PullToRefresh, NetWorthSnapshot } from "@ui/startHub";
+import {
+  QuickActionsCard,
+  MilestoneCard,
+  AlertsCard,
+  PullToRefresh,
+  NetWorthSnapshot,
+} from "@ui/startHub";
 import { FinancialSummary, UIAlert } from "@/types/domains/analytics/reporting";
 
 interface QuickAction {
@@ -76,7 +77,7 @@ const DashboardView: React.FC<DashboardViewProps> = ({
   navigationHandlers,
   onRefresh,
   isRefreshing,
-  portfolioHistory = []
+  portfolioHistory = [],
 }) => {
   const { t } = useTranslation();
   const isDesktop = useDeviceCheck();
@@ -142,18 +143,22 @@ const DashboardView: React.FC<DashboardViewProps> = ({
         </CollapsibleSection>
 
         {/* Milestones */}
-        <MilestoneCard
+        <CollapsibleSection
           title={t("dashboard.activeMilestones")}
-          milestones={milestones.map((milestone) => ({
-            title: t(milestone.titleKey),
-            progress: milestone.progress,
-            target: milestone.target,
-            color: milestone.color,
-            icon: milestone.icon,
-            onClick: milestone.onClick,
-          }))}
           icon={<Target className="h-5 w-5 text-green-500" />}
-        />
+          defaultExpanded={true}
+        >
+          <MilestoneCard
+            milestones={milestones.map((milestone) => ({
+              title: t(milestone.titleKey),
+              progress: milestone.progress,
+              target: milestone.target,
+              color: milestone.color,
+              icon: milestone.icon,
+              onClick: milestone.onClick,
+            }))}
+          />
+        </CollapsibleSection>
 
         {/* Monthly Breakdown */}
         <CollapsibleSection
@@ -177,17 +182,23 @@ const DashboardView: React.FC<DashboardViewProps> = ({
           icon={<BarChart3 className="h-5 w-5 text-indigo-500" />}
           defaultExpanded={false}
         >
-          <PortfolioHistoryCard 
+          <PortfolioHistoryCard
             history={portfolioHistory.map((point, index) => ({
               date: point.date,
               value: point.totalValue,
-              change: index > 0 ? point.totalValue - portfolioHistory[index - 1].totalValue : 0,
-              changePercentage: index > 0 && portfolioHistory[index - 1].totalValue > 0 
-                ? ((point.totalValue - portfolioHistory[index - 1].totalValue) / portfolioHistory[index - 1].totalValue) * 100 
-                : 0
+              change:
+                index > 0
+                  ? point.totalValue - portfolioHistory[index - 1].totalValue
+                  : 0,
+              changePercentage:
+                index > 0 && portfolioHistory[index - 1].totalValue > 0
+                  ? ((point.totalValue -
+                      portfolioHistory[index - 1].totalValue) /
+                      portfolioHistory[index - 1].totalValue) *
+                    100
+                  : 0,
             }))}
           />
-          {/* Portfolio history data is now loaded from portfolio history hook */}
         </CollapsibleSection>
 
         {/* Alerts & Recommendations */}

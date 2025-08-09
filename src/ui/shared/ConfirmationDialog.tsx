@@ -1,8 +1,8 @@
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Modal } from '../portfolioHub/dialog/Modal';
-import { Card } from './Card';
-import { Button } from '../shared';
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { Modal } from "../portfolioHub/dialog/Modal";
+import { Card, CardContent, CardFooter, CardTitle } from "./Card";
+import { Button } from "../shared";
 
 interface ConfirmationDialogProps {
   isOpen: boolean;
@@ -24,16 +24,19 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <Card className="w-full max-w-lg mx-auto">
-            {title}
+        <CardContent>
+          <br />
+          <CardTitle>{title}</CardTitle>
+          <br />
           <p className="text-sm text-gray-500 dark:text-gray-400">
             {description}
           </p>
-          <Button
-            variant="outline"
-            onClick={onClose}
-          >
-            {t('common.cancel')}
+        </CardContent>
+        <CardFooter>
+          <Button variant="outline" onClick={onClose}>
+            {t("common.cancel")}
           </Button>
+          <span className="flex-1" />
           <Button
             variant="destructive"
             onClick={() => {
@@ -41,8 +44,9 @@ export const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
               onClose();
             }}
           >
-            {t('common.remove')}
+            {t("common.remove")}
           </Button>
+        </CardFooter>
       </Card>
     </Modal>
   );
