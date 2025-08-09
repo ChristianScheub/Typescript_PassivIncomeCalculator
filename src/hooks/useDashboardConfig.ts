@@ -5,6 +5,7 @@ import { FinancialRatios } from '@/types/domains/analytics';
 
 export const useDashboardConfig = (
   ratios: FinancialRatios,
+  emergencyFundMonths: number,
   totalLiabilities: number,
   navigationHandlers: NavigationHandlers
 ) => {
@@ -14,8 +15,8 @@ export const useDashboardConfig = (
   );
 
   const miniAnalytics = useMemo(() => 
-    configService.getDashboardMiniAnalytics(ratios, navigationHandlers),
-    [ratios, navigationHandlers]
+    configService.getDashboardMiniAnalytics(ratios, emergencyFundMonths, navigationHandlers),
+    [ratios, emergencyFundMonths, navigationHandlers]
   );
 
   const milestones = useMemo(() => 

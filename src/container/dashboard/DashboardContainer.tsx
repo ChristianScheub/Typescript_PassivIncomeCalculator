@@ -114,6 +114,7 @@ const DashboardContainer: React.FC = () => {
   // UI Configuration using custom hook
   const { quickActions, miniAnalytics, milestones } = useDashboardConfig(
     ratios,
+    financialSummary.emergencyFundMonths,
     financialSummary.totalLiabilities,
     navigationHandlers
   );

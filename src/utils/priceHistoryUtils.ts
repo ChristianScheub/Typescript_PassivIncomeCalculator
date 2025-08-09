@@ -136,7 +136,8 @@ export function addIntradayPriceHistory(
   const seenPrices = new Map<string, number>();
   
   // Sort new entries by timestamp first
-  const sortedNewEntries = uniqueIntradayEntries.sort((a, b) => 
+  const sortedNewEntries = [...uniqueIntradayEntries];
+  sortedNewEntries.sort((a, b) => 
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
   
@@ -283,7 +284,8 @@ export function calculateHistoricalPortfolioValues(
   priceHistory: PriceHistoryEntry[]
 ): PriceHistoryEntry[] {
   // Sort price history by date (oldest first)
-  const sortedHistory = [...priceHistory].sort((a, b) => 
+  const sortedHistory = [...priceHistory];
+  sortedHistory.sort((a, b) => 
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
   

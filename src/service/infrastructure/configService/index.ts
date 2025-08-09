@@ -5,7 +5,8 @@ import { getDashboardMilestones } from './methods/getDashboardMilestones';
 
 const configService: IConfigService = {
   getDashboardQuickActions,
-  getDashboardMiniAnalytics,
+  getDashboardMiniAnalytics: (ratios, emergencyFundMonths, handlers) => 
+    getDashboardMiniAnalytics(ratios, emergencyFundMonths, handlers),
   getDashboardMilestones,
 };
 

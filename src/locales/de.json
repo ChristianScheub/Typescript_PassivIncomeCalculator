@@ -90,7 +90,7 @@
     "passiveRatio": "Passive Quote",
     "expenseCoverage": "Ausgabendeckung",
     "debtRatio": "Schuldenquote",
-    "savingsRate": "Sparquote",
+    "emergencyFundMonths": "Notgroschen",
     "refreshing": "Cache wird aktualisiert...",
     "pullToRefresh": "Zum Aktualisieren ziehen",
     "releaseToRefresh": "Loslassen zum Aktualisieren",

@@ -6,6 +6,7 @@ import DebugSettings from "@/ui/settings/DebugSettings";
 import { featureFlag_Debug_Settings_View } from "@/config/featureFlags";
 import { StockAPIProvider } from "@/types/shared/base/enums";
 import { DashboardMode } from "@/types/shared/analytics";
+import { OperationStatus, CurrencyType, ApiKeyStatus, DeveloperActivationStatus } from "@/types/shared/base/status";
 import { DividendApiSettingsSection } from "../../../ui/settings/DividendApiSettingsSection";
 import { StockApiProviderSection } from "../../../ui/settings/StockApiProviderSection";
 import { ClearDataSection } from "../../../ui/settings/ClearDataSection";
@@ -18,17 +19,17 @@ import { getButtonText } from "@/ui/settings";
 import { ClearStatus } from "@/types/shared/ui/clearButton";
 
 interface SettingsViewProps {
-  exportStatus: "idle" | "loading" | "success" | "error";
-  importStatus: "idle" | "loading" | "success" | "error";
+  exportStatus: OperationStatus;
+  importStatus: OperationStatus;
   importError: string | null;
   logs: string[];
   showLogs: boolean;
   autoRefresh: boolean;
   selectedProvider: StockAPIProvider;
   apiKeys?: { [K in StockAPIProvider]?: string };
-  apiKeyStatus: "idle" | "saving" | "success" | "error";
+  apiKeyStatus: ApiKeyStatus;
   apiKeyError: string | null;
-  currency: "EUR" | "USD";
+  currency: CurrencyType;
   clearStatuses: Record<string, ClearStatus>;
   clearHandlers: Record<string, () => void>;
   isApiEnabled: boolean;
@@ -53,7 +54,7 @@ interface SettingsViewProps {
   onApiKeyChange: (provider: StockAPIProvider, apiKey: string) => void;
   onApiKeyRemove: (provider: StockAPIProvider) => void;
   onProviderChange: (provider: StockAPIProvider) => void;
-  onCurrencyChange: (currency: "EUR" | "USD") => void;
+  onCurrencyChange: (currency: CurrencyType) => void;
   onDashboardModeChange: (mode: DashboardMode) => void;
   selectedDiviProvider: string;
   dividendApiKey: { [provider: string]: string };
@@ -65,7 +66,7 @@ interface SettingsViewProps {
   // Developer Mode Props
   isDeveloperModeEnabled: boolean;
   developerPassword: string;
-  developerActivationStatus: "idle" | "loading" | "success" | "error";
+  developerActivationStatus: DeveloperActivationStatus;
   onDeveloperPasswordChange: (password: string) => void;
   onDeveloperModeActivation: () => void;
   onDeveloperModeDeactivation: () => void;
@@ -121,38 +122,26 @@ const SettingsView: React.FC<SettingsViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const [showApiKey, setShowApiKey] = useState(false);
-  const [tempApiKeys, setTempApiKeys] = useState<
-    Record<StockAPIProvider, string>
-  >({
-    [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? "",
-    [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] ?? "",
-    [StockAPIProvider.ALPHA_VANTAGE]:
-      apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] ?? "",
-    [StockAPIProvider.IEX_CLOUD]: apiKeys?.[StockAPIProvider.IEX_CLOUD] ?? "",
-    [StockAPIProvider.TWELVE_DATA]:
-      apiKeys?.[StockAPIProvider.TWELVE_DATA] ?? "",
-    [StockAPIProvider.QUANDL]: apiKeys?.[StockAPIProvider.QUANDL] ?? "",
-    [StockAPIProvider.EOD_HISTORICAL_DATA]:
-      apiKeys?.[StockAPIProvider.EOD_HISTORICAL_DATA] ?? "",
-    [StockAPIProvider.POLYGON_IO]: apiKeys?.[StockAPIProvider.POLYGON_IO] ?? "",
+
+  // Helper function to create API keys record with default values
+  const createApiKeysRecord = (keys?: { [K in StockAPIProvider]?: string }) => ({
+    [StockAPIProvider.FINNHUB]: keys?.[StockAPIProvider.FINNHUB] ?? "",
+    [StockAPIProvider.YAHOO]: keys?.[StockAPIProvider.YAHOO] ?? "",
+    [StockAPIProvider.ALPHA_VANTAGE]: keys?.[StockAPIProvider.ALPHA_VANTAGE] ?? "",
+    [StockAPIProvider.IEX_CLOUD]: keys?.[StockAPIProvider.IEX_CLOUD] ?? "",
+    [StockAPIProvider.TWELVE_DATA]: keys?.[StockAPIProvider.TWELVE_DATA] ?? "",
+    [StockAPIProvider.QUANDL]: keys?.[StockAPIProvider.QUANDL] ?? "",
+    [StockAPIProvider.EOD_HISTORICAL_DATA]: keys?.[StockAPIProvider.EOD_HISTORICAL_DATA] ?? "",
+    [StockAPIProvider.POLYGON_IO]: keys?.[StockAPIProvider.POLYGON_IO] ?? "",
   });
+
+  const [tempApiKeys, setTempApiKeys] = useState<Record<StockAPIProvider, string>>(
+    createApiKeysRecord(apiKeys)
+  );
 
   // Update tempApiKeys when apiKeys prop changes
   useEffect(() => {
-    setTempApiKeys({
-      [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? "",
-      [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] ?? "",
-      [StockAPIProvider.ALPHA_VANTAGE]:
-        apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] ?? "",
-      [StockAPIProvider.IEX_CLOUD]: apiKeys?.[StockAPIProvider.IEX_CLOUD] ?? "",
-      [StockAPIProvider.TWELVE_DATA]:
-        apiKeys?.[StockAPIProvider.TWELVE_DATA] ?? "",
-      [StockAPIProvider.QUANDL]: apiKeys?.[StockAPIProvider.QUANDL] ?? "",
-      [StockAPIProvider.EOD_HISTORICAL_DATA]:
-        apiKeys?.[StockAPIProvider.EOD_HISTORICAL_DATA] ?? "",
-      [StockAPIProvider.POLYGON_IO]:
-        apiKeys?.[StockAPIProvider.POLYGON_IO] ?? "",
-    });
+    setTempApiKeys(createApiKeysRecord(apiKeys));
   }, [apiKeys]);
 
   // Extract button text helpers for reduced complexity
@@ -163,6 +152,27 @@ const SettingsView: React.FC<SettingsViewProps> = ({
     "settings.saved",
     "settings.saveApiKey"
   );
+
+  // Extract dividend provider selection logic
+  const getDividendProvider = () => {
+    if (selectedDiviProvider) {
+      return selectedDiviProvider;
+    }
+    
+    if (isDeveloperModeEnabled) {
+      return "yahoo";
+    }
+    
+    return Object.keys(dividendApiKey).find((p) => p !== "yahoo") || "";
+  };
+
+  // Extract filtered API keys for dividend configuration
+  const getFilteredDividendApiKeys = () => {
+    const entries = Object.entries(dividendApiKey || {});
+    return Object.fromEntries(
+      entries.filter(([p]) => isDeveloperModeEnabled || p !== "yahoo")
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -216,18 +226,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Dividend API Configuration */}
       <DividendApiSettingsSection
         enabled={isDividendApiEnabled}
-        selectedProvider={
-          selectedDiviProvider
-            ? selectedDiviProvider
-            : isDeveloperModeEnabled
-            ? "yahoo"
-            : Object.keys(dividendApiKey).find((p) => p !== "yahoo") || ""
-        }
-        apiKeys={Object.fromEntries(
-          Object.entries(dividendApiKey || {}).filter(
-            ([p]) => isDeveloperModeEnabled || p !== "yahoo"
-          )
-        )}
+        selectedProvider={getDividendProvider()}
+        apiKeys={getFilteredDividendApiKeys()}
         onEnabledChange={onDividendApiToggle}
         onProviderChange={onDiviProviderChange}
         onApiKeyChange={onDiviApiKeyChange}

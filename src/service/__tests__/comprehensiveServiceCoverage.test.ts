@@ -363,9 +363,17 @@ describe('Service Coverage Tests - Infrastructure Services', () => {
       const mockHandlers = {
         onNavigateToIncome: jest.fn(),
         onNavigateToForecast: jest.fn(),
-        onNavigateToLiabilities: jest.fn()
+        onNavigateToLiabilities: jest.fn(),
+        onNavigateToAssets: jest.fn(),
+        onNavigateToExpenses: jest.fn(),
+        onNavigateToSettings: jest.fn(),
+        onAddIncome: jest.fn(),
+        onAddExpense: jest.fn(),
+        onAddTransaction: jest.fn(),
+        onAddLiability: jest.fn()
       };
-      let result = getDashboardMiniAnalytics(mockRatios, mockHandlers);
+      const emergencyFundMonths = 3.5;
+      let result = getDashboardMiniAnalytics(mockRatios, emergencyFundMonths, mockHandlers);
       expect(Array.isArray(result)).toBe(true);
     });
 

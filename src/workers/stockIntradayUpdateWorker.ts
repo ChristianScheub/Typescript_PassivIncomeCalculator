@@ -24,9 +24,9 @@ type WorkerResponse =
 
 async function updateSingleStockIntraday(
   definition: AssetDefinition,
-  days: number = 1,
   apiKeys: Record<string, string | undefined>,
-  selectedProvider: string
+  selectedProvider: string,
+  days: number = 1
 ): Promise<StockIntradayUpdateResult> {
   try {
     if (definition.type !== 'stock' || !definition.ticker) {
@@ -80,9 +80,9 @@ async function updateSingleStockIntraday(
 
 async function updateBatchStockIntraday(
   definitions: AssetDefinition[],
-  days: number = 1,
   apiKeys: Record<string, string | undefined>,
-  selectedProvider: string
+  selectedProvider: string,
+  days: number = 1
 ): Promise<StockIntradayUpdateResult[]> {
   try {
     // Use centralized batch method with API config
@@ -119,14 +119,14 @@ async function updateBatchStockIntraday(
 
 self.onmessage = function (e: MessageEvent<WorkerRequest>) {
   if (e.data.type === 'updateBatchIntraday') {
-    updateBatchStockIntraday(e.data.definitions, e.data.days, e.data.apiKeys, e.data.selectedProvider).then(results => {
+    updateBatchStockIntraday(e.data.definitions, e.data.apiKeys, e.data.selectedProvider, e.data.days).then(results => {
       const response: WorkerResponse = { type: 'batchResult', results };
       self.postMessage(response);
     }).catch(error => {
       self.postMessage({ type: 'error', error: error instanceof Error ? error.message : String(error) });
     });
   } else if (e.data.type === 'updateSingleIntraday') {
-    updateSingleStockIntraday(e.data.definition, e.data.days, e.data.apiKeys, e.data.selectedProvider).then(result => {
+    updateSingleStockIntraday(e.data.definition, e.data.apiKeys, e.data.selectedProvider, e.data.days).then(result => {
       const response: WorkerResponse = { type: 'singleResult', result };
       self.postMessage(response);
     }).catch(error => {

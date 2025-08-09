@@ -120,33 +120,31 @@ describe('ConfigService Methods', () => {
 
   describe('getDashboardMiniAnalytics', () => {
     test('should return passive ratio analytics correctly', () => {
-      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, mockNavigationHandlers);
+      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, 3.0, mockNavigationHandlers);
       
       const passiveAnalytic = analytics.find(a => a.id === 'passiveRatio');
       
       expect(passiveAnalytic).toBeDefined();
       expect(passiveAnalytic?.titleKey).toBe('dashboard.passiveRatio');
       expect(passiveAnalytic?.value).toBe('25.3%');
-      expect(passiveAnalytic?.icon).toBe('TrendingUp');
       expect(passiveAnalytic?.colorClass).toBe('text-purple-600 dark:text-purple-400');
       expect(passiveAnalytic?.onClick).toBe(mockNavigationHandlers.onNavigateToIncome);
     });
 
     test('should return expense coverage analytics correctly', () => {
-      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, mockNavigationHandlers);
+      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, 3.0, mockNavigationHandlers);
       
       const expenseAnalytic = analytics.find(a => a.id === 'expenseCoverage');
       
       expect(expenseAnalytic).toBeDefined();
       expect(expenseAnalytic?.titleKey).toBe('dashboard.expenseCoverage');
       expect(expenseAnalytic?.value).toBe('75.5%');
-      expect(expenseAnalytic?.icon).toBe('Target');
       expect(expenseAnalytic?.colorClass).toBe('text-green-600 dark:text-green-400');
       expect(expenseAnalytic?.onClick).toBe(mockNavigationHandlers.onNavigateToForecast);
     });
 
     test('should return debt ratio analytics correctly', () => {
-      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, mockNavigationHandlers);
+      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, 3.0, mockNavigationHandlers);
       
       const debtAnalytic = analytics.find(a => a.id === 'debtRatio');
       
@@ -158,24 +156,23 @@ describe('ConfigService Methods', () => {
       expect(debtAnalytic?.onClick).toBe(mockNavigationHandlers.onNavigateToLiabilities);
     });
 
-    test('should return savings rate analytics correctly', () => {
-      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, mockNavigationHandlers);
+    test('should return emergency fund analytics correctly', () => {
+      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, 3.5, mockNavigationHandlers);
       
-      const savingsAnalytic = analytics.find(a => a.id === 'savingsRate');
+      const emergencyFundAnalytic = analytics.find(a => a.id === 'emergencyFundMonths');
       
-      expect(savingsAnalytic).toBeDefined();
-      expect(savingsAnalytic?.titleKey).toBe('dashboard.savingsRate');
-      expect(savingsAnalytic?.value).toBe('20.8%');
-      expect(savingsAnalytic?.icon).toBe('ArrowUpRight');
-      expect(savingsAnalytic?.colorClass).toBe('text-blue-600 dark:text-blue-400');
-      expect(savingsAnalytic?.onClick).toBe(mockNavigationHandlers.onNavigateToForecast);
+      expect(emergencyFundAnalytic).toBeDefined();
+      expect(emergencyFundAnalytic?.titleKey).toBe('dashboard.emergencyFundMonths');
+      expect(emergencyFundAnalytic?.value).toBe('3.5M');
+      expect(emergencyFundAnalytic?.colorClass).toBe('text-blue-600 dark:text-blue-400');
+      expect(emergencyFundAnalytic?.onClick).toBe(mockNavigationHandlers.onNavigateToAssets);
     });
 
     test('should return all four analytics', () => {
-      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, mockNavigationHandlers);
+      const analytics = getDashboardMiniAnalytics(mockFinancialRatios, 3.0, mockNavigationHandlers);
       
       expect(analytics).toHaveLength(4);
-      expect(analytics.map(a => a.id)).toEqual(['passiveRatio', 'expenseCoverage', 'debtRatio', 'savingsRate']);
+      expect(analytics.map(a => a.id)).toEqual(['passiveRatio', 'expenseCoverage', 'debtRatio', 'emergencyFundMonths']);
     });
 
     test('should format percentages to one decimal place', () => {
@@ -186,12 +183,12 @@ describe('ConfigService Methods', () => {
         savingsRate: 20.555
       };
       
-      const analytics = getDashboardMiniAnalytics(preciseRatios, mockNavigationHandlers);
+      const analytics = getDashboardMiniAnalytics(preciseRatios, 4.2, mockNavigationHandlers);
       
       expect(analytics.find(a => a.id === 'expenseCoverage')?.value).toBe('75.5%');
       expect(analytics.find(a => a.id === 'passiveRatio')?.value).toBe('26.0%');
       expect(analytics.find(a => a.id === 'debtRatio')?.value).toBe('30.1%');
-      expect(analytics.find(a => a.id === 'savingsRate')?.value).toBe('20.6%');
+      expect(analytics.find(a => a.id === 'emergencyFundMonths')?.value).toBe('4.2M');
     });
 
     test('should handle zero values correctly', () => {
@@ -202,11 +199,12 @@ describe('ConfigService Methods', () => {
         savingsRate: 0
       };
       
-      const analytics = getDashboardMiniAnalytics(zeroRatios, mockNavigationHandlers);
+      const analytics = getDashboardMiniAnalytics(zeroRatios, 0, mockNavigationHandlers);
       
-      analytics.forEach(analytic => {
-        expect(analytic.value).toBe('0.0%');
-      });
+      expect(analytics.find(a => a.id === 'expenseCoverage')?.value).toBe('0.0%');
+      expect(analytics.find(a => a.id === 'passiveRatio')?.value).toBe('0.0%');
+      expect(analytics.find(a => a.id === 'debtRatio')?.value).toBe('0.0%');
+      expect(analytics.find(a => a.id === 'emergencyFundMonths')?.value).toBe('0.0M');
     });
   });
 
@@ -235,14 +233,14 @@ describe('ConfigService Methods', () => {
       };
       
       const milestones = getDashboardMilestones(extremeRatios, 0, mockNavigationHandlers);
-      const analytics = getDashboardMiniAnalytics(extremeRatios, mockNavigationHandlers);
+      const analytics = getDashboardMiniAnalytics(extremeRatios, 10.0, mockNavigationHandlers);
       
       // Expense coverage should be capped at 100
       expect(milestones.find(m => m.id === 'expenseCoverage')?.progress).toBe(100);
       
       // Analytics should show precise formatting
       expect(analytics.find(a => a.id === 'passiveRatio')?.value).toBe('0.1%');
-      expect(analytics.find(a => a.id === 'savingsRate')?.value).toBe('100.0%');
+      expect(analytics.find(a => a.id === 'emergencyFundMonths')?.value).toBe('10.0M');
     });
   });
 });

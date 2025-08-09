@@ -630,7 +630,7 @@
     "passiveRatio": "Passive Ratio",
     "expenseCoverage": "Expense Coverage",
     "debtRatio": "Debt Ratio",
-    "savingsRate": "Savings Rate",
+    "emergencyFundMonths": "Emergency Fund",
     "milestone": {
       "expenseCoverage": "Expense coverage through passive income",
       "passiveIncome": "Passive income ratio",

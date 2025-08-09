@@ -1,9 +1,10 @@
-import { TrendingUp, TrendingDown, Target, ArrowUpRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, Shield } from 'lucide-react';
 import { MiniAnalytic, NavigationHandlers } from '../interfaces/IConfigService';
 import { FinancialRatios } from '@/types/domains/analytics';
 
 export const getDashboardMiniAnalytics = (
   ratios: FinancialRatios,
+  emergencyFundMonths: number,
   handlers: NavigationHandlers
 ): MiniAnalytic[] => [
   {
@@ -31,11 +32,11 @@ export const getDashboardMiniAnalytics = (
     onClick: handlers.onNavigateToLiabilities
   },
   {
-    id: 'savingsRate',
-    titleKey: 'dashboard.savingsRate',
-    value: `${ratios.savingsRate.toFixed(1)}%`,
-    icon: ArrowUpRight,
+    id: 'emergencyFundMonths',
+    titleKey: 'dashboard.emergencyFundMonths',
+    value: `${emergencyFundMonths.toFixed(1)}M`,
+    icon: Shield,
     colorClass: 'text-blue-600 dark:text-blue-400',
-    onClick: handlers.onNavigateToForecast
+    onClick: handlers.onNavigateToAssets
   }
 ];

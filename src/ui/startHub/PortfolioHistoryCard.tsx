@@ -65,7 +65,6 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history }) 
   }
 
   return (
-    <>
       <PortfolioChart
         data={chartData}
         currentValue={currentValue}
@@ -83,7 +82,6 @@ const PortfolioHistoryCard: React.FC<PortfolioHistoryCardProps> = ({ history }) 
         }}
         className="w-full m-0 p-0"
       />
-    </>
   );
 };
 

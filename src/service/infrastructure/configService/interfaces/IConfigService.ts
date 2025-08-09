@@ -43,6 +43,6 @@ export interface NavigationHandlers {
 
 export interface IConfigService {
   getDashboardQuickActions: (handlers: NavigationHandlers) => QuickAction[];
-  getDashboardMiniAnalytics: (ratios: FinancialRatios, handlers: NavigationHandlers) => MiniAnalytic[];
+  getDashboardMiniAnalytics: (ratios: FinancialRatios, emergencyFundMonths: number, handlers: NavigationHandlers) => MiniAnalytic[];
   getDashboardMilestones: (ratios: FinancialRatios, totalLiabilities: number, handlers: NavigationHandlers) => Milestone[];
 }

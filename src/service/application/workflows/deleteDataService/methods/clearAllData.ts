@@ -7,8 +7,7 @@ import {
   clearAllAssetCategories
 } from '@/store/slices/domain';
 import { setStockApiKey, setStockApiEnabled, setDividendApiKey, setDividendApiEnabled } from '@/store/slices/configSlice';
-import { StockAPIProvider } from '@/types/shared/base/enums';
-import { DividendApiProvider } from '@/types/shared/base/enums';
+import { StockAPIProvider,DividendApiProvider } from '@/types/shared/base/enums';
 import Logger from "@/service/shared/logging/Logger/logger";
 import { clearSQLiteStores } from './utils';
 import { StoreNames } from '@/types/domains/database';

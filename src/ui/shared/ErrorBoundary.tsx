@@ -1,6 +1,5 @@
 
 import React from 'react';
-import Logger from '@/service/shared/logging/Logger/logger';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -16,21 +15,6 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Log error to Logger if available
-    if (Logger && typeof Logger.errorStack === 'function') {
-      Logger.errorStack('ErrorBoundary caught error', error);
-    } else if (Logger && typeof Logger.error === 'function') {
-      Logger.error('ErrorBoundary caught error: ' + error.message);
-    } else if (console && console.error) {
-      console.error('ErrorBoundary caught error:', error, errorInfo);
-    }
   }
 
   render() {

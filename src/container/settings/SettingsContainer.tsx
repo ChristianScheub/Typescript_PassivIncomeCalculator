@@ -27,10 +27,10 @@ import { StockAPIProvider, DividendApiProvider } from "@/types/shared/base/enums
 import { StoreNames } from "@/types/domains/database";
 import { verifyHash } from "@/utils/crypto";
 import { developerPasswordHash } from "@/config/featureFlags";
+import { OperationStatus, CurrencyType, ApiKeyStatus, DeveloperActivationStatus } from "@/types/shared/base/status";
+
 // Type aliases for operation statuses
 type ClearOperationStatus = "idle" | "clearing" | "success";
-type AsyncOperationStatus = "idle" | "loading" | "success" | "error";
-type ApiKeyStatus = "idle" | "saving" | "success" | "error";
 
 const SettingsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -38,18 +38,18 @@ const SettingsContainer: React.FC = () => {
   const dividendApiConfig = useAppSelector((state) => state.config.apis.dividend);
   const currentDashboardMode = useAppSelector((state) => state.config.dashboard.assetFocus.mode);
   const developerConfig = useAppSelector((state) => state.config.developer);
-  const [exportStatus, setExportStatus] = useState<AsyncOperationStatus>("idle");
-  const [importStatus, setImportStatus] = useState<AsyncOperationStatus>("idle");
+  const [exportStatus, setExportStatus] = useState<OperationStatus>("idle");
+  const [importStatus, setImportStatus] = useState<OperationStatus>("idle");
   const [importError, setImportError] = useState<string | null>(null);
   const [logs, setLogs] = useState<string[]>([]);
   const [showLogs, setShowLogs] = useState(false);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [apiKeyStatus, setApiKeyStatus] = useState<ApiKeyStatus>("idle");
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
-  const [currency, setCurrency] = useState<"EUR" | "USD">("EUR");
+  const [currency, setCurrency] = useState<CurrencyType>("EUR");
     // Developer Mode State
   const [developerPassword, setDeveloperPassword] = useState("");
-  const [developerActivationStatus, setDeveloperActivationStatus] = useState<AsyncOperationStatus>("idle");
+  const [developerActivationStatus, setDeveloperActivationStatus] = useState<DeveloperActivationStatus>("idle");
 
    const dashboardMode = useMemo(() => currentDashboardMode, [currentDashboardMode]);
 
@@ -422,7 +422,7 @@ const SettingsContainer: React.FC = () => {
     dispatch(showSuccessSnackbar(t("settings.snackbar.providerChanged")));
   };
 
-  const handleCurrencyChange = (newCurrency: "EUR" | "USD") => {
+  const handleCurrencyChange = (newCurrency: CurrencyType) => {
     setGlobalCurrency(newCurrency);
     setCurrency(newCurrency);
     Logger.info(`Currency changed to ${newCurrency}`);
