@@ -9,16 +9,18 @@ import { CardTitle,Card, CardContent, CardHeader } from '@/ui/shared';
 interface BufferMilestoneProps {
   liquidAssets: number;
   monthlyTotalExpenses: number;
+  monthlyLiabilityPayments: number;
 }
 
 const BufferMilestone: React.FC<BufferMilestoneProps> = ({
   liquidAssets,
   monthlyTotalExpenses,
+  monthlyLiabilityPayments,
 }) => {
   const { t } = useTranslation();
-  
-  const bufferMonths = monthlyTotalExpenses > 0 
-    ? liquidAssets / monthlyTotalExpenses
+
+  const bufferMonths = monthlyTotalExpenses > 0
+    ? liquidAssets / ( monthlyTotalExpenses + monthlyLiabilityPayments )
     : 0;
 
   const percentage = (bufferMonths / 6) * 100; // Target is 6 months

@@ -76,7 +76,7 @@ function getFallbackPrice(assetDefinition: AssetDefinition, normalizedDate: stri
 
   const currentPrice = assetDefinition.currentPrice;
   if (isValidPrice(currentPrice)) {
-    Logger.warn(`No historical price for ${normalizedDate}, using current price as fallback: €${currentPrice.toFixed(2)}`);
+    Logger.infoService(`No historical price for ${normalizedDate}, using current price as fallback: €${currentPrice.toFixed(2)}`);
     return currentPrice;
   }
   

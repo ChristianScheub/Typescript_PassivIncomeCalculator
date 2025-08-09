@@ -115,6 +115,7 @@ const MilestonesView: React.FC<MilestonesViewProps> = ({
           <BufferMilestone
             liquidAssets={liquidAssets}
             monthlyTotalExpenses={monthlyTotalExpenses}
+            monthlyLiabilityPayments={monthlyLiabilityPayments}
           />
 
           {/* Debt and Coverage Grid */}

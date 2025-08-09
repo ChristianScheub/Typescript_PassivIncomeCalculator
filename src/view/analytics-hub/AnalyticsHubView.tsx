@@ -2,10 +2,10 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ViewHeader } from '@ui/shared';
 import { useDeviceCheck } from '@service/shared/utilities/helper/useDeviceCheck';
-import { AnalyticsCategory, AnalyticsSubCategory } from '@/container/analyticsHub/AnalyticsHubContainer';
 import AnalyticsOverviewSection from '../../ui/analyticsHub/hub/AnalyticsOverviewSection';
 import AnalyticsCategoriesSection from '../../ui/analyticsHub/hub/AnalyticsCategoriesSection';
 import type { AIAnalyticsCategory } from '@/types/domains/analytics/ai';
+import { AnalyticsCategory, AnalyticsSubCategory } from '@/types/domains/analytics';
 
 interface AnalyticsHubViewProps {
   selectedCategory: AnalyticsCategory;

@@ -375,7 +375,7 @@
     "milestones": {
       "bufferMilestone": {
         "title": "Sicherheitspuffer",
-        "description": "Verfolge, wie viele Monate der Gesamtausgaben (Fixkosten und bekannte variable Ausgaben) deine liquiden Mittel abdecken könnten. Dieser finanzielle Puffer bietet Sicherheit und Vertrauen für Investitionsentscheidungen.",
+        "description": "Verfolge, wie viele Monate der Gesamtausgaben (Fixkosten und bekannte variable Ausgaben) deine liquiden Mittel (Cash, Aktien, Krypto) abdecken könnten. Dieser finanzielle Puffer bietet Sicherheit und Vertrauen für Investitionsentscheidungen.",
         "noExpenses": "Noch keine Ausgaben erfasst. Füge deine wiederkehrenden Ausgaben hinzu, um deinen Sicherheitspuffer aufzubauen.",
         "monthsCovered": "{{months}} Monate Ausgaben gedeckt",
         "milestone2": "2 Monate Notgroschen erreicht – Du hast einen ersten Sicherheitspuffer aufgebaut.",
