@@ -13,6 +13,7 @@ interface DividendApiSettingsSectionProps {
   onProviderChange: (provider: string) => void;
   onApiKeyChange: (provider: string, apiKey: string) => void;
   onApiKeyRemove: (provider: string) => void;
+  isDeveloperModeEnabled: boolean;
 }
 
 const providerInfo = {
@@ -38,6 +39,7 @@ export const DividendApiSettingsSection: React.FC<DividendApiSettingsSectionProp
   onProviderChange,
   onApiKeyChange,
   onApiKeyRemove,
+  isDeveloperModeEnabled,
 }) => {
   const { t } = useTranslation();
   const safeProvider = selectedProvider && providerInfo[selectedProvider as 'yahoo' | 'finnhub'] ? selectedProvider : 'yahoo';
@@ -60,6 +62,9 @@ export const DividendApiSettingsSection: React.FC<DividendApiSettingsSectionProp
       }
     }
   };
+
+  // Provider-Liste filtern: Yahoo nur im Developer Mode
+  const availableProviders = isDeveloperModeEnabled ? ['yahoo', 'finnhub'] : ['finnhub'];
 
   return (
     <CollapsibleSection
@@ -86,7 +91,7 @@ export const DividendApiSettingsSection: React.FC<DividendApiSettingsSectionProp
           <div>
             <h3 className="font-medium">{t('settings.selectDividendApiProvider')}</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-              {(['yahoo', 'finnhub'] as string[]).map((provider) => {
+              {availableProviders.map((provider) => {
                 const info = providerInfo[provider as 'yahoo' | 'finnhub'];
                 const isSelected = selectedProvider === provider;
                 return (

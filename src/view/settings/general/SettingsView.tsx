@@ -1,28 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardHeader, CardTitle, CardContent, CollapsibleSection, Toggle, ConfirmationDialog, Button, ButtonGroup } from '@ui/shared';
-import { Download, Upload, Key, ChevronRight, Trash, Monitor, Brain, Shield } from 'lucide-react';
+import { CollapsibleSection, ConfirmationDialog } from '@ui/shared';
+import { Download, Trash, Monitor, Brain, Shield } from 'lucide-react';
 import DebugSettings from '@/ui/settings/DebugSettings';
 import { featureFlag_Debug_Settings_View } from '@/config/featureFlags';
 import { StockAPIProvider } from '@/types/shared/base/enums';
 import { DashboardMode } from '@/types/shared/analytics';
-import clsx from 'clsx';
 import { DividendApiSettingsSection } from '../../../ui/settings/DividendApiSettingsSection';
-import { StockApiSettingsSection } from '../../../ui/settings/StockApiSettingsSection';
-import { useDeviceCheck } from '@/service/shared/utilities/helper/useDeviceCheck';
+import { StockApiProviderSection } from '../../../ui/settings/StockApiProviderSection';
+import { ClearDataSection } from '../../../ui/settings/ClearDataSection';
+import { DeveloperModeSettingsSection } from '../../../ui/settings/DeveloperModeSettingsSection';
+import { DataManagementSection } from '../../../ui/settings/DataManagementSection';
+import { DashboardSettingsSection } from '../../../ui/settings/DashboardSettingsSection';
+import { AboutSection } from '../../../ui/settings/AboutSection';
 import { AISettingsContainer } from '@/container/settings/AISettingsContainer';
-import { ClearButton, getButtonText, getClearButtonIcon } from '@/ui/settings';
+import { getButtonText } from '@/ui/settings';
 import { ClearStatus } from '@/types/shared/ui/clearButton';
-
-interface ProviderInfo {
-  name: string;
-  description: string;
-  keyPlaceholder: string;
-  website: string;
-  requiresApiKey: boolean;
-}
-
-type ProviderInfoMap = Record<StockAPIProvider, ProviderInfo>;
 
 interface SettingsViewProps {
   exportStatus: 'idle' | 'loading' | 'success' | 'error';
@@ -150,7 +143,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onCloseConfirmDialog,
   isDividendApiEnabled,
   onDividendApiToggle,
-  // Fix: Add missing prop for dividend history clear
   onClearDividendHistory,
   onPortfolioHistoryRefresh,
   // Developer Mode Props
@@ -162,8 +154,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onDeveloperModeDeactivation,
 }) => {
   const { t } = useTranslation();
-  const isDesktop = useDeviceCheck();
-  const isSmartphone = !isDesktop;
   const [showApiKey, setShowApiKey] = useState(false);
   const [tempApiKeys, setTempApiKeys] = useState<Record<StockAPIProvider, string>>({
     [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? '',
@@ -190,89 +180,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
     });
   }, [apiKeys]);
 
-  // Provider information
-  const providerInfo: ProviderInfoMap = {
-    [StockAPIProvider.FINNHUB]: {
-      name: 'Finnhub',
-      description: t('settings.finnhubDescription'),
-      keyPlaceholder: t('settings.enterFinnhubApiKey'),
-      website: 'https://finnhub.io',
-      requiresApiKey: true
-    },
-    [StockAPIProvider.YAHOO]: {
-      name: 'Yahoo Finance',
-      description: t('settings.yahooDescription'),
-      keyPlaceholder: t('settings.enterYahooApiKey'),
-      website: 'https://finance.yahoo.com',
-      requiresApiKey: false
-    },
-    [StockAPIProvider.ALPHA_VANTAGE]: {
-      name: 'Alpha Vantage',
-      description: t('settings.alphaVantageDescription'),
-      keyPlaceholder: t('settings.enterAlphaVantageApiKey'),
-      website: 'https://www.alphavantage.co',
-      requiresApiKey: true
-    },
-    [StockAPIProvider.IEX_CLOUD]: {
-      name: 'IEX Cloud',
-      description: 'Real-time and historical financial data from IEX Cloud',
-      keyPlaceholder: 'Enter your IEX Cloud API key',
-      website: 'https://iexcloud.io',
-      requiresApiKey: true
-    },
-    [StockAPIProvider.TWELVE_DATA]: {
-      name: 'Twelve Data',
-      description: 'Real-time and historical financial data from Twelve Data API',
-      keyPlaceholder: 'Enter your Twelve Data API key',
-      website: 'https://twelvedata.com',
-      requiresApiKey: true
-    },
-    [StockAPIProvider.QUANDL]: {
-      name: 'Quandl (Nasdaq Data Link)',
-      description: 'Financial and economic data from Quandl/Nasdaq Data Link',
-      keyPlaceholder: 'Enter your Quandl API key',
-      website: 'https://data.nasdaq.com',
-      requiresApiKey: true
-    },
-    [StockAPIProvider.EOD_HISTORICAL_DATA]: {
-      name: 'EOD Historical Data',
-      description: 'End-of-day and real-time financial data',
-      keyPlaceholder: 'Enter your EOD Historical Data API key',
-      website: 'https://eodhistoricaldata.com',
-      requiresApiKey: true
-    },
-    [StockAPIProvider.POLYGON_IO]: {
-      name: 'Polygon.io',
-      description: 'Real-time and historical stock market data from Polygon.io',
-      keyPlaceholder: 'Enter your Polygon.io API key',
-      website: 'https://polygon.io',
-      requiresApiKey: true
-    }
-  };
-
   // Extract button text helpers for reduced complexity
-  const exportButtonText = getButtonText(exportStatus, t, 'settings.exporting', 'settings.exported', 'settings.export');
-  const importButtonText = getButtonText(importStatus, t, 'settings.importing', 'settings.imported', 'settings.import');
   const apiKeyButtonText = getButtonText(apiKeyStatus, t, 'settings.saving', 'settings.saved', 'settings.saveApiKey');
-  const developerButtonText = getButtonText(developerActivationStatus, t, 'settings.activating', 'settings.activated', 'settings.activate');
-
-  // Unterstützte Stores für gezielten Export/Import
-  const STORE_OPTIONS = [
-    { key: 'transactions', label: t('settings.transactions') },
-    { key: 'assetDefinitions', label: t('settings.assetDefinitions') },
-    { key: 'assetCategories', label: t('settings.assetCategories') },
-    { key: 'assetCategoryOptions', label: t('settings.assetCategoryOptions') },
-    { key: 'assetCategoryAssignments', label: t('settings.assetCategoryAssignments') },
-    { key: 'liabilities', label: t('settings.liabilities') },
-    { key: 'expenses', label: t('settings.expenses') },
-    { key: 'income', label: t('settings.income') },
-    { key: 'exchangeRates', label: t('settings.exchangeRates') },
-  ];
-
-  const [selectedStores, setSelectedStores] = useState<string[]>(STORE_OPTIONS.map(opt => opt.key));
-
-  // Move fileInputRef to the top level of the component
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="space-y-6">
@@ -284,41 +193,10 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         icon={<Monitor size={20} />}
         defaultExpanded={false}
       >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{t('settings.dashboardMode')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('settings.dashboardModeDescription')}
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <ButtonGroup className="flex space-x-3">
-              <Button
-                onClick={() => onDashboardModeChange('smartSummary')}
-                variant={dashboardMode === 'smartSummary' ? 'default' : 'secondary'}
-                size="sm"
-              >
-                {t('settings.smartSummary')}
-              </Button>
-              <Button
-                onClick={() => onDashboardModeChange('assetFocus')}
-                variant={dashboardMode === 'assetFocus' ? 'default' : 'secondary'}
-                size="sm"
-              >
-                {t('settings.assetFocus')}
-              </Button>
-            </ButtonGroup>
-            
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              {t('settings.currentDashboardMode', {
-                mode: dashboardMode === 'smartSummary' ? t('settings.smartSummary') : t('settings.assetFocus'),
-              })}
-            </p>
-          </div>
-        </div>
+        <DashboardSettingsSection
+          dashboardMode={dashboardMode}
+          onDashboardModeChange={onDashboardModeChange}
+        />
       </CollapsibleSection>
 
       {/* AI Assistant Configuration */}
@@ -330,144 +208,47 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         <AISettingsContainer />
       </CollapsibleSection>
       
-      {/* API Configuration */}
-      <CollapsibleSection
-        title={t('settings.stockApiConfig')}
-        icon={<Key size={20} />}
-        defaultExpanded={false}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{t('settings.enableStockApi')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('settings.enableStockApiDescription')}
-              </p>
-            </div>
-            <Toggle
-              checked={isApiEnabled}
-              onChange={onApiToggle || (() => {})}
-              id="api-toggle"
-              label={t('settings.enableStockApi')}
-            />
-          </div>
-
-          {/* Provider Selection */}
-          {isApiEnabled && (
-            <div>
-              <h3 className="font-medium">{t('settings.selectProvider')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-                {t('settings.selectProviderDescription')}
-              </p>
-              
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {Object.values(StockAPIProvider).map((provider) => {
-                  const info = providerInfo[provider];
-                  const isSelected = selectedProvider === provider;
-                  // Yahoo Finance doesn't require an API key, so it's always configured
-                  const isConfigured = provider === StockAPIProvider.YAHOO ? true : !!(apiKeys?.[provider]);
-                  
-                  // Extract className logic for provider selection
-                  const providerClassName = isSelected
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600';
-                  
-                  return (
-                    <div
-                      key={provider}
-                      onClick={() => onProviderChange(provider)}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${providerClassName}`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="font-medium">{info.name}</div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {info.description}
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          {isConfigured && (
-                            <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded">
-                              {t('settings.configured')}
-                            </span>
-                          )}
-                          {isSelected && (
-                            <span className="text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-1 rounded">
-                              {t('settings.active')}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* API Key Configuration for Selected Provider */}
-          {isApiEnabled && providerInfo[selectedProvider].requiresApiKey && (
-            <div>
-              <StockApiSettingsSection
-                selectedProvider={selectedProvider}
-                apiKeys={{
-                  [StockAPIProvider.FINNHUB]: apiKeys?.[StockAPIProvider.FINNHUB] ?? '',
-                  [StockAPIProvider.YAHOO]: apiKeys?.[StockAPIProvider.YAHOO] ?? '',
-                  [StockAPIProvider.ALPHA_VANTAGE]: apiKeys?.[StockAPIProvider.ALPHA_VANTAGE] ?? '',
-                  [StockAPIProvider.IEX_CLOUD]: apiKeys?.[StockAPIProvider.IEX_CLOUD] ?? '',
-                  [StockAPIProvider.TWELVE_DATA]: apiKeys?.[StockAPIProvider.TWELVE_DATA] ?? '',
-                  [StockAPIProvider.QUANDL]: apiKeys?.[StockAPIProvider.QUANDL] ?? '',
-                  [StockAPIProvider.EOD_HISTORICAL_DATA]: apiKeys?.[StockAPIProvider.EOD_HISTORICAL_DATA] ?? '',
-                  [StockAPIProvider.POLYGON_IO]: apiKeys?.[StockAPIProvider.POLYGON_IO] ?? '',
-                }}
-                apiKeyStatus={apiKeyStatus}
-                apiKeyError={apiKeyError}
-                tempApiKeys={tempApiKeys}
-                setTempApiKeys={setTempApiKeys}
-                showApiKey={showApiKey}
-                setShowApiKey={setShowApiKey}
-                onApiKeyChange={onApiKeyChange}
-                onApiKeyRemove={onApiKeyRemove}
-                providerInfo={providerInfo}
-                apiKeyButtonText={apiKeyButtonText}
-              />
-            </div>
-          )}
-          
-          <div>
-            <h3 className="font-medium">{t('settings.stockMarketCurrency')}</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-              {t('settings.stockMarketCurrencyDescription')}
-            </p>
-            <div className="flex items-center space-x-4">
-              <Toggle
-                checked={currency === 'EUR'}
-                onChange={(checked) => onCurrencyChange(checked ? 'EUR' : 'USD')}
-                id="currency-toggle"
-                label={t('settings.currencyToggleLabel')}
-              />
-              <span className="text-sm">
-                {currency === 'EUR'
-                  ? t('settings.eurAutoConverted')
-                  : t('settings.usdOriginal')}
-              </span>
-            </div>
-            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
-              {t('settings.currentCurrency', { currency })}
-            </p>
-          </div>
-        </div>
-      </CollapsibleSection>
+      {/* Stock API Configuration */}
+      <StockApiProviderSection
+        isApiEnabled={isApiEnabled}
+        selectedProvider={selectedProvider}
+        apiKeys={apiKeys}
+        apiKeyStatus={apiKeyStatus}
+        apiKeyError={apiKeyError}
+        currency={currency}
+        isDeveloperModeEnabled={isDeveloperModeEnabled}
+        tempApiKeys={tempApiKeys}
+        showApiKey={showApiKey}
+        onApiToggle={onApiToggle}
+        onProviderChange={onProviderChange}
+        onApiKeyChange={onApiKeyChange}
+        onApiKeyRemove={onApiKeyRemove}
+        onCurrencyChange={onCurrencyChange}
+        setTempApiKeys={setTempApiKeys}
+        setShowApiKey={setShowApiKey}
+        apiKeyButtonText={apiKeyButtonText}
+      />
 
       {/* Dividend API Configuration */}
       <DividendApiSettingsSection
         enabled={isDividendApiEnabled}
-        selectedProvider={selectedDiviProvider || 'yahoo'}
-        apiKeys={dividendApiKey || {}}
+        selectedProvider={
+          selectedDiviProvider
+            ? selectedDiviProvider
+            : (isDeveloperModeEnabled
+                ? 'yahoo'
+                : Object.keys(dividendApiKey).find(p => p !== 'yahoo') || '')
+        }
+        apiKeys={
+          Object.fromEntries(
+            Object.entries(dividendApiKey || {}).filter(([p]) => isDeveloperModeEnabled || p !== 'yahoo')
+          )
+        }
         onEnabledChange={onDividendApiToggle}
         onProviderChange={onDiviProviderChange}
         onApiKeyChange={onDiviApiKeyChange}
         onApiKeyRemove={onDiviApiKeyRemove}
+        isDeveloperModeEnabled={isDeveloperModeEnabled}
       />
 
       {/* Data Management */}
@@ -476,110 +257,13 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         icon={<Download size={20} />}
         defaultExpanded={false}
       >
-        <div className="space-y-4">
-          {/* Import Button */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{t('settings.importData')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('settings.importDescription')}
-              </p>
-              {importError && (
-                <p className="text-sm text-red-500 mt-1">{importError}</p>
-              )}
-            </div>
-            <div className={isSmartphone ? '!w-[10vw] min-w-[48px] max-w-[80px] flex justify-center' : 'relative'} style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}>
-              {/* File-Input per Button-Ref triggern */}
-              <input
-                ref={fileInputRef}
-                id="import-file-input"
-                type="file"
-                accept="application/json"
-                onChange={onImportData}
-                className="hidden"
-                disabled={importStatus === 'loading'}
-              />
-              <Button
-                type="button"
-                disabled={importStatus === 'loading'}
-                className={`flex items-center space-x-2${isSmartphone ? ' justify-center' : ''}`}
-                style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Upload size={16} />
-                {!isSmartphone && <span>{importButtonText}</span>}
-              </Button>
-            </div>
-          </div>
-          {/* Export Button */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="font-medium">{t('settings.exportData')}</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {t('settings.exportDescription')}
-              </p>
-            </div>
-            <div className={isSmartphone ? '!w-[10vw] min-w-[48px] max-w-[80px] flex justify-center' : ''} style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}>
-              <Button
-                onClick={() => onExportData(selectedStores)}
-                disabled={exportStatus === 'loading' || selectedStores.length === 0}
-                className={`flex items-center space-x-2${isSmartphone ? ' justify-center' : ''}`}
-                style={isSmartphone ? { width: '10vw', minWidth: 48, maxWidth: 80 } : {}}
-              >
-                <Download size={16} />
-                {!isSmartphone && <span>{exportButtonText}</span>}
-              </Button>
-            </div>
-          </div>
-
-          {/* Store Auswahl Collapsible (jetzt als <details>) */}
-          <details className="mb-2 border border-blue-200 dark:border-blue-700 rounded-lg bg-blue-50 dark:bg-blue-900/10 px-4 py-2">
-            <summary className="cursor-pointer font-medium text-blue-700 dark:text-blue-300 py-2 select-none">
-              {t('settings.selectDataSets')}
-            </summary>
-            <div className="mt-2">
-              {/* Chips für ausgewählte Stores */}
-              <div className="flex flex-wrap gap-2 mb-2">
-                {selectedStores.map(key => {
-                  const label = STORE_OPTIONS.find(opt => opt.key === key)?.label || key;
-                  return (
-                    <span key={key} className="flex items-center bg-blue-600 text-white rounded-full px-3 py-1 text-sm mr-1 mb-1">
-                      {label}
-                      <button
-                        type="button"
-                        className="ml-2 text-white hover:text-gray-200 focus:outline-none"
-                        onClick={() => setSelectedStores(selectedStores.filter(k => k !== key))}
-                        aria-label={`Remove ${label}`}
-                      >
-                        ×
-                      </button>
-                    </span>
-                  );
-                })}
-              </div>
-              {/* Multi-Select Input */}
-              <div className="relative w-full max-w-md">
-                <select
-                  multiple
-                  value={selectedStores}
-                  onChange={e => {
-                    const options = Array.from(e.target.selectedOptions).map(opt => opt.value);
-                    setSelectedStores(options);
-                  }}
-                  className="block w-full border border-blue-400 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-900"
-                  size={Math.min(STORE_OPTIONS.length, 6)}
-                >
-                  {STORE_OPTIONS.map(opt => (
-                    <option key={opt.key} value={opt.key} className="py-1">
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <p className="text-xs text-gray-400 mt-1">{t('settings.selectDataSetsHint')}</p>
-            </div>
-          </details>
-        </div>
+        <DataManagementSection
+          exportStatus={exportStatus}
+          importStatus={importStatus}
+          importError={importError}
+          onExportData={onExportData}
+          onImportData={onImportData}
+        />
       </CollapsibleSection>
 
       {/* Clear Data Section */}
@@ -588,122 +272,26 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         icon={<Trash size={20} />}
         defaultExpanded={false}
       >
-        <div className="space-y-4">
-          {/* Asset Management Section */}
-          <div>
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-              {t("settings.assetManagement")}
-            </h3>
-            <div className="space-y-3">
-              <ClearButton
-                status={clearAssetDefinitionsStatus}
-                onClick={onClearAssetDefinitions}
-                titleKey="settings.clearAssetDefinitions"
-                descKey="settings.clearAssetDefinitionsDesc"
-                t={t}
-              />
-              <ClearButton
-                status={clearPriceHistoryStatus}
-                onClick={onClearPriceHistory}
-                titleKey="settings.clearPriceHistory"
-                descKey="settings.clearPriceHistoryDesc"
-                t={t}
-              />
-              {/* Transaktionen löschen */}
-              <ClearButton
-                status={clearAssetTransactionsStatus}
-                onClick={onClearAssetTransactions}
-                titleKey="settings.clearAssetTransactions"
-                descKey="settings.clearAssetTransactionsDesc"
-                t={t}
-              />
-              {/* Dividendenverlauf löschen */}
-              <ClearButton
-                status={clearDividendHistoryStatus}
-                onClick={onClearDividendHistory}
-                titleKey="settings.clearDividendHistory"
-                descKey="settings.clearDividendHistoryDesc"
-                t={t}
-              />
-            </div>
-          </div>
-
-          {/* Financial Management Section */}
-          <div>
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-              {t("settings.financialManagement")}
-            </h3>
-            <div className="space-y-3">
-              <ClearButton
-                status={clearDebtsStatus}
-                onClick={onClearDebts}
-                titleKey="settings.clearDebts"
-                descKey="settings.clearDebtsDesc"
-                t={t}
-              />
-
-              <ClearButton
-                status={clearExpensesStatus}
-                onClick={onClearExpenses}
-                titleKey="settings.clearExpenses"
-                descKey="settings.clearExpensesDesc"
-                t={t}
-              />
-
-              <ClearButton
-                status={clearIncomeStatus}
-                onClick={onClearIncome}
-                titleKey="settings.clearIncome"
-                descKey="settings.clearIncomeDesc"
-                t={t}
-              />
-            </div>
-          </div>
-
-          {/* Cache Management Section */}
-          <div>
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-              {t("settings.cacheManagement")}
-            </h3>
-            <div className="space-y-3">
-              <ClearButton
-                status={clearReduxCacheStatus}
-                onClick={onClearReduxCache}
-                titleKey="settings.clearReduxCache"
-                descKey="settings.clearReduxCacheDesc"
-                t={t}
-              />
-            </div>
-          </div>
-
-          {/* Complete Reset Section */}
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">
-              {t("settings.completeReset")}
-            </h3>
-            <div className="space-y-3">
-              <Button
-                variant="destructive"
-                className={clsx("w-full justify-between", {
-                  'opacity-50': clearAllDataStatus === "clearing"
-                })}
-                onClick={onClearAllData}
-                disabled={clearAllDataStatus === "clearing"}
-              >
-                <div className="text-left">
-                  <span className="flex items-center mb-1">
-                    {getClearButtonIcon(clearAllDataStatus)}
-                    {t("settings.clearAllData")}
-                  </span>
-                  <p className="text-sm text-gray-400">
-                    {t("settings.clearAllDataDesc")}
-                  </p>
-                </div>
-                <ChevronRight className="h-4 w-4 flex-shrink-0" />
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ClearDataSection
+          clearAssetDefinitionsStatus={clearAssetDefinitionsStatus}
+          clearPriceHistoryStatus={clearPriceHistoryStatus}
+          clearAssetTransactionsStatus={clearAssetTransactionsStatus}
+          clearDebtsStatus={clearDebtsStatus}
+          clearExpensesStatus={clearExpensesStatus}
+          clearIncomeStatus={clearIncomeStatus}
+          clearAllDataStatus={clearAllDataStatus}
+          clearReduxCacheStatus={clearReduxCacheStatus}
+          clearDividendHistoryStatus={clearDividendHistoryStatus}
+          onClearAssetDefinitions={onClearAssetDefinitions}
+          onClearPriceHistory={onClearPriceHistory}
+          onClearAssetTransactions={onClearAssetTransactions}
+          onClearDebts={onClearDebts}
+          onClearExpenses={onClearExpenses}
+          onClearIncome={onClearIncome}
+          onClearAllData={onClearAllData}
+          onClearReduxCache={onClearReduxCache}
+          onClearDividendHistory={onClearDividendHistory}
+        />
       </CollapsibleSection>
 
       {/* Developer Mode Settings */}
@@ -712,83 +300,14 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         icon={<Shield size={20} />}
         defaultExpanded={false}
       >
-        <div className="space-y-4">
-          {isDeveloperModeEnabled ? (
-            // Developer mode is active
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-700">
-                <div>
-                  <h3 className="font-medium text-green-800 dark:text-green-200">
-                    {t('settings.developerModeActive')}
-                  </h3>
-                  <p className="text-sm text-green-600 dark:text-green-400">
-                    {t('settings.developerModeDescription')}
-                  </p>
-                </div>
-                <div className="flex items-center">
-                  <span className="text-xs bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-1 rounded">
-                    {t('settings.activated')}
-                  </span>
-                </div>
-              </div>
-              
-              {/* Deactivation Button */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-medium">{t('settings.disableDeveloperMode')}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {t('settings.disableDeveloperModeDescription')}
-                  </p>
-                </div>
-                <Button
-                  onClick={onDeveloperModeDeactivation}
-                  variant="outline"
-                  size="sm"
-                  className="text-red-600 border-red-200 hover:bg-red-50 dark:text-red-400 dark:border-red-700 dark:hover:bg-red-900/20"
-                >
-                  {t('settings.deactivate')}
-                </Button>
-              </div>
-            </div>
-          ) : (
-            // Developer mode activation form
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="font-medium">{t('settings.enableDeveloperMode')}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {t('settings.developerModeDescription')}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label htmlFor="developer-password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('settings.developerPassword')}
-                  </label>
-                  <input
-                    id="developer-password"
-                    type="password"
-                    value={developerPassword}
-                    onChange={(e) => onDeveloperPasswordChange(e.target.value)}
-                    placeholder={t('settings.enterDeveloperPassword')}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    disabled={developerActivationStatus === 'loading'}
-                  />
-                </div>
-
-                <Button
-                  onClick={onDeveloperModeActivation}
-                  disabled={developerActivationStatus === 'loading' || !developerPassword.trim()}
-                  className="w-full"
-                >
-                  {developerButtonText}
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
+        <DeveloperModeSettingsSection
+          isDeveloperModeEnabled={isDeveloperModeEnabled}
+          developerPassword={developerPassword}
+          developerActivationStatus={developerActivationStatus}
+          onDeveloperPasswordChange={onDeveloperPasswordChange}
+          onDeveloperModeActivation={onDeveloperModeActivation}
+          onDeveloperModeDeactivation={onDeveloperModeDeactivation}
+        />
       </CollapsibleSection>
       
       {/* Debug Settings Component */}
@@ -808,35 +327,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         />
       )}
       {/* About */}
-      <Card className="bg-white dark:bg-gray-800">
-        <CardHeader>
-          <CardTitle>{t('settings.about')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              <strong>{t('settings.appName')}</strong>
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('settings.version', { version: '1.0.0' })}
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {t('settings.appDescription')}
-            </p>
-
-            {featureFlag_Debug_Settings_View ||  isDeveloperModeEnabled && (
-              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <p className="text-xs text-yellow-600 dark:text-yellow-400 font-mono">
-                  🚧 {t('settings.debugModeActive')}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {t('settings.debugModeDescription')}
-                </p>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <AboutSection
+        isDeveloperModeEnabled={isDeveloperModeEnabled}
+      />
 
       {/* Add Confirmation Dialog */}
       <ConfirmationDialog
