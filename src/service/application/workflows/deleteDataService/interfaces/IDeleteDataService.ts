@@ -8,6 +8,7 @@ export interface DeleteDataService {
     clearIncome(): Promise<void>;
     clearAllData(): Promise<void>;
     clearPartialData(): Promise<void>;
+    clearDividendHistory(): Promise<void>;
     clearPortfolioHistory(): Promise<void>;
     clearReduxCacheOnly(dispatch: import('redux').Dispatch): Promise<void>;
 }

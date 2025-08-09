@@ -7,47 +7,41 @@ import { ClearStatus } from '@/types/shared/ui/clearButton';
 import clsx from 'clsx';
 
 interface ClearDataSectionProps {
-  clearAssetDefinitionsStatus: ClearStatus;
-  clearPriceHistoryStatus: ClearStatus;
-  clearAssetTransactionsStatus: ClearStatus;
-  clearDebtsStatus: ClearStatus;
-  clearExpensesStatus: ClearStatus;
-  clearIncomeStatus: ClearStatus;
-  clearAllDataStatus: ClearStatus;
-  clearReduxCacheStatus: ClearStatus;
-  clearDividendHistoryStatus: ClearStatus;
-  onClearAssetDefinitions: () => void;
-  onClearPriceHistory: () => void;
-  onClearAssetTransactions: () => void;
-  onClearDebts: () => void;
-  onClearExpenses: () => void;
-  onClearIncome: () => void;
-  onClearAllData: () => void;
-  onClearReduxCache: () => void;
-  onClearDividendHistory: () => void;
+  // Consolidated props instead of individual ones
+  clearStatuses: Record<string, ClearStatus>;
+  clearHandlers: Record<string, () => void>;
 }
 
 export const ClearDataSection: React.FC<ClearDataSectionProps> = ({
-  clearAssetDefinitionsStatus,
-  clearPriceHistoryStatus,
-  clearAssetTransactionsStatus,
-  clearDebtsStatus,
-  clearExpensesStatus,
-  clearIncomeStatus,
-  clearAllDataStatus,
-  clearReduxCacheStatus,
-  clearDividendHistoryStatus,
-  onClearAssetDefinitions,
-  onClearPriceHistory,
-  onClearAssetTransactions,
-  onClearDebts,
-  onClearExpenses,
-  onClearIncome,
-  onClearAllData,
-  onClearReduxCache,
-  onClearDividendHistory,
+  clearStatuses,
+  clearHandlers,
 }) => {
   const { t } = useTranslation();
+
+  // Extract individual statuses and handlers from the objects
+  const {
+    assetDefinitions: clearAssetDefinitionsStatus,
+    priceHistory: clearPriceHistoryStatus,
+    assetTransactions: clearAssetTransactionsStatus,
+    debts: clearDebtsStatus,
+    expenses: clearExpensesStatus,
+    income: clearIncomeStatus,
+    allData: clearAllDataStatus,
+    reduxCache: clearReduxCacheStatus,
+    dividendHistory: clearDividendHistoryStatus,
+  } = clearStatuses;
+
+  const {
+    assetDefinitions: onClearAssetDefinitions = () => {},
+    priceHistory: onClearPriceHistory = () => {},
+    assetTransactions: onClearAssetTransactions = () => {},
+    debts: onClearDebts = () => {},
+    expenses: onClearExpenses = () => {},
+    income: onClearIncome = () => {},
+    allData: onClearAllData = () => {},
+    reduxCache: onClearReduxCache = () => {},
+    dividendHistory: onClearDividendHistory = () => {},
+  } = clearHandlers;
 
   return (
     <div className="space-y-4">

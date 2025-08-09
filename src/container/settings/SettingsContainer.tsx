@@ -36,23 +36,8 @@ const SettingsContainer: React.FC = () => {
   const dispatch = useAppDispatch();
   const stockApiConfig = useAppSelector((state) => state.config.apis.stock);
   const dividendApiConfig = useAppSelector((state) => state.config.apis.dividend);
-  const dashboardSettings = useAppSelector((state) => state.config.dashboard);
   const currentDashboardMode = useAppSelector((state) => state.config.dashboard.assetFocus.mode);
   const developerConfig = useAppSelector((state) => state.config.developer);
-
-  // Memoized dashboard mode to ensure re-rendering
-  const dashboardMode = useMemo(() => currentDashboardMode, [currentDashboardMode]);
-
-  // Debug: Log dashboard settings changes
-  useEffect(() => {
-    Logger.info(`[Settings] Dashboard assetFocus state changed: ${JSON.stringify(dashboardSettings.assetFocus)}`);
-  }, [dashboardSettings.assetFocus]);
-
-  // Debug: Log specific mode changes
-  useEffect(() => {
-    Logger.info(`[Settings] Current dashboard mode: ${dashboardMode}`);
-  }, [dashboardMode]);
-
   const [exportStatus, setExportStatus] = useState<AsyncOperationStatus>("idle");
   const [importStatus, setImportStatus] = useState<AsyncOperationStatus>("idle");
   const [importError, setImportError] = useState<string | null>(null);
@@ -62,21 +47,25 @@ const SettingsContainer: React.FC = () => {
   const [apiKeyStatus, setApiKeyStatus] = useState<ApiKeyStatus>("idle");
   const [apiKeyError, setApiKeyError] = useState<string | null>(null);
   const [currency, setCurrency] = useState<"EUR" | "USD">("EUR");
-
-  // Clear data operation states
-  const [clearAssetDefinitionsStatus, setClearAssetDefinitionsStatus] = useState<ClearOperationStatus>("idle");
-  const [clearPriceHistoryStatus, setClearPriceHistoryStatus] = useState<ClearOperationStatus>("idle");
-  const [clearAssetTransactionsStatus, setClearAssetTransactionsStatus] = useState<ClearOperationStatus>("idle");
-  const [clearDebtsStatus, setClearDebtsStatus] = useState<ClearOperationStatus>("idle");
-  const [clearExpensesStatus, setClearExpensesStatus] = useState<ClearOperationStatus>("idle");
-  const [clearIncomeStatus, setClearIncomeStatus] = useState<ClearOperationStatus>("idle");
-  const [clearAllDataStatus, setClearAllDataStatus] = useState<ClearOperationStatus>("idle");
-  const [clearReduxCacheStatus, setClearReduxCacheStatus] = useState<ClearOperationStatus>("idle");
-  const [clearDividendHistoryStatus, setClearDividendHistoryStatus] = useState<ClearOperationStatus>("idle");
-
-  // Developer Mode State
+    // Developer Mode State
   const [developerPassword, setDeveloperPassword] = useState("");
   const [developerActivationStatus, setDeveloperActivationStatus] = useState<AsyncOperationStatus>("idle");
+
+   const dashboardMode = useMemo(() => currentDashboardMode, [currentDashboardMode]);
+
+
+  // Clear data operation states - consolidated into a single state map
+  const [clearStatuses, setClearStatuses] = useState<Record<string, ClearOperationStatus>>({
+    assetDefinitions: "idle",
+    priceHistory: "idle",
+    assetTransactions: "idle",
+    debts: "idle",
+    expenses: "idle",
+    income: "idle",
+    allData: "idle",
+    reduxCache: "idle",
+    dividendHistory: "idle"
+  });
 
   // Confirmation Dialog State
   const [confirmDialog, setConfirmDialog] = useState<ConfirmationDialogState>({
@@ -96,19 +85,165 @@ const SettingsContainer: React.FC = () => {
     });
   };
 
+  // Configuration for clear operations
+  const clearOperationsConfig = useMemo(() => [
+    {
+      key: 'assetDefinitions',
+      operation: 'clearAssetDefinitions' as keyof typeof deleteDataService,
+      titleKey: 'settings.clearAssetDefinitionsTitle',
+      confirmKey: 'settings.clearAssetDefinitionsConfirm',
+      successKey: 'settings.snackbar.assetDefinitionsCleared',
+      errorKey: 'settings.snackbar.assetDefinitionsClearError',
+    },
+    {
+      key: 'priceHistory',
+      operation: 'clearPriceHistory' as keyof typeof deleteDataService,
+      titleKey: 'settings.clearPriceHistoryTitle',
+      confirmKey: 'settings.clearPriceHistoryConfirm',
+      successKey: 'settings.snackbar.priceHistoryCleared',
+      errorKey: 'settings.snackbar.priceHistoryClearError',
+    },
+    {
+      key: 'assetTransactions',
+      operation: 'clearAssetTransactions' as keyof typeof deleteDataService,
+      titleKey: 'settings.clearAssetTransactionsTitle',
+      confirmKey: 'settings.clearAssetTransactionsConfirm',
+      successKey: 'settings.snackbar.assetTransactionsCleared',
+      errorKey: 'settings.snackbar.assetTransactionsClearError',
+    },
+    {
+      key: 'debts',
+      operation: 'clearDebts' as keyof typeof deleteDataService,
+      titleKey: 'settings.clearDebtsTitle',
+      confirmKey: 'settings.clearDebtsConfirm',
+      successKey: 'settings.snackbar.debtsCleared',
+      errorKey: 'settings.snackbar.debtsClearError',
+    },
+    {
+      key: 'expenses',
+      operation: 'clearExpenses' as keyof typeof deleteDataService,
+      titleKey: 'settings.clearExpensesTitle',
+      confirmKey: 'settings.clearExpensesConfirm',
+      successKey: 'settings.snackbar.expensesCleared',
+      errorKey: 'settings.snackbar.expensesClearError',
+    },
+    {
+      key: 'income',
+      operation: 'clearIncome' as keyof typeof deleteDataService,
+      titleKey: 'settings.clearIncomeTitle',
+      confirmKey: 'settings.clearIncomeConfirm',
+      successKey: 'settings.snackbar.incomeCleared',
+      errorKey: 'settings.snackbar.incomeClearError',
+    },
+    {
+      key: 'dividendHistory',
+      operation: 'clearDividendHistory' as keyof typeof deleteDataService,
+      titleKey: 'settings.clearDividendHistoryTitle',
+      confirmKey: 'settings.clearDividendHistoryConfirm',
+      successKey: 'settings.snackbar.dividendHistoryCleared',
+      errorKey: 'settings.snackbar.dividendHistoryClearError',
+    },
+    {
+      key: 'allData',
+      operation: 'clearAllData' as keyof typeof deleteDataService,
+      titleKey: 'settings.clearAllDataTitle',
+      confirmKey: 'settings.clearAllDataConfirm',
+      successKey: 'settings.snackbar.allDataCleared',
+      errorKey: 'settings.snackbar.allDataClearError',
+    }
+  ], []);
+
+  // Special handler for Redux cache (needs dispatch parameter)
+  const handleClearReduxCache = async () => {
+    const updateStatus = (status: ClearOperationStatus) => {
+      setClearStatuses(prev => ({ ...prev, reduxCache: status }));
+    };
+
+    try {
+      updateStatus("clearing");
+      Logger.info("Starting to clear Redux cache");
+      await deleteDataService.clearReduxCacheOnly(dispatch);
+      
+      Logger.info("Redux cache cleared successfully");
+      updateStatus("success");
+      dispatch(showSuccessSnackbar(t("settings.snackbar.reduxCacheCleared")));
+      setTimeout(() => updateStatus("idle"), 2000);
+    } catch (error) {
+      Logger.error("Failed to clear Redux cache: " + JSON.stringify(error));
+      updateStatus("idle");
+      dispatch(showErrorSnackbar(t("settings.snackbar.reduxCacheClearError")));
+    }
+  };
+
+  // Generic clear handler factory
+  const createClearHandler = (config: typeof clearOperationsConfig[0]) => async () => {
+    const updateStatus = (status: ClearOperationStatus) => {
+      setClearStatuses(prev => ({ ...prev, [config.key]: status }));
+    };
+
+    try {
+      updateStatus("clearing");
+      Logger.info(`Starting to clear ${config.key}`);
+
+      // Call the service method - special handling for clearReduxCacheOnly
+      const serviceMethod = deleteDataService[config.operation];
+      if (typeof serviceMethod === 'function') {
+        if (config.operation === 'clearReduxCacheOnly') {
+          await serviceMethod(dispatch);
+        } else {
+          await (serviceMethod as () => Promise<void>)();
+        }
+      } else {
+        throw new Error(`Service method ${config.operation} not found`);
+      }
+
+      updateStatus("success");
+      dispatch(showSuccessSnackbar(t(config.successKey)));
+    } catch (error) {
+      Logger.error(`Failed to clear ${config.key}: ${JSON.stringify(error)}`);
+      updateStatus("idle");
+      dispatch(showErrorSnackbar(t(config.errorKey)));
+    }
+  };
+
+  // Generate handlers from config
+  const clearHandlers = useMemo(() => {
+    const handlers: Record<string, () => Promise<void>> = {};
+    clearOperationsConfig.forEach(config => {
+      handlers[config.key] = createClearHandler(config);
+    });
+    // Add special handler for redux cache
+    handlers.reduxCache = handleClearReduxCache;
+    return handlers;
+  }, [clearOperationsConfig, dispatch]);
+
+  // Generate confirmation handlers from config
+  const clearHandlersWithConfirm = useMemo(() => {
+    const handlers: Record<string, () => void> = {};
+    clearOperationsConfig.forEach(config => {
+      handlers[config.key] = () => showConfirmDialog(
+        t(config.titleKey),
+        t(config.confirmKey),
+        clearHandlers[config.key]
+      );
+    });
+    // Add special handler for redux cache
+    handlers.reduxCache = () => showConfirmDialog(
+      t("settings.clearReduxCacheTitle"),
+      t("settings.clearReduxCacheConfirm"),
+      handleClearReduxCache
+    );
+    return handlers;
+  }, [clearOperationsConfig, clearHandlers, showConfirmDialog]);
+
   const closeConfirmDialog = () => {
     setConfirmDialog((prev) => ({ ...prev, isOpen: false }));
   };
 
-  // Load API keys and currency on mount
+  // Load currency on mount
   useEffect(() => {
-    // API keys are already loaded from localStorage in the initial state
-    // We just need to load the currency
     const storedCurrency = getCurrency();
     setCurrency(storedCurrency);
-    
-    // Load dashboard settings from localStorage
-    // dispatch(loadDashboardSettingsFromStorage());
   }, [dispatch]);
 
   const loadLogs = () => {
@@ -254,23 +389,6 @@ const SettingsContainer: React.FC = () => {
     return { timestamp: "", message: logEntry };
   };
 
-  const getLogLevelColor = (level: string) => {
-    switch (level) {
-      case "error":
-        return "text-red-600 dark:text-red-400";
-      case "warning":
-        return "text-yellow-600 dark:text-yellow-400";
-      case "info":
-        return "text-blue-600 dark:text-blue-400";
-      case "service":
-        return "text-green-600 dark:text-green-400";
-      case "redux":
-        return "text-purple-600 dark:text-purple-400";
-      default:
-        return "text-gray-600 dark:text-gray-400";
-    }
-  };
-
   const handleApiKeyChange = async (provider: StockAPIProvider, newApiKey: string) => {
     setApiKeyStatus("saving");
     setApiKeyError(null);
@@ -278,11 +396,11 @@ const SettingsContainer: React.FC = () => {
       dispatch(setStockApiKey({ provider, key: newApiKey }));
       dispatch(setStockApiEnabled(true));
       setApiKeyStatus("success");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.apiKeySaved") || "API-Schlüssel gespeichert."));
+      dispatch(showSuccessSnackbar(t("settings.snackbar.apiKeySaved")));
     } catch (error) {
       setApiKeyError("Failed to save API key");
       setApiKeyStatus("error");
-      dispatch(showErrorSnackbar(t("settings.snackbar.apiKeySaveError") || "Fehler beim Speichern des API-Schlüssels."));
+      dispatch(showErrorSnackbar(t("settings.snackbar.apiKeySaveError")));
       Logger.error("Failed to save API key" + JSON.stringify(error));
     }
   };
@@ -296,12 +414,12 @@ const SettingsContainer: React.FC = () => {
         dispatch(setStockApiEnabled(false));
       }
     }
-    dispatch(showSuccessSnackbar(t("settings.snackbar.apiKeyRemoved") || "API-Schlüssel entfernt."));
+    dispatch(showSuccessSnackbar(t("settings.snackbar.apiKeyRemoved")));
   };
 
   const handleProviderChange = (provider: StockAPIProvider) => {
     dispatch(setStockApiProvider(provider));
-    dispatch(showSuccessSnackbar(t("settings.snackbar.providerChanged") || "API-Provider geändert."));
+    dispatch(showSuccessSnackbar(t("settings.snackbar.providerChanged")));
   };
 
   const handleCurrencyChange = (newCurrency: "EUR" | "USD") => {
@@ -338,20 +456,14 @@ const SettingsContainer: React.FC = () => {
     try {
       setDeveloperActivationStatus("loading");
       
-      // Verify password hash
       const isValidPassword = await verifyHash(developerPassword, developerPasswordHash);
       
       if (isValidPassword) {
-        // Enable developer mode in Redux
         dispatch(setDeveloperModeEnabled(true));
-        
-        // Save to localStorage
         localStorage.setItem('developerModeEnabled', 'true');
         
         setDeveloperActivationStatus("success");
         dispatch(showSuccessSnackbar(t("settings.activated")));
-        
-        // Clear the password field
         setDeveloperPassword("");
         
         Logger.info("Developer mode activated");
@@ -372,10 +484,7 @@ const SettingsContainer: React.FC = () => {
 
   const handleDeveloperModeDeactivation = () => {
     try {
-      // Disable developer mode in Redux
       dispatch(setDeveloperModeEnabled(false));
-      
-      // Remove from localStorage
       localStorage.removeItem('developerModeEnabled');
       
       dispatch(showSuccessSnackbar(t("settings.deactivate") + "d"));
@@ -394,216 +503,22 @@ const SettingsContainer: React.FC = () => {
     }
   }, [dispatch]);
 
-  // Handle clearing all data
-  const handleClearAllData = async () => {
-    try {
-      setClearAllDataStatus("clearing");
-      Logger.infoService("Starting to clear all data");
-
-      // Zentrale Löschlogik nutzen
-      await deleteDataService.clearAllData();
-
-      setClearAllDataStatus("success");
-      Logger.infoService("All data cleared successfully");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.allDataCleared") || "Alle Daten erfolgreich gelöscht."));
-    } catch (error) {
-      Logger.error("Failed to clear all data" + JSON.stringify(error));
-      setClearAllDataStatus("idle");
-      dispatch(showErrorSnackbar(t("settings.snackbar.allDataClearError") || "Fehler beim Löschen aller Daten."));
-    }
-  };
-
-  // Handle clearing only asset definitions
-  const handleClearAssetDefinitions = async () => {
-    try {
-      setClearAssetDefinitionsStatus("clearing");
-      await deleteDataService.clearAssetDefinitions();
-      setClearAssetDefinitionsStatus("success");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.assetDefinitionsCleared") || "Asset-Definitionen gelöscht."));
-      setTimeout(() => setClearAssetDefinitionsStatus("idle"), 2000);
-    } catch (error) {
-      Logger.error("Failed to clear asset definitions" + JSON.stringify(error));
-      setClearAssetDefinitionsStatus("idle");
-      dispatch(showErrorSnackbar(t("settings.snackbar.assetDefinitionsClearError") || "Fehler beim Löschen der Asset-Definitionen."));
-    }
-  };
-
-  // Handle clearing only asset price history
-  const handleClearPriceHistory = async () => {
-    try {
-      setClearPriceHistoryStatus("clearing");
-      await deleteDataService.clearPriceHistory();
-      setClearPriceHistoryStatus("success");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.priceHistoryCleared") || "Kursverlauf gelöscht."));
-      setTimeout(() => setClearPriceHistoryStatus("idle"), 2000);
-    } catch (error) {
-      Logger.error("Failed to clear price history" + JSON.stringify(error));
-      setClearPriceHistoryStatus("idle");
-      dispatch(showErrorSnackbar(t("settings.snackbar.priceHistoryClearError") || "Fehler beim Löschen des Kursverlaufs."));
-    }
-  };
-
-  // Handle clearing only asset transactions
-  const handleClearAssetTransactions = async () => {
-    try {
-      setClearAssetTransactionsStatus("clearing");
-      await deleteDataService.clearAssetTransactions();
-      setClearAssetTransactionsStatus("success");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.assetTransactionsCleared") || "Transaktionen gelöscht."));
-      setTimeout(() => setClearAssetTransactionsStatus("idle"), 2000);
-    } catch (error) {
-      Logger.error("Failed to clear asset transactions" + JSON.stringify(error));
-      setClearAssetTransactionsStatus("idle");
-      dispatch(showErrorSnackbar(t("settings.snackbar.assetTransactionsClearError") || "Fehler beim Löschen der Transaktionen."));
-    }
-  };
-
-  // Handle clearing only debts
-  const handleClearDebts = async () => {
-    try {
-      setClearDebtsStatus("clearing");
-      await deleteDataService.clearDebts();
-      setClearDebtsStatus("success");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.debtsCleared") || "Schulden gelöscht."));
-      setTimeout(() => setClearDebtsStatus("idle"), 2000);
-    } catch (error) {
-      Logger.error("Failed to clear debts" + JSON.stringify(error));
-      setClearDebtsStatus("idle");
-      dispatch(showErrorSnackbar(t("settings.snackbar.debtsClearError") || "Fehler beim Löschen der Schulden."));
-    }
-  };
-
-  // Handle clearing only expenses
-  const handleClearExpenses = async () => {
-    try {
-      setClearExpensesStatus("clearing");
-      await deleteDataService.clearExpenses();
-      setClearExpensesStatus("success");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.expensesCleared") || "Ausgaben gelöscht."));
-      setTimeout(() => setClearExpensesStatus("idle"), 2000);
-    } catch (error) {
-      Logger.error("Failed to clear expenses" + JSON.stringify(error));
-      setClearExpensesStatus("idle");
-      dispatch(showErrorSnackbar(t("settings.snackbar.expensesClearError") || "Fehler beim Löschen der Ausgaben."));
-    }
-  };
-
-  // Handle clearing only income
-  const handleClearIncome = async () => {
-    try {
-      setClearIncomeStatus("clearing");
-      await deleteDataService.clearIncome();
-      setClearIncomeStatus("success");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.incomeCleared") || "Einnahmen gelöscht."));
-      setTimeout(() => setClearIncomeStatus("idle"), 2000);
-    } catch (error) {
-      Logger.error("Failed to clear income" + JSON.stringify(error));
-      setClearIncomeStatus("idle");
-      dispatch(showErrorSnackbar(t("settings.snackbar.incomeClearError") || "Fehler beim Löschen der Einnahmen."));
-    }
-  };
-
-  // Handle clearing Redux cache only
-  const handleClearReduxCache = async () => {
-    try {
-      setClearReduxCacheStatus("clearing");
-      Logger.info("Starting to clear Redux cache");
-
-      // Nutze deleteDataService für Redux-Cache + LocalStorage
-      await deleteDataService.clearReduxCacheOnly(dispatch);
-      
-      Logger.info("Redux cache cleared successfully");
-      setClearReduxCacheStatus("success");
-      dispatch(showSuccessSnackbar(t("settings.snackbar.reduxCacheCleared") || "Redux-Cache gelöscht."));
-      setTimeout(() => setClearReduxCacheStatus("idle"), 2000);
-    } catch (error) {
-      Logger.error("Failed to clear Redux cache: " + JSON.stringify(error));
-      setClearReduxCacheStatus("idle");
-      dispatch(showErrorSnackbar(t("settings.snackbar.reduxCacheClearError") || "Fehler beim Löschen des Redux-Caches."));
-    }
-  };
-
-  // Handle clear operations with confirmation dialogs
-  const handleClearAssetDefinitionsWithConfirm = () => {
-    showConfirmDialog(
-      t("settings.clearAssetDefinitionsTitle"),
-      t("settings.clearAssetDefinitionsConfirm"),
-      handleClearAssetDefinitions
-    );
-  };
-
-  const handleClearPriceHistoryWithConfirm = () => {
-    showConfirmDialog(
-      t("settings.clearPriceHistoryTitle"),
-      t("settings.clearPriceHistoryConfirm"),
-      handleClearPriceHistory
-    );
-  };
-
-  const handleClearAssetTransactionsWithConfirm = () => {
-    showConfirmDialog(
-      t("settings.clearAssetTransactionsTitle"),
-      t("settings.clearAssetTransactionsConfirm"),
-      handleClearAssetTransactions
-    );
-  };
-
-  const handleClearDebtsWithConfirm = () => {
-    showConfirmDialog(
-      t("settings.clearDebtsTitle"),
-      t("settings.clearDebtsConfirm"),
-      handleClearDebts
-    );
-  };
-
-  const handleClearExpensesWithConfirm = () => {
-    showConfirmDialog(
-      t("settings.clearExpensesTitle"),
-      t("settings.clearExpensesConfirm"),
-      handleClearExpenses
-    );
-  };
-
-  const handleClearIncomeWithConfirm = () => {
-    showConfirmDialog(
-      t("settings.clearIncomeTitle"),
-      t("settings.clearIncomeConfirm"),
-      handleClearIncome
-    );
-  };
-
-  const handleClearReduxCacheWithConfirm = () => {
-    showConfirmDialog(
-      t("settings.clearReduxCacheTitle"),
-      t("settings.clearReduxCacheConfirm"),
-      handleClearReduxCache
-    );
-  };
-
-  const handleClearAllDataWithConfirm = () => {
-    showConfirmDialog(
-      t("settings.clearAllDataTitle"),
-      t("settings.clearAllDataConfirm"),
-      handleClearAllData
-    );
-  };
-
   // --- Dividend API Provider/Key Handling ---
   // Accept string, cast to DividendApiProvider for Redux action
   const handleDiviApiKeyChange = (provider: string, newApiKey: string) => {
     dispatch(setDividendApiKey({ provider: provider as DividendApiProvider, key: newApiKey }));
     setApiKeyStatus("success");
-    dispatch(showSuccessSnackbar(t("settings.snackbar.diviApiKeySaved") || "Dividend-API-Schlüssel gespeichert."));
+    dispatch(showSuccessSnackbar(t("settings.snackbar.diviApiKeySaved")));
   };
 
   const handleDiviApiKeyRemove = (provider: string) => {
     dispatch(setDividendApiKey({ provider: provider as DividendApiProvider, key: "" }));
-    dispatch(showSuccessSnackbar(t("settings.snackbar.diviApiKeyRemoved") || "Dividend-API-Schlüssel entfernt."));
+    dispatch(showSuccessSnackbar(t("settings.snackbar.diviApiKeyRemoved")));
   };
 
   const handleDiviProviderChange = (provider: string) => {
     dispatch(setDividendApiProvider(provider as DividendApiProvider));
-    dispatch(showSuccessSnackbar(t("settings.snackbar.diviProviderChanged") || "Dividend-Provider geändert."));
+    dispatch(showSuccessSnackbar(t("settings.snackbar.diviProviderChanged")));
   };
 
   // Handle stock API toggle
@@ -614,51 +529,6 @@ const SettingsContainer: React.FC = () => {
 
   const handleDividendApiToggle = (enabled: boolean) => {
     dispatch(setDividendApiEnabled(enabled));
-  };
-
-  // Handle clearing only dividend history
-  const handleClearDividendHistory = async () => {
-    try {
-      setClearDividendHistoryStatus("clearing");
-      Logger.info("Starte das Löschen des Dividendenverlaufs aller AssetDefinitions");
-      const assetDefs = await sqliteService.getAll("assetDefinitions");
-      let updatedCount = 0;
-      for (const def of assetDefs) {
-        let changed = false;
-        if (def.dividendHistory && def.dividendHistory.length > 0) {
-          def.dividendHistory = [];
-          changed = true;
-        }
-        if (def.dividendGrowthPast3Y !== undefined) {
-          def.dividendGrowthPast3Y = undefined;
-          changed = true;
-        }
-        if (def.dividendForecast3Y && def.dividendForecast3Y.length > 0) {
-          def.dividendForecast3Y = undefined;
-          changed = true;
-        }
-        if (changed && def.id) {
-          await sqliteService.update("assetDefinitions", def);
-          updatedCount++;
-        }
-      }
-      setClearDividendHistoryStatus("success");
-      Logger.info(`Dividendenverlauf bei ${updatedCount} Assets gelöscht.`);
-      dispatch(showSuccessSnackbar(t("settings.snackbar.dividendHistoryCleared") || "Dividendenverlauf gelöscht."));
-      setTimeout(() => setClearDividendHistoryStatus("idle"), 2000);
-    } catch (error) {
-      Logger.error("Fehler beim Löschen des Dividendenverlaufs: " + JSON.stringify(error));
-      setClearDividendHistoryStatus("idle");
-      dispatch(showErrorSnackbar(t("settings.snackbar.dividendHistoryClearError") || "Fehler beim Löschen des Dividendenverlaufs."));
-    }
-  };
-
-  const handleClearDividendHistoryWithConfirm = () => {
-    showConfirmDialog(
-      t("settings.clearDividendHistoryTitle"),
-      t("settings.clearDividendHistoryConfirm"),
-      handleClearDividendHistory
-    );
   };
 
   return (
@@ -674,15 +544,8 @@ const SettingsContainer: React.FC = () => {
       apiKeyStatus={apiKeyStatus}
       apiKeyError={apiKeyError}
       currency={currency}
-      clearAssetDefinitionsStatus={clearAssetDefinitionsStatus}
-      clearPriceHistoryStatus={clearPriceHistoryStatus}
-      clearAssetTransactionsStatus={clearAssetTransactionsStatus}
-      clearDebtsStatus={clearDebtsStatus}
-      clearExpensesStatus={clearExpensesStatus}
-      clearIncomeStatus={clearIncomeStatus}
-      clearAllDataStatus={clearAllDataStatus}
-      clearReduxCacheStatus={clearReduxCacheStatus}
-      clearDividendHistoryStatus={clearDividendHistoryStatus}
+      clearStatuses={clearStatuses}
+      clearHandlers={clearHandlersWithConfirm}
       isApiEnabled={stockApiConfig.enabled}
       isDividendApiEnabled={dividendApiConfig.enabled}
       dashboardMode={dashboardMode}
@@ -702,23 +565,13 @@ const SettingsContainer: React.FC = () => {
       onProviderChange={handleProviderChange}
       onCurrencyChange={handleCurrencyChange}
       onDashboardModeChange={handleDashboardModeChange}
-      onClearAllData={handleClearAllDataWithConfirm}
-      onClearAssetDefinitions={handleClearAssetDefinitionsWithConfirm}
-      onClearPriceHistory={handleClearPriceHistoryWithConfirm}
-      onClearAssetTransactions={handleClearAssetTransactionsWithConfirm}
-      onClearDebts={handleClearDebtsWithConfirm}
-      onClearExpenses={handleClearExpensesWithConfirm}
-      onClearIncome={handleClearIncomeWithConfirm}
-      onClearReduxCache={handleClearReduxCacheWithConfirm}
       onDiviApiKeyChange={handleDiviApiKeyChange}
       onDiviApiKeyRemove={handleDiviApiKeyRemove}
       onDiviProviderChange={handleDiviProviderChange}
-      onClearDividendHistory={handleClearDividendHistoryWithConfirm}
       onPortfolioHistoryRefresh={() => cacheRefreshService.refreshAllCaches()}
       confirmDialog={confirmDialog}
       onCloseConfirmDialog={closeConfirmDialog}
       formatLogEntry={formatLogEntry}
-      getLogLevelColor={getLogLevelColor}
       // Developer Mode Props
       isDeveloperModeEnabled={developerConfig.enabled}
       developerPassword={developerPassword}

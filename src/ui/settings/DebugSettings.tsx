@@ -19,7 +19,6 @@ interface DebugSettingsProps {
   onClearLogs: () => void;
   onAutoRefreshChange: (enabled: boolean) => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
-  getLogLevelColor: (level: string) => string;
   pullToRefreshFake?: () => void;
 }
 
@@ -33,7 +32,6 @@ const DebugSettings: React.FC<DebugSettingsProps> = ({
   onClearLogs,
   onAutoRefreshChange,
   formatLogEntry,
-  getLogLevelColor,
   pullToRefreshFake,
 }) => {
   // Calculate total events from logs length
@@ -129,7 +127,7 @@ const DebugSettings: React.FC<DebugSettingsProps> = ({
                   .reverse()
                   .map((logEntry) => {
                     const { timestamp, message } = formatLogEntry(logEntry);
-                    const colorClass = getLogLevelColor(message);
+                    const colorClass = "text-gray-600 dark:text-gray-400";
 
                     return (
                       <div

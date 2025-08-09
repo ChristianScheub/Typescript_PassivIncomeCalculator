@@ -10,6 +10,7 @@ import { clearPriceHistory } from './methods/clearPriceHistory';
 import { clearPortfolioHistory } from './methods/clearPortfolioHistory';
 import { refreshPortfolioHistory } from './methods/refreshPortfolioHistory';
 import { clearReduxCacheOnly } from './methods/clearReduxCacheOnly';
+import { clearDividendHistory } from './methods/clearDividendHistory';
 
 // Create deleteDataService as a functional object
 const deleteDataService: DeleteDataService = {
@@ -19,6 +20,7 @@ const deleteDataService: DeleteDataService = {
     clearDebts,
     clearExpenses,
     clearIncome,
+    clearDividendHistory,
     clearPartialData,
     clearPriceHistory,
     clearPortfolioHistory,

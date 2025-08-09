@@ -29,15 +29,9 @@ interface SettingsViewProps {
   apiKeyStatus: 'idle' | 'saving' | 'success' | 'error';
   apiKeyError: string | null;
   currency: 'EUR' | 'USD';
-  clearAssetDefinitionsStatus: ClearStatus;
-  clearPriceHistoryStatus: ClearStatus;
-  clearAssetTransactionsStatus: ClearStatus;
-  clearDebtsStatus: ClearStatus;
-  clearExpensesStatus: ClearStatus;
-  clearIncomeStatus: ClearStatus;
-  clearAllDataStatus: ClearStatus;
-  clearReduxCacheStatus: ClearStatus;
-  clearDividendHistoryStatus: ClearStatus;
+  // Clear operations - consolidated
+  clearStatuses: Record<string, ClearStatus>;
+  clearHandlers: Record<string, () => void>;
   isApiEnabled: boolean;
   isDividendApiEnabled: boolean;
   dashboardMode: DashboardMode;
@@ -62,22 +56,12 @@ interface SettingsViewProps {
   onProviderChange: (provider: StockAPIProvider) => void;
   onCurrencyChange: (currency: 'EUR' | 'USD') => void;
   onDashboardModeChange: (mode: DashboardMode) => void;
-  onClearAllData: () => void;
-  onClearAssetDefinitions: () => void;
-  onClearPriceHistory: () => void;
-  onClearAssetTransactions: () => void;
-  onClearDebts: () => void;
-  onClearExpenses: () => void;
-  onClearIncome: () => void;
-  onClearReduxCache: () => void;
   selectedDiviProvider: string;
   dividendApiKey: { [provider: string]: string };
   onDiviApiKeyChange: (provider: string, apiKey: string) => void;
   onDiviApiKeyRemove: (provider: string) => void;
   onDiviProviderChange: (provider: string) => void;
   formatLogEntry: (logEntry: string) => { timestamp: string; message: string };
-  getLogLevelColor: (level: string) => string;
-  onClearDividendHistory: () => void;
   onPortfolioHistoryRefresh?: () => void;
   // Developer Mode Props
   isDeveloperModeEnabled: boolean;
@@ -100,15 +84,9 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   apiKeyStatus,
   apiKeyError,
   currency,
-  clearAllDataStatus,
-  clearAssetDefinitionsStatus,
-  clearPriceHistoryStatus,
-  clearAssetTransactionsStatus,
-  clearDebtsStatus,
-  clearExpensesStatus,
-  clearIncomeStatus,
-  clearReduxCacheStatus,
-  clearDividendHistoryStatus,
+  // Clear operations - consolidated objects
+  clearStatuses,
+  clearHandlers,
   isApiEnabled,
   dashboardMode,
   onApiToggle,
@@ -124,26 +102,16 @@ const SettingsView: React.FC<SettingsViewProps> = ({
   onProviderChange,
   onCurrencyChange,
   onDashboardModeChange,
-  onClearAllData,
-  onClearAssetDefinitions,
-  onClearPriceHistory,
-  onClearAssetTransactions,
-  onClearDebts,
-  onClearExpenses,
-  onClearIncome,
-  onClearReduxCache,
   selectedDiviProvider,
   dividendApiKey,
   onDiviApiKeyChange,
   onDiviApiKeyRemove,
   onDiviProviderChange,
   formatLogEntry,
-  getLogLevelColor,
   confirmDialog,
   onCloseConfirmDialog,
   isDividendApiEnabled,
   onDividendApiToggle,
-  onClearDividendHistory,
   onPortfolioHistoryRefresh,
   // Developer Mode Props
   isDeveloperModeEnabled,
@@ -273,24 +241,8 @@ const SettingsView: React.FC<SettingsViewProps> = ({
         defaultExpanded={false}
       >
         <ClearDataSection
-          clearAssetDefinitionsStatus={clearAssetDefinitionsStatus}
-          clearPriceHistoryStatus={clearPriceHistoryStatus}
-          clearAssetTransactionsStatus={clearAssetTransactionsStatus}
-          clearDebtsStatus={clearDebtsStatus}
-          clearExpensesStatus={clearExpensesStatus}
-          clearIncomeStatus={clearIncomeStatus}
-          clearAllDataStatus={clearAllDataStatus}
-          clearReduxCacheStatus={clearReduxCacheStatus}
-          clearDividendHistoryStatus={clearDividendHistoryStatus}
-          onClearAssetDefinitions={onClearAssetDefinitions}
-          onClearPriceHistory={onClearPriceHistory}
-          onClearAssetTransactions={onClearAssetTransactions}
-          onClearDebts={onClearDebts}
-          onClearExpenses={onClearExpenses}
-          onClearIncome={onClearIncome}
-          onClearAllData={onClearAllData}
-          onClearReduxCache={onClearReduxCache}
-          onClearDividendHistory={onClearDividendHistory}
+          clearStatuses={clearStatuses}
+          clearHandlers={clearHandlers}
         />
       </CollapsibleSection>
 
@@ -322,7 +274,6 @@ const SettingsView: React.FC<SettingsViewProps> = ({
           onClearLogs={onClearLogs}
           onAutoRefreshChange={onAutoRefreshChange}
           formatLogEntry={formatLogEntry}
-          getLogLevelColor={getLogLevelColor}
           pullToRefreshFake={onPortfolioHistoryRefresh}
         />
       )}
