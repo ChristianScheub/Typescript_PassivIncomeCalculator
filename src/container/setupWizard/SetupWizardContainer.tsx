@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { useSetupStatus } from '../../hooks/useSetupStatus';
 import SetupWizardView from '@view/setupWizard/SetupWizardView';
+import { WizardStep } from '@/types/shared/base/enums';
 import setupWizardService, { stepValidationService } from '@service/application/setupWizard';
 import {
   goToNextStep,
@@ -78,6 +79,13 @@ const SetupWizardContainer: React.FC = () => {
 
   // Navigation handlers
   const handleNext = useCallback(() => {
+    // If the user chose to skip the entire wizard on the welcome step, complete immediately
+    if (currentStep === WizardStep.WELCOME && stepData.welcome.skipWizard) {
+      markSetupCompleted();
+      dispatch(completeWizard());
+      return;
+    }
+
     // Validate current step before proceeding
     const validation = stepValidationService.validateStep(currentStep, stepData);
     
@@ -93,7 +101,7 @@ const SetupWizardContainer: React.FC = () => {
         dispatch(showErrorSnackbar(error));
       });
     }
-  }, [currentStep, stepData, dispatch]);
+  }, [currentStep, stepData, dispatch, markSetupCompleted]);
 
   const handleBack = useCallback(() => {
     dispatch(goToPreviousStep());

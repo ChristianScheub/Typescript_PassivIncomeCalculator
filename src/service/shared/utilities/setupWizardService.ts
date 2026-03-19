@@ -31,6 +31,13 @@ export class SetupWizardStateService {
     try {
       localStorage.setItem(this.SETUP_COMPLETED_KEY, 'true');
       localStorage.setItem(this.SETUP_VERSION_KEY, this.CURRENT_SETUP_VERSION);
+      // Dispatch a synthetic storage event so same-tab listeners (e.g. in AppContent)
+      // also react immediately — the native storage event only fires in other tabs.
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: this.SETUP_COMPLETED_KEY,
+        newValue: 'true',
+        storageArea: localStorage,
+      }));
     } catch (error) {
       Logger.warn('Failed to mark setup as completed: ' + (error instanceof Error ? error.message : String(error)));
     }
