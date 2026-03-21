@@ -37,7 +37,7 @@ const getDefaultValues = (initialData?: Asset): Partial<AssetFormData> => {
   if (!initialData) {
     return {
       type: 'stock' as AssetType,
-      purchaseDate: new Date().getFullYear() + '-01-01'
+      purchaseDate: new Date().toISOString().split('T')[0]
     };
   }
 
@@ -131,7 +131,7 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
           transactionType: 'buy', // Default transaction type for material asset form
           createdAt: initialData?.createdAt || new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          purchaseDate: data.purchaseDate || new Date().getFullYear() + '-01-01',
+      purchaseDate: data.purchaseDate || new Date().toISOString().split('T')[0],
           purchasePrice: data.purchasePrice || 0,
           notes: data.notes
         };
@@ -161,7 +161,7 @@ export const MaterialAssetForm: React.FC<AssetFormProps> = ({ initialData, onSub
         name: initialData.name || '',
         type: initialData.type,
         value: initialData.value || 0,
-        purchaseDate: initialData.purchaseDate || new Date().getFullYear() + '-01-01',
+        purchaseDate: initialData.purchaseDate || new Date().toISOString().split('T')[0],
         notes: initialData.notes || '',
       };
 

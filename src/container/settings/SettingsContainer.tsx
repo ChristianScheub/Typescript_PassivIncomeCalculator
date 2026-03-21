@@ -454,6 +454,7 @@ const SettingsContainer: React.FC = () => {
     }
 
     try {
+      Logger.info("Attempting to activate developer mode");
       setDeveloperActivationStatus("loading");
       
       const isValidPassword = await verifyHash(developerPassword, developerPasswordHash);

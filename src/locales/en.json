@@ -87,6 +87,12 @@
     "change": "Change",
     "all": "All"
   },
+  "form": {
+    "quickMode": "Quick",
+    "quickModeHint": "Quick entry: only the most essential fields",
+    "detailMode": "Detail",
+    "detailModeHint": "Full entry: all fields and options"
+  },
   "alerts": {
     "cashflow": {
       "negative": {

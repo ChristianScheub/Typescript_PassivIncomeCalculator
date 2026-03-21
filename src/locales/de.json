@@ -667,6 +667,12 @@
     "value": "Wert",
     "change": "Änderung"
   },
+  "form": {
+    "quickMode": "Schnell",
+    "quickModeHint": "Schnelleingabe: nur die wichtigsten Felder",
+    "detailMode": "Detail",
+    "detailModeHint": "Vollständige Eingabe: alle Felder und Optionen"
+  },
   "expenses": {
     "title": "Ausgaben",
     "summary": "Monatliche Ausgaben",
@@ -1239,12 +1245,12 @@
         "skip": "Überspringen"
       },
       "steps": {
-        "welcome": {},
-        "assetDefinitions": {},
-        "transactions": {},
-        "liabilities": {},
-        "income": {},
-        "completion": {}
+        "welcome": "Willkommen",
+        "assetDefinitions": "Asset-Definitionen",
+        "transactions": "Transaktionen",
+        "liabilities": "Verbindlichkeiten",
+        "income": "Einkommensquellen",
+        "completion": "Setup abschließen"
       }
     },
     "welcome": {

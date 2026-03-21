@@ -13,6 +13,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { getPaymentFrequencyOptions, getExpenseCategoryOptions } from '../../../constants';
 import { CustomScheduleSection } from '@/ui/portfolioHub';
+import { useFormMode } from '@/ui/portfolioHub/forms/FormModeContext';
 
 interface MaterialExpenseFormViewProps {
   // Form state props
@@ -46,6 +47,7 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
+  const { quickMode } = useFormMode();
   
   // Type-safe onChange handlers
   const handleNameChange = (value: FormFieldValue) => {
@@ -131,28 +133,32 @@ const MaterialExpenseFormView: React.FC<MaterialExpenseFormViewProps> = ({
             min={0}
           />
 
-          <StandardFormField
-            label={t('expenses.form.dayOfMonth')}
-            name="paymentSchedule.dayOfMonth"
-            type="number"
-            error={errors.paymentSchedule?.dayOfMonth?.message}
-            value={watch('paymentSchedule.dayOfMonth')}
-            onChange={handleDayOfMonthChange}
-            placeholder={t('expenses.form.dayOfMonthPlaceholder')}
-            step={1}
-            min={1}
-            max={31}
-          />
+          {!quickMode && (
+            <StandardFormField
+              label={t('expenses.form.dayOfMonth')}
+              name="paymentSchedule.dayOfMonth"
+              type="number"
+              error={errors.paymentSchedule?.dayOfMonth?.message}
+              value={watch('paymentSchedule.dayOfMonth')}
+              onChange={handleDayOfMonthChange}
+              placeholder={t('expenses.form.dayOfMonthPlaceholder')}
+              step={1}
+              min={1}
+              max={31}
+            />
+          )}
 
-          <StandardFormField
-            label={t('common.startDate')}
-            name="startDate"
-            type="date"
-            required
-            error={errors.startDate?.message}
-            value={watch('startDate')}
-            onChange={handleStartDateChange}
-          />
+          {!quickMode && (
+            <StandardFormField
+              label={t('common.startDate')}
+              name="startDate"
+              type="date"
+              required
+              error={errors.startDate?.message}
+              value={watch('startDate')}
+              onChange={handleStartDateChange}
+            />
+          )}
         </FormGrid>
       </RequiredSection>
 

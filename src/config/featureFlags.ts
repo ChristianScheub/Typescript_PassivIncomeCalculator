@@ -15,7 +15,7 @@ const featureFlag_Debug_Log_Cache: boolean = false; //Show cache logs in the con
 const featureFlag_Debug_Log_API: boolean = true; //Show API service logs in the console
 const featureFlag_SetupImport: boolean = false; //Enable setup import feature
 
-const developerPasswordHash: string = "3fb7b39416f1d067268747fc214494d759d2609f863ace1a8a76705618d5c80b"; // SHA256 hash of "hello"
+const developerPasswordHash: string = "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"; // SHA256 hash of "hello"
 
 export {
   developerPasswordHash,

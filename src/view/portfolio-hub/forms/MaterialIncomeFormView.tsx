@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { getPaymentFrequencyOptions, getIncomeTypeOptions } from '../../../constants';
 import { CustomScheduleSection, FormGrid, OptionalFieldsSection, RequiredSection, StandardFormWrapper } from '@/ui/portfolioHub';
 import { StandardFormField } from '@/ui/portfolioHub/forms';
+import { useFormMode } from '@/ui/portfolioHub/forms/FormModeContext';
 
 // Define the IncomeFormData interface for the form
 interface IncomeFormData {
@@ -52,6 +53,7 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
+  const { quickMode } = useFormMode();
   
   // Helper function to safely cast watch values
   const watchValue = (field: string) => watch(field) as string | number | boolean | undefined;
@@ -144,35 +146,41 @@ export const MaterialIncomeFormView: React.FC<MaterialIncomeFormViewProps> = ({
             min={0}
           />
 
-          <StandardFormField
-            label={t('income.form.dayOfMonth')}
-            name="paymentSchedule.dayOfMonth"
-            type="number"
-            error={errors.paymentSchedule?.dayOfMonth?.message}
-            value={watchValue('paymentSchedule.dayOfMonth')}
-            onChange={handleDayOfMonthChange}
-            placeholder={t('income.form.dayOfMonthPlaceholder')}
-            step={1}
-            min={1}
-            max={31}
-          />
+          {!quickMode && (
+            <StandardFormField
+              label={t('income.form.dayOfMonth')}
+              name="paymentSchedule.dayOfMonth"
+              type="number"
+              error={errors.paymentSchedule?.dayOfMonth?.message}
+              value={watchValue('paymentSchedule.dayOfMonth')}
+              onChange={handleDayOfMonthChange}
+              placeholder={t('income.form.dayOfMonthPlaceholder')}
+              step={1}
+              min={1}
+              max={31}
+            />
+          )}
 
-          <StandardFormField
-            label={t('common.startDate')}
-            name="startDate"
-            type="date"
-            required
-            value={watchValue('startDate')}
-            onChange={handleStartDateChange}
-          />
+          {!quickMode && (
+            <StandardFormField
+              label={t('common.startDate')}
+              name="startDate"
+              type="date"
+              required
+              value={watchValue('startDate')}
+              onChange={handleStartDateChange}
+            />
+          )}
 
-          <StandardFormField
-            label={t('income.form.passiveIncome')}
-            name="isPassive"
-            type="checkbox"
-            value={watchValue('isPassive')}
-            onChange={handleIsPassiveChange}
-          />
+          {!quickMode && (
+            <StandardFormField
+              label={t('income.form.passiveIncome')}
+              name="isPassive"
+              type="checkbox"
+              value={watchValue('isPassive')}
+              onChange={handleIsPassiveChange}
+            />
+          )}
         </FormGrid>
       </RequiredSection>
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { FormGrid, StandardFormField } from '../FormGrid';
 import { useTranslation } from 'react-i18next';
 import { OptionalSection } from './OptionalSection';
+import { useFormMode } from '../FormModeContext';
 
 interface OptionalFieldsSectionProps {
   // Form state values
@@ -35,11 +36,13 @@ const OptionalFieldsSection: React.FC<OptionalFieldsSectionProps> = ({
   showNotes = true,
 }) => {
   const { t } = useTranslation();
-  
-  // Don't render anything if both fields are disabled
+  const { quickMode } = useFormMode();
+
+  // Don't render anything if both fields are disabled or in quick mode
   if (!showEndDate && !showNotes) {
     return null;
   }
+  if (quickMode) return null;
 
   return (
     <OptionalSection title={title || t('common.optionalFields')}>

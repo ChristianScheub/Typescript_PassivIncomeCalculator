@@ -7,6 +7,7 @@ import { CustomScheduleSection, OptionalFieldsSection,StandardFormWrapper,
   RequiredSection,
   FormGrid } from '@/ui/portfolioHub';
 import { StandardFormField } from '@/ui/portfolioHub/forms';
+import { useFormMode } from '@/ui/portfolioHub/forms/FormModeContext';
 
 // Define the LiabilityFormData interface for the form
 interface LiabilityFormData {
@@ -62,6 +63,7 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
 }) => {
   const { t } = useTranslation();
   const formRef = React.useRef<HTMLFormElement>(null);
+  const { quickMode } = useFormMode();
 
   const liabilityTypeOptions = getLiabilityTypeOptions(t);
   const paymentFrequencyOptions = getPaymentFrequencyOptions(t);
@@ -97,18 +99,20 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             placeholder={t('liabilities.form.selectType')}
           />
 
-          <StandardFormField
-            label={t('liabilities.form.initialBalance')}
-            name="initialBalance"
-            type="number"
-            required
-            error={errors.initialBalance?.message}
-            value={watch('initialBalance')}
-            onChange={(value) => setValue('initialBalance', Number(value))}
-            placeholder="0"
-            step={0.01}
-            min={0}
-          />
+          {!quickMode && (
+            <StandardFormField
+              label={t('liabilities.form.initialBalance')}
+              name="initialBalance"
+              type="number"
+              required
+              error={errors.initialBalance?.message}
+              value={watch('initialBalance')}
+              onChange={(value) => setValue('initialBalance', Number(value))}
+              placeholder="0"
+              step={0.01}
+              min={0}
+            />
+          )}
 
           <StandardFormField
             label={t('liabilities.form.currentBalance')}
@@ -161,15 +165,17 @@ const MaterialLiabilityFormView: React.FC<MaterialLiabilityFormViewProps> = ({
             min={0}
           />
 
-          <StandardFormField
-            label={t('common.startDate')}
-            name="startDate"
-            type="date"
-            required
-            error={errors.startDate?.message}
-            value={watch('startDate')}
-            onChange={(value) => setValue('startDate', value as string)}
-          />
+          {!quickMode && (
+            <StandardFormField
+              label={t('common.startDate')}
+              name="startDate"
+              type="date"
+              required
+              error={errors.startDate?.message}
+              value={watch('startDate')}
+              onChange={(value) => setValue('startDate', value as string)}
+            />
+          )}
         </FormGrid>
       </RequiredSection>
 

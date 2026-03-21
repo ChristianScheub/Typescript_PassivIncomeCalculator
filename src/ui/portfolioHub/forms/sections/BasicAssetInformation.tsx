@@ -7,6 +7,7 @@ import { BasicAssetInformationProps } from '@/types/shared/ui/asset-sections';
 import { AssetType } from '@/types/shared/base/enums';
 import { Button } from "../../../shared/Button";
 import { Toggle } from '@/ui/shared';
+import { useFormMode } from '../FormModeContext';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export function getErrorMessage(error: unknown): string | undefined {
@@ -26,6 +27,7 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
   isDefinition = false
 }) => {
   const { t } = useTranslation();
+  const { quickMode } = useFormMode();
 
   // Multi-country state and handlers
   const [multiCountry, setMultiCountry] = useState(false);
@@ -100,18 +102,20 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
           onChange={(value) => setValue("type", value as AssetType)}
         />
 
-        <StandardFormField
-          label={t("assets.riskLevel")}
-          name="riskLevel"
-          type="select"
-          options={[
-            { value: "low", label: t("assets.riskLevels.low") },
-            { value: "medium", label: t("assets.riskLevels.medium") },
-            { value: "high", label: t("assets.riskLevels.high") },
-          ]}
-          value={watch("riskLevel")}
-          onChange={(value) => setValue("riskLevel", value)}
-        />
+        {!quickMode && (
+          <StandardFormField
+            label={t("assets.riskLevel")}
+            name="riskLevel"
+            type="select"
+            options={[
+              { value: "low", label: t("assets.riskLevels.low") },
+              { value: "medium", label: t("assets.riskLevels.medium") },
+              { value: "high", label: t("assets.riskLevels.high") },
+            ]}
+            value={watch("riskLevel")}
+            onChange={(value) => setValue("riskLevel", value)}
+          />
+        )}
 
         {watch("type") !== "real_estate" && (
           <StandardFormField
@@ -123,8 +127,8 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
           />
         )}
 
-        {/* Country section with multi-country support */}
-        {!multiCountry && (
+        {/* Country section with multi-country support — detail mode only */}
+        {!quickMode && !multiCountry && (
           <>
             <StandardFormField
               label={t("assets.country")}
@@ -145,7 +149,7 @@ export const BasicAssetInformation: React.FC<BasicAssetInformationProps> = ({
             </div>
           </>
         )}
-        {multiCountry && (
+        {!quickMode && multiCountry && (
           <>
             <div className="flex items-center mb-2 mt-2">
               <Toggle

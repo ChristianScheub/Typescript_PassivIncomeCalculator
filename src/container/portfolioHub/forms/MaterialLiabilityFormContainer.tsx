@@ -31,10 +31,12 @@ export const MaterialLiabilityForm = ({ initialData, onSubmit }: LiabilityFormPr
     if (!initialData) {
       return {
         type: 'personal_loan' as LiabilityType,
+        initialBalance: 0,
         paymentSchedule: {
           frequency: 'none' as PaymentFrequency,
           amount: 0,
-        }
+        },
+        startDate: new Date().toISOString().split('T')[0],
       };
     }
     return initialData;
